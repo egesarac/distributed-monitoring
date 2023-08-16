@@ -1,0 +1,377 @@
+\documentclass[envcountsame, runningheads]{llncs}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[hidelinks]{hyperref}
+\usepackage{diagbox}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usetikzlibrary{backgrounds, positioning, arrows, calc}
+\usepackage{mathtools}
+\usepackage[linesnumbered,vlined,noend]{algorithm2e}
+\usepackage[inline]{enumitem}  
+
+% ----- DEBUG
+\newcommand{\noteitem}{\ensuremath{\;{\bullet}\;}}
+\setlength{\marginparwidth}{4.2cm}
+\setlength{\marginparsep}{0.3cm}
+\usepackage{todonotes}
+\newcommand{\answer}[1]{{\color{white}#1}}
+\newcommand{\orangenote}[2][]{{\todo[color=orange!80,size=\footnotesize,#1]{\normalcolor\normalfont#2}}}
+\newcommand{\bluenote}[2][]{{\todo[color=cyan!80,size=\footnotesize,#1]{\normalcolor\normalfont#2}}}
+\newcommand{\greennote}[2][]{{\todo[color=green!80!black,size=\footnotesize,#1]{\normalcolor\normalfont#2}}}
+\newcommand{\rednote}[2][]{{\todo[color=magenta!80,size=\footnotesize,#1]{\normalcolor\normalfont#2}}}
+\newcommand\alert[1]{\textcolor{red}{#1}}
+\newcommand\TODO{\textcolor{red}{TODO}}
+
+% ----- FIGURES
+\tikzstyle{state}=[thick,minimum size=18pt, circle,draw]
+\tikzstyle{transition}=[->,thick,>=stealth,shorten >=1pt,shorten <=1pt]
+\tikzstyle{final}=[after node path={ node[state, scale=.8] at (\tikzlastnode) {} }]
+\tikzstyle{initial}=[after node path={
+	[to path={[transition] (\tikztostart) -- (\tikztotarget)}]
+	(\tikzlastnode)++(180:22pt) edge (\tikzlastnode)
+}]
+\tikzset{
+	bg/.default={},
+	bg/.style={execute at end picture={
+			\begin{scope}[on background layer]
+				\node[xshift=-1mm, yshift=-1mm] (sw) at (current bounding box.south west) {};
+				\node[xshift=1mm, yshift=1mm] (ne) at (current bounding box.north east) {};
+				\node[xshift=1mm, yshift=-1mm] (nw) at (current bounding box.north west) {};
+				\fill[fill=black!10,rounded corners] (sw) rectangle (ne);
+				
+				\ifx&#1&\else
+				\node[anchor=north east, xshift=2pt] at (nw) {#1};
+				\fi
+			\end{scope}
+	}},
+}
+
+% ----- NUMERICAL SETS
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\ZZ}{\overline{\ref{ex:minresp}Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\NN}{\overline{\N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\RR}{\R^{\pm \infty}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\D}{\mathbb{D}}
+\newcommand{\B}{\mathbb{B}}
+
+% ------ FUNCTIONS
+\newcommand{\avg}{\text{\normalfont avg}}
+\newcommand{\disc}{\text{\normalfont disc}}
+\newcommand{\fin}{\text{\normalfont fin}} 
+\newcommand{\limavg}{\text{\normalfont limavg}} 
+
+% ----- LTL SYNTAX
+\newcommand{\LTLf}{\ensuremath{\lozenge}}
+\let\LTLfinally\LTLf
+\let\LTLeventualy\LTLf
+\newcommand{\LTLg}{\ensuremath{\square}}
+\let\LTLalways\LTLg
+\let\LTLglobally\LTLg
+\newcommand{\LTLo}{\ensuremath{\bigcirc}}
+\let\LTLnext\LTLo
+\def\until{\,\mathcal{U}\,}
+\def\since{\,\mathcal{S}\,}
+
+\newcommand{\?}{\text{?}}
+
+\newcommand{\req}{\texttt{rq}}
+\newcommand{\ping}{\texttt{ping}}
+\newcommand{\ack}{\texttt{ack}}
+\newcommand{\gra}{\texttt{gr}}
+\newcommand{\tick}{\texttt{tk}}
+\newcommand{\other}{\texttt{oo}}
+\newcommand{\off}{\texttt{off}}
+%\newcommand{\ready}{\texttt{ready}}
+
+% ----- MONITOR
+\newcommand{\res}{\mathbf{r}}
+\newcommand{\RES}{\mathbf{R}}
+\newcommand{\ggeq}{\mathrel{\underline{\gg}}}
+\newcommand{\lleq}{\mathrel{\underline{\ll}}}
+\newcommand{\calM}{\mathcal{M}}
+\newcommand{\calA}{\mathcal{A}}
+\newcommand{\calB}{\mathcal{B}}
+\newcommand{\prefixeq}{\preceq}
+\newcommand{\prefix}{\prec}
+\newcommand{\infPhi}{\inf\nolimits_\varPhi}
+\newcommand{\supPhi}{\sup\nolimits_\varPhi}
+\newcommand{\spec}{\textit{spec}}
+\newcommand{\trace}{\textit{trace}}
+\newcommand{\pref}{\textit{pref}}
+
+% ----- GENERAL
+\newcommand{\dom}[1]{{\textsf{dom}(#1)}}
+\newcommand{\sem}[1]{{[\!\![#1]\!\!]}}
+\newcommand{\suchthat}{\;\ifnum\currentgrouptype=16 \middle\fi|\;}
+\let\st\suchthat
+\newcommand{\defeq}{\coloneqq}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+\newcommand\Circle[1][1.4]{\tikz[baseline=-3.3]{\draw(0,0)circle[radius=#1mm];}}
+
+% ----- THEOREMS
+\newtheorem{observation}[theorem]{Fact}
+
+\title{} 
+\author{} %
+\institute{} %
+\authorrunning{} %
+\date{}
+
+%\renewcommand{\baselinestretch}{.98}
+
+\begin{document}
+	\maketitle
+%	\begin{abstract}
+%		...
+%	\end{abstract}
+%	
+%	\section{Introduction}
+%	...
+%
+%	\paragraph*{\bf Overview.}
+%	...
+%	
+%	\paragraph*{\bf Related Work.}
+%	...
+%
+%	\section{Preliminaries}
+%	...
+
+	\subsubsection*{Assumptions}
+	\begin{enumerate}
+		\item Every atomic proposition is uniquely mapped to a process, which transmit the changes in their truth values to a central monitor. The initial values of each atomic proposition is known by the monitor.
+%		\item
+%		\begin{enumerate}
+			\item There exists $e > 0$ such that the local clocks of every pair of processes are guaranteed to be less than $e$ apart at any given point. The value of the least upper bound on $e$ is known by the monitor. 
+%			\item There exists $e > 0$ such that the local clock of every processes is guaranteed to be less than $e$ apart from the global clock at any given point. The value of $e$ is known by the monitor. \rednote{(2b) allows us to consider each event in a time range of size $2e$. How do we have something comparable using (2a)? \answer{Assuming the monitor also runs on some process, we can take (2a). Then, can we do better knowing that the clock drifts are also bounded within other processes? Another point: if a process has multiple APs, we know their events are totally ordered}}
+%		\end{enumerate} 
+%		\bluenote{(2b) implies (2a) but not vice versa}
+%		This is different from requiring that the local clock values are less than $e$ apart from the global clock. All local clocks may be very close but also very slow compared to the global clock. But is this irrelevant for non-timed properties?
+		\item For every atomic proposition, its value stays the same for at least $d > 2e$ time units after each change. % changes its value at most once within any interval of size $d > 2 e$.
+		\item The processes do not fail, the communication channels are FIFO and lossless, and the events may arrive out of order to the monitor.
+	\end{enumerate}
+	
+	\rednote[inline]{Our approach currently does not consider the information we can obtain by considering the relations between the clock values of processes. We only focus on comparing the clock value of a process with the clock value of the monitor.}
+	\begin{example}[for Assumption~(2)]
+		Consider two processes $P_1$ and $P_2$ and the property $\Diamond ((\uparrow p) \rightarrow \Diamond (\uparrow q))$ where $p$ and $q$ are respectively mapped to $P_1$ and $P_2$.
+		Let $p$ and $q$ be initially false and let $e = 2$.
+		Let $M$ be the monitor (which is technically another process).
+		
+		Suppose the monitor observes the events $(p,5)$ and $(q,8)$.
+		Considering the relation between only $P_1 - M$ and $P_2 - M$, these events would be concurrent.
+		However, considering also $P_1 - P_2$, we know that $(p,5)$ happens before $(q,8)$.
+%		According to Assumption~(2a), these two events are not concurrent. Since $(p,5)$ happens before $(q,8)$, the property is satisfied.
+%		According to Assumption~(2b), the events are concurrent. The event $(p,5)$ may have happened at global time 6.99 while $(q,8)$ happened at 6.01, which means that the property may be not satisfied.	
+	\end{example}
+	
+%	\TODO: Do we want to consider some communication delay $c$? Figure out how $e,d,c$ compare in our applications.
+	
+%	\subsubsection*{Approach (assuming (2b))}
+%	\begin{itemize}
+%		\item The monitor verdicts are defined over a 5-valued logic with the following values: irrevocably true, irrevocably false, currently true, currently false, unknown (due to clock skew).
+%		\item Offline monitoring: It is relatively easy to split each boolean signal into segments (with respect to the time stamps and $\pm e$ skew), evaluate their truth value according to the 5-valued logic, and propagate this all the way up to the main LTL formula.
+%		\item Online monitoring: Conceptually, we can do the same while updating the worldview after each observation. If we bound how out of order the events can be (maybe by bounding the communication delay), we can also bound the verdict delay.
+%				
+%%		\bluenote{It is not very intuitive to think of the verdict as a function of time stamps because the events may be out of order. That's why I don't see how we can say something like `the monitor output is delayed by $e$'}
+%		%\rednote{does the monitor have a clock? if yes, then ... if no, then how does it know when to emit a verdict? note that messages may arrive out of order.}
+%	\end{itemize}
+	
+	\subsection*{LTL5}
+	
+%	\TODO: Extend the semantics of FLTL to cover uncertainty. Define the semantics of LTL5 like RV-LTL.
+%	
+%	Algorithm sketch: Given an LTL formula $\phi$, a distributed computation, a clock skew $\epsilon$, initial values of each atomic proposition, 
+%	\begin{enumerate}
+%%		\item Construct a sequence of events by replacing each event $(p, \tau, \sigma, i)$ with $(p, \tau - \epsilon, \sigma, i, \bot)$ and $(p, \tau + \epsilon, \sigma, i, \top)$.
+%%		\item Sort the event sequence by increasing order of local time.
+%%		\item Compute the subformulas of $\phi$
+%		\item 
+%	\end{enumerate}
+
+	Let $\mathcal{P} = \{P_1, \ldots, P_n\}$ be a set of $n \geq 2$ processes.
+	Let $\mathbb{P} = \{p_1, \ldots, p_n\}$ be a set of atomic propositions where proposition $p_i$ is mapped to process $P_i$. \rednote{extend: many propositions per process}
+	Let $\mathbb{T} = [0,d]$ be a temporal domain where $d \in \R_{\geq 0}$, and let $\B = \{\bot, \top\}$ be the boolean value domain.
+	We denote by $\mathbb{T}_\infty = [0, \infty)$ the infinite temporal domain.
+	A boolean signal $w : \mathbb{P} \times \mathbb{T} \to \B$ maps each atomic proposition and time value to a boolean truth value. %\rednote{same temporal domain for all propositions = assuming some padding? \answer{the definition as a total function covers this}}
+%	A word $u$ is a sequence of sets of atomic propositions.
+
+	Note that every boolean signal $w$ can be represented in a discrete manner by identifying all the rising and falling edges.
+	Then, between any two time stamp corresponding to `consecutive' such edges, say $t_i$ and $t_{i+1}$, all the proposition values are constant.
+	We can represent as an event $\sigma \in 2^\mathbb{P}$ the set of propositions that $w$ maps to $\top$ between $t_i$ and $t_{i+1}$.
+	Let $\tau(w)$ be the discrete representation of the signal $w$ as described above.
+	This allow us to interpret LTL over such signals.
+	In particular, given an LTL formula $\psi$  we denote by $\mathcal{L}(\psi)$ the language of $\psi$ which consists of all infinite-length signals whose discrete representation as above satisfies $\psi$.
+	
+	
+	We define a 5-valued logic LTL5 to account for the clock skew.
+	The truth domain of LTL5 consists of 5 values with $\bot < \bot_p < \? < \top_p < \top$, where $\overline{\bot} = \top$, $\overline{\bot_p} = \top_p$, and $\overline{\?} = \?$.
+	
+	To define LTL5, we first incorporate the value $\?$ in the standard logics FLTL and LTL3 below.
+	
+	\subsubsection*{Syntax}
+	$$ \varphi := \texttt{true} \,|\, p_i \,|\, \lnot \varphi \,|\, \varphi \lor \varphi \,|\, \varphi \until \varphi $$ %\,|\, \varphi \since \varphi
+	where $1 \leq i \leq n $ and $p_i \in \mathbb{P}$.
+	
+	\subsubsection*{Semantics}
+	Let $w : \mathbb{P} \times \mathbb{T} \to \B$ be a boolean signal of finite length, $t \in \mathbb{T}$ be a time value, and $e$ be the least upper bound on clock skew.
+	
+	
+	
+%	Given a one-dimensional boolean signal $u$, we denote its rising and falling edges by $\uparrow u$ and $\downarrow u$, respectively.
+%	Formally,
+%	$$\uparrow u = (u \land (\lnot u \since \texttt{true})) \lor (\lnot u \land (u \until \texttt{true})),$$
+%	$$\downarrow u = (\lnot u \land (u \since \texttt{true})) \land (u \land (\lnot u \until \texttt{true})) $$
+%	\rednote[inline]{these should be defined after the semantics of until and since}
+	
+	FLTL:
+	\begin{align*}
+		[w,t \models \texttt{true}]_F &= \top \\
+%		[w,t \models p_i]_F &= \begin{cases}
+%			\top \text{, if } \forall t' \in [t - e, t + e] : w(p_i, t') = \top\\
+%			\bot \text{, if } \forall t' \in [t - e, t + e] : w(p_i, t') = \bot\\
+%			? \text{, otherwise}
+%		\end{cases} \\
+		[w,t \models p_i]_F &= \begin{cases}
+			\top \text{, if } w(p_i, t) = \top
+			&\land \left( t - \sup\{ t' \st t' \leq t \land w(p_i, t') = \bot \} > e \right)\\
+			&\land \left( \inf\{ t' \st t \leq t' \land w(p_i, t') = \bot \} - t > e \right) \\
+			\bot \text{, if } w(p_i, t) = \bot
+			&\land \left( t - \sup\{ t' \st t' \leq t \land w(p_i, t') = \top \} > e \right)\\
+			&\land \left( \inf\{ t' \st t \leq t' \land w(p_i, t') = \top \} - t > e \right) \\
+			? \text{, otherwise}
+		\end{cases} \\
+		[w,t \models \lnot \varphi]_F &= \overline{[w,t \models \varphi]_F}\\
+		[w,t \models \varphi_1 \lor \varphi_2]_F &= \max([w,t \models \varphi_1]_F, [w,t \models \varphi_2]_F)\\
+		[w,t \models \varphi_1 \until \varphi_2]_F &= \max_{t \leq t'} \left( \min \left( [w,t' \models \varphi_2]_F, \min_{t \leq t'' \leq t'} \left( [w,t'' \models \varphi_1]_F \right) \right) \right)\\
+%		[w,t \models \varphi_1 \since \varphi_2]_F &=  \max_{t' \leq t} \left( \min \left( [w,t' \models \varphi_2]_F, \min_{t \leq t'' \leq t'} \left( [w,t'' \models \varphi_1]_F \right) \right) \right)\\
+	\end{align*}
+	
+	LTL3:
+	\begin{align*}
+		[w,t \models \varphi]_3 &= \begin{cases}
+			\top \text{, if for all }  w' : \mathbb{P} \times \mathbb{T}_\infty \to \B  \text{ we have } \tau(w) \tau(w') \in \mathcal{L}(\varphi)\\
+			\bot \text{, if for all }  w' : \mathbb{P} \times \mathbb{T}_\infty \to \B  \text{ we have } \tau(w) \tau(w') \notin \mathcal{L}(\varphi)\\
+			? \text{, otherwise}\\
+		\end{cases}
+	\end{align*}
+	
+	LTL5:
+	\begin{align*}
+		[w,t \models \varphi]_5 &= \begin{cases}
+			\top \text{, if } [w,t \models \varphi]_3 = \top \\
+			\top_p \text{, if } [w,t \models \varphi]_3 = ? \text{ and } [w,t \models \varphi]_F = \top \\
+			? \text{, if } [w,t \models \varphi]_3 = ? \text{ and } [w,t \models \varphi]_F = ? \\
+			\bot_p \text{, if } [w,t \models \varphi]_3 = ? \text{ and } [w,t \models \varphi]_F = \bot \\
+			\bot \text{, if } [w,t \models \varphi]_3 = \bot \\
+		\end{cases} \\
+	\end{align*}
+	
+	\subsubsection{Derived operators}
+	As usual.
+	
+
+	\subsection*{Offline Algorithm}
+	Let $\varphi$ be an LTL5 formula and $w : \mathbb{P} \times \mathbb{T} \to \B$ be an $n$-dimensional finite-length signal.
+	Note that the evaluation of the formula depends on the rising/falling edges of the atomic propositions in the signal.
+	To account for the timing uncertainty, we partition each proposition's signal into segments of 3 types: certainly false, certainly true, uncertain.
+	
+	\begin{enumerate}
+		\item Let $t_1, \ldots, t_k$ be a nondecreasing sequence of timestamps corresponding to segment borders of $w$, and let $t_0 = 0$.
+		\item Enumerate the subformulas of $\varphi$ such that each formula has an enumeration number smaller than the numbers of all its subformulas. Let $\varphi_0, \ldots, \varphi_m$ be such an enumeration. Note that $\varphi_0 = \varphi$.
+%		\item From $i = m$ to $i = 1$, evaluate $[w,0 \models \varphi_i]_5$.
+		\item For $i = k .. 0$ : for $j = m .. 0$ : compute $[w, t_i \models \varphi_j]_5$
+		\item Output $[w,0 \models \varphi_0]_5$.
+	\end{enumerate}
+
+	The interpretations of the subformulas can be computed by a dynamic programming algorithm in the sprit of~\cite{Havelund2002}, using the standard recursive definition of the until operator, namely $p \until q = q \lor (p \land \LTLnext (p \until q))$.
+	
+	
+%	\subsection*{Online Algorithm (idea)}
+%	Given a formula $\varphi$.
+%	The monitor watches an $n$-dimensional boolean signal $w : \mathbb{P} \times T \to \B$ in real time.
+%	We assume no communication delay. \rednote{extend: nonzero communication delay}
+%	The monitor computes a verdict based on the initial values of the propositions.
+%	Its output is this initial verdict until the first rising or falling edge.
+%	At that point, it computes a new verdict, keeps outputting this value for the next $2e$ time units or the next rising/falling edge (whichever is earlier).
+%	Keeps repeating.
+%	
+%	Note: During the execution, the monitor always evaluates the signal at time point 0, but the temporal domain $T$ keeps growing.
+		
+%	\begin{enumerate}
+%		\item Enumerate the subformulas of $\varphi$ such that each formula has an enumeration number smaller than the numbers of all its subformulas. Let $\varphi_1, \ldots, \varphi_m$ be such an enumeration.
+%		\item If $t < e$, output the initial monitor verdict.
+%		\item If $t \geq e$ and $w$ has a rising or falling edge at time $t$, evaluate $[w, t - e \models \varphi_i]_5$ from $i = m$ to $i = 1$ and output $[w, t - e \models \varphi_1]_5$. Wait for $2e$ time units, evaluate $[w, t + e \models \varphi_i]_5$ from $i = m$ to $i = 1$ and output $[w, t - e \models \varphi_1]_5$
+%	\end{enumerate}
+
+%	Alternative: use past-time logic to make it truly online/incremental
+		
+	\subsubsection*{Reversal Boundedness}
+	...
+	
+	\newpage
+	
+	\subsection*{Improved Semantics}
+	Let $w : \mathbb{P} \times \mathbb{T} \to \B$ be a boolean signal of finite length, $t \in \mathbb{T}$ be a time value, $e$ be the least upper bound on the clock skew, $f : \mathbb{P} \to \mathcal{P}$ a mapping from propositions to processes, $p \in \mathbb{P}$ be a proposition, and $P \in \mathcal{P}$ be a process.
+	
+	Process-aware FLTL:
+	\begin{align*}
+		[w,t \models \texttt{true}]_P &= \top \\
+		%		[w,t \models p]_F &= \begin{cases}
+			%			\top \text{, if } \forall t' \in [t - e, t + e] : w(p, t') = \top\\
+			%			\bot \text{, if } \forall t' \in [t - e, t + e] : w(p, t') = \bot\\
+			%			? \text{, otherwise}
+			%		\end{cases} \\
+		[w,t \models p]_P &= \begin{cases}
+			w(p,t) \text{, if } f(p) = P\\
+			\top \text{, if } f(p) \not = P \land \forall t' \in (t - e, t + e) : w(p, t') = \top\\
+			\bot \text{, if } f(p) \not = P \land \forall t' \in (t - e, t + e) : w(p, t') = \bot\\
+			? \text{, otherwise}
+		\end{cases} \\
+		[w,t \models \lnot \varphi]_P &= \overline{[w,t \models \varphi]_P}\\
+		[w,t \models \varphi_1 \lor \varphi_2]_P &= \max([w,t \models \varphi_1]_P, [w,t \models \varphi_2]_P)\\
+		[w,t \models \varphi_1 \until \varphi_2]_P &= \max_{t \leq t'} \left( \min \left( [w,t' \models \varphi_2]_P, \min_{t \leq t'' \leq t'} \left( [w,t'' \models \varphi_1]_P \right) \right) \right)\\
+		%		[w,t \models \varphi_1 \since \varphi_2]_F &=  \max_{t' \leq t} \left( \min \left( [w,t' \models \varphi_2]_F, \min_{t \leq t'' \leq t'} \left( [w,t'' \models \varphi_1]_F \right) \right) \right)\\
+	\end{align*}
+	
+	LTL3:
+	\begin{align*}
+		[w,t \models \varphi]_3 &= \begin{cases}
+			\top \text{, if for all }  w' : \mathbb{P} \times \mathbb{T}_\infty \to \B  \text{ we have } \tau(w) \tau(w') \in \mathcal{L}(\varphi)\\
+			\bot \text{, if for all }  w' : \mathbb{P} \times \mathbb{T}_\infty \to \B  \text{ we have } \tau(w) \tau(w') \notin \mathcal{L}(\varphi)\\
+			? \text{, otherwise}\\
+		\end{cases}
+	\end{align*}
+	
+	LTL5:
+	\begin{align*}
+		[w,t \models \varphi]_5 &= \begin{cases}
+			\top \text{, if } [w,t \models \varphi]_3 = \top \\
+			\top_p \text{, if } [w,t \models \varphi]_3 = ? \text{ and } [w,t \models \varphi]_F = \top \\
+			? \text{, if } [w,t \models \varphi]_3 = ? \text{ and } [w,t \models \varphi]_F = ? \\
+			\bot_p \text{, if } [w,t \models \varphi]_3 = ? \text{ and } [w,t \models \varphi]_F = \bot \\
+			\bot \text{, if } [w,t \models \varphi]_3 = \bot \\
+		\end{cases} \\
+	\end{align*}
+	
+	
+	\subsection*{Improved Offline Algorithm}
+	.
+	
+	\subsection*{Sketch: Improved Online Algorithm}
+	.
+	
+%	\paragraph*{\bf Acknowledgments.}
+%	We thank the anonymous reviewers for their helpful comments.
+	
+	\newpage
+	\bibliographystyle{splncs04}
+	\bibliography{main}
+\end{document}

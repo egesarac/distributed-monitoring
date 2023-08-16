@@ -1,0 +1,282 @@
+\documentclass[envcountsame, runningheads]{llncs}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[hidelinks]{hyperref}
+\usepackage{diagbox}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usetikzlibrary{backgrounds, positioning, arrows, calc}
+\usepackage{mathtools}
+\usepackage[linesnumbered,vlined,noend]{algorithm2e}
+\usepackage[inline]{enumitem}  
+
+% ----- DEBUG
+\newcommand{\noteitem}{\ensuremath{\;{\bullet}\;}}
+\setlength{\marginparwidth}{4.2cm}
+\setlength{\marginparsep}{0.3cm}
+\usepackage{todonotes}
+\newcommand{\answer}[1]{{\color{white}#1}}
+\newcommand{\orangenote}[2][]{{\todo[color=orange!80,size=\footnotesize,#1]{\normalcolor\normalfont#2}}}
+\newcommand{\bluenote}[2][]{{\todo[color=cyan!80,size=\footnotesize,#1]{\normalcolor\normalfont#2}}}
+\newcommand{\greennote}[2][]{{\todo[color=green!80!black,size=\footnotesize,#1]{\normalcolor\normalfont#2}}}
+\newcommand{\rednote}[2][]{{\todo[color=magenta!80,size=\footnotesize,#1]{\normalcolor\normalfont#2}}}
+\newcommand\alert[1]{\textcolor{red}{#1}}
+\newcommand\TODO{\textcolor{red}{TODO}}
+
+% ----- FIGURES
+\tikzstyle{state}=[thick,minimum size=18pt, circle,draw]
+\tikzstyle{transition}=[->,thick,>=stealth,shorten >=1pt,shorten <=1pt]
+\tikzstyle{final}=[after node path={ node[state, scale=.8] at (\tikzlastnode) {} }]
+\tikzstyle{initial}=[after node path={
+	[to path={[transition] (\tikztostart) -- (\tikztotarget)}]
+	(\tikzlastnode)++(180:22pt) edge (\tikzlastnode)
+}]
+\tikzset{
+	bg/.default={},
+	bg/.style={execute at end picture={
+			\begin{scope}[on background layer]
+				\node[xshift=-1mm, yshift=-1mm] (sw) at (current bounding box.south west) {};
+				\node[xshift=1mm, yshift=1mm] (ne) at (current bounding box.north east) {};
+				\node[xshift=1mm, yshift=-1mm] (nw) at (current bounding box.north west) {};
+				\fill[fill=black!10,rounded corners] (sw) rectangle (ne);
+				
+				\ifx&#1&\else
+				\node[anchor=north east, xshift=2pt] at (nw) {#1};
+				\fi
+			\end{scope}
+	}},
+}
+
+% ----- NUMERICAL SETS
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\ZZ}{\overline{\ref{ex:minresp}Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\NN}{\overline{\N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\RR}{\R^{\pm \infty}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\D}{\mathbb{D}}
+\newcommand{\B}{\mathbb{B}}
+
+% ------ FUNCTIONS
+\newcommand{\avg}{\text{\normalfont avg}}
+\newcommand{\disc}{\text{\normalfont disc}}
+\newcommand{\fin}{\text{\normalfont fin}} 
+\newcommand{\limavg}{\text{\normalfont limavg}} 
+
+% ----- LTL SYNTAX
+\newcommand{\LTLf}{\ensuremath{\lozenge}}
+\let\LTLfinally\LTLf
+\let\LTLeventualy\LTLf
+\newcommand{\LTLg}{\ensuremath{\square}}
+\let\LTLalways\LTLg
+\let\LTLglobally\LTLg
+\newcommand{\LTLo}{\ensuremath{\bigcirc}}
+\let\LTLnext\LTLo
+\def\until{\,\mathcal{U}\,}
+\def\since{\,\mathcal{S}\,}
+
+\newcommand{\?}{\text{?}}
+
+\newcommand{\req}{\texttt{rq}}
+\newcommand{\ping}{\texttt{ping}}
+\newcommand{\ack}{\texttt{ack}}
+\newcommand{\gra}{\texttt{gr}}
+\newcommand{\tick}{\texttt{tk}}
+\newcommand{\other}{\texttt{oo}}
+\newcommand{\off}{\texttt{off}}
+%\newcommand{\ready}{\texttt{ready}}
+
+% ----- MONITOR
+\newcommand{\res}{\mathbf{r}}
+\newcommand{\RES}{\mathbf{R}}
+\newcommand{\ggeq}{\mathrel{\underline{\gg}}}
+\newcommand{\lleq}{\mathrel{\underline{\ll}}}
+\newcommand{\calM}{\mathcal{M}}
+\newcommand{\calA}{\mathcal{A}}
+\newcommand{\calB}{\mathcal{B}}
+\newcommand{\prefixeq}{\preceq}
+\newcommand{\prefix}{\prec}
+\newcommand{\infPhi}{\inf\nolimits_\varPhi}
+\newcommand{\supPhi}{\sup\nolimits_\varPhi}
+\newcommand{\spec}{\textit{spec}}
+\newcommand{\trace}{\textit{trace}}
+\newcommand{\pref}{\textit{pref}}
+
+% ----- GENERAL
+\newcommand{\dom}[1]{{\textsf{dom}(#1)}}
+\newcommand{\sem}[1]{{[\!\![#1]\!\!]}}
+\newcommand{\suchthat}{\;\ifnum\currentgrouptype=16 \middle\fi|\;}
+\let\st\suchthat
+\newcommand{\defeq}{\coloneqq}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+\newcommand\Circle[1][1.4]{\tikz[baseline=-3.3]{\draw(0,0)circle[radius=#1mm];}}
+
+% ----- THEOREMS
+\newtheorem{observation}[theorem]{Fact}
+
+\title{} 
+\author{} %
+\institute{} %
+\authorrunning{} %
+\date{}
+
+%\renewcommand{\baselinestretch}{.98}
+
+\begin{document}
+	\maketitle
+
+	\subsubsection*{Assumptions}
+	\begin{enumerate}
+		\item Every atomic proposition is uniquely mapped to a process, which transmit the changes in their truth values to a central monitor. The initial values of each atomic proposition is known by the monitor.
+		\item There exists $\varepsilon > 0$ such that the local clocks of every pair of processes are guaranteed to be less than $\varepsilon$ apart at any given point. The value of the least upper bound on $\varepsilon$ is known by the monitor. 
+		\item The atomic propositions have bounded variability, i.e., their values stay the same at least $\delta > 0$ time units after each change. The value of the greatest lower bound on $\delta$ is known by the monitor. 
+		\item The processes do not fail, the communication channels are FIFO and lossless.
+		\item For online monitoring: The events may arrive out of order to the monitor. \rednote{Not taken into account yet.}
+	\end{enumerate}
+	
+	\subsection*{LTL5 for Distributed Monitoring under Partial Synchrony}
+	Let $\mathcal{P} = \{P_1, \ldots, P_m\}$ be a set of $m \geq 2$ processes and $\mathbb{P} = \{p_1, \ldots, p_n\}$ be a set of atomic propositions.
+	The function $\pi : \mathbb{P} \to \mathcal{P}$ maps each proposition to the process it belongs to.
+	Let $\B = \{\bot, \top\}$ be the boolean value domain, and $d \in \R_{\geq 0} \cup \{\infty\}$.
+	A boolean signal $w : \mathbb{P} \times [0,d) \to \B$ maps each atomic proposition and time value to a boolean truth value.
+
+	Note that every boolean signal $w$ can be represented in a discrete manner by identifying all the rising and falling edges.
+	Let $\tau(w)$ be the discrete representation of a given signal $w$.
+	Given an LTL formula $\psi$, we denote by $\mathcal{L}(\psi)$ the language of $\psi$ which consists of all infinite-length signals $w$ whose discrete representation $\tau(w)$ satisfies $\psi$.
+	
+	We define a 5-valued logic LTL5 to account for the clock skew.
+	The truth domain of LTL5 consists of 5 values with $\bot < \bot_c < \? < \top_c < \top$, where $\overline{\bot} = \top$, $\overline{\bot_c} = \top_c$, and $\overline{\?} = \?$.
+	To define LTL5, we first incorporate the value $\?$ in the standard logics FLTL and LTL3.
+	
+	\subsubsection*{Syntax}
+	Defined by
+	$ \varphi := \texttt{true} \,|\, p \,|\, \lnot \varphi \,|\, \varphi \lor \varphi \,|\, \varphi \until \varphi $
+	where $p \in \mathbb{P}$.
+	
+	\subsubsection*{Semantics}
+	Let $w : \mathbb{P} \times [0,d) \to \B$ be a boolean signal of finite length, $t \in [0,d)$ be a time value, $\varepsilon$ be the least upper bound on the clock skew, $\pi : \mathbb{P} \to \mathcal{P}$ a mapping from propositions to processes, $p \in \mathbb{P}$ be a proposition, and $P \in \mathcal{P}$ be a process.
+	
+	The semantics of a formula depends on the process it is viewed from because we do not need to consider the clock skew when evaluating the atomic propositions of the observing process.
+	
+	FLTL: Takes as input a boolean signal $w : \mathbb{P} \times [0,d) \to \B$. We use this for a preprocessing step of the algorithm.
+	\begin{align*}
+		[w,t \models \texttt{true}]_P &= \top \\
+		[w,t \models p]_P &= \begin{cases}
+			w(p,t) \text{, if } \pi(p) = P\\
+			\top \text{, if } \pi(p) \not = P \land \forall t' \in (\max(0, t - \varepsilon), \min(d, t + \varepsilon)) : w(p, t') = \top\\
+			\bot \text{, if } \pi(p) \not = P \land \forall t' \in (\max(0, t - \varepsilon), \min(d, t + \varepsilon)) : w(p, t') = \bot\\
+			? \text{, otherwise}
+		\end{cases} \\
+		[w,t \models \lnot \varphi]_P &= \overline{[w,t \models \varphi]_P}\\
+		[w,t \models \varphi_1 \lor \varphi_2]_P &= \max([w,t \models \varphi_1]_P, [w,t \models \varphi_2]_P)\\
+		[w,t \models \varphi_1 \until \varphi_2]_P &= \max_{t \leq t'} \left( \min \left( [w,t' \models \varphi_2]_P, \min_{t \leq t'' \leq t'} \left( [w,t'' \models \varphi_1]_P \right) \right) \right)\\
+		%		[w,t \models \varphi_1 \since \varphi_2]_F &=  \max_{t' \leq t} \left( \min \left( [w,t' \models \varphi_2]_F, \min_{t \leq t'' \leq t'} \left( [w,t'' \models \varphi_1]_F \right) \right) \right)\\
+	\end{align*}
+	
+	Monitor-LTL: Takes as input a 3-valued signal $w : \mathbb{P} \times [0,d) \to \B \cup \{\?\}$. We use this and below for the monitoring step of the algorithm. \rednote{TODO: Unify FLTL and Monitor-LTL, modify the algorithm accordingly.}
+	\begin{align*}
+		[w,t \models \texttt{true}]_M &= \top \\
+		[w,t \models p]_M &= w(p,t)  \\
+		[w,t \models \lnot \varphi]_M &= \overline{[w,t \models \varphi]_M}\\
+		[w,t \models \varphi_1 \lor \varphi_2]_M &= \max([w,t \models \varphi_1]_M, [w,t \models \varphi_2]_M)\\
+		[w,t \models \varphi_1 \until \varphi_2]_M &= \max_{t \leq t'} \left( \min \left( [w,t' \models \varphi_2]_M, \min_{t \leq t'' \leq t'} \left( [w,t'' \models \varphi_1]_M \right) \right) \right)\\
+		%		[w,t \models \varphi_1 \since \varphi_2]_F &=  \max_{t' \leq t} \left( \min \left( [w,t' \models \varphi_2]_F, \min_{t \leq t'' \leq t'} \left( [w,t'' \models \varphi_1]_F \right) \right) \right)\\
+	\end{align*}
+	
+	LTL3:
+	\begin{align*}
+		[w,t \models \varphi]_3 &= \begin{cases}
+			\top \text{, if for all }  w' : \mathbb{P} \times [0, \infty) \to \B  \text{ we have } \tau(w) \tau(w') \in \mathcal{L}(\varphi)\\
+			\bot \text{, if for all }  w' : \mathbb{P} \times [0, \infty) \to \B  \text{ we have } \tau(w) \tau(w') \notin \mathcal{L}(\varphi)\\
+			? \text{, otherwise}\\
+		\end{cases}
+	\end{align*}
+	
+	LTL5:
+	\begin{align*}
+		[w,t \models \varphi]_{5} &= \begin{cases}
+			\top \text{, if } [w,t \models \varphi]_3 = \top \\
+			\top_c \text{, if } [w,t \models \varphi]_3 = ? \text{ and } [w,t \models \varphi]_M = \top \\
+			? \text{, if } [w,t \models \varphi]_3 = ? \text{ and } [w,t \models \varphi]_M = ? \\
+			\bot_c \text{, if } [w,t \models \varphi]_3 = ? \text{ and } [w,t \models \varphi]_M = \bot \\
+			\bot \text{, if } [w,t \models \varphi]_3 = \bot \\
+		\end{cases} \\
+	\end{align*}
+	
+
+	\rednote[inline]{An alternative: Define the semantics with the global view in mind by only considering if the propositions involved in a subformula belong to the same process or not. This requires the assumption that the propositions in disjunctions are ordered by the processes they belong to (or some other canonical form).}
+	
+	\subsubsection{Derived operators}
+	Defined as usual.
+	
+%	\subsection*{Retiming for Distributed Monitoring under Partial Synchrony}
+%	DEFINITION.
+%	VALID RETIMING.
+%	EXAMPLE.
+	
+	\subsection*{Offline Algorithm} \rednote{TODO: Check for bugs.}
+	The algorithm consists of two preprocessing steps followed by a simple monitoring step.
+	In the first step, we update the structure of the input formula to enable the local evaluation of the subformulas whose propositions belong to the same process.
+	In the second step, we refine the regions of uncertainty by considering the bounded variability assumption.
+	Finally, the monitoring step evaluates the updated subformulas incrementally on the refined input signal.
+	
+	Let $\varphi$ be an LTL5 formula and $w : \mathbb{P} \times [0,d) \to \B$ be an $n$-dimensional finite-length signal.
+	
+	\begin{enumerate}
+		\item Preprocessing: Restructuring of the subformulas and the input signal
+		\begin{enumerate}[label=\arabic*.]
+			\item Enumerate the subformulas of $\varphi$ such that each formula has an enumeration number smaller than the numbers of all its subformulas. Let $\varphi_0, \ldots, \varphi_m$ be such an enumeration. Note that $\varphi_0 = \varphi$.
+			\item For each process $P$, let $m_P$ be the least number such that all the propositions that occur in $\varphi_{m_P}$ belong to $P$. If $\varphi_{m_P}$ is not an atomic proposition, define a fresh proposition $q$ on process $P$. Let $\mathbb{P}'$ be the set of propositions extended with the fresh ones.
+			\item Define a new signal $w' : \mathbb{P}' \times [0,d) \to \B$ as follows: for all $p \in \mathbb{P}'$ and $t \in [0,d)$, let \\
+			- $w'(p,t) = w(p,t)$ if $p \in \mathbb{P}$, and\\
+			- $w'(p,t) = [w,t \models \varphi_{m_{\pi(p)}}]_{\pi(p)}$ otherwise.
+		\end{enumerate}
+		
+		\item Preprocessing: $(\varepsilon,\delta)$-retiming of the restructured input signal
+		\begin{enumerate}[label=\arabic*.]
+			\item Let $p \in \mathbb{P}'$ be a proposition and $t_1, \ldots, t_k$ be the increasing sequence of timestamps corresponding to the events on $p$ of the signal $w'$. Let $T = \{t_1, \ldots, t_k\}$. Let $\ell_p$ be an empty list.
+			\item Let $\ell$ be an empty list. Add the lowest timestamp $t$ in $T$ to $\ell$ and remove it from $T$. While the greatest timestamp in $\ell$ and the lowest timestamp $t'$ in $T$ are less than $\delta + 2\varepsilon$ apart, add $t'$ to $\ell$ and remove it from $T$.
+			\item Compute the regions of uncertainty for the proposition $p$ under the assumption of bounded variability:\\ for $i = 1 .. |\ell|$ let $N_i = \left[\max_{j \in \{1, i\}} \ell[j] - \varepsilon + (i-j)\delta, \min_{i \leq j \leq |\ell|} \ell[j] + \varepsilon - (j-i)\delta\right]$ %\rednote{assuming $\ell[1] \geq \varepsilon$ for now to make it look cleaner}
+			and add $N_i$ to $\ell_p$.
+			\item Repeat (2)-(3) until $T$ is empty. Store the list $\ell_p$ of intervals in memory.
+			\item Repeat (1)-(4) for all $p \in \mathbb{P}'$.
+			\item Define a new signal $w'' : \mathbb{P}' \times [0,d) \to \B \cup \{\?\}$ as follows: for all $p \in \mathbb{P}'$ and $t \in [0,d)$, let \\
+			- $w''(p,t) = \?$ if $t \in N$ for some $N \in \ell_p$, \\
+			- $w''(p,t) = w'(p,0)$ if $t \notin N$ for any $N \in \ell_p$, and there is an even number of intervals in $\ell_p$ before $t$, and \\
+			- $w''(p,t) = \overline{w'(p,0)}$ if $t \notin N$ for any $N \in \ell_p$, and there is an odd number of intervals in $\ell_p$ before $t$.
+		\end{enumerate}
+		
+		\item Monitoring
+		\begin{enumerate}[label=\arabic*.]
+			\item Let $\varphi'$ be the formula obtained by replacing the appropriate subformulas of $\varphi$ with the fresh propositions as described in the first preprocessing step. Let $\varphi_0', \ldots, \varphi_{m'}'$ be its subformulas satisfying the enumeration invariant given in the first preprocessing step. Note that $\varphi_0'$  and $\varphi$ are semantically equivalent. %some redundancy to handle here
+			\item Let $t_1, \ldots, t_k$ be a nondecreasing sequence of timestamps corresponding to the interval borders of the propositions in $w''$ as computed in the second preprocessing step. Let $t_0 = 0$.
+			\item For $i = k .. 0$, for $j = m' .. 0$, compute $[w'', t_i \models \varphi_j]_5$.
+			\item Output $[w'',0 \models \varphi_0']_5$.
+		\end{enumerate}
+	\end{enumerate}
+	
+	
+%	\begin{enumerate}
+%		\item Let $t_1, \ldots, t_k$ be a nondecreasing sequence of timestamps corresponding to segment borders of $w$, and let $t_0 = 0$.
+%		\item Enumerate the subformulas of $\varphi$ such that each formula has an enumeration number smaller than the numbers of all its subformulas. Let $\varphi_0, \ldots, \varphi_m$ be such an enumeration. Note that $\varphi_0 = \varphi$.
+%		\item For $i = k .. 0$ : for $j = m .. 0$ : compute $[w, t_i \models \varphi_j]_5$
+%		\item Output $[w,0 \models \varphi_0]_5$.
+%	\end{enumerate}
+
+%	The interpretations of the subformulas can be computed by a dynamic programming algorithm in the sprit of~\cite{Havelund2002}, using the standard recursive definition of the until operator. % $p \until q = q \lor (p \land \LTLnext (p \until q))$
+	
+	\subsection*{Online Algorithm [idea]}
+	The monitor outputs verdicts with a delay of $h = \delta + 2\varepsilon$.
+	At each event, the interval borders of the corresponding proposition needs to be recomputed.
+	However, if there are no new events in the horizon of $h$, then we can stop updating the intervals we have computed so far because whatever happens later will not affect the previous events.
+	This helps us provide an upper bound on the time and space requirements because in any chain of uncertainty intervals of length $L$, there are at most $\floor{\frac{L}{\delta}} + 1$ events. \rednote{TODO: Clarify this.}
+		
+	\newpage
+	\bibliographystyle{splncs04}
+	\bibliography{main}
+\end{document}
