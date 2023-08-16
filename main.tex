@@ -277,6 +277,54 @@
 	This helps us provide an upper bound on the time and space requirements because in any chain of uncertainty intervals of length $L$, there are at most $\floor{\frac{L}{\delta}} + 1$ events. \rednote{TODO: Clarify this.}
 		
 	\newpage
+	
+	\greennote[inline]{Idea: Add the 2nd preprocessing step into the semantics by defining two functions $\rho_{\text{lo}}$ and $\rho_{\text{hi}}$ that maps an event to its lower and upper bounds of uncertainty.}
+	\vspace{1em}
+	
+	Given $w : \mathbb{P} \times [0,d) \to \B$ and $p \in \mathbb{P}$, let $S_{w,p} = \{t^p_1, \ldots, t^p_{n_p}\}$ be the set of timestamps for the rising/falling edges of $w$ for $p$.
+	We define the (partial) functions $\rho_{\text{lo}}$ and $\rho_{\text{hi}}$ as follows, where $w$ is a signal, $p$ is a proposition, and $t^p_i \in S_{w,p}$ is a timestamp corresponding to an event.
+	\rednote{TODO: Refine the edge cases below.}
+	
+	$$ \rho_{\text{lo}}(w, p, t^p_i) = \max_{j \in \{1, i\}} t^p_j - \varepsilon + (i-j)\delta $$
+	
+	$$ \rho_{\text{hi}}(w, p, t^p_i) = \min_{i \leq j \leq k} t^p_j + \varepsilon - (j-i)\delta $$
+	where $i \leq k \leq n_p$ satisfies $t^p_{j + 1} - t^p_j < \delta + 2\varepsilon$ for all $i \leq j \leq k - 1$.
+	
+	\vspace{1em}
+	FLTL:
+	\begin{align*}
+		[w,t \models \texttt{true}]_P &= \top \\
+		[w,t \models p]_P &= \begin{cases}
+			? &\text{if } \pi(p) \not = P \land \exists t' \in \ell_{w,p} : t \in (\rho_{\text{lo}}(w, p, t'), \rho_{\text{hi}}(w, p, t')) \\
+			w(p,t) &\text{otherwise}			
+		\end{cases} \\
+		[w,t \models \lnot \varphi]_P &= \overline{[w,t \models \varphi]_P}\\
+		[w,t \models \varphi_1 \lor \varphi_2]_P &= \max([w,t \models \varphi_1]_P, [w,t \models \varphi_2]_P)\\
+		[w,t \models \varphi_1 \until \varphi_2]_P &= \max_{t \leq t'} \left( \min \left( [w,t' \models \varphi_2]_P, \min_{t \leq t'' \leq t'} \left( [w,t'' \models \varphi_1]_P \right) \right) \right)\\
+		%		[w,t \models \varphi_1 \since \varphi_2]_F &=  \max_{t' \leq t} \left( \min \left( [w,t' \models \varphi_2]_F, \min_{t \leq t'' \leq t'} \left( [w,t'' \models \varphi_1]_F \right) \right) \right)\\
+	\end{align*}
+	
+	LTL3:
+	\begin{align*}
+		[w,t \models \varphi]_3 &= \begin{cases}
+			\top \text{, if for all }  w' : \mathbb{P} \times [0, \infty) \to \B  \text{ we have } \tau(w) \tau(w') \in \mathcal{L}(\varphi)\\
+			\bot \text{, if for all }  w' : \mathbb{P} \times [0, \infty) \to \B  \text{ we have } \tau(w) \tau(w') \notin \mathcal{L}(\varphi)\\
+			? \text{, otherwise}\\
+		\end{cases}
+	\end{align*}
+	
+	LTL5:
+	\begin{align*}
+		[w,t \models \varphi]_{5} &= \begin{cases}
+			\top \text{, if } [w,t \models \varphi]_3 = \top \\
+			\top_c \text{, if } [w,t \models \varphi]_3 = ? \text{ and } [w,t \models \varphi]_F = \top \\
+			? \text{, if } [w,t \models \varphi]_3 = ? \text{ and } [w,t \models \varphi]_F = ? \\
+			\bot_c \text{, if } [w,t \models \varphi]_3 = ? \text{ and } [w,t \models \varphi]_F = \bot \\
+			\bot \text{, if } [w,t \models \varphi]_3 = \bot \\
+		\end{cases} \\
+	\end{align*}	
+	
+	\newpage
 	\bibliographystyle{splncs04}
 	\bibliography{main}
 \end{document}
