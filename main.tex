@@ -146,7 +146,8 @@
 	A boolean signal $w : \mathbb{P} \times [0,d) \to \B$ maps each atomic proposition and time value to a boolean truth value.
 
 	Note that every boolean signal $w$ can be represented in a discrete manner by identifying all the rising and falling edges.
-	Let $\tau(w)$ be the discrete representation of a given signal $w$.
+	Given a signal $w : \mathbb{P} \times [0,d) \to \B$ and a time value $0 \leq t < d$, let $\tau(w,t)$ be the discrete representation of the signal corresponding to the projection of $w$ on the temporal domain $[t, d)$.
+	When $t = 0$, we simply write $\tau(w)$. 
 	Given an LTL formula $\psi$, we denote by $\mathcal{L}(\psi)$ the language of $\psi$ which consists of all infinite-length signals $w$ whose discrete representation $\tau(w)$ satisfies $\psi$.
 	
 	We define a 5-valued logic LTL5 to account for the clock skew.
@@ -189,8 +190,8 @@
 	LTL3:
 	\begin{align*}
 		[w,t \models \varphi]_3 &= \begin{cases}
-			\top &\text{if for all }  w' : \mathbb{P} \times [0, \infty) \to \B  \text{ we have } \tau(w) \tau(w') \in \mathcal{L}(\varphi)\\
-			\bot &\text{if for all }  w' : \mathbb{P} \times [0, \infty) \to \B  \text{ we have } \tau(w) \tau(w') \notin \mathcal{L}(\varphi)\\
+			\top &\text{if for all }  w' : \mathbb{P} \times [0, \infty) \to \B  \text{ we have } \tau(w,t) \tau(w') \in \mathcal{L}(\varphi)\\
+			\bot &\text{if for all }  w' : \mathbb{P} \times [0, \infty) \to \B  \text{ we have } \tau(w,t) \tau(w') \notin \mathcal{L}(\varphi)\\
 			? &\text{otherwise}\\
 		\end{cases}
 	\end{align*}
@@ -199,9 +200,9 @@
 	\begin{align*}
 		[w,t \models \varphi]_{P,5} &= \begin{cases}
 			\top &\text{if } [w,t \models \varphi]_3 = \top \\
-			\top_c &\text{if } [w,t \models \varphi]_3 = ? \text{ and } [w,t \models \varphi]_P = \top \\
-			? &\text{if } [w,t \models \varphi]_3 = ? \text{ and } [w,t \models \varphi]_P = ? \\
-			\bot_c &\text{if } [w,t \models \varphi]_3 = ? \text{ and } [w,t \models \varphi]_P = \bot \\
+			\top_c &\text{if } [w,t \models \varphi]_3 = \? \text{ and } [w,t \models \varphi]_P = \top \\
+			? &\text{if } [w,t \models \varphi]_3 = \? \text{ and } [w,t \models \varphi]_P = \? \\
+			\bot_c &\text{if } [w,t \models \varphi]_3 = \? \text{ and } [w,t \models \varphi]_P = \bot \\
 			\bot &\text{if } [w,t \models \varphi]_3 = \bot \\
 		\end{cases} \\
 	\end{align*}	
@@ -246,9 +247,9 @@
 		
 		\item Monitoring
 		\begin{enumerate}[label=\arabic*.]
-			\item Let $t_1, \ldots, t_k$ be an increasing sequence of timestamps corresponding to the events of the propositions in $w'$. Let $t_0 = 0$.
-			\item For $i = k .. 0$, for $j = m' .. 0$, compute $[w', t_i \models \varphi_j]_5$. Note that the FLTL interpretations are evaluated from the perspective of the monitor process.
-			\item Output $[w',0 \models \varphi_0']_5$.
+			\item Let $M$ be the process on which the monitor is running. Let $t_1, \ldots, t_k$ be an increasing sequence of timestamps corresponding to the events in $w'$. Let $t_0 = 0$.
+			\item For $i = k .. 0$, for $j = m' .. 0$, compute $[w', t_i \models \varphi_j]_{M,5}$.
+			\item Output $[w',0 \models \varphi_0']_{M,5}$.
 		\end{enumerate}
 	\end{enumerate}
 	
@@ -263,11 +264,14 @@
 	\vspace{1em}
 	\noindent
 	\textbf{A counter-example:} Consider a one-dimensional infinite-length signal $w$ with the following sequence of timestamps for its events
-	$$ t, t + \delta - \varepsilon, t + 2\delta - \frac{3\varepsilon}{2}, t + 3\delta - \frac{7\varepsilon}{4}, \ldots$$
+	
+	$$ t \hspace{2em} t + \delta - \varepsilon \hspace{2em} t + 2\delta - \frac{3\varepsilon}{2} \hspace{2em} t + 3\delta - \frac{7\varepsilon}{4} \hspace{2em} \ldots $$
+	
 	Once the first event is observed, its uncertainty upper bound is $t + \varepsilon$.
 	After the second event, it becomes $t$, then $t - \frac{\varepsilon}{2}$, and $t - \frac{3\varepsilon}{4}$ and so on.
 	Regardless of how distant a future event is from the first event, it affects its uncertainty upper bound.
 	This sequence of timestamps is indeed valid because for all $k \geq 1$
+	
 	$$ \floor{\frac{(k-1)\delta + 2\varepsilon - (2\varepsilon \cdot \sum_{i=1}^{k}2^{-k})}{\delta}} + 1 \geq k $$
 
 	
