@@ -175,7 +175,7 @@
 	Note that each process knows the initial values of the propositions.
 	
 	\vspace{1em}
-	FLTL: \rednote{works if the monitor process has }
+	FLTL:
 	\begin{align*}
 		[w,t \models \texttt{true}]_P &= \top \\
 		[w,t \models p]_P &= \begin{cases}
@@ -230,7 +230,7 @@
 		\begin{enumerate}[label=\arabic*.]
 			\item Enumerate the subformulas of $\varphi$ such that each formula has an enumeration number smaller than the numbers of all its subformulas. Let $\varphi_0, \ldots, \varphi_m$ be such an enumeration. Note that $\varphi_0 = \varphi$.
 %			\item For each process $P$, let $m_P$ be the least number such that all the propositions that occur in $\varphi_{m_P}$ belong to $P$. If $\varphi_{m_P}$ is not an atomic proposition, define a fresh proposition on process $P$. Let $\mathbb{P}'$ be the set of propositions extended with the fresh ones. \rednote{TODO: a process may have more than one subformula we need to treat}
-			\item For each process $P$, let $F_P$ be the set of subformulas of $\varphi$ such that for every  $\psi \in F_P$ we have (i) all the propositions that occur in $\psi$ belong to $P$, and (ii) in every subformula of $\varphi$ of which $\psi$ is a subformula, a proposition that does not belong to $P$ occurs. If $\psi$ is not an atomic proposition, define a fresh proposition on process $P$. Let $\gamma$ be a bijection from the fresh propositions to the corresponding subformulas, and $\mathbb{P}'$ be the set of propositions extended with the fresh ones.
+			\item For each process $P$, let $F_P$ be the set of subformulas of $\varphi$ such that for every  $\psi \in F_P$ we have (i) all the propositions that occur in $\psi$ belong to $P$, and (ii) in every subformula of $\varphi$ of which $\psi$ is a subformula, a proposition that does not belong to $P$ occurs. For each $\psi \in F_P$, if $\psi$ is not an atomic proposition, define a fresh proposition on process $P$. Let $\gamma$ be a bijection from the fresh propositions to the corresponding subformulas, and $\mathbb{P}'$ be the set of propositions extended with the fresh ones.
 			\item Let $\varphi'$ be the formula obtained by replacing the appropriate subformulas of $\varphi$ with the corresponding fresh propositions. Let $\varphi_0', \ldots, \varphi_{m'}'$ be its subformulas satisfying the enumeration invariant given above. Note that $\varphi_0'$  and $\varphi$ are semantically equivalent. %some redundancy to handle here
 			\item Define a new signal $w' : \mathbb{P}' \times [0,d) \to \B$ as follows: for all $p \in \mathbb{P}'$ and $t \in [0,d)$, let \\
 			- $w'(p,t) = w(p,t)$ if $p \in \mathbb{P}$, and\\
