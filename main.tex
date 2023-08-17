@@ -134,7 +134,7 @@
 	\begin{enumerate}
 		\item Every atomic proposition is uniquely mapped to a process, which transmit the changes in their truth values to a central monitor. The initial values of each atomic proposition is known by the monitor.
 		\item There exists $\varepsilon > 0$ such that the local clocks of every pair of processes are guaranteed to be less than $\varepsilon$ apart at any given point. The value of the least upper bound on $\varepsilon$ is known by the monitor. 
-		\item The atomic propositions have bounded variability, i.e., their values stay the same at least $\delta > 0$ time units after each change. The value of the greatest lower bound on $\delta$ is known by the monitor. 
+		\item The atomic propositions have bounded variability, i.e., their values stay the same at least $\delta > 0$ time units after each change (with respect to an imaginary global clock). The value of the greatest lower bound on $\delta$ is known by the monitor. 
 		\item The processes do not fail, the communication channels are FIFO and lossless.
 		\item For online monitoring: The events may arrive out of order to the monitor. \rednote{Not taken into account yet.}
 	\end{enumerate}
@@ -161,125 +161,7 @@
 	\subsubsection*{Semantics}
 	Let $w : \mathbb{P} \times [0,d) \to \B$ be a boolean signal of finite length, $t \in [0,d)$ be a time value, $\varepsilon$ be the least upper bound on the clock skew, $\pi : \mathbb{P} \to \mathcal{P}$ a mapping from propositions to processes, $p \in \mathbb{P}$ be a proposition, and $P \in \mathcal{P}$ be a process.
 	
-	The semantics of a formula depends on the process it is viewed from because we do not need to consider the clock skew when evaluating the atomic propositions of the observing process.
-	
-	FLTL: Takes as input a boolean signal $w : \mathbb{P} \times [0,d) \to \B$. We use this for a preprocessing step of the algorithm.
-	\begin{align*}
-		[w,t \models \texttt{true}]_P &= \top \\
-		[w,t \models p]_P &= \begin{cases}
-			w(p,t) \text{, if } \pi(p) = P\\
-			\top \text{, if } \pi(p) \not = P \land \forall t' \in (\max(0, t - \varepsilon), \min(d, t + \varepsilon)) : w(p, t') = \top\\
-			\bot \text{, if } \pi(p) \not = P \land \forall t' \in (\max(0, t - \varepsilon), \min(d, t + \varepsilon)) : w(p, t') = \bot\\
-			? \text{, otherwise}
-		\end{cases} \\
-		[w,t \models \lnot \varphi]_P &= \overline{[w,t \models \varphi]_P}\\
-		[w,t \models \varphi_1 \lor \varphi_2]_P &= \max([w,t \models \varphi_1]_P, [w,t \models \varphi_2]_P)\\
-		[w,t \models \varphi_1 \until \varphi_2]_P &= \max_{t \leq t'} \left( \min \left( [w,t' \models \varphi_2]_P, \min_{t \leq t'' \leq t'} \left( [w,t'' \models \varphi_1]_P \right) \right) \right)\\
-		%		[w,t \models \varphi_1 \since \varphi_2]_F &=  \max_{t' \leq t} \left( \min \left( [w,t' \models \varphi_2]_F, \min_{t \leq t'' \leq t'} \left( [w,t'' \models \varphi_1]_F \right) \right) \right)\\
-	\end{align*}
-	
-	Monitor-LTL: Takes as input a 3-valued signal $w : \mathbb{P} \times [0,d) \to \B \cup \{\?\}$. We use this and below for the monitoring step of the algorithm. \rednote{TODO: Unify FLTL and Monitor-LTL, modify the algorithm accordingly.}
-	\begin{align*}
-		[w,t \models \texttt{true}]_M &= \top \\
-		[w,t \models p]_M &= w(p,t)  \\
-		[w,t \models \lnot \varphi]_M &= \overline{[w,t \models \varphi]_M}\\
-		[w,t \models \varphi_1 \lor \varphi_2]_M &= \max([w,t \models \varphi_1]_M, [w,t \models \varphi_2]_M)\\
-		[w,t \models \varphi_1 \until \varphi_2]_M &= \max_{t \leq t'} \left( \min \left( [w,t' \models \varphi_2]_M, \min_{t \leq t'' \leq t'} \left( [w,t'' \models \varphi_1]_M \right) \right) \right)\\
-		%		[w,t \models \varphi_1 \since \varphi_2]_F &=  \max_{t' \leq t} \left( \min \left( [w,t' \models \varphi_2]_F, \min_{t \leq t'' \leq t'} \left( [w,t'' \models \varphi_1]_F \right) \right) \right)\\
-	\end{align*}
-	
-	LTL3:
-	\begin{align*}
-		[w,t \models \varphi]_3 &= \begin{cases}
-			\top \text{, if for all }  w' : \mathbb{P} \times [0, \infty) \to \B  \text{ we have } \tau(w) \tau(w') \in \mathcal{L}(\varphi)\\
-			\bot \text{, if for all }  w' : \mathbb{P} \times [0, \infty) \to \B  \text{ we have } \tau(w) \tau(w') \notin \mathcal{L}(\varphi)\\
-			? \text{, otherwise}\\
-		\end{cases}
-	\end{align*}
-	
-	LTL5:
-	\begin{align*}
-		[w,t \models \varphi]_{5} &= \begin{cases}
-			\top \text{, if } [w,t \models \varphi]_3 = \top \\
-			\top_c \text{, if } [w,t \models \varphi]_3 = ? \text{ and } [w,t \models \varphi]_M = \top \\
-			? \text{, if } [w,t \models \varphi]_3 = ? \text{ and } [w,t \models \varphi]_M = ? \\
-			\bot_c \text{, if } [w,t \models \varphi]_3 = ? \text{ and } [w,t \models \varphi]_M = \bot \\
-			\bot \text{, if } [w,t \models \varphi]_3 = \bot \\
-		\end{cases} \\
-	\end{align*}
-	
-
-	\rednote[inline]{An alternative: Define the semantics with the global view in mind by only considering if the propositions involved in a subformula belong to the same process or not. This requires the assumption that the propositions in disjunctions are ordered by the processes they belong to (or some other canonical form).}
-	
-	\subsubsection{Derived operators}
-	Defined as usual.
-	
-%	\subsection*{Retiming for Distributed Monitoring under Partial Synchrony}
-%	DEFINITION.
-%	VALID RETIMING.
-%	EXAMPLE.
-	
-	\subsection*{Offline Algorithm} \rednote{TODO: Check for bugs.}
-	The algorithm consists of two preprocessing steps followed by a simple monitoring step.
-	In the first step, we update the structure of the input formula to enable the local evaluation of the subformulas whose propositions belong to the same process.
-	In the second step, we refine the regions of uncertainty by considering the bounded variability assumption.
-	Finally, the monitoring step evaluates the updated subformulas incrementally on the refined input signal.
-	
-	Let $\varphi$ be an LTL5 formula and $w : \mathbb{P} \times [0,d) \to \B$ be an $n$-dimensional finite-length signal.
-	
-	\begin{enumerate}
-		\item Preprocessing: Restructuring of the subformulas and the input signal
-		\begin{enumerate}[label=\arabic*.]
-			\item Enumerate the subformulas of $\varphi$ such that each formula has an enumeration number smaller than the numbers of all its subformulas. Let $\varphi_0, \ldots, \varphi_m$ be such an enumeration. Note that $\varphi_0 = \varphi$.
-			\item For each process $P$, let $m_P$ be the least number such that all the propositions that occur in $\varphi_{m_P}$ belong to $P$. If $\varphi_{m_P}$ is not an atomic proposition, define a fresh proposition $q$ on process $P$. Let $\mathbb{P}'$ be the set of propositions extended with the fresh ones.
-			\item Define a new signal $w' : \mathbb{P}' \times [0,d) \to \B$ as follows: for all $p \in \mathbb{P}'$ and $t \in [0,d)$, let \\
-			- $w'(p,t) = w(p,t)$ if $p \in \mathbb{P}$, and\\
-			- $w'(p,t) = [w,t \models \varphi_{m_{\pi(p)}}]_{\pi(p)}$ otherwise.
-		\end{enumerate}
-		
-		\item Preprocessing: $(\varepsilon,\delta)$-retiming of the restructured input signal
-		\begin{enumerate}[label=\arabic*.]
-			\item Let $p \in \mathbb{P}'$ be a proposition and $t_1, \ldots, t_k$ be the increasing sequence of timestamps corresponding to the events on $p$ of the signal $w'$. Let $T = \{t_1, \ldots, t_k\}$. Let $\ell_p$ be an empty list.
-			\item Let $\ell$ be an empty list. Add the lowest timestamp $t$ in $T$ to $\ell$ and remove it from $T$. While the greatest timestamp in $\ell$ and the lowest timestamp $t'$ in $T$ are less than $\delta + 2\varepsilon$ apart, add $t'$ to $\ell$ and remove it from $T$.
-			\item Compute the regions of uncertainty for the proposition $p$ under the assumption of bounded variability:\\ for $i = 1 .. |\ell|$ let $N_i = \left[\max_{j \in \{1, i\}} \ell[j] - \varepsilon + (i-j)\delta, \min_{i \leq j \leq |\ell|} \ell[j] + \varepsilon - (j-i)\delta\right]$ %\rednote{assuming $\ell[1] \geq \varepsilon$ for now to make it look cleaner}
-			and add $N_i$ to $\ell_p$.
-			\item Repeat (2)-(3) until $T$ is empty. Store the list $\ell_p$ of intervals in memory.
-			\item Repeat (1)-(4) for all $p \in \mathbb{P}'$.
-			\item Define a new signal $w'' : \mathbb{P}' \times [0,d) \to \B \cup \{\?\}$ as follows: for all $p \in \mathbb{P}'$ and $t \in [0,d)$, let \\
-			- $w''(p,t) = \?$ if $t \in N$ for some $N \in \ell_p$, \\
-			- $w''(p,t) = w'(p,0)$ if $t \notin N$ for any $N \in \ell_p$, and there is an even number of intervals in $\ell_p$ before $t$, and \\
-			- $w''(p,t) = \overline{w'(p,0)}$ if $t \notin N$ for any $N \in \ell_p$, and there is an odd number of intervals in $\ell_p$ before $t$.
-		\end{enumerate}
-		
-		\item Monitoring
-		\begin{enumerate}[label=\arabic*.]
-			\item Let $\varphi'$ be the formula obtained by replacing the appropriate subformulas of $\varphi$ with the fresh propositions as described in the first preprocessing step. Let $\varphi_0', \ldots, \varphi_{m'}'$ be its subformulas satisfying the enumeration invariant given in the first preprocessing step. Note that $\varphi_0'$  and $\varphi$ are semantically equivalent. %some redundancy to handle here
-			\item Let $t_1, \ldots, t_k$ be a nondecreasing sequence of timestamps corresponding to the interval borders of the propositions in $w''$ as computed in the second preprocessing step. Let $t_0 = 0$.
-			\item For $i = k .. 0$, for $j = m' .. 0$, compute $[w'', t_i \models \varphi_j]_5$.
-			\item Output $[w'',0 \models \varphi_0']_5$.
-		\end{enumerate}
-	\end{enumerate}
-	
-	
-%	\begin{enumerate}
-%		\item Let $t_1, \ldots, t_k$ be a nondecreasing sequence of timestamps corresponding to segment borders of $w$, and let $t_0 = 0$.
-%		\item Enumerate the subformulas of $\varphi$ such that each formula has an enumeration number smaller than the numbers of all its subformulas. Let $\varphi_0, \ldots, \varphi_m$ be such an enumeration. Note that $\varphi_0 = \varphi$.
-%		\item For $i = k .. 0$ : for $j = m .. 0$ : compute $[w, t_i \models \varphi_j]_5$
-%		\item Output $[w,0 \models \varphi_0]_5$.
-%	\end{enumerate}
-
-%	The interpretations of the subformulas can be computed by a dynamic programming algorithm in the sprit of~\cite{Havelund2002}, using the standard recursive definition of the until operator. % $p \until q = q \lor (p \land \LTLnext (p \until q))$
-	
-	\subsection*{Online Algorithm [idea]}
-	The monitor outputs verdicts with a delay of $h = \delta + 2\varepsilon$.
-	At each event, the interval borders of the corresponding proposition needs to be recomputed.
-	However, if there are no new events in the horizon of $h$, then we can stop updating the intervals we have computed so far because whatever happens later will not affect the previous events.
-	This helps us provide an upper bound on the time and space requirements because in any chain of uncertainty intervals of length $L$, there are at most $\floor{\frac{L}{\delta}} + 1$ events. \rednote{TODO: Clarify this.}
-		
-	\newpage
-	
-	\greennote[inline]{Idea: Add the 2nd preprocessing step into the semantics by defining two functions $\rho_{\text{lo}}$ and $\rho_{\text{hi}}$ that maps an event to its lower and upper bounds of uncertainty.}
-	\vspace{1em}
+	\greennote{Update: Add the 2nd preprocessing step into the semantics by defining two functions $\rho_{\text{lo}}$ and $\rho_{\text{hi}}$ that maps an event to its lower and upper bounds of uncertainty.}
 	
 	Given $w : \mathbb{P} \times [0,d) \to \B$ and $p \in \mathbb{P}$, let $S_{w,p} = \{t^p_1, \ldots, t^p_{n_p}\}$ be the set of timestamps for the rising/falling edges of $w$ for $p$.
 	We define the (partial) functions $\rho_{\text{lo}}$ and $\rho_{\text{hi}}$ as follows, where $w$ is a signal, $p$ is a proposition, and $t^p_i \in S_{w,p}$ is a timestamp corresponding to an event.
@@ -288,7 +170,7 @@
 	$$ \rho_{\text{lo}}(w, p, t^p_i) = \max_{j \in \{1, i\}} t^p_j - \varepsilon + (i-j)\delta $$
 	
 	$$ \rho_{\text{hi}}(w, p, t^p_i) = \min_{i \leq j \leq k} t^p_j + \varepsilon - (j-i)\delta $$
-	where $i \leq k \leq n_p$ satisfies $t^p_{j + 1} - t^p_j < \delta + 2\varepsilon$ for all $i \leq j \leq k - 1$.
+	where $i \leq k \leq n_p$ satisfies $t^p_{j + 1} - t^p_j < \delta + 2\varepsilon$ for all $i \leq j \leq k - 1$. \greennote{$\rho_{\text{hi}}(w, p, t^p_{j+1}) - (t^p_j + \varepsilon) < \delta$ \\ this would be useful in the offline case}
 	
 	\vspace{1em}
 	FLTL:
@@ -323,6 +205,71 @@
 			\bot \text{, if } [w,t \models \varphi]_3 = \bot \\
 		\end{cases} \\
 	\end{align*}	
+	
+
+%	\rednote[inline]{An alternative: Define the semantics with the global view in mind by only considering if the propositions involved in a subformula belong to the same process or not. This requires the assumption that the propositions in disjunctions are ordered by the processes they belong to (or some other canonical form).}
+	
+	\subsubsection{Derived operators}
+	Defined as usual.
+	
+	\subsection*{Offline Algorithm} \rednote{TODO: Check for bugs.}
+	The algorithm consists of a preprocessing steps followed by the monitoring algorithm.
+	First, we update the structure of the input formula to enable the local evaluation of the subformulas whose propositions belong to the same process.
+	Then, the monitoring step evaluates the updated subformulas incrementally on the refined input signal.
+	
+	Let $\varphi$ be an LTL5 formula and $w : \mathbb{P} \times [0,d) \to \B$ be an $n$-dimensional finite-length signal.
+	
+	\begin{enumerate}
+		\item Preprocessing: Restructuring of the subformulas and the input signal
+		\begin{enumerate}[label=\arabic*.]
+			\item Enumerate the subformulas of $\varphi$ such that each formula has an enumeration number smaller than the numbers of all its subformulas. Let $\varphi_0, \ldots, \varphi_m$ be such an enumeration. Note that $\varphi_0 = \varphi$.
+			\item For each process $P$, let $m_P$ be the least number such that all the propositions that occur in $\varphi_{m_P}$ belong to $P$. If $\varphi_{m_P}$ is not an atomic proposition, define a fresh proposition on process $P$. Let $\mathbb{P}'$ be the set of propositions extended with the fresh ones.
+			\item Let $\varphi'$ be the formula obtained by replacing the appropriate subformulas of $\varphi$ with the corresponding fresh propositions. Let $\varphi_0', \ldots, \varphi_{m'}'$ be its subformulas satisfying the enumeration invariant given above. Note that $\varphi_0'$  and $\varphi$ are semantically equivalent. %some redundancy to handle here
+			\item Define a new signal $w' : \mathbb{P}' \times [0,d) \to \B$ as follows: for all $p \in \mathbb{P}'$ and $t \in [0,d)$, let \\
+			- $w'(p,t) = w(p,t)$ if $p \in \mathbb{P}$, and\\
+			- $w'(p,t) = [w,t \models \varphi_{m_{\pi(p)}}]_{\pi(p)}$ otherwise.
+		\end{enumerate}
+		
+%		\item Preprocessing: $(\varepsilon,\delta)$-retiming of the restructured input signal
+%		\begin{enumerate}[label=\arabic*.]
+%			\item Let $p \in \mathbb{P}'$ be a proposition and $t_1, \ldots, t_k$ be the increasing sequence of timestamps corresponding to the events on $p$ of the signal $w'$. Let $T = \{t_1, \ldots, t_k\}$. Let $\ell_p$ be an empty list.
+%			\item Let $\ell$ be an empty list. Add the lowest timestamp $t$ in $T$ to $\ell$ and remove it from $T$. While the greatest timestamp in $\ell$ and the lowest timestamp $t'$ in $T$ are less than $\delta + 2\varepsilon$ apart, add $t'$ to $\ell$ and remove it from $T$.
+%			\item Compute the regions of uncertainty for the proposition $p$ under the assumption of bounded variability:\\ for $i = 1 .. |\ell|$ let $N_i = \left[\max_{j \in \{1, i\}} \ell[j] - \varepsilon + (i-j)\delta, \min_{i \leq j \leq |\ell|} \ell[j] + \varepsilon - (j-i)\delta\right]$ %\rednote{assuming $\ell[1] \geq \varepsilon$ for now to make it look cleaner}
+%			and add $N_i$ to $\ell_p$.
+%			\item Repeat (2)-(3) until $T$ is empty. Store the list $\ell_p$ of intervals in memory.
+%			\item Repeat (1)-(4) for all $p \in \mathbb{P}'$.
+%			\item Define a new signal $w'' : \mathbb{P}' \times [0,d) \to \B \cup \{\?\}$ as follows: for all $p \in \mathbb{P}'$ and $t \in [0,d)$, let \\
+%			- $w''(p,t) = \?$ if $t \in N$ for some $N \in \ell_p$, \\
+%			- $w''(p,t) = w'(p,0)$ if $t \notin N$ for any $N \in \ell_p$, and there is an even number of intervals in $\ell_p$ before $t$, and \\
+%			- $w''(p,t) = \overline{w'(p,0)}$ if $t \notin N$ for any $N \in \ell_p$, and there is an odd number of intervals in $\ell_p$ before $t$.
+%		\end{enumerate}
+		
+		\item Monitoring
+		\begin{enumerate}[label=\arabic*.]
+			\item Let $t_1, \ldots, t_k$ be an increasing sequence of timestamps corresponding to the events of the propositions in $w'$. Let $t_0 = 0$.
+			\item For $i = k .. 0$, for $j = m' .. 0$, compute $[w', t_i \models \varphi_j]_5$. Note that the FLTL interpretations are evaluated from the perspective of the monitor process.
+			\item Output $[w',0 \models \varphi_0']_5$.
+		\end{enumerate}
+	\end{enumerate}
+	
+	
+	\subsection*{Online Algorithm [idea]}
+	\textbf{Initial idea:}
+	The monitor outputs verdicts with a delay of $h = \delta + 2\varepsilon$.
+	At each event, the interval borders of the corresponding proposition needs to be recomputed.
+	However, if there are no new events in the horizon of $h$, then we can stop updating the intervals we have computed so far because whatever happens later will not affect the previous events.
+	This helps us provide an upper bound on the time and space requirements because in any chain of uncertainty intervals of length $L$, there are at most $\floor{\frac{L}{\delta}} + 1$ events.
+	
+	\vspace{1em}
+	\noindent
+	\textbf{A counter-example:} Consider a one-dimensional infinite-length signal $w$ with the following sequence of timestamps for its events
+	$$ t, t + \delta - \varepsilon, t + 2\delta - \frac{3\varepsilon}{2}, t + 3\delta - \frac{7\varepsilon}{4}, \ldots$$
+	Once the first event is observed, its uncertainty upper bound is $t + \varepsilon$.
+	After the second event, it becomes $t$, then $t - \frac{\varepsilon}{2}$, and $t - \frac{3\varepsilon}{4}$ and so on.
+	Regardless of how distant a future event is from the first event, it affects its uncertainty upper bound.
+	This sequence of timestamps is indeed valid because for all $k \geq 1$
+	$$ \floor{\frac{(k-1)\delta + 2\varepsilon - (2\varepsilon \cdot \sum_{i=1}^{k}2^{-k})}{\delta}} + 1 \geq k $$
+
 	
 	\newpage
 	\bibliographystyle{splncs04}
