@@ -133,9 +133,9 @@
 	\subsubsection*{Assumptions}
 	\begin{enumerate}
 		\item Every atomic proposition is uniquely mapped to a process, which transmit the changes in their truth values to a central monitor. The initial values of each atomic proposition is known by the monitor.
-		\item The monitor runs on a process which does not own any propositions. \rednote{to confirm}
+%		\item The monitor runs on a process which does not own any propositions. \rednote{to confirm}
 		\item There exists $\varepsilon > 0$ such that the local clocks of every pair of processes are guaranteed to be less than $\varepsilon$ apart at any given point. The value of the least upper bound on $\varepsilon$ is known by the monitor. 
-		\item The values of the atomic propositions stay the same for at least $\delta > 0$ time units after each change with respect to the local clock of the monitor. The value of the greatest lower bound on $\delta$ is known by the monitor. \rednote{to confirm}
+		\item The values of the atomic propositions stay the same for at least $\delta > 0$ time units after each change with respect to the local clock of the monitor. The value of the greatest lower bound on $\delta$ is known by the monitor.
 		\item The processes do not fail, the communication channels are FIFO and lossless.
 		\item For online monitoring: The events may arrive out of order to the monitor. \rednote{Not taken into account yet.}
 	\end{enumerate}
