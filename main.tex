@@ -189,20 +189,20 @@
 	LTL3:
 	\begin{align*}
 		[w,t \models \varphi]_3 &= \begin{cases}
-			\top \text{, if for all }  w' : \mathbb{P} \times [0, \infty) \to \B  \text{ we have } \tau(w) \tau(w') \in \mathcal{L}(\varphi)\\
-			\bot \text{, if for all }  w' : \mathbb{P} \times [0, \infty) \to \B  \text{ we have } \tau(w) \tau(w') \notin \mathcal{L}(\varphi)\\
-			? \text{, otherwise}\\
+			\top &\text{if for all }  w' : \mathbb{P} \times [0, \infty) \to \B  \text{ we have } \tau(w) \tau(w') \in \mathcal{L}(\varphi)\\
+			\bot &\text{if for all }  w' : \mathbb{P} \times [0, \infty) \to \B  \text{ we have } \tau(w) \tau(w') \notin \mathcal{L}(\varphi)\\
+			? &\text{otherwise}\\
 		\end{cases}
 	\end{align*}
 	
 	LTL5:
 	\begin{align*}
-		[w,t \models \varphi]_{5} &= \begin{cases}
-			\top \text{, if } [w,t \models \varphi]_3 = \top \\
-			\top_c \text{, if } [w,t \models \varphi]_3 = ? \text{ and } [w,t \models \varphi]_F = \top \\
-			? \text{, if } [w,t \models \varphi]_3 = ? \text{ and } [w,t \models \varphi]_F = ? \\
-			\bot_c \text{, if } [w,t \models \varphi]_3 = ? \text{ and } [w,t \models \varphi]_F = \bot \\
-			\bot \text{, if } [w,t \models \varphi]_3 = \bot \\
+		[w,t \models \varphi]_{P,5} &= \begin{cases}
+			\top &\text{if } [w,t \models \varphi]_3 = \top \\
+			\top_c &\text{if } [w,t \models \varphi]_3 = ? \text{ and } [w,t \models \varphi]_P = \top \\
+			? &\text{if } [w,t \models \varphi]_3 = ? \text{ and } [w,t \models \varphi]_P = ? \\
+			\bot_c &\text{if } [w,t \models \varphi]_3 = ? \text{ and } [w,t \models \varphi]_P = \bot \\
+			\bot &\text{if } [w,t \models \varphi]_3 = \bot \\
 		\end{cases} \\
 	\end{align*}	
 	
