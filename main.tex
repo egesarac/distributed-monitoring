@@ -133,8 +133,9 @@
 	\subsubsection*{Assumptions}
 	\begin{enumerate}
 		\item Every atomic proposition is uniquely mapped to a process, which transmit the changes in their truth values to a central monitor. The initial values of each atomic proposition is known by the monitor.
+		\item The monitor runs on a process which does not own any propositions. \rednote{to confirm}
 		\item There exists $\varepsilon > 0$ such that the local clocks of every pair of processes are guaranteed to be less than $\varepsilon$ apart at any given point. The value of the least upper bound on $\varepsilon$ is known by the monitor. 
-		\item The atomic propositions have bounded variability, i.e., their values stay the same at least $\delta > 0$ time units after each change (with respect to an imaginary global clock). The value of the greatest lower bound on $\delta$ is known by the monitor. 
+		\item The values of the atomic propositions stay the same for at least $\delta > 0$ time units after each change with respect to the local clock of the monitor. The value of the greatest lower bound on $\delta$ is known by the monitor. \rednote{to confirm}
 		\item The processes do not fail, the communication channels are FIFO and lossless.
 		\item For online monitoring: The events may arrive out of order to the monitor. \rednote{Not taken into account yet.}
 	\end{enumerate}
@@ -222,6 +223,7 @@
 	The algorithm consists of a preprocessing steps followed by the monitoring algorithm.
 	First, we update the structure of the input formula to enable the local evaluation of the subformulas whose propositions belong to the same process.
 	Then, the monitoring step evaluates the updated subformulas incrementally on the refined input signal.
+	 
 	
 	Let $\varphi$ be an LTL5 formula and $w : \mathbb{P} \times [0,d) \to \B$ be an $n$-dimensional finite-length signal.
 	
@@ -253,7 +255,7 @@
 		
 		\item Monitoring
 		\begin{enumerate}[label=\arabic*.]
-			\item Let $M$ be the process on which the monitor is running. Let $t_1, \ldots, t_k$ be an increasing sequence of timestamps corresponding to the events in $w'$. Let $t_0 = 0$.
+			\item Let $M$ be the process on which the monitor is running. Recall that $\pi(p) \neq M$ for all $p \in \mathbb{P}'$. Let $t_1, \ldots, t_k$ be an increasing sequence of timestamps corresponding to the events in $w'$. Let $t_0 = 0$.
 			\item For $i = k .. 0$, for $j = m' .. 0$, compute $[w', t_i \models \varphi_j]_{M,5}$.
 			\item Output $[w',0 \models \varphi_0']_{M,5}$.
 		\end{enumerate}
