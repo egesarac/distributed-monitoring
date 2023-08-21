@@ -172,8 +172,9 @@
 	$$ \rho_{\text{hi}}(w, p, t^p_i) = \min_{i \leq j \leq k} t^p_j + \varepsilon - (j-i)\delta $$
 	where $i \leq k \leq n_p$ satisfies $t^p_{j + 1} - t^p_j < \delta + 2\varepsilon$ for all $i \leq j \leq k - 1$. \greennote{$\rho_{\text{hi}}(w, p, t^p_{j+1}) - (t^p_j + \varepsilon) < \delta$ \\ this could be useful in the offline case}
 	
-	The interpretation of a formula depends on the which process we observe the propositions from.
+	The interpretation of a formula depends on which process we observe the propositions from.
 	Note that each process knows the initial values of the propositions.
+	\rednote{TODO: This approach is too coarse: (i) it does not take into account that the clock skew is bounded for each process pair, and (ii) it fails to capture the truth values of close-enough events when $\delta < 2\varepsilon$.}
 	
 	\vspace{1em}
 	FLTL:
@@ -182,9 +183,9 @@
 		[w,t \models p]_P &= \begin{cases}
 			? &\text{if } \pi(p) \not = P \land \exists t' \in S_{w,p} : t \in (\rho_{\text{lo}}(w, p, t'), \rho_{\text{hi}}(w, p, t')) \\
 			w(p,0) &\text{if } \pi(p) \not = P \land \forall t' \in S_{w,p} : t \notin (\rho_{\text{lo}}(w, p, t'), \rho_{\text{hi}}(w, p, t')) \\
-			&\land |\{t'' \in S_{w,p} \st t'' < t\}| \text{ is even} \\
+			&\land |\{t'' \in S_{w,p} \st \rho_{\text{hi}}(w, p, t'') < t\}| \text{ is even} \\
 			\overline{w(p,0)} &\text{if } \pi(p) \not = P \land \forall t' \in S_{w,p} : t \notin (\rho_{\text{lo}}(w, p, t'), \rho_{\text{hi}}(w, p, t')) \\
-			&\land |\{t'' \in S_{w,p} \st t'' < t\}| \text{ is odd} \\
+			&\land |\{t'' \in S_{w,p} \st \rho_{\text{hi}}(w, p, t'') < t\}| \text{ is odd} \\
 			w(p,t) &\text{if } \pi(p) = P \\
 		\end{cases} \\
 		[w,t \models \lnot \varphi]_P &= \overline{[w,t \models \varphi]_P}\\
@@ -262,7 +263,7 @@
 	\end{enumerate}
 	
 	
-	\subsection*{Online Algorithm [idea]}
+	\subsection*{Online Algorithm}
 	\textbf{Initial idea:}
 	The monitor outputs verdicts with a delay of $h = \delta + 2\varepsilon$.
 	At each event, the interval borders of the corresponding proposition needs to be recomputed.
@@ -282,7 +283,24 @@
 	This sequence of timestamps is indeed valid because for all $k \geq 1$
 	
 	$$ \floor{\frac{(k-1)\delta + 2\varepsilon - (2\varepsilon \cdot \sum_{i=1}^{k}2^{-i})}{\delta}} + 1 \geq k $$
-
+	\rednote{TODO: Is there a reasonable assumption that would prevent this and guarantee a fixed finite horizon that applies to all events?}
+	
+	\vspace{1em}
+	\noindent
+	\textbf{A simple option:}
+	Assume bounded variability with respect to local clocks (instead of the monitor's clock) and $\delta > 2\varepsilon$.
+	Then, introducing a delay of $\varepsilon$ to monitor verdicts, online monitoring of past-time formulas requires constant time per event and constant space overall (both linear in the size of the input formula) similar to~\cite{Havelund2002}.
+	\rednote{TODO: What if we have communication delay $\leq \gamma$ here? Further delay the verdict by $\gamma$, treat the events from different processes within this interval as concurrent?}
+	
+	\subsection*{Reversal-boundedness}
+	Instead of the bounded variability assumption above, assume the following:
+	\begin{itemize}
+		\item For all signals there exists $k \in \N$ such that each proposition associated with the signal changes its value at most $k$ times in total.
+	\end{itemize}
+	
+%	Note:
+%	In this setting, we can't do much to refine long segments of uncertainty.
+%	This could be especially problematic when we have to deal with uncertainty and a binary operation.
 	
 	\newpage
 	\bibliographystyle{splncs04}
