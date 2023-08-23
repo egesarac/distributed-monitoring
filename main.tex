@@ -308,6 +308,18 @@
 	
 	\textbf{An attempt to fix LTL3:}
 	
+	\rednote[inline]{Remark:
+		Consider the formula $\Diamond (p \land q)$ where $p$ is initially false, $q$ is initially true, and $p$ and $q$ belong to different processes.
+		Let $m < 2 \varepsilon$
+		Let us take a finite signal with the following events: $(p, t - m)$, $(\lnot q, t)$.
+		These events are concurrent, but if we discretize the trace without caring about this, its interpretation under LTL3 would be $\top$.
+		Now, suppose the signal has the following events instead: $(\lnot q, t)$, $(p, t + m)$.
+		Then, the LTL3 interpretation would be “?” as expected.
+		
+		We should treat the two signals the same way because the two events are concurrent in both signals, and the first case satisfies the formula by luck.
+		For this, we want to define LTL3 such that whenever it evaluates something as $\top$ or $\bot$ we know that this accounts for all continuations as well as all uncertainties/interleavings.
+	}
+	
 	Let $u : \mathbb{P} \times [0,d) \to \B$ be a boolean signal of finite length and $w : \mathbb{P} \times [0,\infty) \to \B$,  be an infinite-length one.
 	Let $t$ be a time value appropriate for the signal length, $\varepsilon$ be the least upper bound on the clock skew, $\pi : \mathbb{P} \to \mathcal{P}$ a mapping from propositions to processes, $p \in \mathbb{P}$ be a proposition, and $P \in \mathcal{P}$ be a process.
 	Given a finite or infinite signal $x$ and $p \in \mathbb{P}$, let $S_{x,p} = \{t^p_1, t^p_2 \ldots\}$ be the set of timestamps for the rising/falling edges of $x$ for $p$.
