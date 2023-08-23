@@ -134,8 +134,9 @@
 	\begin{enumerate}
 		\item Every atomic proposition is uniquely mapped to a process, which transmit the changes in their truth values to a central monitor. The initial values of each atomic proposition is known by the monitor.
 %		\item The monitor runs on a process which does not own any propositions. \rednote{to confirm}
-		\item There exists $\varepsilon > 0$ such that the local clocks of every pair of processes are guaranteed to be less than $\varepsilon$ apart at any given point. The value of the least upper bound on $\varepsilon$ is known by the monitor. 
-		\item The values of the atomic propositions stay the same for at least $\delta > 0$ time units after each change with respect to the local clock of the monitor. The value of the greatest lower bound on $\delta$ is known by the monitor.
+		\item \alert{The monitor runs on the same process as the reference clock.}
+		\item There exists $\varepsilon > 0$ such that the local clocks of the processes are guaranteed to be less than $\varepsilon$ apart \alert{from the reference clock} at any given point. The value of the least upper bound on $\varepsilon$ is known by the monitor. %There exists $\varepsilon > 0$ such that the local clocks of every pair of processes are guaranteed to be less than $\varepsilon$ apart at any given point. The value of the least upper bound on $\varepsilon$ is known by the monitor. 
+		\item There exists $\delta > 0$ such that the values of the atomic propositions stay the same after each change for at least $\delta$ time units \alert{with respect to the reference clock}. The value of the greatest lower bound on $\delta$ is known by the monitor.
 		\item The processes do not fail, the communication channels are FIFO and lossless.
 		\item For online monitoring: The events may arrive out of order to the monitor. \rednote{Not taken into account yet.}
 	\end{enumerate}
@@ -174,7 +175,7 @@
 	
 	The interpretation of a formula depends on which process we observe the propositions from.
 	Note that each process knows the initial values of the propositions.
-	\rednote{TODO: This approach is too coarse: (i) it does not take into account that the clock skew is bounded for each process pair, and (ii) it fails to capture the truth values of close-enough events when $\delta < 2\varepsilon$.}
+	\rednote{TODO: This approach is too coarse: it fails to capture the correct truth values when two events are close enough with $\delta < 2\varepsilon$.}
 	
 	\vspace{1em}
 	FLTL:
@@ -194,7 +195,7 @@
 		%		[w,t \models \varphi_1 \since \varphi_2]_F &=  \max_{t' \leq t} \left( \min \left( [w,t' \models \varphi_2]_F, \min_{t \leq t'' \leq t'} \left( [w,t'' \models \varphi_1]_F \right) \right) \right)\\
 	\end{align*}
 	
-	LTL3:
+	LTL3: \rednote{TODO: This should also take partial synchrony into account.}
 	\begin{align*}
 		[w,t \models \varphi]_3 &= \begin{cases}
 			\top &\text{if for all }  w' : \mathbb{P} \times [0, \infty) \to \B  \text{ we have } \tau(w,t) \tau(w') \in \mathcal{L}(\varphi)\\
