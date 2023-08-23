@@ -303,6 +303,86 @@
 %	In this setting, we can't do much to refine long segments of uncertainty.
 %	This could be especially problematic when we have to deal with uncertainty and a binary operation.
 	
+	
+	\newpage
+	
+	\textbf{An attempt to fix LTL3:}
+	
+	Let $u : \mathbb{P} \times [0,d) \to \B$ be a boolean signal of finite length and $w : \mathbb{P} \times [0,\infty) \to \B$,  be an infinite-length one.
+	Let $t$ be a time value appropriate for the signal length, $\varepsilon$ be the least upper bound on the clock skew, $\pi : \mathbb{P} \to \mathcal{P}$ a mapping from propositions to processes, $p \in \mathbb{P}$ be a proposition, and $P \in \mathcal{P}$ be a process.
+	Given a finite or infinite signal $x$ and $p \in \mathbb{P}$, let $S_{x,p} = \{t^p_1, t^p_2 \ldots\}$ be the set of timestamps for the rising/falling edges of $x$ for $p$.
+	
+	We define the (partial) functions $\rho_{\text{lo}}$ and $\rho_{\text{hi}}$ as follows, where $u$ is a finite signal, $p$ is a proposition, and $t^p_i \in S_{u,p}$ is a timestamp corresponding to an event.
+	
+	$$ \rho_{\text{lo}}(u, p, t^p_i) = \max_{j \in \{1, i\}} t^p_j - \varepsilon - (j-i)\delta $$
+	
+	$$ \rho_{\text{hi}}(u, p, t^p_i) = \min_{i \leq j \leq k} t^p_j + \varepsilon - (j-i)\delta $$
+	where $k = \min \{ i \leq x \leq |S_{u,p}| \st \forall i \leq j \leq x - 1 : t^p_{j + 1} - t^p_j < \delta + 2\varepsilon\}$.
+	
+	Similarly, for an infinite signal $w$, we define the corresponding (partial) functions $\Omega_{\text{lo}}$ and $\Omega_{\text{hi}}$ as follows, where $p$ is a proposition, and $t^p_i \in S_{w,p}$ is a timestamp corresponding to an event.
+	
+	$$ \Omega_{\text{lo}}(w, p, t^p_i) = \max_{j \in \{1, i\}} t^p_j - \varepsilon - (j-i)\delta $$
+	
+	$$ \Omega_{\text{hi}}(w, p, t^p_i) = \min_{i \leq j \leq k} t^p_j + \varepsilon - (j-i)\delta $$
+	where $k = \inf \{ i \leq x < |S_{w,p}| \st \forall i \leq j \leq x - 1 : t^p_{j + 1} - t^p_j < \delta + 2\varepsilon\}$.
+	
+	The interpretation of a formula depends on which process we observe the propositions from.
+	Note that each process knows the initial values of the propositions.
+	
+	LTL:
+	\begin{align*}
+		[w,t \models \texttt{true}]_P^\omega &= \top \\
+		[w,t \models p]_P^\omega &= \begin{cases}
+			? &\text{if } \pi(p) \not = P \land \exists t' \in S_{w,p} : t \in (\Omega_{\text{lo}}(w, p, t'), \Omega_{\text{hi}}(w, p, t')) \\
+			w(p,0) &\text{if } \pi(p) \not = P \land \forall t' \in S_{w,p} : t \notin (\Omega_{\text{lo}}(w, p, t'), \Omega_{\text{hi}}(w, p, t')) \\
+			&\land |\{t'' \in S_{w,p} \st \Omega_{\text{hi}}(w, p, t'') < t\}| \text{ is even} \\
+			\overline{w(p,0)} &\text{if } \pi(p) \not = P \land \forall t' \in S_{w,p} : t \notin (\Omega_{\text{lo}}(w, p, t'), \Omega_{\text{hi}}(w, p, t')) \\
+			&\land |\{t'' \in S_{w,p} \st \Omega_{\text{hi}}(w, p, t'') < t\}| \text{ is odd} \\
+			w(p,t) &\text{if } \pi(p) = P \\
+		\end{cases} \\
+		[w,t \models \lnot \varphi]_P^\omega &= \overline{[w,t \models \varphi]_P^\omega}\\
+		[w,t \models \varphi_1 \lor \varphi_2]_P^\omega &= \max([w,t \models \varphi_1]_P^\omega, [w,t \models \varphi_2]_P^\omega)\\
+		[w,t \models \varphi_1 \until \varphi_2]_P^\omega &= \sup_{t \leq t'} \left( \min \left( [w,t' \models \varphi_2]_P^\omega, \min_{t \leq t'' \leq t'} \left( [w,t'' \models \varphi_1]_P^\omega \right) \right) \right)\\
+		%		[w,t \models \varphi_1 \since \varphi_2]_F &=  \max_{t' \leq t} \left( \min \left( [w,t' \models \varphi_2]_F, \min_{t \leq t'' \leq t'} \left( [w,t'' \models \varphi_1]_F \right) \right) \right)\\
+	\end{align*}
+	
+	FLTL:
+	\begin{align*}
+		[u,t \models \texttt{true}]_P^* &= \top \\
+		[u,t \models p]_P &= \begin{cases}
+			? &\text{if } \pi(p) \not = P \land \exists t' \in S_{u,p} : t \in (\rho_{\text{lo}}(u, p, t'), \rho_{\text{hi}}(u, p, t')) \\
+			u(p,0) &\text{if } \pi(p) \not = P \land \forall t' \in S_{u,p} : t \notin (\rho_{\text{lo}}(u, p, t'), \rho_{\text{hi}}(u, p, t')) \\
+			&\land |\{t'' \in S_{u,p} \st \rho_{\text{hi}}(u, p, t'') < t\}| \text{ is even} \\
+			\overline{u(p,0)} &\text{if } \pi(p) \not = P \land \forall t' \in S_{u,p} : t \notin (\rho_{\text{lo}}(u, p, t'), \rho_{\text{hi}}(u, p, t')) \\
+			&\land |\{t'' \in S_{u,p} \st \rho_{\text{hi}}(u, p, t'') < t\}| \text{ is odd} \\
+			u(p,t) &\text{if } \pi(p) = P \\
+		\end{cases} \\
+		[u,t \models \lnot \varphi]_P^* &= \overline{[u,t \models \varphi]_P^*}\\
+		[u,t \models \varphi_1 \lor \varphi_2]_P^* &= \max([u,t \models \varphi_1]_P^*, [u,t \models \varphi_2]_P^*)\\
+		[u,t \models \varphi_1 \until \varphi_2]_P^* &= \max_{t \leq t'} \left( \min \left( [w,t' \models \varphi_2]_P^*, \min_{t \leq t'' \leq t'} \left( [u,t'' \models \varphi_1]_P^* \right) \right) \right)\\
+		%		[w,t \models \varphi_1 \since \varphi_2]_F &=  \max_{t' \leq t} \left( \min \left( [w,t' \models \varphi_2]_F, \min_{t \leq t'' \leq t'} \left( [w,t'' \models \varphi_1]_F \right) \right) \right)\\
+	\end{align*}
+	
+	LTL3: For a finite signal $u$ and a time value $t$ less than the length of $u$, we denote by $u_t$ the suffix of $u$ that starts from time $t$.
+	\begin{align*}
+		[u,t \models \varphi]_{P,3} &= \begin{cases}
+			\top &\text{if for all }  w : \mathbb{P} \times [0, \infty) \to \B  \text{ we have } [u_t w \models \varphi]_P^\omega = \top \\
+			\bot &\text{if for all }  w : \mathbb{P} \times [0, \infty) \to \B  \text{ we have } [u_t w \models \varphi]_P^\omega = \bot \\
+			? &\text{otherwise}
+		\end{cases}
+	\end{align*}
+	
+	LTL5:
+	\begin{align*}
+		[w,t \models \varphi]_{P,5} &= \begin{cases}
+			\top &\text{if } [w,t \models \varphi]_3 = \top \\
+			\top_c &\text{if } [w,t \models \varphi]_3 = \? \text{ and } [w,t \models \varphi]_P = \top \\
+			? &\text{if } [w,t \models \varphi]_3 = \? \text{ and } [w,t \models \varphi]_P = \? \\
+			\bot_c &\text{if } [w,t \models \varphi]_3 = \? \text{ and } [w,t \models \varphi]_P = \bot \\
+			\bot &\text{if } [w,t \models \varphi]_3 = \bot \\
+		\end{cases} \\
+	\end{align*}	
+	
 	\newpage
 	\bibliographystyle{splncs04}
 	\bibliography{main}
