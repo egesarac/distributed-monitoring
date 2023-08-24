@@ -378,8 +378,8 @@
 	LTL3: For a finite signal $u$ and a time value $t$ less than the length of $u$, we denote by $u_t$ the suffix of $u$ that starts from time $t$.
 	\begin{align*}
 		[u,t \models \varphi]_{P,3} &= \begin{cases}
-			\top &\text{if for all }  w : \mathbb{P} \times [0, \infty) \to \B  \text{ we have } [u_t w \models \varphi]_P^\omega = \top \\
-			\bot &\text{if for all }  w : \mathbb{P} \times [0, \infty) \to \B  \text{ we have } [u_t w \models \varphi]_P^\omega = \bot \\
+			\top &\text{if for all }  w : \mathbb{P} \times [0, \infty) \to \B  \text{ we have } [u_t w, 0 \models \varphi]_P^\omega = \top \\
+			\bot &\text{if for all }  w : \mathbb{P} \times [0, \infty) \to \B  \text{ we have } [u_t w, 0 \models \varphi]_P^\omega = \bot \\
 			? &\text{otherwise}
 		\end{cases}
 	\end{align*}
