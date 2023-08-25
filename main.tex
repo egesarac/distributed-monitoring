@@ -8,6 +8,7 @@
 
 \usepackage{amssymb}
 \usepackage{amsmath}
+\usepackage{stmaryrd}
 \usepackage{tikz}
 \usetikzlibrary{backgrounds, positioning, arrows, calc}
 \usepackage{mathtools}
@@ -26,6 +27,10 @@
 \newcommand{\rednote}[2][]{{\todo[color=magenta!80,size=\footnotesize,#1]{\normalcolor\normalfont#2}}}
 \newcommand\alert[1]{\textcolor{red}{#1}}
 \newcommand\TODO{\textcolor{red}{TODO}}
+
+\newcommand{\pfx}{\textsf{prefix}}
+\newcommand{\sfx}{\textsf{suffix}}
+\newcommand{\conjunction}{\textsf{conj}}
 
 % ----- FIGURES
 \tikzstyle{state}=[thick,minimum size=18pt, circle,draw]
@@ -394,7 +399,11 @@
 			\bot &\text{if } [w,t \models \varphi]_3 = \bot \\
 		\end{cases} \\
 	\end{align*}	
+
+
 	
+	\newpage
+	\input encoding
 	\newpage
 	\bibliographystyle{splncs04}
 	\bibliography{main}
