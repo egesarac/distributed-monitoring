@@ -11,7 +11,7 @@ A closed interval $[a,b] \subseteq \R$ of reals has length $|b-a|$.
 \end{definition}
 
 We consider an asynchronous and loosely-coupled message-passing system of $N \geq 2$ reliable agents, denoted $\A = \{A_1, \ldots, A_N\}$.
-The agents produce a set of $n \geq 2$ signals $\S = \{x_1, \ldots, x_n\}$ where $x_i : [0,d] \to \B$ for some $d \in \R_{\geq 0}$. 
+The agents produce a set of $n \geq 2$ signals $\S = \{x_1, \ldots, x_n\}$ where $x_i : [0,d] \to \B$ for some $d \in \R_{\geq 0}$. %todo: right-open or right-closed?
 The function $\pi : \S \to \A$ maps each signal to the agent it is produced by.
 The agents do not share memory or a global clock.
 Only to formalize statements, we speak of a hypothetical global clock and denote its value by $T$.
@@ -29,8 +29,6 @@ We respectively denote by $D_i^\uparrow$ and $D_i^\downarrow$ the sets of rising
 
 We assume that signals have \emph{bounded variability} with respect to the reference clock: for each signal $x_i$ and every pair $(t, x_i(t)), (t', x_i(t')) \in D_i$ of edges, we have $|\chi(c_j^{-1}(t)) - \chi(c_j^{-1}(t'))| \geq \delta$, where $A_j = \pi(x_i)$ is the agent that produces $x_i$ and $\delta \in \R_{\geq 0}$ is the bounded variability constant.
 
-%TODO: retiming?
-
 \begin{definition}
 	A \emph{distributed signal} is a pair $(S, {\hb})$ where $S = (x_1, \ldots, x_n)$ is a vector of signals and ${\hb}$ is the happened-before relation between events in signals extended with the partial synchrony assumption as follows.
 	\begin{itemize}
@@ -40,7 +38,7 @@ We assume that signals have \emph{bounded variability} with respect to the refer
 \end{definition}
 
 \begin{example}
-	\TODO
+	\TODO: distributed signal, happened-before relation
 \end{example}
 
 \begin{definition}
@@ -50,21 +48,20 @@ We assume that signals have \emph{bounded variability} with respect to the refer
 
 We denote by $\CC(T)$ the (infinite) set of consistent cuts at global time $T$.
 Given a consistent cut $C$, its \emph{frontier} $\fr(C) \subseteq C$ is the set consisting of the last events in $C$ of each signal, i.e., $\fr(C) = \bigcup_{i = 1}^{n} \{ (t, x_i(t)) \in E_i \cap C \st \forall t' > t : (t', x_i(t')) \notin E_i \cap C \}$.
+
 A \emph{consistent cut flow} is a function $f : I \to 2^E$, where $I \subset \R_{\geq 0}$ is a closed interval, that maps a global clock value $T$ to the frontier of a consistent cut at time $T$, i.e., $f(T) \in \{\fr(C) \st C \in \CC(T)\}$.
 Moreover, for all $T,T' \in I$ and $1 \leq i \leq n$, if $T < T'$, then for every pair of events $(c_j(T), x_i(c_j(T))) \in f(T)$ and $(c_j(T'), x_i(c_j(T'))) \in f(T')$ we have $(c_j(T), x_i(c_j(T))) \hb (c_j(T'), x_i(c_j(T')))$, where $A_j = \pi(x_i)$.
 We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distributed signal $(S,{\hb})$.
 
-
 \begin{example}
-	\TODO
+	\TODO: consistent cut, frontier, consistent cut flow
 \end{example}
 
-
-\subsection{RV-LTL}
+\subsection{RV-LTL} \label{sec:rvltl}
 
 Let $\AP$ be a set of atomic propositions.
 The syntax is given by the following grammar where $p \in \AP$.
-$$ \varphi :=  p \,|\, \lnot \varphi \,|\, \varphi \lor \varphi \,|\, \varphi \until \varphi $$
+$$ \varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \lor \varphi ~|~ \varphi \until \varphi $$
 We additionally use the following standard abbreviations: $\true = p \lor \lnot p$, $\false = \lnot \true$, $ \varphi_1 \land \varphi_2 = \lnot \varphi_1 \lor \lnot \varphi_2$, $\LTLf \varphi = \true \until \varphi$, and $\LTLg \varphi = \lnot \LTLf \lnot \varphi$.
 
 %A trace $w = (E_1, \ldots, E_n)$ is a vector of event sets of continuous-time boolean-valued finite-length signals $x_1, \ldots, x_n$ whose initial values are $v_0, \ldots, v_n$.
@@ -107,8 +104,6 @@ Let $S = (x_1, \ldots, x_n)$ where $x_i : [0,d] \to \B$ for some $d \in \R_{\geq
 For a distributed signal $(S,{\hb})$, a consistent cut flow $f \in \CCF(S,{\hb})$ yields a concrete trace $S_f = (x'_1, \ldots x'_n)$ such that $(c_j(T), x_i(c_j(T))) \in f(T)$ implies $x_i'(T) = x_i(c_j(T))$ for all $1 \leq i \leq n$ and $T \in [0,d]$, where $A_j = \pi(x_i)$.
 \alert{The set of traces of $(S,{\hb})$ is given by $\tr(S,{\hb}) = \{ S_f \st \exists f \in \CCF(S,{\hb})\}$.}
 
-
-
 %For a distributed signal $(S,{\hb})$, a sequence $C_0 C_1 \ldots$ of consistent cuts is \emph{valid} iff $C_i \subset C_{i+1}$ and $|C_i| + 1 = |C_{i+1}|$ for all $i \geq 0$.
 %We denote by $\CC(S,{\hb})$ the set of all valid sequences of consistent cuts of $(S,{\hb})$.
 %The set of traces of $(S,{\hb})$ is given by $\tr(S,{\hb}) = \{ \fr(C_0) \fr(C_1) \ldots \st C_0 C_1 \ldots \in \CC(S,{\hb}) \}$.
@@ -116,13 +111,63 @@ For a distributed signal $(S,{\hb})$, a consistent cut flow $f \in \CCF(S,{\hb})
 Given a distributed signal $(S, {\hb})$, an LTL formula $\varphi$, a bounded variability constant $\delta > 0$, and a maximum clock skew $\varepsilon > 0$, we aim to compute the set $[S, {\hb} \models \varphi] = \{ [w, 0 \models \varphi]_{RV} \st w \in \tr(S, {\hb}) \}$ of truth values.
 
 \begin{example}
-	\TODO
+	\TODO: precise solution without and with $\varepsilon$ and $\delta$, under-approximations and over-approximations
 \end{example}
 
-\section{Our Logic}
-%The values of $\delta$ and $\varepsilon$ are known by the monitor.
-syntax
+\section{Our Approach}
+We assume that the values of $\delta$ and $\varepsilon$ are known by the monitor.
 
-finite-trace semantics
+\subsection{Uncertainty Regions and Signal Retiming}
+.
+%todo: define a function from timestamps to segments, maybe using a proper retiming?
 
-infinite-trace semantics (?)
+\subsection{Truth Expressions}
+\TODO: clean
+
+Consider a binary alphabet $\Sigma = \{0,1\}$ and let $\epsilon$ be the empty string.
+We denote by $v$ a finite and non-empty word in $L = (1 + \epsilon) \cdot (0 \cdot 1)^* \cdot (0 + \epsilon)$.
+In order to encode signal values that include uncertainty and interleavings, we use the following grammar.
+
+%todo: add conjunction to syntax and semantics, add destuttering to semantics of each operation
+$$ \psi := 0 ~|~ 1 ~|~ \psi \cdot \psi ~|~ \psi \triangleleft \psi ~|~ \psi \triangleright \psi ~|~ \psi \diamond \psi $$
+
+We denote by $\Psi$ the set of all expressions that can be generated by the above grammar.
+Letting $\psi_1, \psi_2 \in \Psi$, we inductively define the semantics for our encoding.
+\begin{equation}
+	\begin{array}{lcl}
+		\llbracket 0 \rrbracket & = & \{ 0 \} \\
+		\llbracket 1 \rrbracket & = & \{ 1 \} \\
+		\llbracket \psi_1 \cdot \psi_2 \rrbracket & = & \{ w_1 \cdot w_2~|~w_1 \in \llbracket \psi_1 \rrbracket \text{ and } w_2 \in \llbracket \psi_2 \rrbracket \} \\
+		\llbracket \psi_1 \triangleleft \psi_2 \rrbracket & = & \llbracket \psi_1 \rrbracket \; \cup \;  \llbracket \psi_1 \cdot \psi_2 \rrbracket \\
+		\llbracket \psi_1 \triangleright \psi_2 \rrbracket & = & \llbracket \psi_2 \rrbracket \; \cup \;  \llbracket \psi_1 \cdot \psi_2 \rrbracket \\
+		\llbracket \psi_1 \diamond \psi_2 \rrbracket & = & \llbracket \psi_1 \triangleleft \psi_2 \rrbracket \; \cup \; \llbracket \psi_1 \triangleright \psi_2 \rrbracket\\
+	\end{array}
+\end{equation}
+
+Let $w = (\psi_1, I_1), (\psi_2, I_2), \ldots , (\psi_n, I_n)$ a continuous-time finite-length boolean signal with uncertainty such that $I_i = [t_i, t_{i+1})$, where $t_1 = 0$ and for all $i \in [0,n)$, $t_{i+1} > t_i$.
+In every interval $I_i$, the signal can assume value patterns defined by the qualitative word $v \in \llbracket \psi_i \rrbracket$.
+
+\begin{example}
+	A signal $w$ of duration $d$ with a single rising edge at time $t$ is represented as $(0, [0, t)), (1, [t, d))$.
+	This same signal, interpreted at some other process, assuming a maximal clock skew $0 < \varepsilon < t$ is represented as $(0, [0, t - \varepsilon)), (0\cdot 1, [t - \varepsilon, t + \varepsilon)), (1, [t + \varepsilon, d))$. %todo: explain the idea (observing from different process etc) at the beginning of the section
+\end{example}
+
+%todo: rephrase, show closure under pfx and sfx, show closure under conjunction
+The first two operations on $\psi$ that we need are its prefix $\pfx(\psi)$ and suffix $\sfx(\psi)$:
+\begin{equation}
+	\begin{array}{lcl}
+		\pfx(\psi) & = & \{ w~|~ \exists w' \text{ s.t. } w\cdot w' \in \llbracket \psi \rrbracket \} \\
+		\sfx(\psi) & = & \{ w~|~ \exists w' \text{ s.t. } w'\cdot w \in \llbracket \psi \rrbracket \} \\
+	\end{array}
+\end{equation}
+
+\begin{example}
+	We need the prefix and the suffix operations when we need to split an interval into two intervals and describe what is allowed in each interval. For example, consider the interval $(0\cdot 1, [t_1, t_2))$ from the previous example and a time $t_1 < t' < t_2$ at which we want to split the interval. We now need to describe what are the qualitative patterns that we can observe in $[t_1, t)$ and in $[t', t_2)$. It is not hard to see that in $[t_1, t')$, we can see either $0$ or $0 \cdot 1$, while in $[t_1, t')$ we can see either $0 \cdot 1$ or $1$. It follows that we can represent $(0 \cdot 1, [t_1, t2)$ as $(\pfx(0\cdot 1), [t_1, t')), (\sfx(0 \cdot 1), [t', t_2))$, where $\pfx(0 \cdot 1) = 0 \triangleleft 1$ and $\sfx(0 \cdot 1) = 0 \triangleright 1$. We want to have simple, syntactic and inductive definition of the prefix and suffix operations.
+\end{example}
+
+%todo: define a function from signals and segments to truth expressions
+
+\subsection{The Logic}
+We use the same syntax as in \cref{sec:rvltl}.
+
+%todo: use the above-defined functions to define the semantics
