@@ -11,23 +11,23 @@ A closed interval $[a,b] \subseteq \R$ of reals has length $|b-a|$.
 \end{definition}
 
 We consider an asynchronous and loosely-coupled message-passing system of $N \geq 2$ reliable agents, denoted $\A = \{A_1, \ldots, A_N\}$.
-The agents produce a set of $n \geq 2$ signals $\S = \{x_1, \ldots, x_n\}$ where $x_i : [0,d] \to \B$ for some $d \in \R_{\geq 0}$.
+The agents produce a set of $n \geq 2$ signals $\S = \{x_1, \ldots, x_n\}$ where $x_i : [0,d] \to \B$ for some $d \in \R_{\geq 0}$. 
 The function $\pi : \S \to \A$ maps each signal to the agent it is produced by.
 The agents do not share memory or a global clock.
 Only to formalize statements, we speak of a hypothetical global clock and denote its value by $T$.
 For denoting local time values, we use the lowercase letters $t$ and $s$.
 
-We represent the local clock of the agent $A_i$ as an increasing function $c_i : \R_{\geq 0} \to \R_{\geq 0}$ that maps a global clock value $T$ to a local clock value $t$ of $A_i$.
+We represent the local clock of the agent $A_i$ as an increasing function $c_i : \R_{\geq 0} \to \R_{\geq 0}$ that maps a global time $T$ to a local time $c_i(T)$ of $A_i$.
 We denote by $c_i^{-1}$ the inverse of the local clock function $c_i$.
-We assume that the system is \emph{partially synchronous}: the agents use a clock synchronization algorithm that guarantees a bounded clock skew with respect to a fixed reference clock, i.e., $|c_i(T) - \chi(T)| < \varepsilon$ for all $1 \leq i \leq N$ and $T \in \R_{\geq 0}$, where $\chi : \R_{\geq 0} \to \R_{\geq 0}$ is the reference clock and $\varepsilon \in \R_{> 0}$ is the maximum clock skew. %TODO: strict or nonstrict?
+We assume that the system is \emph{partially synchronous}: the agents use a clock synchronization algorithm that guarantees a bounded clock skew with respect to a fixed reference clock, i.e., $|c_i(T) - \chi(T)| < \varepsilon$ for all $1 \leq i \leq N$ and $T \in \R_{\geq 0}$, where $\chi : \R_{\geq 0} \to \R_{\geq 0}$ is the reference clock and $\varepsilon \in \R_{> 0}$ is the maximum clock skew. %TODO: strict or nonstrict? nonzero or not?
 
-An \emph{event} of a given signal $x_i$ is a pair $(t, x_i(t))$ where $t$ is a local clock value.
+An \emph{event} of a given signal $x_i$ is a pair $(t, x_i(t))$ where $t$ is a local clock value of the agent $\pi(x_i)$.
 We denote by $E_i$ the set of events of signal $x_i$.
 An \emph{edge} of $x_i$ is an event $(t, x_i(t))$ such that $\lim_{s \to t^-} x_i(s) \neq \lim_{s \to t^+} x_i(s)$.
 In particular, it is a \emph{rising} edge if $\lim_{s \to t^-} x_i(s) < \lim_{s \to t^+} x_i(s)$, and a \emph{falling} edge otherwise.
 We respectively denote by $D_i^\uparrow$ and $D_i^\downarrow$ the sets of rising and falling edges of $x_i$, and we let $D_i = D_i^\uparrow \cup D_i^\downarrow$. %TODO: check later if necessary
 
-We assume that signals have \emph{bounded variability} with respect to the reference clock: for each agent $A_i$ and every pair $(t, x_i(t)), (t', x_i(t')) \in D_i$ of edges, we have $|\chi(c_i^{-1}(t)) - \chi(c_i^{-1}(t'))| \geq \delta$, where $\delta \in \R_{\geq 0}$ is the bounded variability constant.
+We assume that signals have \emph{bounded variability} with respect to the reference clock: for each signal $x_i$ and every pair $(t, x_i(t)), (t', x_i(t')) \in D_i$ of edges, we have $|\chi(c_j^{-1}(t)) - \chi(c_j^{-1}(t'))| \geq \delta$, where $A_j = \pi(x_i)$ is the agent that produces $x_i$ and $\delta \in \R_{\geq 0}$ is the bounded variability constant.
 
 %TODO: retiming?
 
@@ -44,14 +44,16 @@ We assume that signals have \emph{bounded variability} with respect to the refer
 \end{example}
 
 \begin{definition}
-	Let $(S, {\hb})$ be a distributed signal of $n$ signals, and $E = \bigcup_{i = 1}^{n} E_i$ the set of its events.
+	Let $(S, {\hb})$ be a distributed signal of $n$ signals, and $E = \bigcup_{i = 1}^{n} E_i$ be the set of its events.
 	A set $C \subseteq E$ is a \emph{consistent cut} iff for every event in $C$, all events that happened before  it also belong to $C$, i.e., for all $e, e' \in E$, if $e \in C$ and $e' \hb e$, then $e' \in C$.
 \end{definition}
 
 We denote by $\CC(T)$ the (infinite) set of consistent cuts at global time $T$.
 Given a consistent cut $C$, its \emph{frontier} $\fr(C) \subseteq C$ is the set consisting of the last events in $C$ of each signal, i.e., $\fr(C) = \bigcup_{i = 1}^{n} \{ (t, x_i(t)) \in E_i \cap C \st \forall t' > t : (t', x_i(t')) \notin E_i \cap C \}$.
-A \emph{consistent cut flow} is a function $\ccf : I \to 2^E$, where $I \subset \R_{\geq 0}$ is a closed interval, that maps a global clock value $T$ to the frontier of a consistent cut at time $T$, i.e., $\ccf(T) \in \{\fr(C) \st C \in \CC(T)\}$.
-We denote by $\mathbb{CCF}(S,{\hb})$ the set of all consistent cut flows of the distributed signal $(S,{\hb})$.
+A \emph{consistent cut flow} is a function $f : I \to 2^E$, where $I \subset \R_{\geq 0}$ is a closed interval, that maps a global clock value $T$ to the frontier of a consistent cut at time $T$, i.e., $f(T) \in \{\fr(C) \st C \in \CC(T)\}$.
+Moreover, for all $T,T' \in I$ and $1 \leq i \leq n$, if $T < T'$, then for every pair of events $(c_j(T), x_i(c_j(T))) \in f(T)$ and $(c_j(T'), x_i(c_j(T'))) \in f(T')$ we have $(c_j(T), x_i(c_j(T))) \hb (c_j(T'), x_i(c_j(T')))$, where $A_j = \pi(x_i)$.
+We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distributed signal $(S,{\hb})$.
+
 
 \begin{example}
 	\TODO
@@ -102,8 +104,8 @@ Finally, the semantics of RV-LTL is defined over $\B_4 = \B \cup \{\bot_c, \top_
 \subsection{Problem Statement}
 
 Let $S = (x_1, \ldots, x_n)$ where $x_i : [0,d] \to \B$ for some $d \in \R_{\geq 0}$.
-For a distributed signal $(S,{\hb})$, a consistent cut flow $\ccf \in \mathbb{CCF}(S,{\hb})$ yields a concrete trace $w_\ccf = (x'_1, \ldots x'_n)$ such that $(c_i(T), x_i(c_i(T))) \in \ccf(T)$ implies $x_i'(T) = x_i(c_i(T))$ for all $1 \leq i \leq n$ and $T \in [0,d]$.
-The set of traces of $(S,{\hb})$ is given by $\tr(S,{\hb}) = \{ w_\ccf \st \exists \ccf \in \mathbb{CCF}(S,{\hb})\}$.
+For a distributed signal $(S,{\hb})$, a consistent cut flow $f \in \CCF(S,{\hb})$ yields a concrete trace $S_f = (x'_1, \ldots x'_n)$ such that $(c_j(T), x_i(c_j(T))) \in f(T)$ implies $x_i'(T) = x_i(c_j(T))$ for all $1 \leq i \leq n$ and $T \in [0,d]$, where $A_j = \pi(x_i)$.
+\alert{The set of traces of $(S,{\hb})$ is given by $\tr(S,{\hb}) = \{ S_f \st \exists f \in \CCF(S,{\hb})\}$.}
 
 
 
