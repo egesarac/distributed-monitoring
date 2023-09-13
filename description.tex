@@ -21,11 +21,13 @@ We represent the local clock of the agent $A_i$ as an increasing function $c_i :
 We denote by $c_i^{-1}$ the inverse of the local clock function $c_i$.
 We assume that the system is \emph{partially synchronous}: the agents use a clock synchronization algorithm that guarantees a bounded clock skew with respect to a fixed reference clock, i.e., $|c_i(T) - \chi(T)| < \varepsilon$ for all $1 \leq i \leq N$ and $T \in \R_{\geq 0}$, where $\chi : \R_{\geq 0} \to \R_{\geq 0}$ is the reference clock and $\varepsilon \in \R_{> 0}$ is the maximum clock skew. %TODO: strict or nonstrict? nonzero or not?
 
+%TODO: check later if necessary
 An \emph{event} of a given signal $x_i$ is a pair $(t, x_i(t))$ where $t$ is a local clock value of the agent $\pi(x_i)$.
 We denote by $E_i$ the set of events of signal $x_i$.
 An \emph{edge} of $x_i$ is an event $(t, x_i(t))$ such that $\lim_{s \to t^-} x_i(s) \neq \lim_{s \to t^+} x_i(s)$.
 In particular, it is a \emph{rising} edge if $\lim_{s \to t^-} x_i(s) < \lim_{s \to t^+} x_i(s)$, and a \emph{falling} edge otherwise.
-We respectively denote by $D_i^\uparrow$ and $D_i^\downarrow$ the sets of rising and falling edges of $x_i$, and we let $D_i = D_i^\uparrow \cup D_i^\downarrow$. %TODO: check later if necessary
+We respectively denote by $D_{x_i}^\uparrow$ and $D_{x_i}^\downarrow$ the sets of rising and falling edges of $x_i$, and we let $D_{x_i} = D_{x_i}^\uparrow \cup D_{x_i}^\downarrow$.
+%Moreover, we let $D = \bigcup_{i = 1}^{n} D_{x_i}$ to denote the set of events of a distributed signal $S = (x_1, \ldots, x_n)$ 
 
 We assume that signals have \emph{bounded variability} with respect to the reference clock: for each signal $x_i$ and every pair $(t, x_i(t)), (t', x_i(t')) \in D_i$ of edges, we have $|\chi(c_j^{-1}(t)) - \chi(c_j^{-1}(t'))| \geq \delta$, where $A_j = \pi(x_i)$ is the agent that produces $x_i$ and $\delta \in \R_{\geq 0}$ is the bounded variability constant.
 
@@ -115,11 +117,40 @@ Given a distributed signal $(S, {\hb})$, an LTL formula $\varphi$, a bounded var
 \end{example}
 
 \section{Our Approach}
-We assume that the values of $\delta$ and $\varepsilon$ are known by the monitor.
 
-\subsection{Uncertainty Regions and Signal Retiming}
-.
-%todo: define a function from timestamps to segments, maybe using a proper retiming?
+%todo?
+We assume that the monitor runs on the same process as the reference clock and it knows the values of $\delta$ and $\varepsilon$.
+
+\subsection{Uncertainty Regions and Canonical Segmentations}
+
+Consider a signal $x : [0,d] \to \B$ with $x(0) = \bot$ and a single rising edge at local time $t$.
+A monitor observing $x$ from another process/agent needs to take into account the clock skew: according to the reference clock, the rising edge of $x$ occurs in the range $(t - \varepsilon$ and $t + \varepsilon)$.
+This range is called an \emph{uncertainty region} because the monitor cannot tell the value of $x$ precisely, but only that it changes from $\bot$ to $\top$.
+To systematically reason about uncertainty regions of signals, we define the notion of segmentation of temporal domains of signals.
+
+\begin{definition}
+	Given an interval $I \subset \R_{\geq 0}$, a \emph{segmentation} of $I$ is a partition of $I$ into finitely many intervals $I_1, \ldots, I_k$ of the form \alert{$I_j = [t_j, t_{j+1})$} for all $1 \leq j \leq k$.
+%	Given a signal $x : I \to \B$, a \emph{segmentation} of $x$ is a partition of its temporal domain $I$ into finitely many intervals $I_1, \ldots, I_k$ of the form \alert{$I_j = [t_j, t_{j+1})$} for all $1 \leq j \leq k$.
+	By extension, a segmentation of a collection of signals with the same temporal domain $I$ is a segmentation of $I$.
+\end{definition}
+
+Let $x : [0,d] \to \B$ be a signal and $D_x = \{(t_1, x(t_1)), \ldots, (t_m, x(t_m))\}$ be the set of edges of $x$, given in an increasing order of local clock values.
+For $1 \leq i \leq m$, let $\theta_{\text{lo}}(x,t_i) = \max\{0, \max_{j \in \{1, i\}} t_j - \varepsilon - (j-i)\delta\}$ and $\theta_{\text{hi}}(x,t_i) = \min\{d, \min_{i \leq j \leq m} t_j + \varepsilon - (j-i)\delta\}$.
+Intuitively, $\theta_{\text{lo}}$ and $\theta_{\text{hi}}$ give us the lower and upper bounds on the value of the reference clock for a given edge.
+We use these to describe a canonical segmentation of a distributed signal.
+
+Let $(S,{\hb})$ be a distributed signal of $n$ signals.
+For each signal $x_i$, let $F_i = \{\theta_{\text{lo}}(x_i, t_j) \st (t_j, x_i(t_j)) \in D_{x_i}\} \cup \{\theta_{\text{hi}}(x_i, t_j) \st (t_j, x_i(t_j)) \in D_{x_i}\}$ be the set of bounds on the reference clock values for its edges.
+Let $F = \{0, d\} \cup \bigcup_{i = 1}^{n} F_i$ and let $(a_j)_{1 \leq j \leq |F|}$ be an increasing sequence of clock values corresponding to the elements of $F$.
+We define the canonical segmentation of $(S,{\hb})$ as $G_S = \{I_1, \ldots, I_{|F| - 1}\}$ where $I_k = [a_k, a_{k+1})$ for all $1 \leq k \leq |F| - 1$.
+Moreover, given $t \in [0,d]$, we define $\theta(S,t) = I'$ where $I' \in G_S$ and $t \in I'$.
+
+\begin{example}
+	\TODO: canonical segmentation
+\end{example}
+
+%todo: define a function from timestamps to segments.
+
 
 \subsection{Truth Expressions}
 \TODO: clean
