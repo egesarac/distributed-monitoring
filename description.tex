@@ -180,6 +180,9 @@ Letting $\psi_1, \psi_2 \in \Psi$, we inductively define the semantics for our e
 		\llbracket \psi_1 \triangleright \psi_2 \rrbracket &= \destutter(\llbracket \psi_2 \rrbracket \; \cup \;  \llbracket \psi_1 \cdot \psi_2 \rrbracket) \\
 		\llbracket \psi_1 \diamond \psi_2 \rrbracket &= \destutter(\llbracket \psi_1 \triangleleft \psi_2 \rrbracket \; \cup \; \llbracket \psi_1 \triangleright \psi_2 \rrbracket)\\
 \end{align*}
+
+\TODO: give intuition for each operation
+
 Note that we can additionally define $\psi_1 \lor \psi_2 = \lnot (\lnot \psi_1 \land \lnot \psi_2)$.
 Moreover, one can easily verify that $\destutter(\Sigma^*)$ is closed under these operations.
 
