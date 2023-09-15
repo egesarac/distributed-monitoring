@@ -35,12 +35,12 @@ Moreover, given $t \in [0,d)$, we define $\theta(S,t) = I'$ where $I' \in G_S$ a
 
 Consider a binary alphabet $\Sigma = \{0,1\}$.
 We denote by $\Sigma^*$ the set of finite words over $\Sigma$ and by $\epsilon$ the empty word.
-Given $u,v \in \Sigma^*$ of the same length, we respectively denote by $u \BitAnd v$ and $u \BitOr v$ the `bitwise and' and `bitwise or' operations, and by $\BitNeg u$ the `bitwise negation' operator.
+Given $u,v \in \Sigma^*$ of the same length, we respectively denote by $u \BitAnd v$ and $u \BitOr v$ the `bitwise and' and `bitwise or' operations, and by $\BitNeg u$ the `bitwise negation' operation.
 
 We define the function $\destutter : \Sigma^* \to \Sigma^*$ inductively as follows.
 For all $\sigma \in \Sigma \cup \{\epsilon\}$, let $\destutter(\sigma) = \sigma$.
 For all $u \in \Sigma^*$ such that $u = \sigma_1 \sigma_2 v$ for some $\sigma_1,\sigma_2 \in \Sigma$ and $v \in \Sigma^*$, let (i) $\destutter(u) = \destutter(\sigma_2 v)$ if $\sigma_1 = \sigma_2$, and (ii) $\destutter(u) = \sigma_1 \cdot \destutter(\sigma_2 v)$ otherwise.
-Given a set $L$ of finite words, we define $\destutter(L) = \{\destutter(u) \st u \in L\}$.
+Given a set $L \subseteq \Sigma^*$ of finite words, we define $\destutter(L) = \{\destutter(u) \st u \in L\}$.
 Moreover, given an integer $k \geq 0$, we define $\stutter_k : \Sigma^* \to \Sigma^*$ such that $\stutter_k(u) = \{v \in \Sigma^* \st |v| = k \land \destutter(v) = \destutter(u)\}$ if $k \geq |u|$, and $\stutter_k(u) = \emptyset$ otherwise. %todo: check the definition
 
 In the sequel, we use finite words from $\destutter(\Sigma^*)$ to denote how the values of a signal evolve through intervals that include uncertainty and interleavings.
