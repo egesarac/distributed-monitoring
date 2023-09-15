@@ -1,0 +1,102 @@
+\section{Preliminaries}
+
+We denote by $\B = \{ \bot, \top \}$ the set of boolean truth values, $\R$ the set of reals, $\R_{\geq 0}$ the set of nonnegative reals, $\R_{> 0}$ the set of positive reals.
+A left-closed right-open interval $[a,b) \subseteq \R$ of reals has length $|b-a|$.
+%, $\N$ the set of natural numbers (including 0).
+
+\subsection{Signal Model}
+
+\begin{definition}
+	A \emph{(boolean) signal} is a right-continuous function $x : [0,d) \to \B$ where $d \in \R_{> 0}$ is the length of $x$.
+\end{definition}
+
+We consider an asynchronous and loosely-coupled message-passing system of $N \geq 2$ reliable agents, denoted $\A = \{A_1, \ldots, A_N\}$.
+The agents produce a set of $n \geq 2$ signals $\S = \{x_1, \ldots, x_n\}$ where $x_i : [0,d) \to \B$ for some $d \in \R_{> 0}$.
+The function $\pi : \S \to \A$ maps each signal to the agent it is produced by.
+The agents do not share memory or a global clock.
+Only to formalize statements, we speak of a hypothetical global clock and denote its value by $T$.
+For denoting local time values, we use the lowercase letters $t$ and $s$.
+
+We represent the local clock of the agent $A_i$ as an increasing function $c_i : \R_{\geq 0} \to \R_{\geq 0}$ that maps a global time $T$ to a local time $c_i(T)$ of $A_i$.
+We denote by $c_i^{-1}$ the inverse of the local clock function $c_i$.
+We assume that the system is \emph{partially synchronous}: the agents use a clock synchronization algorithm that guarantees a bounded clock skew with respect to a fixed reference clock, i.e., $|c_i(T) - \chi(T)| < \varepsilon$ for all $1 \leq i \leq N$ and $T \in \R_{\geq 0}$, where $\chi : \R_{\geq 0} \to \R_{\geq 0}$ is the reference clock and $\varepsilon \in \R_{> 0}$ is the maximum clock skew. %TODO: strict or nonstrict? nonzero or not?
+
+%TODO: check later if necessary
+An \emph{event} of a given signal $x_i$ is a pair $(t, x_i(t))$ where $t$ is a local clock value of the agent $\pi(x_i)$.
+We denote by $E_i$ the set of events of signal $x_i$.
+An \emph{edge} of $x_i$ is an event $(t, x_i(t))$ such that $\lim_{s \to t^-} x_i(s) \neq \lim_{s \to t^+} x_i(s)$.
+In particular, it is a \emph{rising} edge if $\lim_{s \to t^-} x_i(s) < \lim_{s \to t^+} x_i(s)$, and a \emph{falling} edge otherwise.
+We respectively denote by $D_{x_i}^\uparrow$ and $D_{x_i}^\downarrow$ the sets of rising and falling edges of $x_i$, and we let $D_{x_i} = D_{x_i}^\uparrow \cup D_{x_i}^\downarrow$.
+%Moreover, we let $D = \bigcup_{i = 1}^{n} D_{x_i}$ to denote the set of events of a distributed signal $S = (x_1, \ldots, x_n)$ 
+
+We assume that signals have \emph{bounded variability} with respect to the reference clock: for each signal $x_i$ and every pair $(t, x_i(t)), (t', x_i(t')) \in D_{x_i}$ of edges, we have $|\chi(c_j^{-1}(t)) - \chi(c_j^{-1}(t'))| \geq \delta$, where $A_j = \pi(x_i)$ is the agent that produces $x_i$ and $\delta \in \R_{\geq 0}$ is the bounded variability constant.
+
+\begin{definition}
+	A \emph{distributed signal} is a pair $(S, {\hb})$ where $S = (x_1, \ldots, x_n)$ is a vector of signals and ${\hb}$ is the happened-before relation between events in signals extended with the partial synchrony assumption as follows.
+	\begin{itemize}
+		\item For every agent, the events of its signal are totally ordered, i.e., for all $1 \leq i \leq n$ and $(t, x_i(t)), (t', x_i(t')) \in E_i$, if $t < t'$ then $(t, x_i(t)) \hb (t', x_i(t'))$.
+		\item Every pair of events whose timestamps are more than $\varepsilon$ apart is totally ordered, i.e., for all $1 \leq i,j \leq n$ and events $(t, x_i(t)) \in E_i$ and $(t', x_j(t')) \in E_j$, if $t + \varepsilon < t'$ then $(t, x_i(t)) \hb (t', x_j(t'))$. %TODO: strict or nonstrict?
+	\end{itemize}
+\end{definition}
+
+\begin{example}
+	\TODO: distributed signal, happened-before relation
+\end{example}
+
+\begin{definition}
+	Let $(S, {\hb})$ be a distributed signal of $n$ signals, and $E = \bigcup_{i = 1}^{n} E_i$ be the set of its events.
+	A set $C \subseteq E$ is a \emph{consistent cut} iff for every event in $C$, all events that happened before  it also belong to $C$, i.e., for all $e, e' \in E$, if $e \in C$ and $e' \hb e$, then $e' \in C$.
+\end{definition}
+
+%todo: check below 2 paragraphs for consistency with using a reference clock
+We denote by $\CC(T)$ the (infinite) set of consistent cuts at global time $T$.
+Given a consistent cut $C$, its \emph{frontier} $\fr(C) \subseteq C$ is the set consisting of the last events in $C$ of each signal, i.e., $\fr(C) = \bigcup_{i = 1}^{n} \{ (t, x_i(t)) \in E_i \cap C \st \forall t' > t : (t', x_i(t')) \notin E_i \cap C \}$.
+
+A \emph{consistent cut flow} is a function $f : I \to 2^E$, where $I \subset \R_{\geq 0}$ is a left-closed right-open interval, that maps a global clock value $T$ to the frontier of a consistent cut at time $T$, i.e., $f(T) \in \{\fr(C) \st C \in \CC(T)\}$.
+Moreover, for all $T,T' \in I$ and $1 \leq i \leq n$, if $T < T'$, then for every pair of events $(c_j(T), x_i(c_j(T))) \in f(T)$ and $(c_j(T'), x_i(c_j(T'))) \in f(T')$ we have $(c_j(T), x_i(c_j(T))) \hb (c_j(T'), x_i(c_j(T')))$, where $A_j = \pi(x_i)$.
+We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distributed signal $(S,{\hb})$.
+
+\begin{example}
+	\TODO: consistent cut, frontier, consistent cut flow
+\end{example}
+
+\subsection{RV-LTL} \label{sec:rvltl}
+
+Let $\AP$ be a set of atomic propositions.
+The syntax is given by the following grammar where $p \in \AP$.
+$$ \varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \lor \varphi ~|~ \varphi \until \varphi $$
+We additionally use the following standard abbreviations: $\true = p \lor \lnot p$, $\false = \lnot \true$, $ \varphi_1 \land \varphi_2 = \lnot \varphi_1 \lor \lnot \varphi_2$, $\LTLf \varphi = \true \until \varphi$, and $\LTLg \varphi = \lnot \LTLf \lnot \varphi$.
+
+%A trace $w = (E_1, \ldots, E_n)$ is a vector of event sets of continuous-time boolean-valued finite-length signals $x_1, \ldots, x_n$ whose initial values are $v_0, \ldots, v_n$.
+
+%TODO: this paragraph is a little handwavy
+We assume the reader is familiar with the infinite-trace semantics of LTL, which we denote by $[\omega \models \varphi]$ where $\omega$ is a vector of continuous-time boolean-valued infinite-length signals and $\varphi$ is a formula with the syntax above.
+
+A trace $w = (x_1, \ldots, x_n)$ is a vector of signals $x_i : [0,d) \to \B$, each corresponding to the atomic proposition $p_i \in \AP$.
+Let $w$ be a trace and $t \in [0,d)$ a timestamp.
+We recall the semantics of FLTL defined over $\B = \{\bot, \top\}$ where $\bot < \top$ and they are complementary to each other. 
+\begin{align*}
+	[w,t \models p_i]_F &= x_i(t)\\
+	[w,t \models \lnot \varphi]_F &= \overline{[w,t \models \varphi]_F}\\
+	[w,t \models \varphi_1 \lor \varphi_2]_F &= \max([w,t \models \varphi_1]_F, [w,t \models \varphi_2]_F)\\
+	[w,t \models \varphi_1 \until \varphi_2]_F &= \max_{t \leq t' \leq d} \left( \min \left( [w,t' \models \varphi_2]_F, \min_{t \leq t'' \leq t'} \left( [w,t'' \models \varphi_1]_F \right) \right) \right)\\
+\end{align*}
+
+Now, let us recall the semantics of LTL3 defined over $\B_3 = \B \cup \{\?\}$ where $\bot < \? < \top$ and $\?$ is complementary to itself. %TODO: concat is not defined
+\begin{align*}
+	[w,t \models \varphi]_3 &= \begin{cases}
+		\top &\text{if for all } \omega : \R_{\geq 0}^n \to \B^n \text{ we have } [w \omega \models \varphi]\\
+		\bot &\text{if for all } \omega : \R_{\geq 0}^n \to \B^n \text{ we have } [w \omega \models \lnot \varphi]\\
+		\? &\text{otherwise}\\
+	\end{cases}
+\end{align*}
+
+Finally, the semantics of RV-LTL is defined over $\B_4 = \B \cup \{\bot_c, \top_c \}$ where $\bot < \bot_c < \top_c < \top$ and the values $\bot_c$ and $\top_c$ complement each other.
+\begin{align*}
+	[w,t \models \varphi]_{RV} &= \begin{cases}
+		\top &\text{if } [w,t \models \varphi]_3 = \top \\
+		\top_c &\text{if } [w,t \models \varphi]_3 = \? \text{ and } [w,t \models \varphi]_F = \top \\
+		\bot_c &\text{if } [w,t \models \varphi]_3 = \? \text{ and } [w,t \models \varphi]_F = \bot \\
+		\bot &\text{if } [w,t \models \varphi]_3 = \bot \\
+	\end{cases} \\
+\end{align*}	
