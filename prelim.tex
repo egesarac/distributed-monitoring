@@ -64,8 +64,8 @@ We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distribu
 
 Let $\AP$ be a set of atomic propositions.
 The syntax is given by the following grammar where $p \in \AP$.
-$$ \varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \lor \varphi ~|~ \varphi \until \varphi $$
-We additionally use the following standard abbreviations: $\true = p \lor \lnot p$, $\false = \lnot \true$, $ \varphi_1 \land \varphi_2 = \lnot \varphi_1 \lor \lnot \varphi_2$, $\LTLf \varphi = \true \until \varphi$, and $\LTLg \varphi = \lnot \LTLf \lnot \varphi$.
+$$ \varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \land \varphi ~|~ \varphi \until \varphi $$
+We additionally use the following standard abbreviations: $\true = p \lor \lnot p$, $\false = \lnot \true$, $ \varphi_1 \lor \varphi_2 = \lnot \varphi_1 \land \lnot \varphi_2$, $\LTLf \varphi = \true \until \varphi$, and $\LTLg \varphi = \lnot \LTLf \lnot \varphi$.
 
 %A trace $w = (E_1, \ldots, E_n)$ is a vector of event sets of continuous-time boolean-valued finite-length signals $x_1, \ldots, x_n$ whose initial values are $v_0, \ldots, v_n$.
 
@@ -78,7 +78,7 @@ We recall the semantics of FLTL defined over $\B = \{\bot, \top\}$ where $\bot <
 \begin{align*}
 	[w,t \models p_i]_F &= x_i(t)\\
 	[w,t \models \lnot \varphi]_F &= \overline{[w,t \models \varphi]_F}\\
-	[w,t \models \varphi_1 \lor \varphi_2]_F &= \max([w,t \models \varphi_1]_F, [w,t \models \varphi_2]_F)\\
+	[w,t \models \varphi_1 \land \varphi_2]_F &= \min([w,t \models \varphi_1]_F, [w,t \models \varphi_2]_F)\\
 	[w,t \models \varphi_1 \until \varphi_2]_F &= \max_{t \leq t' \leq d} \left( \min \left( [w,t' \models \varphi_2]_F, \min_{t \leq t'' \leq t'} \left( [w,t'' \models \varphi_1]_F \right) \right) \right)\\
 \end{align*}
 
