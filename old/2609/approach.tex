@@ -10,6 +10,11 @@ A monitor observing $x$ from another process/agent needs to take into account th
 This range is called an \emph{uncertainty region} because the monitor cannot tell the value of $x$ precisely, but only that it changes from $\bot$ to $\top$.
 To systematically reason about uncertainty regions of signals, we define the notion of segmentation of temporal domains of signals.
 
+\begin{definition}
+	Given an interval $I \subset \R_{\geq 0}$, a \emph{segmentation} of $I$ is a partition of $I$ into finitely many intervals $I_1, \ldots, I_k$ of the form $I_j = [t_j, t_{j+1})$ such that $t_j < t_{j+1}$ for all $1 \leq j \leq k$.
+%	Given a signal $x : I \to \B$, a \emph{segmentation} of $x$ is a partition of its temporal domain $I$ into finitely many intervals $I_1, \ldots, I_k$ of the form \alert{$I_j = [t_j, t_{j+1})$} for all $1 \leq j \leq k$.
+	By extension, a segmentation of a collection of signals with the same temporal domain $I$ is a segmentation of $I$.
+\end{definition}
 
 Let $x : [0,d) \to \B$ be a signal and $D_x = \{(t_1, x(t_1)), \ldots, (t_m, x(t_m))\}$ be the set of edges of $x$, given in an increasing order of local clock values.
 For $1 \leq i \leq m$, let $\theta_{\text{lo}}(x,t_i) = \max\{0, \max_{j \in \{1, i\}} t_j - \varepsilon - (j-i)\delta\}$ and $\theta_{\text{hi}}(x,t_i) = \min\{d, \min_{i \leq j \leq m} t_j + \varepsilon - (j-i)\delta\}$.
@@ -28,7 +33,11 @@ Moreover, given $t \in [0,d)$, we define $\theta(S,t) = I'$ where $I' \in G_S$ a
 
 \subsection{Value Expressions}
 %We encode possible behaviors of satisfaction signals using sets of alternating bit sequences.
-
+Consider a binary alphabet $\Sigma = \{0,1\}$.
+We denote by $\Sigma^*$ the set of finite words over $\Sigma$ and by $\epsilon$ the empty word.
+For $u \in \Sigma^*$, we respectively write $\pfx(u)$ and $\sfx(u)$ for the sets of prefixes and suffixes of $u$.
+%For a nonempty word $u \in \Sigma^*$ and $0 \leq i \leq |u| - 1$ we denote by $u[i]$ the $i$th letter of $u$ and by $u^i$ the suffix of $u$ of length $|u| - i$. 
+For a nonempty word $u \in \Sigma^*$ and $0 \leq i \leq |u| - 1$ we denote by $u[i]$ the $i$th letter of $u$, by $u[..i]$ the prefix of $u$ of length $i+1$, and by $u[i..]$ the suffix of $u$ of length $|u| - 1$. 
 Given $u,v \in \Sigma^*$ of the same length, we respectively denote by $u \BitAnd v$ and $u \BitOr v$ the `bitwise and' and `bitwise or' operations, and by $\BitNeg u$ the `bitwise negation' operation.
 In addition, given a nonempty words $u,v \in \Sigma^*$ of length $\ell$, we define as auxiliary bitwise temporal operators as follows:
 $$ \mathsf{E} u = \left( \max_{i \leq j \leq \ell - 1} u[j] \right)_{0 \leq i \leq \ell - 1} $$
@@ -37,7 +46,12 @@ $$ u \mathsf{U}_0 v = \left( \max_{i \leq j \leq \ell - 1} \left( \min \left( v[
 $$ u \mathsf{U}_1 v = \left( \max \left( u^i \mathsf{U}_0 v^i, \mathsf{A} u^i \right) \right)_{0 \leq i \leq \ell - 1} $$
 Observe that $\mathsf{A} u = u \mathsf{U}_1 0^\ell$ and $\mathsf{E} u = 1^\ell \mathsf{U}_0 u$.
 
+We define the function $\destutter : \Sigma^* \to \Sigma^*$ inductively as follows.
+For all $\sigma \in \Sigma \cup \{\epsilon\}$, let $\destutter(\sigma) = \sigma$.
+For all $u \in \Sigma^*$ such that $u = \sigma_1 \sigma_2 v$ for some $\sigma_1,\sigma_2 \in \Sigma$ and $v \in \Sigma^*$, let (i) $\destutter(u) = \destutter(\sigma_2 v)$ if $\sigma_1 = \sigma_2$, and (ii) $\destutter(u) = \sigma_1 \cdot \destutter(\sigma_2 v)$ otherwise.
+Given a set $L \subseteq \Sigma^*$ of finite words, we define $\destutter(L) = \{\destutter(u) \st u \in L\}$.
 
+Moreover, given an integer $k \geq 0$, we define $\stutter_k : \Sigma^* \to \Sigma^*$ such that $\stutter_k(u) = \{v \in \Sigma^* \st |v| = k \land \destutter(v) = \destutter(u)\}$ if $k \geq |u|$, and $\stutter_k(u) = \emptyset$ otherwise.
 
 Finally, given $u_1, u_2 \in \Sigma^*$, we define $u_1 \otimes u_2 = \{ (v_1,v_2) \st \max(|u_1|, |u_2|) \leq k \leq |u_1| + |u_2|, v_1 \in \stutter_k(u_1), v_2 \in \stutter_k(u_2) \}$ as the asynchronous product of $u_1$ and $u_2$.
 By extension, given $L_1, L_2 \subseteq \Sigma^*$, we have $L_1 \otimes L_2 = \{ u_1 \otimes u_2 \st u_1 \in L_1, u_2 \in L_2 \}$.

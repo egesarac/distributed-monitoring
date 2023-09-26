@@ -1,33 +1,14 @@
 \section{Preliminaries}
 
-We denote by $\B = \{ \bot, \top \}$ the set of boolean truth values, $\R$ the set of reals, $\R_{\geq 0}$ the set of nonnegative reals, and $\R_{> 0}$ the set of positive reals.
+We denote by $\B = \{ \bot, \top \}$ the set of boolean truth values, $\R$ the set of reals, $\R_{\geq 0}$ the set of nonnegative reals, $\R_{> 0}$ the set of positive reals.
 A left-closed right-open interval $[a,b) \subseteq \R$ of reals has length $|b-a|$.
 %, $\N$ the set of natural numbers (including 0).
-
-Let $\Sigma$ be a finite alphabet.
-We denote by $\Sigma^*$ the set of finite words over $\Sigma$ and by $\epsilon$ the empty word.
-For $u \in \Sigma^*$, we respectively write $\pfx(u)$ and $\sfx(u)$ for the sets of prefixes and suffixes of $u$.
-For a nonempty word $u \in \Sigma^*$ and $1 \leq i \leq |u|$ we denote by $u[i]$ the $i$th letter of $u$, by $u[..i]$ the prefix of $u$ of length $i$, and by $u[i..]$ the suffix of $u$ of length $|u| - i + 1$. 
-
-We define the function $\destutter : \Sigma^* \to \Sigma^*$ inductively as follows.
-For all $\sigma \in \Sigma \cup \{\epsilon\}$, let $\destutter(\sigma) = \sigma$.
-For all $u \in \Sigma^*$ such that $u = \sigma_1 \sigma_2 v$ for some $\sigma_1,\sigma_2 \in \Sigma$ and $v \in \Sigma^*$, let (i) $\destutter(u) = \destutter(\sigma_2 v)$ if $\sigma_1 = \sigma_2$, and (ii) $\destutter(u) = \sigma_1 \cdot \destutter(\sigma_2 v)$ otherwise.
-By extension, for a set $L \subseteq \Sigma^*$ of finite words, we have $\destutter(L) = \{\destutter(u) \st u \in L\}$.
-
-Moreover, given an integer $k \geq 0$, we define $\stutter_k : \Sigma^* \to \Sigma^*$ such that $\stutter_k(u) = \{v \in \Sigma^* \st |v| = k \land \destutter(v) = \destutter(u)\}$ if $k \geq |u|$, and $\stutter_k(u) = \emptyset$ otherwise.
 
 \subsection{Signal Model}
 
 \begin{definition}
 	A \emph{(boolean) signal} is a right-continuous function $x : [0,d) \to \B$ where $d \in \R_{> 0}$ is the length of $x$.
 \end{definition}
-
-Given an interval $I \subset \R_{\geq 0}$, a \emph{segmentation} of $I$ is a partition of $I$ into finitely many intervals $I_1, \ldots, I_k$ of the form $I_j = [t_j, t_{j+1})$ such that $t_j < t_{j+1}$ for all $1 \leq j \leq k$.
-By extension, a segmentation of a collection of signals with the same temporal domain $I$ is a segmentation of $I$.
-
-Let $x : [0,d) \to \B$ be a signal.
-The \emph{piecewise segmentation} of $x$ is the smallest segmentation $I_1, \ldots, I_k$ of $[0,d)$ such that $x(t) = x(t')$ for every $1 \leq i \leq k$ and $t,t' \in I_i$.
-Then, the \emph{profile} of $x$ is the nonstuttering sequence of truth values encoding the behavior of $x$ with respect to its piecewise segmentation, i.e., $\prof(x) = \destutter((x(t_i))_{1 \leq i \leq k})$ where $I_i = [t_i, t_{i+1})$ for all $1 \leq i \leq k$.
 
 We consider an asynchronous and loosely-coupled message-passing system of $N \geq 2$ reliable agents, denoted $A_1, \ldots, A_N$.
 The agents produce a set of $n \geq 2$ signals $x_1, \ldots, x_n$ where $x_i : [0,d) \to \B$ for some $d \in \R_{> 0}$.
@@ -38,7 +19,9 @@ For denoting local time values, we use the lowercase letters $t$ and $s$.
 
 We represent the local clock of the agent $A_i$ as an increasing and divergent function $c_i : \R_{\geq 0} \to \R_{\geq 0}$ that maps a global time $T$ to a local time $c_i(T)$ of $A_i$.
 We denote by $c_i^{-1}$ the inverse of the local clock function $c_i$.
-We assume that the system is \emph{partially synchronous}: the agents use a clock synchronization algorithm that guarantees a bounded clock skew with respect to the global clock, i.e., $|c_i(T) - T| < \varepsilon$ for all $1 \leq i \leq N$ and $T \in \R_{\geq 0}$, where $\varepsilon \in \R_{> 0}$ is the maximum clock skew.
+%We assume that the system is \emph{partially synchronous}: the agents use a clock synchronization algorithm that guarantees a bounded clock skew with respect to a fixed reference clock, i.e., $|c_i(T) - \chi(T)| < \varepsilon$ for all $1 \leq i \leq N$ and $T \in \R_{\geq 0}$, where $\chi : \R_{\geq 0} \to \R_{\geq 0}$ is the reference clock and $\varepsilon \in \R_{> 0}$ is the maximum clock skew. %TODO: strict or nonstrict? nonzero or not?
+We assume that the system is \emph{partially synchronous}: the agents use a clock synchronization algorithm that guarantees a bounded clock skew \alert{with respect to each other}, i.e., $|c_i(T) - c_j(T)| < \varepsilon$ for all $1 \leq i,j \leq N$ and $T \in \R_{\geq 0}$, where $\varepsilon \in \R_{> 0}$ is the maximum clock skew.
+%TODO: strict or nonstrict? nonzero or not?
 
 An \emph{event} of a given signal $x_i$ is a pair $(t, x_i(t))$ where $t$ is a local clock value.
 We denote by $E_i$ the set of events of signal $x_i$.
@@ -47,13 +30,14 @@ In particular, it is a \emph{rising} edge if $\lim_{s \to t^-} x_i(s) < \lim_{s 
 We respectively denote by $D_{x_i}^\uparrow$ and $D_{x_i}^\downarrow$ the sets of rising and falling edges of $x_i$, and we let $D_{x_i} = D_{x_i}^\uparrow \cup D_{x_i}^\downarrow$.
 %Moreover, we let $D = \bigcup_{i = 1}^{n} D_{x_i}$ to denote the set of events of a distributed signal $S = (x_1, \ldots, x_n)$ 
 
-We assume that signals have \emph{bounded variability} with respect to the global clock: for each signal $x_i$ and every pair $(t, x_i(t)), (t', x_i(t')) \in D_{x_i}$ of edges, we have $|c_j^{-1}(t) - c_j^{-1}(t')| \geq \delta$, where $A_j = \pi(x_i)$ is the agent that produces $x_i$ and $\delta \in \R_{\geq 0}$ is the bounded variability constant.
+%We assume that signals have \emph{bounded variability} with respect to the reference clock: for each signal $x_i$ and every pair $(t, x_i(t)), (t', x_i(t')) \in D_{x_i}$ of edges, we have $|\chi(c_j^{-1}(t)) - \chi(c_j^{-1}(t'))| \geq \delta$, where $A_j = \pi(x_i)$ is the agent that produces $x_i$ and $\delta \in \R_{\geq 0}$ is the bounded variability constant.
+We assume that signals have \emph{bounded variability} \alert{with respect to the global clock}: for each signal $x_i$ and every pair $(t, x_i(t)), (t', x_i(t')) \in D_{x_i}$ of edges, we have $|c_j^{-1}(t) - c_j^{-1}(t')| \geq \delta$, where $A_j = \pi(x_i)$ is the agent that produces $x_i$ and $\delta \in \R_{\geq 0}$ is the bounded variability constant.
 
 \begin{definition}
 	A \emph{distributed signal} is a pair $(S, {\hb})$ where $S = (x_1, \ldots, x_n)$ is a vector of signals and ${\hb}$ is the happened-before relation between events in signals extended with the partial synchrony assumption as follows.
 	\begin{itemize}
 		\item For every agent, the events of its signals are totally ordered, i.e., for all $1 \leq i,j \leq n$ with $\pi(x_i) = \pi(x_j)$ and all $(t, x_i(t)) \in E_i$ and $(t', x_j(t')) \in E_j$, if $t < t'$ then $(t, x_i(t)) \hb (t', x_j(t'))$.
-		\item Every pair of events whose timestamps are more than $2 \varepsilon$ apart is totally ordered, i.e., for all $1 \leq i,j \leq n$ and all $(t, x_i(t)) \in E_i$ and $(t', x_j(t')) \in E_j$, if $t + 2\varepsilon < t'$ then $(t, x_i(t)) \hb (t', x_j(t'))$. %TODO: strict or nonstrict?
+		\item Every pair of events whose timestamps are more than $\varepsilon$ apart is totally ordered, i.e., for all $1 \leq i,j \leq n$ and all $(t, x_i(t)) \in E_i$ and $(t', x_j(t')) \in E_j$, if $t + \varepsilon < t'$ then $(t, x_i(t)) \hb (t', x_j(t'))$. %TODO: strict or nonstrict?
 	\end{itemize}
 \end{definition}
 
@@ -78,10 +62,7 @@ We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distribu
 	\TODO: consistent cut, frontier, consistent cut flow
 \end{example}
 
-
 \subsection{RV-LTL} \label{sec:rvltl}
-
-\TODO: use stl with quantitative semantics instead?
 
 Let $\AP$ be a set of atomic propositions.
 The syntax is given by the following grammar where $p \in \AP$.
@@ -94,8 +75,6 @@ We additionally use the following standard abbreviations: $\true = p \lor \lnot 
 We assume the reader is familiar with the infinite-trace semantics of LTL, which we denote by $[\omega \models \varphi]$ where $\omega$ is a vector of continuous-time boolean-valued infinite-length signals and $\varphi$ is a formula with the syntax above.
 
 A trace $w = (x_1, \ldots, x_n)$ is a vector of \alert{synchronous} signals $x_i : [0,d) \to \B$, each corresponding to an atomic proposition $p_i \in \AP$.
-\TODO: notation $w[t..]$ (to fix in ltl3?)
-
 Let $w$ be a trace and $t \in [0,d)$ a timestamp.
 We recall the semantics of FLTL defined over $\B = \{\bot, \top\}$ where $\bot < \top$ and they are complementary to each other. 
 \begin{align*}
