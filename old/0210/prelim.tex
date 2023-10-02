@@ -1,7 +1,6 @@
 \section{Preliminaries}
 
-We define $\B = \{ \bot, \top \}$ as the set of boolean truth values where $\bot < \top$ and they complement each other.
-We denote by $\R$ the set of reals, $\R_{\geq 0}$ the set of nonnegative reals, and $\R_{> 0}$ the set of positive reals.
+We denote by $\B = \{ \bot, \top \}$ the set of boolean truth values, $\R$ the set of reals, $\R_{\geq 0}$ the set of nonnegative reals, and $\R_{> 0}$ the set of positive reals.
 A left-closed right-open interval $[a,b) \subseteq \R$ of reals has length $|b-a|$.
 %, $\N$ the set of natural numbers (including 0).
 
@@ -20,20 +19,18 @@ Moreover, given an integer $k \geq 0$, we define $\stutter_k : \Sigma^* \to \Sig
 \subsection{Signal Model}
 
 \begin{definition}
-	A \emph{signal} is a right-continuous, left-limited, non-Zeno, piecewise-constant function $x : [a,b) \to \R$ where $[a,b) \subseteq \R_{\geq 0}$ is the temporal domain of $x$.
+	A \emph{(boolean) signal} is a right-continuous function $x : [0,d) \to \B$ where $d \in \R_{> 0}$ is the length of $x$.
 \end{definition}
-
-\TODO: right-cont, left-lim, nonzeno, piecewise-constant, interval operations
 
 Given an interval $I \subset \R_{\geq 0}$, a \emph{segmentation} of $I$ is a partition of $I$ into finitely many intervals $I_1, \ldots, I_k$ of the form $I_j = [t_j, t_{j+1})$ such that $t_j < t_{j+1}$ for all $1 \leq j \leq k$.
 By extension, a segmentation of a collection of signals with the same temporal domain $I$ is a segmentation of $I$.
 
-%Let $x : [0,d) \to \B$ be a signal.
-%The \emph{piecewise segmentation} of $x$ is the smallest segmentation $I_1, \ldots, I_k$ of $[0,d)$ such that $x(t) = x(t')$ for every $1 \leq i \leq k$ and $t,t' \in I_i$.
-%Then, the \emph{profile} of $x$ is the nonstuttering sequence of truth values encoding the behavior of $x$ with respect to its piecewise segmentation, i.e., $\prof(x) = \destutter((x(t_i))_{1 \leq i \leq k})$ where $I_i = [t_i, t_{i+1})$ for all $1 \leq i \leq k$.
+Let $x : [0,d) \to \B$ be a signal.
+The \emph{piecewise segmentation} of $x$ is the smallest segmentation $I_1, \ldots, I_k$ of $[0,d)$ such that $x(t) = x(t')$ for every $1 \leq i \leq k$ and $t,t' \in I_i$.
+Then, the \emph{profile} of $x$ is the nonstuttering sequence of truth values encoding the behavior of $x$ with respect to its piecewise segmentation, i.e., $\prof(x) = \destutter((x(t_i))_{1 \leq i \leq k})$ where $I_i = [t_i, t_{i+1})$ for all $1 \leq i \leq k$.
 
 We consider an asynchronous and loosely-coupled message-passing system of $N \geq 2$ reliable agents, denoted $A_1, \ldots, A_N$.
-The agents produce a set of $n \geq 2$ signals $x_1, \ldots, x_n$ where $x_i : [0,d) \to \R$ for some $d \in \R_{> 0}$.
+The agents produce a set of $n \geq 2$ signals $x_1, \ldots, x_n$ where $x_i : [0,d) \to \B$ for some $d \in \R_{> 0}$.
 The function $\pi : \{x_1, \ldots, x_n\} \to \{A_1, \ldots, A_N\}$ maps each signal to the agent it is produced by.
 The agents do not share memory or a global clock.
 Only to formalize statements, we speak of a hypothetical global clock and denote its value by $T$.
@@ -82,28 +79,49 @@ We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distribu
 \end{example}
 
 
-\subsection{Signal Temporal Logic} \label{sec:stl}
+\subsection{RV-LTL} \label{sec:rvltl}
+
+\TODO: use stl with quantitative semantics instead?
+
 Let $\AP$ be a set of atomic propositions.
-The syntax is given by the following grammar where $p \in \AP$ and $[a,b) \subseteq \R_{\geq 0}$.
-$$ \varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \land \varphi ~|~ \varphi \until_{[a,b)} \varphi $$
-We additionally use the following standard abbreviations: $\true = p \lor \lnot p$, $\false = \lnot \true$, $ \varphi_1 \lor \varphi_2 = \lnot \varphi_1 \land \lnot \varphi_2$, $\LTLf_{[a,b)} \varphi = \true \until_{[a,b)} \varphi$, $\LTLg_{[a,b)} \varphi = \lnot \LTLf_{[a,b)} \lnot \varphi$.
-Moreover, the untimed temporal operators are defined through their timed counterparts on the interval $[0,\infty)$, e.g., $\varphi_1 \until \varphi_2 = \varphi_1 \until_{[0,\infty)} \varphi_2$.
+The syntax is given by the following grammar where $p \in \AP$.
+$$ \varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \land \varphi ~|~ \varphi \until \varphi $$
+We additionally use the following standard abbreviations: $\true = p \lor \lnot p$, $\false = \lnot \true$, $ \varphi_1 \lor \varphi_2 = \lnot \varphi_1 \land \lnot \varphi_2$, $\LTLf \varphi = \true \until \varphi$, and $\LTLg \varphi = \lnot \LTLf \lnot \varphi$.
 
-A trace $w = (x_1, \ldots, x_n)$ is a vector of synchronous signals $x_i : [0,d) \to \R$.
-We express atomic propositions as functions of trace values at a time point $t$, i.e., a proposition $p \in \AP$ is defined as $f_p(x_1(t), \ldots, x_n(t)) > c_p$ where $f_p : \R^n \to \R$ is a function and $c_p \in \R$ is a constant.
+%A trace $w = (E_1, \ldots, E_n)$ is a vector of event sets of continuous-time boolean-valued finite-length signals $x_1, \ldots, x_n$ whose initial values are $v_0, \ldots, v_n$.
 
-Below we recall the infinite-trace qualitative semantics of STL defined over $\B$.
-Let $w = (x_1, \ldots, x_n)$ be a trace with $x_i : [0,d) \to \R$ for all $1 \leq i \leq n$, and $t \in [0,d)$ be a value in its temporal domain.
+%TODO: this paragraph is a little handwavy
+We assume the reader is familiar with the infinite-trace semantics of LTL, which we denote by $[\omega \models \varphi]$ where $\omega$ is a vector of continuous-time boolean-valued infinite-length signals and $\varphi$ is a formula with the syntax above.
 
+A trace $w = (x_1, \ldots, x_n)$ is a vector of \alert{synchronous} signals $x_i : [0,d) \to \B$, each corresponding to an atomic proposition $p_i \in \AP$.
+\TODO: notation $w[t..]$ (to fix in ltl3?)
+
+Let $w$ be a trace and $t \in [0,d)$ a timestamp.
+We recall the semantics of FLTL defined over $\B = \{\bot, \top\}$ where $\bot < \top$ and they are complementary to each other. 
 \begin{align*}
-	[w,t \models p] &\iff f_p(x_1(t), \ldots, x_n(t)) > c_p \\
-	[w,t \models \lnot \varphi] &\iff \overline{[w,t \models \varphi]} \\
-	[w,t \models \varphi_1 \land \varphi_2] &\iff [w,t \models \varphi_1] \land [w,t \models \varphi_1 \\ 	[w,t \models \varphi_1 \until_{[a,b)} \varphi_2] &\iff \exists t' \in t \oplus [a,b) : [w,t' \models \varphi_2] \land 
-	\forall t'' \in [t, t') : [w,t'' \models \varphi_1] \\
+	[w,t \models p_i]_F &= x_i(t)\\
+	[w,t \models \lnot \varphi]_F &= \overline{[w,t \models \varphi]_F}\\
+	[w,t \models \varphi_1 \land \varphi_2]_F &= \min([w,t \models \varphi_1]_F, [w,t \models \varphi_2]_F)\\
+	[w,t \models \varphi_1 \until \varphi_2]_F &= \max_{t \leq t' \leq d} \left( \min \left( [w,t' \models \varphi_2]_F, \min_{t \leq t'' \leq t'} \left( [w,t'' \models \varphi_1]_F \right) \right) \right)\\
 \end{align*}
-We simply write $[w \models \varphi]$ for $[w,0 \models \varphi]$.
 
-Observe that the semantics above is defined for infinite traces while a distributed signal has finite length.
-To bridge this gap, we take the standard extension to a 3-valued semantics:
-Given a finite-length synchronous trace $w$ and an STL formula $\varphi$, 
-we define $[w \models \varphi]_3 = \top$ iff $[w w' \models \varphi]$ for every infinite-length signal $w'$, define $[w \models \varphi]_3 = \bot$ iff $[w w' \models \lnot \varphi]$ for every infinite-length signal $w'$, and $[w \models \varphi]_3 = \?$ otherwise.
+Now, let us recall the semantics of LTL3 defined over $\B_3 = \B \cup \{\?\}$ where $\bot < \? < \top$ and $\?$ is complementary to itself. %TODO: concat is not defined
+\begin{align*}
+	[w,t \models \varphi]_3 &= \begin{cases}
+		\top &\text{if for all } \omega : \R_{\geq 0}^n \to \B^n \text{ we have } [w \omega \models \varphi]\\
+		\bot &\text{if for all } \omega : \R_{\geq 0}^n \to \B^n \text{ we have } [w \omega \models \lnot \varphi]\\
+		\? &\text{otherwise}\\
+	\end{cases}
+\end{align*}
+
+Finally, the semantics of RV-LTL is defined over $\B_4 = \B \cup \{\bot_c, \top_c \}$ where $\bot < \bot_c < \top_c < \top$ and the values $\bot_c$ and $\top_c$ complement each other.
+\begin{align*}
+	[w,t \models \varphi]_{RV} &= \begin{cases}
+		\top &\text{if } [w,t \models \varphi]_3 = \top \\
+		\top_c &\text{if } [w,t \models \varphi]_3 = \? \text{ and } [w,t \models \varphi]_F = \top \\
+		\bot_c &\text{if } [w,t \models \varphi]_3 = \? \text{ and } [w,t \models \varphi]_F = \bot \\
+		\bot &\text{if } [w,t \models \varphi]_3 = \bot \\
+	\end{cases} \\
+\end{align*}	
+
+Given a formula $\varphi$ and a trace $w$ over the temporal domain $[0,d)$, the \emph{satisfaction signal} of $\varphi$ over $w$ is $y_{\varphi,w} : [0,d) \to \B_4$ such that $y_{\varphi,w}(t) = [w,t \models \varphi]_{RV}$ for all $t \in [0,d)$.

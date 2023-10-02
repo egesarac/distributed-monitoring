@@ -1,0 +1,58 @@
+\section{The Offline Algorithm}
+The algorithm consists of a preprocessing steps followed by the monitoring algorithm.
+First, we update the structure of the input formula to enable the local evaluation of the subformulas whose propositions (or signals) belong to the same agent.
+Then, the monitoring step evaluates the updated subformulas incrementally on the refined input signal.
+
+Let $\varphi$ be an RV-LTL formula and $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots x_n$.
+
+\begin{enumerate}
+	\item Preprocessing: Restructuring of the subformulas and the input signal
+	\begin{enumerate}[label=\arabic*.]
+		\item
+		Enumerate the subformulas of $\varphi$ such that each formula has an enumeration number smaller than the numbers of all its subformulas.
+		Let $\varphi_0, \ldots, \varphi_m$ be such an enumeration.
+		Note that $\varphi_0 = \varphi$.
+		
+		\item
+		Recall that the propositions of $\varphi$ coincide with the signals $x_1, \ldots, x_n$.
+		For each agent $A_i$, let $P_i$ be the set of subformulas of $\varphi$ such that for every $\psi \in P_i$ we have
+		(i) for each proposition $x$ that occurs in $\psi$ we have $\pi(x) = A_i$, and
+		(ii) for each subformula $\psi'$ of $\varphi$ such that $\psi$ is a subformula of $\psi'$, a proposition $x'$ with $\pi(x') \neq A_i$ occurs in $\psi'$.
+		For each $\psi \in P_i$, if $\psi$ is not an atomic proposition, define a fresh proposition $x'$ on agent $A_i$.
+		Let $\mathbf{P}_\textit{fresh}$ be the set of fresh propositions, $\mathbf{P}_\textit{old}$ be the (nonfresh) propositions of $\varphi$, and let $\mathbf{P} = \mathbf{P}_\textit{fresh} \cup \mathbf{P}_\textit{old}$.
+		Let $\mathsf{f} : \mathbf{P} \to \{\varphi_0, \ldots, \varphi_m\}$ be function that maps each fresh proposition to the corresponding subformula and each (nonfresh) proposition of $\varphi$ to itself.
+		
+		\item
+		For each fresh proposition $x \in \mathbf{P}_\textit{fresh}$, replace in $\varphi$ the subformula $\mathsf{f}(x)$ with $x$.
+		Let $\varphi'$ be the obtained formula.
+		Let $\varphi_0', \ldots, \varphi_{m'}'$ be the subformulas of $\varphi'$ satisfying the enumeration invariant given above.
+		Note that $\varphi_0'$  and $\varphi$ are semantically equivalent. %some redundancy to handle here
+		
+		\item
+		We define a new distributed signal appropriately extending $(S,{\hb})$ with the fresh signals.
+		Let $(S', {\hb}')$ be a distributed signal with $S' = (x_1', \ldots x_{|\mathbf{P}|}')$ and $x_i'(t) = [S, t \models \mathsf{f}(x_i')]_{A_j}$ for all $t \in [0,d)$, where $\pi(x_i') = A_j$.
+	\end{enumerate}
+
+	\item Monitoring
+	\begin{enumerate}[label=\arabic*.]
+		\item
+		Let $M$ be the process on which the monitor is running.
+		Let $G_{S'} = \{ [t_0, t_1), \ldots, [t_k, t_{k+1}) \}$ be the canonical segmentation of $(S', {\hb}')$.
+		
+		\item
+		For $i = k .. 0$, for $j = m' .. 0$, compute $[S', t_i \models \varphi_j']_M$.
+		Let $V_i = [S', t_i \models \varphi_0']_M$.
+		
+		\item
+		Output $V = \destutter(V_0 \cdot \ldots \cdot V_k)$.
+	\end{enumerate}
+\end{enumerate}
+
+\begin{claim}
+	For every distributed signal $(S, {\hb})$ of bounded clock skew $\varepsilon$ and bounded variability $\delta$, the output $V$ of the monitoring algorithm contains ... % NOT ACCURATE ENOUGH
+%	$V$ contains $\destutter([S, {\hb} \models \varphi])$
+\end{claim}
+
+\begin{claim}
+	The preprocessing part runs in time and space ..., and the monitoring part runs in time and space linear in the size of the input formula and the number of edges in the input signal. \rednote{we need a bound on the length of value expressions to prove this}
+\end{claim}

@@ -1,34 +1,33 @@
 \section{Our Approach}
-We assume a central monitor that knows the values of $\delta$ and $\varepsilon$ as well as the initial values of the signals.
+
+%todo?
+We assume that the monitor runs on the same process as the reference clock and it knows the values of $\delta$ and $\varepsilon$.
 
 \subsection{Uncertainty Regions and Canonical Segmentations}
 
-Consider a signal $x : [0,d) \to \R$ with a single rising edge from value 2 to 3 at local time $t$.
-The monitoring observing this signal needs to take into account the clock skew: according to the global clock, the rising edge of $x$ occurs in the range $(t - \varepsilon, t + \varepsilon)$.
-This range is called an \emph{uncertainty region} because the monitor cannot tell the value of $x$ precisely, but only that it changes from 2 to 3.
-To systematically reason about uncertainty regions of signals, we use the notion of segmentation of temporal domains of signals.
+Consider a signal $x : [0,d) \to \B$ with $x(0) = \bot$ and a single rising edge at local time $t$.
+A monitor observing $x$ from another process/agent needs to take into account the clock skew: according to the reference clock, the rising edge of $x$ occurs in the range $(t - \varepsilon, t + \varepsilon)$.
+This range is called an \emph{uncertainty region} because the monitor cannot tell the value of $x$ precisely, but only that it changes from $\bot$ to $\top$.
+To systematically reason about uncertainty regions of signals, we define the notion of segmentation of temporal domains of signals.
 
-Let $x : [0,d) \to \R$ be a signal and $D_x = \{(t_1, x(t_1)), \ldots, (t_m, x(t_m))\}$ be the set of edges of $x$, given in an increasing order of local clock values.
+
+Let $x : [0,d) \to \B$ be a signal and $D_x = \{(t_1, x(t_1)), \ldots, (t_m, x(t_m))\}$ be the set of edges of $x$, given in an increasing order of local clock values.
 For $1 \leq i \leq m$, let $\theta_{\text{lo}}(x,t_i) = \max\{0, \max_{j \in \{1, i\}} t_j - \varepsilon - (j-i)\delta\}$ and $\theta_{\text{hi}}(x,t_i) = \min\{d, \min_{i \leq j \leq m} t_j + \varepsilon - (j-i)\delta\}$.
-Intuitively, $\theta_{\text{lo}}$ and $\theta_{\text{hi}}$ give us the lower and upper bounds on the value of the global clock for a given edge.
+Intuitively, $\theta_{\text{lo}}$ and $\theta_{\text{hi}}$ give us the lower and upper bounds on the value of the reference clock for a given edge.
 We use these to describe a canonical segmentation of a distributed signal.
 
 Let $(S,{\hb})$ be a distributed signal of $n$ signals.
-For each signal $x_i$, let $F_i = \{\theta_{\text{lo}}(x_i, t_j) \st (t_j, x_i(t_j)) \in D_{x_i}\} \cup \{\theta_{\text{hi}}(x_i, t_j) \st (t_j, x_i(t_j)) \in D_{x_i}\}$ be the set of bounds on the global clock values for its edges.
+For each signal $x_i$, let $F_i = \{\theta_{\text{lo}}(x_i, t_j) \st (t_j, x_i(t_j)) \in D_{x_i}\} \cup \{\theta_{\text{hi}}(x_i, t_j) \st (t_j, x_i(t_j)) \in D_{x_i}\}$ be the set of bounds on the reference clock values for its edges.
 Let $F = \{0, d\} \cup \bigcup_{i = 1}^{n} F_i$ and let $(a_j)_{1 \leq j \leq |F|}$ be an increasing sequence of clock values corresponding to the elements of $F$.
-We define the \emph{canonical segmentation} of $(S,{\hb})$ as $G_S = \{I_1, \ldots, I_{|F| - 1}\}$ where $I_k = [a_k, a_{k+1})$ for all $1 \leq k \leq |F| - 1$.
+We define the canonical segmentation of $(S,{\hb})$ as $G_S = \{I_1, \ldots, I_{|F| - 1}\}$ where $I_k = [a_k, a_{k+1})$ for all $1 \leq k \leq |F| - 1$.
 Moreover, given $t \in [0,d)$, we define $\theta(S,t) = I'$ where $I' \in G_S$ and $t \in I'$.
-\rednote{if the formula has bounded temporal operators, we need to segment the canonical segmentation even further}
 
 \begin{example}
 	\TODO: canonical segmentation
 \end{example}
 
 \subsection{Value Expressions}
-%TODO
-%In uncertainty regions, although the monitor is not able to determine the exact value of a signal at a time point, it knows which 
-
-
+%We encode possible behaviors of satisfaction signals using sets of alternating bit sequences.
 
 Given $u,v \in \Sigma^*$ of the same length, we respectively denote by $u \BitAnd v$ and $u \BitOr v$ the `bitwise and' and `bitwise or' operations, and by $\BitNeg u$ the `bitwise negation' operation.
 In addition, given a nonempty words $u,v \in \Sigma^*$ of length $\ell$, we define as auxiliary bitwise temporal operators as follows:
@@ -101,7 +100,7 @@ Moreover, one can easily verify that $\destutter(\Sigma^*)$ is closed under thes
 %%todo: define a function from signals and segments to truth expressions
 
 \subsection{The Overapproximation Logic}
-We use the same syntax as in \cref{sec:stl}.
+We use the same syntax as in \cref{sec:rvltl}.
 Our logic maps each interval in the canonical segmentation to a set of value expressions.
 We assume that at any interval the signal can realize any value expression of the interval.
 This leads to an overapproximation of the set of possible behaviors as demonstrated below.
