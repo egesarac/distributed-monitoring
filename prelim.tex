@@ -23,7 +23,7 @@ Moreover, given an integer $k \geq 0$, we define $\stutter_k : \Sigma^* \to \Sig
 	A \emph{signal} is a right-continuous, left-limited, non-Zeno, piecewise-constant function $x : [a,b) \to \R$ where $[a,b) \subseteq \R_{\geq 0}$ is the temporal domain of $x$.
 \end{definition}
 
-\TODO: right-cont, left-lim, nonzeno, piecewise-constant, interval operations
+\TODO: right-cont, left-lim, nonzeno, piecewise-constant, interval operations, minkowski sum
 
 Given an interval $I \subset \R_{\geq 0}$, a \emph{segmentation} of $I$ is a partition of $I$ into finitely many intervals $I_1, \ldots, I_k$ of the form $I_j = [t_j, t_{j+1})$ such that $t_j < t_{j+1}$ for all $1 \leq j \leq k$.
 By extension, a segmentation of a collection of signals with the same temporal domain $I$ is a segmentation of $I$.
@@ -85,23 +85,25 @@ We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distribu
 \subsection{Signal Temporal Logic} \label{sec:stl}
 Let $\AP$ be a set of atomic propositions.
 The syntax is given by the following grammar where $p \in \AP$ and $I \subseteq \R_{\geq 0}$ is an interval.
-$$ \varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \land \varphi ~|~ \varphi \until_I \varphi $$
+$$ \varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \land \varphi ~|~ \varphi \until \varphi ~|~ \LTLf_I \varphi ~|~ \LTLg_I \varphi$$
 
 A trace $w = (x_1, \ldots, x_n)$ is a vector of synchronous signals $x_i : [0,d) \to \R$.
 We express atomic propositions as functions of trace values at a time point $t$, i.e., a proposition $p \in \AP$ is defined as $f_p(x_1(t), \ldots, x_n(t)) > 0$ where $f_p : \R^n \to \R$ is a function.
 
 Below we recall the infinite-trace qualitative semantics of STL defined over $\B$.
-Let $w = (x_1, \ldots, x_n)$ be a trace with $x_i : [0,d) \to \R$ for all $1 \leq i \leq n$, and $t \in [0,d)$ be a value in its temporal domain.
-
+Let $w = (x_1, \ldots, x_n)$ be a trace with $x_i : [0,d) \to \R$ for all $1 \leq i \leq n$, and $\varphi_1, \varphi_2$ be STL formulas.
+We implicitly assume that the time values $t,t',t'' \in [0,d)$ are within the signals' temporal domain.
 \begin{align*}
 	[w,t \models p] &\iff f_p(x_1(t), \ldots, x_n(t)) > 0 \\
 	[w,t \models \lnot \varphi] &\iff \overline{[w,t \models \varphi]} \\
 	[w,t \models \varphi_1 \land \varphi_2] &\iff [w,t \models \varphi_1] \land [w,t \models \varphi_1] \\
-	[w,t \models \varphi_1 \until_I \varphi_2] &\iff \exists t' \in t \oplus I : [w,t' \models \varphi_2] \land \forall t'' \in (t, t') : [w,t'' \models \varphi_1] \\
+	[w,t \models \varphi_1 \until \varphi_2] &\iff \exists t' > t : [w,t' \models \varphi_2] \land \forall t'' \in (t, t') : [w,t'' \models \varphi_1] \\
+	[w,t \models \LTLf_I \varphi_1] &\iff \exists t' \in t \oplus I : [w,t' \models \varphi_1] \\
+	[w,t \models \LTLg_I \varphi_1] &\iff \forall t' \in t \oplus I : [w,t' \models \varphi_1] \\
 \end{align*}
 
-We additionally use the following standard abbreviations: $\true = p \lor \lnot p$, $\false = \lnot \true$, $ \varphi_1 \lor \varphi_2 = \lnot \varphi_1 \land \lnot \varphi_2$, $\LTLf_I \varphi = \true \until_I \varphi$, $\LTLg_I \varphi = \lnot \LTLf_I \lnot \varphi$.
-Moreover, the untimed temporal operators are defined through their timed counterparts on the interval $(0,\infty)$, e.g., $\varphi_1 \until \varphi_2 = \varphi_1 \until_{(0,\infty)} \varphi_2$.
+We additionally use the following standard abbreviations: $\true = p \lor \lnot p$, $\false = \lnot \true$, $ \varphi_1 \lor \varphi_2 = \lnot \varphi_1 \land \lnot \varphi_2$, $\LTLf \varphi = \true \until \varphi$, $\LTLg \varphi = \lnot \LTLf \lnot \varphi$.
+%Moreover, the untimed temporal operators are defined through their timed counterparts on the interval $(0,\infty)$, e.g., $\varphi_1 \until \varphi_2 = \varphi_1 \until_{(0,\infty)} \varphi_2$.
 Finally, we simply write $[w \models \varphi]$ for $[w,0 \models \varphi]$.
 
 The semantics above is defined for infinite traces while a distributed signal has finite length.
