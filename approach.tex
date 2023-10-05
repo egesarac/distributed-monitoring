@@ -1,7 +1,7 @@
 \section{Our Approach}
 We assume a central monitor that knows the values of $\delta$ and $\varepsilon$ as well as the initial values of the signals.
 
-\subsection{Uncertainty Regions and Canonical Segmentations}
+\subsection{Uncertainty Regions and Canonical Segmentations} \label{sec:segment}
 
 Consider a signal $x : [0,d) \to \R$ with a single rising edge from value 2 to 3 at local time $t$.
 The monitoring observing this signal needs to take into account the clock skew: according to the global clock, the rising edge of $x$ occurs in the range $(t - \varepsilon, t + \varepsilon)$.
@@ -16,35 +16,42 @@ We use these to describe a canonical segmentation of a distributed signal.
 Let $(S,{\hb})$ be a distributed signal of $n$ signals.
 For each signal $x_i$, let $F_i = \{\theta_{\text{lo}}(x_i, t_j) \st (t_j, x_i(t_j)) \in D_{x_i}\} \cup \{\theta_{\text{hi}}(x_i, t_j) \st (t_j, x_i(t_j)) \in D_{x_i}\}$ be the set of bounds on the global clock values for its edges.
 Let $F = \{0, d\} \cup \bigcup_{i = 1}^{n} F_i$ and let $(a_j)_{1 \leq j \leq |F|}$ be an increasing sequence of clock values corresponding to the elements of $F$.
-We define the \emph{canonical segmentation} of $(S,{\hb})$ as $G_S = \{I_1, \ldots, I_{|F| - 1}\}$ where $I_k = [a_k, a_{k+1})$ for all $1 \leq k \leq |F| - 1$.
+We define the \emph{canonical segmentation} of $(S,{\hb})$ as $G_S = \{I_1, \ldots, I_{|F| - 1}\}$ where $I_k = [a_k, a_{k+1})$ for all $1 \leq k < |F|$.
 Moreover, given $t \in [0,d)$, we define $\theta(S,t) = I'$ where $I' \in G_S$ and $t \in I'$.
-\rednote{if the formula has bounded temporal operators, we need to segment the canonical segmentation even further}
 
 \begin{example}
 	\TODO: canonical segmentation
 \end{example}
 
 \subsection{Value Expressions}
-%TODO
-%In uncertainty regions, although the monitor is not able to determine the exact value of a signal at a time point, it knows which 
+In uncertainty regions, although the monitor is not able to determine the exact value of a signal at a time point, it knows how the signal values change.
+To capture this information, we use short sequences of possible signal values capturing how a signal behaves within a segment and several operations on them to propagate the information from real-valued signals to truth values of atomic propositions and subformulas.
 
+%In the next section, we will map each segment of a signal to a set of value expressions corresponding to its set of possible behaviors in this time segment.
+%Moreover, we propagate this information from real-valued signals to truth values of atomic propositions and subformulas to complete the evaluation of a distributed signal and a formula.
 
+Let $\Sigma$ be a finite alphabet corresponding to a set of signal values.
+A \emph{value expression} is a finite word in $\Sigma^*$.
+Given two value expressions $u_1, u_2 \in \Sigma^*$, we define their asynchronous product as $u_1 \otimes u_2 = \{ (v_1,v_2) \st \max(|u_1|, |u_2|) \leq k \leq |u_1| + |u_2|, v_1 \in \stutter_k(u_1), v_2 \in \stutter_k(u_2) \}$.
+By extension, given $L_1, L_2 \subseteq \Sigma^*$, we have $L_1 \otimes L_2 = \{ u_1 \otimes u_2 \st u_1 \in L_1, u_2 \in L_2 \}$.
+For a function $f : \R^2 \to \R$, we refer to the set of value expressions that can be obtained by applying $f$ to the potential ``interleavings'' of $u_1$ and $u_2$ as follows: $f(u_1, u_2) = \destutter(\{(f(v_1[i], v_2[i]))_{0 \leq i < |v_1|} \st (v_1, v_2) \in u_1 \otimes u_2\})$.
+Moreover, for $c \in \R$, we write $f(u_1, u_2) \geq c$ to denote the set $\destutter(\{(f(v_1[i], v_2[i]) \geq c)_{0 \leq i < |v_1|} \st (v_1, v_2) \in u_1 \otimes u_2\})$ where $f(v_1[i], v_2[i]) \geq c$ is 1 if the inequality holds, and it is 0 otherwise.
 
-Given $u,v \in \Sigma^*$ of the same length, we respectively denote by $u \BitAnd v$ and $u \BitOr v$ the `bitwise and' and `bitwise or' operations, and by $\BitNeg u$ the `bitwise negation' operation.
+Note that these definitions can be extended to handle more than two signals.
+As we will detail in the next section, after computing the value expressions of real-valued signals, we compute those of satisfaction signals of atomic propositions.
+We use these boolean value expressions in the evaluation of the STL formula.
+Therefore, we assume a binary alphabet in the sequel.
+
+Let $\Sigma = \{0,1\}$.
+Given $u,v \in \Sigma^*$ of the same length, we respectively denote by $u \BitAnd v$ the `bitwise and' operation, and by $\BitNeg u$ the `bitwise negation' operation.
 In addition, given a nonempty words $u,v \in \Sigma^*$ of length $\ell$, we define as auxiliary bitwise temporal operators as follows:
-$$ \mathsf{E} u = \left( \max_{i \leq j \leq \ell - 1} u[j] \right)_{0 \leq i \leq \ell - 1} $$
-$$ \mathsf{A} u = \left( \min_{i \leq j \leq \ell - 1} u[j] \right)_{0 \leq i \leq \ell - 1} $$
-$$ u \mathsf{U}_0 v = \left( \max_{i \leq j \leq \ell - 1} \left( \min \left( v[j], \min_{i \leq k \leq j - 1} u[k] \right) \right) \right)_{0 \leq i \leq \ell - 1} $$
-$$ u \mathsf{U}_1 v = \left( \max \left( u^i \mathsf{U}_0 v^i, \mathsf{A} u^i \right) \right)_{0 \leq i \leq \ell - 1} $$
+$$ \mathsf{E} u = \left( \max_{i \leq j < \ell} u[j] \right)_{0 \leq i < \ell} $$
+$$ \mathsf{A} u = \left( \min_{i \leq j < \ell} u[j] \right)_{0 \leq i < \ell} $$
+$$ u \mathsf{U}_0 v = \left( \max_{i \leq j < \ell} \left( \min \left( v[j], \min_{i \leq k < j} u[k] \right) \right) \right)_{0 \leq i < \ell} $$
+$$ u \mathsf{U}_1 v = \left( \max \left( u^i \mathsf{U}_0 v^i, \mathsf{A} u^i \right) \right)_{0 \leq i < \ell} $$
 Observe that $\mathsf{A} u = u \mathsf{U}_1 0^\ell$ and $\mathsf{E} u = 1^\ell \mathsf{U}_0 u$.
 
-
-
-Finally, given $u_1, u_2 \in \Sigma^*$, we define $u_1 \otimes u_2 = \{ (v_1,v_2) \st \max(|u_1|, |u_2|) \leq k \leq |u_1| + |u_2|, v_1 \in \stutter_k(u_1), v_2 \in \stutter_k(u_2) \}$ as the asynchronous product of $u_1$ and $u_2$.
-By extension, given $L_1, L_2 \subseteq \Sigma^*$, we have $L_1 \otimes L_2 = \{ u_1 \otimes u_2 \st u_1 \in L_1, u_2 \in L_2 \}$.
-
-In the sequel, we use finite words from $\destutter(\Sigma^*)$ to denote how the values of a signal evolve through intervals that include uncertainty and interleavings.
-A subset of $\destutter(\Sigma^*)$ is called a \emph{value expression}.
+Below we use finite words from $\destutter(\Sigma^*)$ to denote how the values of a satisfaction signal evolve through intervals that include uncertainty and interleavings.
 We use the following grammar to encode such expressions. \rednote{add standard set union? add $\pfx$ and $\sfx$?}
 $$ \psi := 0 ~|~ 1 ~|~ \lnot \psi ~|~ \psi \sqcap \psi  ~|~ \psi \cdot \psi ~|~ \psi_1 \until_{\!0} \psi_2 ~|~ \psi_1 \until_{\!1} \psi_2 $$  %~|~ \psi \triangleleft \psi ~|~ \psi \triangleright \psi ~|~ \psi \diamond \psi
 
@@ -65,7 +72,7 @@ Letting $\psi_1, \psi_2 \in \Psi$, we inductively define the semantics for our e
 Note that we can additionally define $\psi_1 \sqcup \psi_2 = \lnot (\lnot \psi_1 \sqcap \lnot \psi_2)$.
 Moreover, one can easily verify that $\destutter(\Sigma^*)$ is closed under these operations.
 
-\TODO: explain how we represent the value expressions and how we do the operations (pref, suff, conj, neg. and others?)
+%\TODO: explain how we represent the value expressions and how we do the operations (pref, suff, conj, neg. and others?)
 
 %In order to implement these efficiently, we represent subsets of $\destutter(\Sigma^*)$ as follows.
 %2D ARRAY STUFF.
@@ -101,25 +108,35 @@ Moreover, one can easily verify that $\destutter(\Sigma^*)$ is closed under thes
 %%todo: define a function from signals and segments to truth expressions
 
 \subsection{The Overapproximation Logic}
-We use the same syntax as in \cref{sec:stl}.
-Our logic maps each interval in the canonical segmentation to a set of value expressions.
-We assume that at any interval the signal can realize any value expression of the interval.
+We use the same syntax as in \Cref{sec:stl}.
+Given a distributed signal $(S,{\hb})$, our logic maps a segmentation of $(S,{\hb})$ to a set of value expressions.
+Using these, first we compute the value expressions for atomic propositions, and then inductively define the evaluation of subformulas.
+
+We assume that, at any segment, the signal can realize any value expression of the segment.
 This leads to an overapproximation of the set of possible behaviors as demonstrated below.
 
 \begin{example}
 	\TODO: how value expressions overapproximate possible behaviors
 \end{example}
 
-Let $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots x_n$ and let $G_S$ be its canonical segmentation.
-We want to compute the value expressions of each signal in every interval in the canonical segmentation.
-For this, we first let $\gamma(I, i) = \emptyset$ for all $I \in G_S$ and $1 \leq i \leq n$, and incrementally add value expressions to $\gamma(I, i)$ to capture the potential behaviors of $x_i$ in interval $I$.
+Let $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots x_n$, let $G_S$ be its canonical segmentation, and let $\varphi$ be the formula to be evaluated.
+For a given STL formula $\varphi$, let $B_\varphi$ be the set of finite and positive bounds that occur in the timed operators of $\varphi$.
+Recall the set $F$ we used in \Cref{sec:segment} to define the canonical segmentation of $(S,{\hb})$.
+To take into account the timed operators in $\varphi$, we extend $F$ as follows:
+$F_\varphi = F \cup \{t - b \st t \in F, b \in B_\varphi, t > b\}$.
+Now, let $d_1, \ldots, d_M$ be the elements of $F_\varphi$ in increasing order.
+We extend the canonical segmentation $G_S$ as follows:
+$G_S^\varphi = \{I_1', \ldots I_{M-1}'\}$ where $I_i' = [d_i, d_{i+1})$.
+
+We want to compute the value expressions of each signal in every interval in the extended canonical segmentation $G_S^\varphi$.
+For this, we first let $\gamma(I, i) = \emptyset$ for all $I \in G_S^\varphi$ and $1 \leq i \leq n$, and incrementally add value expressions to $\gamma(I, i)$ to capture the potential behaviors of $x_i$ in interval $I$.
 
 For each $x_i$, consider the set $X_i = \cup_{1 \leq j < |D_i|} \{K_{i,j}\}$ of its uncertainty regions, i.e.,  $K_{i,j} = [l_j, h_j)$ where $l_j = \theta_{\text{lo}}(x_i, t_j)$ and $h_j = \theta_{\text{hi}}(x_i, t_j)$.
-These intervals have the value expression $01$ if the uncertainty is due to a rising edge or the value expressions $10$ if it is due to a falling edge.
-We denote the value expression of interval $K_{i,j}$ by $v_{i,j}$.
-Note that for each signal $x_i$ the remaining intervals of the temporal domain $[0,d)$ have the expressions $0$ or $1$.
+These intervals have the value expression $v_{i,j} = \nu_1 \nu_2$ if $\lim_{s \to t_j^-} x_i(s) = \nu_1$ and $\lim_{s \to t_j^+} x_i(s) = \nu_2$.
+%We denote the value expression of interval $K_{i,j}$ by $v_{i,j}$.
+Note that the value expressions of the remaining intervals are constant.
 
-For each interval $I \in G_S$ where $I = [l,h)$ and each $1 \leq i \leq n$, let $J_i = \{ K_{i,j} \in X_i \st I \subseteq K_{i,j}\}$ be the uncertainty regions of $x_i$ that contain the interval $I$.
+For each interval $I \in G_S^\varphi$ where $I = [l,h)$ and each $1 \leq i \leq n$, let $J_i = \{ K_{i,j} \in X_i \st I \subseteq K_{i,j}\}$ be the uncertainty regions of $x_i$ that contain the interval $I$.
 For each $K_{i,j} = [l_j, h_j) \in J_i$, do the following:
 \begin{itemize}
 	\item If $l = l_j$ and $h = h_j$, then add $v_{i,j}$ to $\gamma(I, i)$.
@@ -133,21 +150,19 @@ For each $K_{i,j} = [l_j, h_j) \in J_i$, do the following:
 %	\item If $l = l_j$ and $h = h_j$, then add $v_{i,j}$ to $\gamma(I, i)$.
 %\end{itemize}
 
-Let $\tau : [0,d) \to G_S$ be a function that maps each time stamp to the interval of the canonical segmentation that it belongs to, i.e., $\tau(t) = I$ such that $t \in I$.
+Finally, let $\tau : [0,d) \to G_S^\varphi$ be a function that maps each time stamp to the interval of the extended canonical segmentation that it belongs to, i.e., $\tau(t) = [t', t'')$ where $t' \leq t < t''$ and $[t', t'') \in G_S^\varphi$.
+%We are now ready to construct the value expressions for the satisfaction signals of the atomic propositions.
+%Let $p$ be an atomic proposition where $f_p : \R^n \to \R$ is the corresponding function over signal values and $c_p \in \R$ is the corresponding constant.
+%For each $t \in [0,d)$, we denote by $\Omega(S, {\hb}, p, t)$ the set $f_p(\gamma(\tau(t), 1), \ldots, \gamma(\tau(t), n)) \geq c_p$ of binary value expressions encoding how the satisfaction signals of atomic propositions behave.
 We are now ready to define the semantics.
-Due to timing uncertainty, the value of a formula depends on the agent from which the signals are observed.
-Let $A_j$ be the observing agent and $t$ be a local clock value.
+
 \begin{align*}
-	[S,t \models p_i]_{A_j} &= \begin{cases}
-		0 &\text{if } i = j \land x_i(t) = \bot \\
-		1 &\text{if } i = j \land x_i(t) = \top \\
-	 	\gamma(\tau(t), i) &\text{if } i \neq j
-	\end{cases} \\
-	[S,t \models \lnot \varphi]_{A_j} &= \alert{\lnot} [S,t \models \varphi]_{A_j} \\
-	[S,t \models \varphi_1 \land \varphi_2]_{A_j} &= [S,t \models \varphi_1]_{A_j} \sqcap [S,t \models \varphi_2]_{A_j} \\
-	[S,t \models \varphi_1 \until \varphi_2]_{A_j} &= \{ \destutter(v_1 \mathsf{U}_{b} v_2) \st (v_1,v_2) \in [S,t \models \varphi_1]_{A_j} \otimes [S,t \models \varphi_2]_{A_j}, \tau(t) = [t',t''),\\ 
-	&\hspace{10em} \text{if $t'' < d$, then } b \in \{ u[0] \st u \in [S,t'' \models \varphi_1 \until \varphi_2]_{A_j} \}, \\
-	&\hspace{10em} \text{otherwise } b = 0 \} 
-\end{align*} \rednote{check the until}
+	[S,t \models p] &=  f_p(\gamma(\tau(t), 1), \ldots, \gamma(\tau(t), n)) > 0 \\
+	[S,t \models \lnot \varphi] &= \alert{\lnot} [S,t \models \varphi] \\
+	[S,t \models \varphi_1 \land \varphi_2] &= [S,t \models \varphi_1] \sqcap [S,t \models \varphi_2] \\
+	[S,t \models \varphi_1 \until \varphi_2] &= \destutter(\{ v_1 \mathsf{U}_{b} v_2 \st (v_1,v_2) \in [S,t \models \varphi_1] \otimes [S,t \models \varphi_2], \tau(t) = [t',t''),\\ 
+	&\hspace{10em} \text{if $t'' < d$, then } b \in \{ u[0] \st u \in [S,t'' \models \varphi_1 \until \varphi_2] \}, \\
+	&\hspace{10em} \text{otherwise } b = 0 \})
+\end{align*} \rednote{check the until, distinguish notation from stl}
 
 

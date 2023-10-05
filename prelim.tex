@@ -52,7 +52,7 @@ We respectively denote by $D_{x_i}^\uparrow$ and $D_{x_i}^\downarrow$ the sets o
 
 We assume that signals have \emph{bounded variability} with respect to the global clock: for each signal $x_i$ and every pair $(t, x_i(t)), (t', x_i(t')) \in D_{x_i}$ of edges, we have $|c_j^{-1}(t) - c_j^{-1}(t')| \geq \delta$, where $A_j = \pi(x_i)$ is the agent that produces $x_i$ and $\delta \in \R_{\geq 0}$ is the bounded variability constant.
 
-\begin{definition}
+\begin{definition} \label{defn:hb}
 	A \emph{distributed signal} is a pair $(S, {\hb})$ where $S = (x_1, \ldots, x_n)$ is a vector of signals and ${\hb}$ is the happened-before relation between events in signals extended with the partial synchrony assumption as follows.
 	\begin{itemize}
 		\item For every agent, the events of its signals are totally ordered, i.e., for all $1 \leq i,j \leq n$ with $\pi(x_i) = \pi(x_j)$ and all $(t, x_i(t)) \in E_i$ and $(t', x_j(t')) \in E_j$, if $t < t'$ then $(t, x_i(t)) \hb (t', x_j(t'))$.
@@ -84,26 +84,27 @@ We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distribu
 
 \subsection{Signal Temporal Logic} \label{sec:stl}
 Let $\AP$ be a set of atomic propositions.
-The syntax is given by the following grammar where $p \in \AP$ and $[a,b) \subseteq \R_{\geq 0}$.
-$$ \varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \land \varphi ~|~ \varphi \until_{[a,b)} \varphi $$
-We additionally use the following standard abbreviations: $\true = p \lor \lnot p$, $\false = \lnot \true$, $ \varphi_1 \lor \varphi_2 = \lnot \varphi_1 \land \lnot \varphi_2$, $\LTLf_{[a,b)} \varphi = \true \until_{[a,b)} \varphi$, $\LTLg_{[a,b)} \varphi = \lnot \LTLf_{[a,b)} \lnot \varphi$.
-Moreover, the untimed temporal operators are defined through their timed counterparts on the interval $[0,\infty)$, e.g., $\varphi_1 \until \varphi_2 = \varphi_1 \until_{[0,\infty)} \varphi_2$.
+The syntax is given by the following grammar where $p \in \AP$ and $I \subseteq \R_{\geq 0}$ is an interval.
+$$ \varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \land \varphi ~|~ \varphi \until_I \varphi $$
 
 A trace $w = (x_1, \ldots, x_n)$ is a vector of synchronous signals $x_i : [0,d) \to \R$.
-We express atomic propositions as functions of trace values at a time point $t$, i.e., a proposition $p \in \AP$ is defined as $f_p(x_1(t), \ldots, x_n(t)) > c_p$ where $f_p : \R^n \to \R$ is a function and $c_p \in \R$ is a constant.
+We express atomic propositions as functions of trace values at a time point $t$, i.e., a proposition $p \in \AP$ is defined as $f_p(x_1(t), \ldots, x_n(t)) > 0$ where $f_p : \R^n \to \R$ is a function.
 
 Below we recall the infinite-trace qualitative semantics of STL defined over $\B$.
 Let $w = (x_1, \ldots, x_n)$ be a trace with $x_i : [0,d) \to \R$ for all $1 \leq i \leq n$, and $t \in [0,d)$ be a value in its temporal domain.
 
 \begin{align*}
-	[w,t \models p] &\iff f_p(x_1(t), \ldots, x_n(t)) > c_p \\
+	[w,t \models p] &\iff f_p(x_1(t), \ldots, x_n(t)) > 0 \\
 	[w,t \models \lnot \varphi] &\iff \overline{[w,t \models \varphi]} \\
-	[w,t \models \varphi_1 \land \varphi_2] &\iff [w,t \models \varphi_1] \land [w,t \models \varphi_1 \\ 	[w,t \models \varphi_1 \until_{[a,b)} \varphi_2] &\iff \exists t' \in t \oplus [a,b) : [w,t' \models \varphi_2] \land 
-	\forall t'' \in [t, t') : [w,t'' \models \varphi_1] \\
+	[w,t \models \varphi_1 \land \varphi_2] &\iff [w,t \models \varphi_1] \land [w,t \models \varphi_1] \\
+	[w,t \models \varphi_1 \until_I \varphi_2] &\iff \exists t' \in t \oplus I : [w,t' \models \varphi_2] \land \forall t'' \in (t, t') : [w,t'' \models \varphi_1] \\
 \end{align*}
-We simply write $[w \models \varphi]$ for $[w,0 \models \varphi]$.
 
-Observe that the semantics above is defined for infinite traces while a distributed signal has finite length.
+We additionally use the following standard abbreviations: $\true = p \lor \lnot p$, $\false = \lnot \true$, $ \varphi_1 \lor \varphi_2 = \lnot \varphi_1 \land \lnot \varphi_2$, $\LTLf_I \varphi = \true \until_I \varphi$, $\LTLg_I \varphi = \lnot \LTLf_I \lnot \varphi$.
+Moreover, the untimed temporal operators are defined through their timed counterparts on the interval $(0,\infty)$, e.g., $\varphi_1 \until \varphi_2 = \varphi_1 \until_{(0,\infty)} \varphi_2$.
+Finally, we simply write $[w \models \varphi]$ for $[w,0 \models \varphi]$.
+
+The semantics above is defined for infinite traces while a distributed signal has finite length.
 To bridge this gap, we take the standard extension to a 3-valued semantics:
 Given a finite-length synchronous trace $w$ and an STL formula $\varphi$, 
 we define $[w \models \varphi]_3 = \top$ iff $[w w' \models \varphi]$ for every infinite-length signal $w'$, define $[w \models \varphi]_3 = \bot$ iff $[w w' \models \lnot \varphi]$ for every infinite-length signal $w'$, and $[w \models \varphi]_3 = \?$ otherwise.
