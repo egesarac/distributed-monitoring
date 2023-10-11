@@ -32,8 +32,9 @@
 \newcommand\TODO{\textcolor{red}{TODO}}
 
 \newcommand{\pfx}{\textsf{prefix}}
-\newcommand{\prof}{\textsf{profile}}
+\newcommand{\first}{\textsf{first}}
 \newcommand{\sfx}{\textsf{suffix}}
+\newcommand{\infx}{\textsf{infix}}
 \newcommand{\conjunction}{\textsf{conj}}
 
 \newcommand{\hb}{\rightsquigarrow}
@@ -104,7 +105,8 @@
 \let\LTLglobally\LTLg
 \newcommand{\LTLo}{\ensuremath{\bigcirc}}
 \let\LTLnext\LTLo
-\def\until{\,\mathcal{U}\,}
+\def\until{\kern.1em\mathcal{U}}
+%\newcommand \until      {\mathbin{\mathcal{U}\kern-.1em}}
 \def\since{\,\mathcal{S}\,}
 
 \newcommand{\?}{\text{?}}

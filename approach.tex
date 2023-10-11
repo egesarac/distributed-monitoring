@@ -9,14 +9,15 @@ This range is called an \emph{uncertainty region} because the monitor cannot tel
 To systematically reason about uncertainty regions of signals, we use the notion of segmentation of temporal domains of signals.
 
 Let $x : [0,d) \to \R$ be a signal and $D_x = \{(t_1, x(t_1)), \ldots, (t_m, x(t_m))\}$ be the set of edges of $x$, given in an increasing order of local clock values.
-For $1 \leq i \leq m$, let $\theta_{\text{lo}}(x,t_i) = \max\{0, \max_{j \in \{1, i\}} t_j - \varepsilon - (j-i)\delta\}$ and $\theta_{\text{hi}}(x,t_i) = \min\{d, \min_{i \leq j \leq m} t_j + \varepsilon - (j-i)\delta\}$.
+For $1 \leq i \leq m$, let $\theta_{\text{lo}}(x,t_i) = \max\{0, \max_{j \in \{1, i\}} t_j - \varepsilon - (j-i)\delta\}$ and $\theta_{\text{hi}}(x,t_i) = \min_{i \leq j \leq m} t_j + \varepsilon - (j-i)\delta$.
 Intuitively, $\theta_{\text{lo}}$ and $\theta_{\text{hi}}$ give us the lower and upper bounds on the value of the global clock for a given edge.
 We use these to describe a canonical segmentation of a distributed signal.
 
 Let $(S,{\hb})$ be a distributed signal of $n$ signals.
 For each signal $x_i$, let $F_i = \{\theta_{\text{lo}}(x_i, t_j) \st (t_j, x_i(t_j)) \in D_{x_i}\} \cup \{\theta_{\text{hi}}(x_i, t_j) \st (t_j, x_i(t_j)) \in D_{x_i}\}$ be the set of bounds on the global clock values for its edges.
-Let $F = \{0, d\} \cup \bigcup_{i = 1}^{n} F_i$ and let $(a_j)_{1 \leq j \leq |F|}$ be an increasing sequence of clock values corresponding to the elements of $F$.
-We define the \emph{canonical segmentation} of $(S,{\hb})$ as $G_S = \{I_1, \ldots, I_{|F| - 1}\}$ where $I_k = [a_k, a_{k+1})$ for all $1 \leq k < |F|$.
+Let $d' = \max(d, \max (\bigcup_{i = 1}^{n} F_i))$. \rednote{we assume padding of the `retimed' signals too?}
+We define $F = \{0, d'\} \cup \bigcup_{i = 1}^{n} F_i$ and let $(a_j)_{1 \leq j \leq |F|}$ be an increasing sequence of clock values corresponding to the elements of $F$.
+We define the \emph{canonical segmentation} of $(S,{\hb})$ as $G_S = \{I_1, \ldots, I_{|F| - 1}\}$ where $I_j = [a_j, a_{j+1})$ for all $1 \leq j < |F|$.
 %Moreover, given $t \in [0,d)$, we define $\theta(S,t) = I'$ where $I' \in G_S$ and $t \in I'$.
 
 \begin{example}
@@ -25,16 +26,16 @@ We define the \emph{canonical segmentation} of $(S,{\hb})$ as $G_S = \{I_1, \ldo
 
 \subsection{Value Expressions}
 In uncertainty regions, although the monitor is not able to determine the exact value of a signal at a time point, it knows how the signal values change.
-To capture this information, we use short sequences of possible signal values capturing how a signal behaves within a segment and several operations on them to propagate the information from real-valued signals to truth values of atomic propositions and subformulas.
+To capture this information, we use short sequences of possible signal values capturing how a signal behaves within a segment and several operations on them to propagate the information from real-valued signals to truth values subformulas.
 
 %In the next section, we will map each segment of a signal to a set of value expressions corresponding to its set of possible behaviors in this time segment.
 %Moreover, we propagate this information from real-valued signals to truth values of atomic propositions and subformulas to complete the evaluation of a distributed signal and a formula.
 
 Let $\Sigma$ be a finite alphabet corresponding to a set of signal values.
-A \emph{value expression} is a finite word in $\Sigma^*$.
-Given two value expressions $u_1, u_2 \in \Sigma^*$, we define their asynchronous product as $u_1 \otimes u_2 = \{ (v_1,v_2) \st \max(|u_1|, |u_2|) \leq k \leq |u_1| + |u_2|, v_1 \in \stutter_k(u_1), v_2 \in \stutter_k(u_2) \}$.
-By extension, given $L_1, L_2 \subseteq \Sigma^*$, we have $L_1 \otimes L_2 = \{ u_1 \otimes u_2 \st u_1 \in L_1, u_2 \in L_2 \}$.
-For a function $f : \R^2 \to \R$, we refer to the set of value expressions that can be obtained by applying $f$ to the potential ``interleavings'' of $u_1$ and $u_2$ as follows: $f(u_1, u_2) = \destutter(\{(f(v_1[i], v_2[i]))_{0 \leq i < |v_1|} \st (v_1, v_2) \in u_1 \otimes u_2\})$.
+A \emph{value expression} is a finite word in $\destutter(\Sigma^*)$.
+Given two value expressions $u_1$ and $u_2$, we define their asynchronous product as $u_1 \otimes u_2 = \{ (v_1,v_2) \st \max(|u_1|, |u_2|) \leq k \leq |u_1| + |u_2|, v_1 \in \stutter_k(u_1), v_2 \in \stutter_k(u_2) \}$.
+By extension, given $L_1, L_2 \subseteq \destutter(\Sigma^*$), we have $L_1 \otimes L_2 = \{ u_1 \otimes u_2 \st u_1 \in L_1, u_2 \in L_2 \}$.
+For a function $f : \Sigma^2 \to \R$, we refer to the set of value expressions that can be obtained by applying $f$ to the potential ``interleavings'' of $u_1$ and $u_2$ as follows: $f(u_1, u_2) = \destutter(\{(f(v_1[i], v_2[i]))_{0 \leq i < |v_1|} \st (v_1, v_2) \in u_1 \otimes u_2\})$.
 Moreover, for $c \in \R$, we write $f(u_1, u_2) \geq c$ to denote the set $\destutter(\{(f(v_1[i], v_2[i]) \geq c)_{0 \leq i < |v_1|} \st (v_1, v_2) \in u_1 \otimes u_2\})$ where $f(v_1[i], v_2[i]) \geq c$ is 1 if the inequality holds, and it is 0 otherwise.
 
 Note that the definitions above can be extended to handle more than two signals.
@@ -48,14 +49,14 @@ In addition, given nonempty words $u,v \in \Sigma^*$ of length $\ell$, we define
 \begin{align*}
 \mathsf{E} u &= \left( \max_{i \leq j < \ell} u[j] \right)_{0 \leq i < \ell} \\
 \mathsf{A} u &= \left( \min_{i \leq j < \ell} u[j] \right)_{0 \leq i < \ell} \\
-u \mathsf{U}_0 v &= \left( \max_{i \leq j < \ell} \left( \min \left( v[j], \min_{i \leq k < j} u[k] \right) \right) \right)_{0 \leq i < \ell} \\
-u \mathsf{U}_1 v &= \left( \max \left( u[i..] \mathsf{U}_0 v[i..], \mathsf{A} u[i..] \right) \right)_{0 \leq i < \ell} \\
+u \mathsf{U}^0 v &= \left( \max_{i \leq j < \ell} \left( \min \left( v[j], \min_{i \leq k < j} u[k] \right) \right) \right)_{0 \leq i < \ell} \\
+u \mathsf{U}^1 v &= \left( \max \left( u[i..] \mathsf{U}^0 v[i..], \mathsf{A} u[i..] \right) \right)_{0 \leq i < \ell} \\
 \end{align*}
-Observe that $\mathsf{A} u = u \mathsf{U}_1 0^\ell$ and $\mathsf{E} u = 1^\ell \mathsf{U}_0 u$.
+Observe that $\mathsf{A} u = u \mathsf{U}^1 0^\ell$ and $\mathsf{E} u = 1^\ell \mathsf{U}^0 u$.
 
 Below we use finite words from $\destutter(\Sigma^*)$ to denote how the values of a satisfaction signal evolve through intervals that include uncertainty and interleavings.
 We use the following grammar to encode such expressions.
-$$ \psi := 0 ~|~ 1 ~|~ \lnot \psi ~|~ \psi \sqcap \psi  ~|~ \psi \cdot \psi ~|~ \psi + \psi ~|~ \psi \until_{\!0} \psi ~|~ \psi \until_{\!1} \psi $$ %  ~|~ \LTLf \psi ~|~ \LTLg \psi $$  %~|~ \psi \triangleleft \psi ~|~ \psi \triangleright \psi ~|~ \psi \diamond \psi
+$$ \psi := 0 ~|~ 1 ~|~ \lnot \psi ~|~ \psi \sqcap \psi  ~|~ \psi \cdot \psi ~|~ \psi + \psi ~|~ \psi \until^0 \psi ~|~ \psi \until^1 \psi $$ %  ~|~ \LTLf \psi ~|~ \LTLg \psi $$  %~|~ \psi \triangleleft \psi ~|~ \psi \triangleright \psi ~|~ \psi \diamond \psi
 
 We denote by $\Psi$ the set of all expressions generated by the above grammar.
 Letting $\psi_1, \psi_2 \in \Psi$, we inductively define the semantics for our encoding.
@@ -66,15 +67,15 @@ Letting $\psi_1, \psi_2 \in \Psi$, we inductively define the semantics for our e
 		\llbracket \psi_1 \sqcap \psi_2 \rrbracket &= \destutter(\{ v_1 \BitAnd v_2 \st (v_1,v_2) \in \llbracket \psi_1 \rrbracket \otimes \llbracket \psi_2 \rrbracket \}) \\
 		\llbracket \psi_1 \cdot \psi_2 \rrbracket &= \destutter(\{ u_1 u_2 \st u_1 \in \llbracket \psi_1 \rrbracket, u_2 \in \llbracket \psi_2 \rrbracket \}) \\
 		\llbracket \psi_1 + \psi_2 \rrbracket &= \llbracket \psi_1 \rrbracket \cup \llbracket \psi_2 \rrbracket \\
-		\llbracket \psi_1 \until_{\!0} \psi_2 \rrbracket &= \destutter(\{ v_1 \mathsf{U}_0 v_2  \st (v_1,v_2) \in \llbracket \psi_1 \rrbracket \otimes \llbracket \psi_2 \rrbracket \}) \\
-		\llbracket \psi_1 \until_{\!1} \psi_2 \rrbracket &= \destutter(\{ v_1 \mathsf{U}_1 v_2  \st (v_1,v_2) \in \llbracket \psi_1 \rrbracket \otimes \llbracket \psi_2 \rrbracket \}) \\
+		\llbracket \psi_1 \until^0 \psi_2 \rrbracket &= \destutter(\{ v_1 \mathsf{U}^0 v_2  \st (v_1,v_2) \in \llbracket \psi_1 \rrbracket \otimes \llbracket \psi_2 \rrbracket \}) \\
+		\llbracket \psi_1 \until^1 \psi_2 \rrbracket &= \destutter(\{ v_1 \mathsf{U}^1 v_2  \st (v_1,v_2) \in \llbracket \psi_1 \rrbracket \otimes \llbracket \psi_2 \rrbracket \}) \\
 %		\llbracket \LTLf \psi \rrbracket &= \destutter(\{ \mathsf{E} u \st u \in \llbracket \psi \rrbracket \}) \\
 %		\llbracket \LTLg \psi \rrbracket &= \destutter(\{ \mathsf{A} u \st u \in \llbracket \psi \rrbracket \}) \\
 \end{align*}
 
 \TODO: give intuition for each operation
 
-We additionally define $\psi_1 \sqcup \psi_2 = \lnot (\lnot \psi_1 \sqcap \lnot \psi_2)$, $\LTLf \psi = 1 \until_{\!0} \psi$, and $\LTLg \psi = \psi \until_{\!1} 0$, and 
+We additionally define $\psi_1 \sqcup \psi_2 = \lnot (\lnot \psi_1 \sqcap \lnot \psi_2)$, $\LTLf \psi = 1 \until^0 \psi$, and $\LTLg \psi = \psi \until^1 0$, and 
 Moreover, one can easily verify that $\destutter(\Sigma^*)$ is closed under these operations.
 
 %\TODO: explain how we represent the value expressions and how we do the operations (pref, suff, conj, neg. and others?)
@@ -113,9 +114,8 @@ Moreover, one can easily verify that $\destutter(\Sigma^*)$ is closed under thes
 %%todo: define a function from signals and segments to truth expressions
 
 \subsection{The Overapproximation Logic}
-We use the same syntax as in \Cref{sec:stl}.
 Given a distributed signal $(S,{\hb})$, our logic maps a segmentation of $(S,{\hb})$ to a set of value expressions.
-Using these, first we compute the value expressions for atomic propositions, and then inductively define the evaluation of subformulas.
+Using these, first we compute the value expressions for atomic propositions, and then inductively evaluate the subformulas.
 
 We assume that, at any segment, the signal can realize any value expression of the segment.
 This leads to an overapproximation of the set of possible behaviors as demonstrated below.
@@ -125,66 +125,73 @@ This leads to an overapproximation of the set of possible behaviors as demonstra
 \end{example}
 
 Let $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots x_n$, let $G_S$ be its canonical segmentation, and let $\varphi$ be the formula to be evaluated.
-For a given STL formula $\varphi$, let $B_\varphi$ be the set of finite and positive bounds that occur in the timed operators of $\varphi$.
-Recall the set $F$ we used in \Cref{sec:segment} to define the canonical segmentation of $(S,{\hb})$.
-To take into account the timed operators in $\varphi$, we extend $F$ as follows:
-$F_\varphi = F \cup \{t - b \st t \in F, b \in B_\varphi, t > b\}$.
-Now, let $d_1, \ldots, d_M$ be the elements of $F_\varphi$ in increasing order.
-We extend the canonical segmentation $G_S$ as follows:
-$G_S^\varphi = \{I_1', \ldots I_{M-1}'\}$ where $I_i' = [d_i, d_{i+1})$.
-
-We want to compute the value expressions of each signal in every interval in the extended canonical segmentation $G_S^\varphi$.
-For this, we first let $\gamma(I, i) = \emptyset$ for all $I \in G_S^\varphi$ and $1 \leq i \leq n$, and incrementally add value expressions to $\gamma(I, i)$ to capture the potential behaviors of $x_i$ in interval $I$.
+%For a given STL formula $\varphi$, let $B_\varphi$ be the set of finite and positive bounds that occur in the timed operators of $\varphi$.
+%Recall the set $F$ we used in \Cref{sec:segment} to define the canonical segmentation of $(S,{\hb})$.
+%To take into account the timed operators in $\varphi$, we extend $F$ as follows:
+%$F_\varphi = F \cup \{t - b \st t \in F, b \in B_\varphi, t > b\}$.
+%Now, let $d_1, \ldots, d_M$ be the elements of $F_\varphi$ in increasing order.
+%We extend the canonical segmentation $G_S$ as follows:
+%$G_S^\varphi = \{I_1', \ldots I_{M-1}'\}$ where $I_i' = [d_i, d_{i+1})$.
+We want to compute the value expressions of each signal in every interval in the canonical segmentation $G_S$.
+For this, we first let $\gamma(I, i) = \{\epsilon\}$ for all $I \in G_S$ and $1 \leq i \leq n$, then incrementally add value expressions to $\gamma(I, i)$ to capture the potential behaviors of $x_i$ in the interval $I$.
 
 For each $x_i$, consider the set $X_i = \cup_{1 \leq j < |D_i|} \{K_{i,j}\}$ of its uncertainty regions, i.e.,  $K_{i,j} = [l_j, h_j)$ where $l_j = \theta_{\text{lo}}(x_i, t_j)$ and $h_j = \theta_{\text{hi}}(x_i, t_j)$.
 These intervals have the value expression $v_{i,j} = \nu_1 \nu_2$ if $\lim_{s \to t_j^-} x_i(s) = \nu_1$ and $\lim_{s \to t_j^+} x_i(s) = \nu_2$.
 %We denote the value expression of interval $K_{i,j}$ by $v_{i,j}$.
 Note that the value expressions of the remaining intervals are constant.
 
-For each interval $I \in G_S^\varphi$ where $I = [l,h)$ and each $1 \leq i \leq n$, let $J_i = \{ K_{i,j} \in X_i \st I \subseteq K_{i,j}\}$ be the uncertainty regions of $x_i$ that contain the interval $I$.
-For each $K_{i,j} = [l_j, h_j) \in J_i$, do the following:
+Let $G_S = \{I_1, \ldots, I_{n'}\}$ where $I_\ell = [a_\ell, a_{\ell+1})$ for all $1 \leq \ell \leq n'$.
+For each $1 \leq i \leq n$ and $1 \leq k \leq n'$ let $Y_{k,i} = \{ K_{i,j} \in X_i \st I_k \subseteq K_{i,j}\}$ be the uncertainty regions of $x_i$ that contain the interval $I_k$.
+%For each interval $I \in G_S$ where $I = [l,h)$ and each $1 \leq i \leq n$, let $Y_{I,i} = \{ K_{i,j} \in X_i \st I \subseteq K_{i,j}\}$ be the uncertainty regions of $x_i$ that contain the interval $I$.
+We compute the value expressions of signals for the canonical segmentation as follows.
 \begin{itemize}
-	\item If $l = l_j$ and $h = h_j$, then add $v_{i,j}$ to $\gamma(I, i)$.
-	\item If $l = l_j$ and $h < h_j$, then add $\pfx(v_{i,j})$ to $\gamma(I,i)$.
-	\item If $l > l_j$ and $h = h_j$, then add $\sfx(v_{i,j})$ to $\gamma(I,i)$.
-	\item If $l > l_j$ and $h < h_j$, then add $\pfx(v_{i,j})$ and $\sfx(v_{i,j})$ to $\gamma(I,i)$.
+	\item For each $1 \leq i \leq n$ in increasing order, for each $1 \leq k \leq n'$ in increasing order, and for each $K_{i,j} = [l_j, h_j) \in Y_{k,i}$ in increasing order, do the following:
+	\begin{itemize}
+		\item If $a_k = l_j$ and $a_{k+1} = h_j$, then $\gamma(I_k, i) = \gamma(I_k, i) \cdot \{v_{i,j}\}$.
+		\item If $a_k = l_j$ and $a_{k+1}  < h_j$, then $\gamma(I_k, i) = \gamma(I_k, i) \cdot \pfx(v_{i,j})$.
+		\item If $a_k > l_j$ and $a_{k+1}  = h_j$, then $\gamma(I_k, i) = \gamma(I_k, i) \cdot \sfx(v_{i,j})$.
+		\item If $a_k > l_j$ and $a_{k+1}  < h_j$, then $\gamma(I_k, i) = \gamma(I_k, i) \cdot \infx(v_{i,j})$.
+	\end{itemize}
 \end{itemize}
+
 %\begin{itemize}
 %	\item If $h < h_j$, then add $\pfx(v_{i,j})$ to $\gamma(I,i)$.
 %	\item If $l > l_j$ then add $\sfx(v_{i,j})$ to $\gamma(I,i)$.
 %	\item If $l = l_j$ and $h = h_j$, then add $v_{i,j}$ to $\gamma(I, i)$.
 %\end{itemize}
 
-Let $\tau_S : [0,d) \to G_S^\varphi$ be a function that maps each time stamp to the interval of the extended canonical segmentation that it belongs to, i.e., $\tau_S(t) = [t', t'')$ where $t' \leq t < t''$ and $[t', t'') \in G_S^\varphi$.
-Let $I \subset \R_{\geq 0}$.
+Given a set $L \subseteq \Sigma^*$, we define $\first(L) = \{ u[0] \st u \in L\}$.
+Let $\tau_S : [0,d) \to G_S$ be a function that maps each time stamp to the interval of the canonical segmentation that it belongs to, i.e., $\tau_S(t) = [t', t'')$ where $t' \leq t < t''$ and $[t', t'') \in G_S$.
+%For $t_1, t_2 \in [0,d)$, if $\tau_S(t_1) \neq \tau_S(t_2)$, let $(J_i)_{1 \leq i \leq k}$ the (potentially empty) sequence of intervals that are strictly between $\tau_S(t_1)$ and $\tau_S(t_2)$.
 
+Let $(S, {\hb})$ be a distributed signal of $n$ signals, $t \in [0,d)$ be a time value, $I \subseteq \R_{\geq 0}$ be a time interval with the end points $a < b$.
+Note that timed until can be expressed using timed eventually, timed globally, and untimed until~\cite{DBLP:journals/sttt/MalerN13}.
+We provide the semantics of our logic based on this remark. %and the STL syntax given in \Cref{sec:stl}.
 
-
-
-take t and (a,b) and signal vector
-list of intervals from t+a to t+b
-choose pref, suff, pref of suff depending on how the end points relate and concat
-
-$J_i$ is the seq of intervals with nonempty intersection with $t \oplus I$, in increasing order of start points.
-$V_i$ is the set of valexpr of $J_i$.
-$\Gamma_S(t, I) = \destutter(\operatorname{op_1}(J_1) \ldots \operatorname{op_m}(J_m))$ where $\operatorname{op_i}(J_i)$ is
-$V_i$ if both end points of $J_i$ are contained in $I$
-$\pfx(V_i)$ if 
-$\sfx(V_i)$ if ...
-$\pfx(\sfx(V_i))$ if $J_i$ contains $I$
-
-
-
+%take t and (a,b) and signal vector
+%list of intervals from t+a to t+b
+%choose pref, suff, pref of suff depending on how the end points relate and concat
+%
+%$J_i$ is the seq of intervals with nonempty intersection with $t \oplus I$, in increasing order of start points.
+%$V_i$ is the set of valexpr of $J_i$.
+%$\Gamma_S(t, I) = \destutter(\operatorname{op_1}(J_1) \ldots \operatorname{op_m}(J_m))$ where $\operatorname{op_i}(J_i)$ is
+%$V_i$ if both end points of $J_i$ are contained in $I$
+%$\pfx(V_i)$ if 
+%$\sfx(V_i)$ if ...
+%$\pfx(\sfx(V_i))$ if $J_i$ contains $I$
 
 \begin{align*}
 	[S,t \models p] &=  f_p(\gamma(\tau_S(t), 1), \ldots, \gamma(\tau_S(t), n)) > 0 \\
 	[S,t \models \lnot \varphi] &= \lnot [S,t \models \varphi] \\
 	[S,t \models \varphi_1 \land \varphi_2] &= [S,t \models \varphi_1] \sqcap [S,t \models \varphi_2] \\
-	[S,t \models \varphi_1 \until \varphi_2] &= \destutter(\{ v_1 \mathsf{U}_{b} v_2 \st (v_1,v_2) \in [S,t \models \varphi_1] \otimes [S,t \models \varphi_2], \tau_S(t) = [t',t''),\\ 
-	&\hspace{10em} \text{if $t'' < d$, then } b \in \{ u[0] \st u \in [S,t'' \models \varphi_1 \until \varphi_2] \}, \\
-	&\hspace{10em} \text{otherwise } b = 0 \}) \\
-	[S,t \models \LTLf_I \varphi] &= \destutter(\{  \}) \\
+	[S,t \models \varphi_1 \until \varphi_2] &= \destutter(\{ [S,t \models \varphi_1] \until^b [S,t \models \varphi_2] \st \tau_S(t) = [t',t''), \text{if $t'' < d$} \\
+	&\hspace{14em} \text{then } b \in \first([S,t'' \models \varphi_1 \until \varphi_2]), \\
+	&\hspace{20.75em} \text{otherwise } b = 0 \}) \\
+	[S,t \models \LTLf_I \varphi] &= \destutter(\{ \mathsf{E} \operatorname{op_1}([S,t+a \models \varphi] ([S, s_i \models \varphi])_{1 \leq i \leq k})  \}) \\
 	[S,t \models \LTLg_I \varphi] &= ...
-\end{align*} \rednote{check the until, distinguish notation from stl}
+\end{align*}
+
+
+\TODO: change notation to avoid confusion with stl semantics.
 
 
