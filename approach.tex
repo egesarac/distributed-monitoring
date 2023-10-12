@@ -168,17 +168,31 @@ Let $(S, {\hb})$ be a distributed signal of $n$ signals, $t \in [0,d)$ be a time
 Note that timed until can be expressed using timed eventually, timed globally, and untimed until~\cite{DBLP:journals/sttt/MalerN13}.
 We provide the semantics of our logic based on this remark. %and the STL syntax given in \Cref{sec:stl}.
 
-%take t and (a,b) and signal vector
-%list of intervals from t+a to t+b
-%choose pref, suff, pref of suff depending on how the end points relate and concat
-%
-%$J_i$ is the seq of intervals with nonempty intersection with $t \oplus I$, in increasing order of start points.
-%$V_i$ is the set of valexpr of $J_i$.
-%$\Gamma_S(t, I) = \destutter(\operatorname{op_1}(J_1) \ldots \operatorname{op_m}(J_m))$ where $\operatorname{op_i}(J_i)$ is
-%$V_i$ if both end points of $J_i$ are contained in $I$
-%$\pfx(V_i)$ if 
-%$\sfx(V_i)$ if ...
-%$\pfx(\sfx(V_i))$ if $J_i$ contains $I$
+Let $I \subseteq [0,d)$ be an interval with the end-points $a < b$.
+Let $(H_i)_{1 \leq i \leq K}$ be a (possibly empty) sequence of intervals where $H_i = [d_i, d_{i+1}) \in G_S$ and $a < d_i < d_{i+1} < b$ for all $1 \leq i \leq K$ and $K$ is the number of intervals in $G_S$ whose endpoints are strictly between $a$ and $b$.
+Below we define the \emph{profile} of $I \subseteq [0,d)$ with respect to $S$ and $\varphi$.
+Given $t \in [0,d)$, we let $\mathsf{start}(t, S)$ (resp. $\mathsf{end}(t, S)$) be true iff there is an interval $I' \in G_S$ such that $I' = [t, t')$ (resp. $I' = [t', t))$ for some $t' \in [0,d)$.
+We denote by $Q(S, a, b)$ the concatenation of the value expressions of the intervals $H_1, \ldots, H_K$, i.e., $Q(S, a, b) = [S, d_1 \models \varphi] \cdot \ldots \cdot [S, d_K \models \varphi]$.
+\rednote{fix the cases: $a \in I$? $b \in I$?}
+\begin{equation*} 
+	\mathsf{profile}(I, S, \varphi) =
+	\begin{cases}
+		[S, a \models \varphi] &\text{if $\tau_S(a) = \tau_S(b) \land \mathsf{start}(a, S) \land \mathsf{end}(b, S)$} \\
+		\pfx([S, a \models \varphi]) &\text{if $\tau_S(a) = \tau_S(b) \land \mathsf{start}(a, S) \land \lnot\mathsf{end}(b, S)$} \\
+		\sfx([S, a \models \varphi]) &\text{if $\tau_S(a) = \tau_S(b) \land \lnot\mathsf{start}(a, S) \land \mathsf{end}(b, S)$} \\
+		\infx([S, a \models \varphi]) &\text{if $\tau_S(a) = \tau_S(b) \land \lnot\mathsf{start}(a, S) \land \lnot\mathsf{end}(b, S)$} \\
+		[S, a \models \varphi] \cdot Q(S, a, b) \cdot [S, b \models \varphi] &\text{if $\tau_S(a) \neq \tau_S(b) \land \mathsf{start}(a, S) \land \mathsf{end}(b, S)$} \\
+		[S, a \models \varphi] \cdot Q(S, a, b) \cdot \pfx([S, a \models \varphi]) &\text{if $\tau_S(a) \neq \tau_S(b) \land \mathsf{start}(a, S) \land \lnot\mathsf{end}(b, S)$} \\
+		\sfx([S, a \models \varphi]) \cdot Q(S, a, b) \cdot [S, a \models \varphi] &\text{if $\tau_S(a) \neq \tau_S(b) \land \lnot\mathsf{start}(a, S) \land \mathsf{end}(b, S)$} \\
+		\sfx([S, a \models \varphi]) \cdot Q(S, a, b) \cdot \pfx([S, b \models \varphi]) &\text{if $\tau_S(a) \neq \tau_S(b) \land \lnot\mathsf{start}(a, S) \land \lnot\mathsf{end}(b, S)$} 
+	\end{cases}
+\end{equation*}
+
+%Given an interval $J \subseteq [0,d)$, let $\mathsf{Int}(d, J)$ be the set of all intervals with the same length and type as $J$.
+%Let $\mathsf{PInt}(d, J, S, \varphi)$ be the set of profiles of all the intervals in $\mathsf{Int}(d, J)$ with respect to $S$ and $\varphi$.
+For $s_1, s_2 \in [0,d)$, let $\mathsf{profsbw}(I, S, \varphi, s_1, s_2)$ be the set of profiles with respect to $S$ and $\varphi$ of intervals in $G_S$ that are strictly between $s_1$ and $s_2$ and are of the same length and type as $I$.
+
+We are now ready to define the semantics.
 
 \begin{align*}
 	[S,t \models p] &=  f_p(\gamma(\tau_S(t), 1), \ldots, \gamma(\tau_S(t), n)) > 0 \\
@@ -190,7 +204,6 @@ We provide the semantics of our logic based on this remark. %and the STL syntax 
 	[S,t \models \LTLf_I \varphi] &= \destutter(\{ \mathsf{E} \operatorname{op_1}([S,t+a \models \varphi] ([S, s_i \models \varphi])_{1 \leq i \leq k})  \}) \\
 	[S,t \models \LTLg_I \varphi] &= ...
 \end{align*}
-
 
 \TODO: change notation to avoid confusion with stl semantics.
 
