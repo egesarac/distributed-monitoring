@@ -44,10 +44,10 @@ Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal of $n$ s
 		Let $G_{S'}^{\varphi'}= \{ [t_0, t_1), \ldots, [t_k, t_{k+1}) \}$ be the extended canonical segmentation of $(S', {\hb}')$ with respect to $\varphi'$.
 		
 		\item
-		For $i = k .. 0$, for $j = m' .. 0$, compute $[S', t_i \models \varphi_j']$. \rednote{distinguish from stl}
+		For $i = k .. 0$, for $j = m' .. 0$, compute $[S', t_i \models \varphi_j']$.
 		
 		\item
-		Output the set of first bits of the expressions in $[S' \models \varphi_0']$.
+		Output $\first([S' \models \varphi_0'])$.
 	\end{enumerate}
 \end{enumerate}
 

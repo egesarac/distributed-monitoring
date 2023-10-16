@@ -15,7 +15,7 @@ We use these to describe a canonical segmentation of a distributed signal.
 
 Let $(S,{\hb})$ be a distributed signal of $n$ signals.
 For each signal $x_i$, let $F_i = \{\theta_{\text{lo}}(x_i, t_j) \st (t_j, x_i(t_j)) \in D_{x_i}\} \cup \{\theta_{\text{hi}}(x_i, t_j) \st (t_j, x_i(t_j)) \in D_{x_i}\}$ be the set of bounds on the global clock values for its edges.
-Let $d' = \max(d, \max (\bigcup_{i = 1}^{n} F_i))$. \rednote{we assume padding of the `retimed' signals too?}
+Let $d' = \max(d, \max (\bigcup_{i = 1}^{n} F_i))$. %\rednote{we assume padding of the `retimed' signals too?}
 We define $F = \{0, d'\} \cup \bigcup_{i = 1}^{n} F_i$ and let $(a_j)_{1 \leq j \leq |F|}$ be an increasing sequence of clock values corresponding to the elements of $F$.
 We define the \emph{canonical segmentation} of $(S,{\hb})$ as $G_S = \{I_1, \ldots, I_{|F| - 1}\}$ where $I_j = [a_j, a_{j+1})$ for all $1 \leq j < |F|$.
 %Moreover, given $t \in [0,d)$, we define $\theta(S,t) = I'$ where $I' \in G_S$ and $t \in I'$.
@@ -169,42 +169,50 @@ Note that timed until can be expressed using timed eventually, timed globally, a
 We provide the semantics of our logic based on this remark. %and the STL syntax given in \Cref{sec:stl}.
 
 Let $I \subseteq [0,d)$ be an interval with the end-points $a < b$.
-Let $(H_i)_{1 \leq i \leq K}$ be a (possibly empty) sequence of intervals where $H_i = [d_i, d_{i+1}) \in G_S$ and $a < d_i < d_{i+1} < b$ for all $1 \leq i \leq K$ and $K$ is the number of intervals in $G_S$ whose endpoints are strictly between $a$ and $b$.
 Below we define the \emph{profile} of $I \subseteq [0,d)$ with respect to $S$ and $\varphi$.
-Given $t \in [0,d)$, we let $\mathsf{start}(t, S)$ (resp. $\mathsf{end}(t, S)$) be true iff there is an interval $I' \in G_S$ such that $I' = [t, t')$ (resp. $I' = [t', t))$ for some $t' \in [0,d)$.
+Given $t \in [0,d)$, we let $\mathsf{end}(t, S)$ be true iff $t=d$ or $\tau_S(t) = [t, t')$ for some $t' \in [0,d)$.
+Let $(H_i)_{1 \leq i \leq K}$ be a (possibly empty) sequence of intervals where $H_i = [d_i, d_{i+1}) \in G_S$ and $a < d_i < d_{i+1} < b$ for all $1 \leq i \leq K$ and $K$ is the number of intervals in $G_S$ whose endpoints are strictly between $a$ and $b$.
 We denote by $Q(S, a, b)$ the concatenation of the value expressions of the intervals $H_1, \ldots, H_K$, i.e., $Q(S, a, b) = [S, d_1 \models \varphi] \cdot \ldots \cdot [S, d_K \models \varphi]$.
-\rednote{fix the cases: $a \in I$? $b \in I$?}
+%\rednote{fix the cases: $a \in I$? $b \in I$?}
+
+\scriptsize
+%\scalebox{0.8}{
 \begin{equation*} 
 	\mathsf{profile}(I, S, \varphi) =
 	\begin{cases}
-		[S, a \models \varphi] &\text{if $\tau_S(a) = \tau_S(b) \land \mathsf{start}(a, S) \land \mathsf{end}(b, S)$} \\
-		\pfx([S, a \models \varphi]) &\text{if $\tau_S(a) = \tau_S(b) \land \mathsf{start}(a, S) \land \lnot\mathsf{end}(b, S)$} \\
-		\sfx([S, a \models \varphi]) &\text{if $\tau_S(a) = \tau_S(b) \land \lnot\mathsf{start}(a, S) \land \mathsf{end}(b, S)$} \\
-		\infx([S, a \models \varphi]) &\text{if $\tau_S(a) = \tau_S(b) \land \lnot\mathsf{start}(a, S) \land \lnot\mathsf{end}(b, S)$} \\
-		[S, a \models \varphi] \cdot Q(S, a, b) \cdot [S, b \models \varphi] &\text{if $\tau_S(a) \neq \tau_S(b) \land \mathsf{start}(a, S) \land \mathsf{end}(b, S)$} \\
-		[S, a \models \varphi] \cdot Q(S, a, b) \cdot \pfx([S, a \models \varphi]) &\text{if $\tau_S(a) \neq \tau_S(b) \land \mathsf{start}(a, S) \land \lnot\mathsf{end}(b, S)$} \\
-		\sfx([S, a \models \varphi]) \cdot Q(S, a, b) \cdot [S, a \models \varphi] &\text{if $\tau_S(a) \neq \tau_S(b) \land \lnot\mathsf{start}(a, S) \land \mathsf{end}(b, S)$} \\
-		\sfx([S, a \models \varphi]) \cdot Q(S, a, b) \cdot \pfx([S, b \models \varphi]) &\text{if $\tau_S(a) \neq \tau_S(b) \land \lnot\mathsf{start}(a, S) \land \lnot\mathsf{end}(b, S)$} 
+%		[S, a \models \varphi] &\text{if $\tau_S(a) = \tau_S(b) \land \mathsf{start}(a, S) \land \mathsf{end}(b, S)$} \\
+		\pfx([S, a \models \varphi]) &\text{if $\tau_S(a) = \tau_S(b) \land \mathsf{end}(a, S)$} \\
+%		\sfx([S, a \models \varphi]) &\text{if $\tau_S(a) = \tau_S(b) \land \lnot\mathsf{start}(a, S) \land \mathsf{end}(b, S)$} \\
+		\infx([S, a \models \varphi]) &\text{if $\tau_S(a) = \tau_S(b) \land \lnot\mathsf{end}(a, S)$} \\
+		[S, a \models \varphi] \cdot Q(S, a, b) \cdot \first([S, b \models \varphi]) &\text{if $\tau_S(a) \neq \tau_S(b) \land \mathsf{end}(a, S) \land \mathsf{end}(b, S) \land b \in I$} \\
+		[S, a \models \varphi] \cdot Q(S, a, b) &\text{if $\tau_S(a) \neq \tau_S(b) \land \mathsf{end}(a, S) \land \mathsf{end}(b, S) \land b \notin I$} \\
+		[S, a \models \varphi] \cdot Q(S, a, b) \cdot \pfx([S, a \models \varphi]) &\text{if $\tau_S(a) \neq \tau_S(b) \land \mathsf{end}(a, S) \land \lnot\mathsf{end}(b, S)$} \\
+		\sfx([S, a \models \varphi]) \cdot Q(S, a, b) \cdot \first([S, b \models \varphi]) &\text{if $\tau_S(a) \neq \tau_S(b) \land \lnot\mathsf{end}(a, S) \land \mathsf{end}(b, S) \land b \in I$} \\
+		\sfx([S, a \models \varphi]) \cdot Q(S, a, b) &\text{if $\tau_S(a) \neq \tau_S(b) \land \lnot\mathsf{end}(a, S) \land \mathsf{end}(b, S) \land b \notin I$} \\
+		\sfx([S, a \models \varphi]) \cdot Q(S, a, b) \cdot \pfx([S, b \models \varphi]) &\text{if $\tau_S(a) \neq \tau_S(b) \land \lnot\mathsf{end}(a, S) \land \lnot\mathsf{end}(b, S)$} 
 	\end{cases}
 \end{equation*}
+%}
+\normalsize
 
 %Given an interval $J \subseteq [0,d)$, let $\mathsf{Int}(d, J)$ be the set of all intervals with the same length and type as $J$.
 %Let $\mathsf{PInt}(d, J, S, \varphi)$ be the set of profiles of all the intervals in $\mathsf{Int}(d, J)$ with respect to $S$ and $\varphi$.
-For $s_1, s_2 \in [0,d)$, let $\mathsf{profsbw}(I, S, \varphi, s_1, s_2)$ be the set of profiles with respect to $S$ and $\varphi$ of intervals in $G_S$ that are strictly between $s_1$ and $s_2$ and are of the same length and type as $I$.
 
+For $s_1, s_2 \in [0,d)$, let $\mathsf{profsbw}(I, S, \varphi, s_1, s_2) = \{\textit{Pr}_1, \ldots, \textit{Pr}_M\}$ be the set of profiles with respect to $S$ and $\varphi$ of intervals in $G_S$ that are strictly between $s_1$ and $s_2$ and are of the same length and type as $I$, given in an increasing order of the starting points of the intervals they correspond to. \rednote{define same type}
+Let $\tau_S(t) = [t', t'')$.
 We are now ready to define the semantics.
 
+\scriptsize
 \begin{align*}
 	[S,t \models p] &=  f_p(\gamma(\tau_S(t), 1), \ldots, \gamma(\tau_S(t), n)) > 0 \\
 	[S,t \models \lnot \varphi] &= \lnot [S,t \models \varphi] \\
 	[S,t \models \varphi_1 \land \varphi_2] &= [S,t \models \varphi_1] \sqcap [S,t \models \varphi_2] \\
-	[S,t \models \varphi_1 \until \varphi_2] &= \destutter(\{ [S,t \models \varphi_1] \until^b [S,t \models \varphi_2] \st \tau_S(t) = [t',t''), \text{if $t'' < d$} \\
-	&\hspace{14em} \text{then } b \in \first([S,t'' \models \varphi_1 \until \varphi_2]), \\
-	&\hspace{20.75em} \text{otherwise } b = 0 \}) \\
-	[S,t \models \LTLf_I \varphi] &= \destutter(\{ \mathsf{E} \operatorname{op_1}([S,t+a \models \varphi] ([S, s_i \models \varphi])_{1 \leq i \leq k})  \}) \\
-	[S,t \models \LTLg_I \varphi] &= ...
+	[S,t \models \varphi_1 \until \varphi_2] &= \destutter(\{ [S,t \models \varphi_1] \until^b [S,t \models \varphi_2] \st \text{ if $t'' < d$ then $b \in \first([S,t'' \models \varphi_1 \until \varphi_2])$, otherwise $b = 0$} \}) \\
+	[S,t \models \LTLf_I \varphi] &= \destutter(\{ \mathsf{E}(\textit{Pr}_1 \cdot \ldots \cdot \mathsf{E}(\textit{Pr}_M) \}) \text{ where $\textit{Pr}_i \in \mathsf{profsbw}(I, S, \varphi, t' + a, t'' + b)$} \\
+	[S,t \models \LTLg_I \varphi] &= \destutter(\{ \mathsf{A}(\textit{Pr}_1 \cdot \ldots \cdot \mathsf{A}(\textit{Pr}_M) \}) \text{ where $\textit{Pr}_i \in \mathsf{profsbw}(I, S, \varphi, t' + a, t'' + b)$}
 \end{align*}
+\normalsize
 
-\TODO: change notation to avoid confusion with stl semantics.
+
 
 

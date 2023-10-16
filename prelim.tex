@@ -34,7 +34,7 @@ By extension, a segmentation of a collection of signals with the same temporal d
 %Then, the \emph{profile} of $x$ is the nonstuttering sequence of truth values encoding the behavior of $x$ with respect to its piecewise segmentation, i.e., $\prof(x) = \destutter((x(t_i))_{1 \leq i \leq k})$ where $I_i = [t_i, t_{i+1})$ for all $1 \leq i \leq k$.
 
 We consider an asynchronous and loosely-coupled message-passing system of $N \geq 2$ reliable agents, denoted $A_1, \ldots, A_N$.
-The agents produce a set of $n \geq 2$ signals $x_1, \ldots, x_n$ where $x_i : [0,d) \to \R$ for some $d \in \R_{> 0}$. \rednote{we take the longest signal and pad the rest?}
+The agents produce a set of $n \geq 2$ signals $x_1, \ldots, x_n$ where $x_i : [0,d) \to \R$ for some $d \in \R_{> 0}$. %\rednote{we take the longest signal and pad the rest?}
 The function $\pi : \{x_1, \ldots, x_n\} \to \{A_1, \ldots, A_N\}$ maps each signal to the agent it is produced by.
 The agents do not share memory or a global clock.
 Only to formalize statements, we speak of a hypothetical global clock and denote its value by $T$.
@@ -94,14 +94,17 @@ We express atomic propositions as functions of trace values at a time point $t$,
 Below we recall the infinite-trace qualitative semantics of STL defined over $\B$.
 Let $w = (x_1, \ldots, x_n)$ be a trace with $x_i : [0,d) \to \R$ for all $1 \leq i \leq n$, and $\varphi_1, \varphi_2$ be STL formulas.
 We assume that $t,t',t'' \in [0,d)$.
+
+\small
 \begin{align*}
-	[w,t \models p] &\iff f_p(x_1(t), \ldots, x_n(t)) > 0 \\
-	[w,t \models \lnot \varphi] &\iff \overline{[w,t \models \varphi]} \\
-	[w,t \models \varphi_1 \land \varphi_2] &\iff [w,t \models \varphi_1] \land [w,t \models \varphi_1] \\
-	[w,t \models \varphi_1 \until \varphi_2] &\iff \exists t' \in t \oplus I : [w,t' \models \varphi_2] \land \forall t'' \in (t, t') : [w,t'' \models \varphi_1] \\
+	[w,t \models p]_{\mathsf{STL}} &\iff f_p(x_1(t), \ldots, x_n(t)) > 0 \\
+	[w,t \models \lnot \varphi]_{\mathsf{STL}} &\iff \overline{[w,t \models \varphi]_{\mathsf{STL}}} \\
+	[w,t \models \varphi_1 \land \varphi_2]_{\mathsf{STL}} &\iff [w,t \models \varphi_1]_{\mathsf{STL}} \land [w,t \models \varphi_2]_{\mathsf{STL}} \\
+	[w,t \models \varphi_1 \until_I \varphi_2]_{\mathsf{STL}} &\iff \exists t' \in t \oplus I : [w,t' \models \varphi_2]_{\mathsf{STL}} \land \forall t'' \in (t, t') : [w,t'' \models \varphi_1]_{\mathsf{STL}} \\
 %	[w,t \models \LTLf_I \varphi_1] &\iff \exists t' \in t \oplus I : [w,t' \models \varphi_1] \\
 %	[w,t \models \LTLg_I \varphi_1] &\iff \forall t' \in t \oplus I : [w,t' \models \varphi_1] \\
 \end{align*}
+\normalsize
 
 We additionally use the following standard abbreviations: 
 $\true = p \lor \lnot p$,
@@ -117,4 +120,4 @@ Finally, we simply write $[w \models \varphi]$ for $[w,0 \models \varphi]$.
 The semantics above is defined for infinite traces while a distributed signal has finite length.
 To bridge this gap, we take the standard extension to a 3-valued semantics:
 Given a finite-length synchronous trace $w$ and an STL formula $\varphi$, 
-we define $[w \models \varphi]_3 = \top$ iff $[w w' \models \varphi]$ for every infinite-length signal $w'$, define $[w \models \varphi]_3 = \bot$ iff $[w w' \models \lnot \varphi]$ for every infinite-length signal $w'$, and $[w \models \varphi]_3 = \?$ otherwise.
+we define $[w \models \varphi]_3 = \top$ iff $[w w' \models \varphi]_{\mathsf{STL}}$ for every infinite-length signal $w'$, define $[w \models \varphi]_3 = \bot$ iff $[w w' \models \lnot \varphi]_{\mathsf{STL}}$ for every infinite-length signal $w'$, and $[w \models \varphi]_3 = \?$ otherwise.
