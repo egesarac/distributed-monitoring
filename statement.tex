@@ -1,14 +1,9 @@
 \section{Problem Statement}
 Let $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots, x_n$ with the temporal domain $[0,d)$ where $d \in \R_{> 0}$.
-A consistent cut flow $f \in \CCF(S,{\hb})$ yields a concrete trace $w_{S,f}= (x'_1, \ldots x'_n)$ on a temporal domain $[0,d_f)$ where $d_f \in \R_{> 0}$ such that $(c_j(T), x_i(c_j(T))) \in f(T)$ implies $x_i'(T) = x_i(c_j(T))$ for all $1 \leq i \leq n$ and $T \in \R_{\geq 0}$, where $A_j = \pi(x_i)$.
-The set of traces of $(S,{\hb})$ is given by $\tr(S,{\hb}) = \{ w_{S,f} \st f \in \CCF(S,{\hb})\}$.
-%Given $w_{S,f} \in \tr(S,{\hb})$ with $w_{S,f} = (x_1', \ldots, x_n')$, we define $\mathbb{T} = \{T_0, T_1, \ldots, T_K\}$ where $T_0 = 0$ and $T_1, \ldots, T_K$ is the increasing sequence of global clock values corresponding to the edges of $w_{S,f}$, i.e., $T_j \in \bigcup_{i = 1}^n \{T \in [0,d_f) \st (t, x_i'(t)) \in D_{x_i'} \}$ for all $1 \leq j \leq K$.
+A consistent cut flow $f \in \CCF(S,{\hb})$ yields a concrete trace $w_f = (x'_1, \ldots x'_n)$ on a temporal domain $[0,d_f)$ where $d_f \in \R_{> 0}$ such that $(c_j(T), x_i(c_j(T))) \in f(T)$ implies $x_i'(T) = x_i(c_j(T))$ for all $1 \leq i \leq n$ and $T \in [0, d_f)$, where $A_j = \pi(x_i)$.
+The set of traces of $(S,{\hb})$ is given by $\tr(S,{\hb}) = \{ w_f \st f \in \CCF(S,{\hb})\}$.
 
-%For a distributed signal $(S,{\hb})$, a sequence $C_0 C_1 \ldots$ of consistent cuts is \emph{valid} iff $C_i \subset C_{i+1}$ and $|C_i| + 1 = |C_{i+1}|$ for all $i \geq 0$.
-%We denote by $\CC(S,{\hb})$ the set of all valid sequences of consistent cuts of $(S,{\hb})$.
-%The set of traces of $(S,{\hb})$ is given by $\tr(S,{\hb}) = \{ \fr(C_0) \fr(C_1) \ldots \st C_0 C_1 \ldots \in \CC(S,{\hb}) \}$.
-
-Given a distributed signal $(S, {\hb})$, an STL formula $\varphi$, a maximum clock skew $\varepsilon > 0$, and a bounded variability constant $\delta > 0$, we aim to compute $[(S, {\hb}) \models \varphi] = \{[w \models \varphi]_3 \st w \in \tr(S, {\hb}) \}$, i.e., the set of possible truth values obtained from evaluating $\varphi$ on $(S, {\hb})$ over the standard 3-valued semantics.
+Given a distributed signal $(S, {\hb})$, an STL formula $\varphi$, a maximum clock skew $\varepsilon > 0$, and a bounded variability constant $\delta > 0$, we aim to compute $\{ [w \models \varphi]_3 \st w \in \tr(S, {\hb}) \}$, i.e., the set of possible truth values obtained from evaluating $\varphi$ on $(S, {\hb})$ over the standard 3-valued semantics.
 
 \begin{example}
 	\TODO: precise solution without and with $\varepsilon$ and $\delta$, under-approximations and over-approximations

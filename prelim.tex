@@ -2,43 +2,40 @@
 
 We define $\B = \{ \bot, \top \}$ as the set of boolean truth values where $\bot < \top$ and they complement each other.
 We denote by $\R$ the set of reals, $\R_{\geq 0}$ the set of nonnegative reals, and $\R_{> 0}$ the set of positive reals.
-A left-closed right-open interval $[a,b) \subseteq \R$ of reals has length $|b-a|$.
-%, $\N$ the set of natural numbers (including 0).
+An interval $I \subseteq \R$ of reals with the end points $a < b$ has length $|b-a|$.
 
 Let $\Sigma$ be a finite alphabet.
 We denote by $\Sigma^*$ the set of finite words over $\Sigma$ and by $\epsilon$ the empty word.
 For $u \in \Sigma^*$, we respectively write $\pfx(u)$ and $\sfx(u)$ for the sets of prefixes and suffixes of $u$.
 Moreover, we let $\infx(u) = \{v \in \Sigma^* \st \exists x,y \in \Sigma^* : u = xvy\}$.
 For a nonempty word $u \in \Sigma^*$ and $1 \leq i \leq |u|$ we denote by $u[i]$ the $i$th letter of $u$, by $u[..i]$ the prefix of $u$ of length $i$, and by $u[i..]$ the suffix of $u$ of length $|u| - i + 1$. 
+Given $u \in \Sigma^*$ and $\ell \geq 1$, we denote by $u^\ell$ the word obtained by concatenating $u$ by itself $\ell - 1$ times.
 
 We define the function $\destutter : \Sigma^* \to \Sigma^*$ inductively as follows.
 For all $\sigma \in \Sigma \cup \{\epsilon\}$, let $\destutter(\sigma) = \sigma$.
-For all $u \in \Sigma^*$ such that $u = \sigma_1 \sigma_2 v$ for some $\sigma_1,\sigma_2 \in \Sigma$ and $v \in \Sigma^*$, let (i) $\destutter(u) = \destutter(\sigma_2 v)$ if $\sigma_1 = \sigma_2$, and (ii) $\destutter(u) = \sigma_1 \cdot \destutter(\sigma_2 v)$ otherwise.
-By extension, for a set $L \subseteq \Sigma^*$ of finite words, we have $\destutter(L) = \{\destutter(u) \st u \in L\}$.
+For all $u \in \Sigma^*$ such that $u = \sigma_1 \sigma_2 v$ for some $\sigma_1,\sigma_2 \in \Sigma$ and $v \in \Sigma^*$, let $\destutter(u) = \destutter(\sigma_2 v)$ if $\sigma_1 = \sigma_2$, and  $\destutter(u) = \sigma_1 \cdot \destutter(\sigma_2 v)$ if $\sigma_1 \neq \sigma_2$.
+By extension, for a set $L \subseteq \Sigma^*$ of finite words, we write $\destutter(L) = \{\destutter(u) \st u \in L\}$.
 
 Moreover, given an integer $k \geq 0$, we define $\stutter_k : \Sigma^* \to \Sigma^*$ such that $\stutter_k(u) = \{v \in \Sigma^* \st |v| = k \land \destutter(v) = \destutter(u)\}$ if $k \geq |u|$, and $\stutter_k(u) = \emptyset$ otherwise.
 
 \subsection{Signal Model}
 
+Let $A,B \subset \R$.
+A function $f : A \to B$ is
+\emph{right-continuous} iff $\lim_{a' \to a^+} f(a') = f(a)$ for all $a \in A$;
+\emph{left-limited} iff $\lim_{a' \to a^-} f(a') < \infty$ for all $a \in A$;
+\emph{non-Zeno} iff for every bounded interval $I \subseteq A$ there are finitely many $a \in I$ such that $f$ is not continuous at $a$.
+
 \begin{definition}
-	A \emph{signal} is a right-continuous, left-limited, non-Zeno, piecewise-constant function $x : [0,d) \to \R$ where $d \R_{> 0}$ is the duration of $x$.
+	A \emph{signal} is a right-continuous, left-limited, non-Zeno, piecewise-constant function $x : [0,d) \to \R$ where $d \in \R_{> 0}$ is the duration of $x$ and $[0,d)$ is its temporal domain.
 \end{definition}
 
-\TODO: right-cont, left-lim, nonzeno, piecewise-constant, interval operations, minkowski sum
-
-Given an interval $I \subset \R_{\geq 0}$, a \emph{segmentation} of $I$ is a partition of $I$ into finitely many intervals $I_1, \ldots, I_k$ of the form $I_j = [t_j, t_{j+1})$ such that $t_j < t_{j+1}$ for all $1 \leq j \leq k$.
-By extension, a segmentation of a collection of signals with the same temporal domain $I$ is a segmentation of $I$.
-
-%Let $x : [0,d) \to \B$ be a signal.
-%The \emph{piecewise segmentation} of $x$ is the smallest segmentation $I_1, \ldots, I_k$ of $[0,d)$ such that $x(t) = x(t')$ for every $1 \leq i \leq k$ and $t,t' \in I_i$.
-%Then, the \emph{profile} of $x$ is the nonstuttering sequence of truth values encoding the behavior of $x$ with respect to its piecewise segmentation, i.e., $\prof(x) = \destutter((x(t_i))_{1 \leq i \leq k})$ where $I_i = [t_i, t_{i+1})$ for all $1 \leq i \leq k$.
-
 We consider an asynchronous and loosely-coupled message-passing system of $N \geq 2$ reliable agents, denoted $A_1, \ldots, A_N$.
-The agents produce a set of $n \geq 2$ signals $x_1, \ldots, x_n$ where $x_i : [0,d) \to \R$ for some $d \in \R_{> 0}$. %\rednote{we take the longest signal and pad the rest?}
+The agents produce a set of $n \geq 2$ signals $x_1, \ldots, x_n$ where for some $d \in \R_{> 0}$ we have $x_i : [0,d) \to \R$ for all $1 \leq i \leq n$.
 The function $\pi : \{x_1, \ldots, x_n\} \to \{A_1, \ldots, A_N\}$ maps each signal to the agent it is produced by.
 The agents do not share memory or a global clock.
 Only to formalize statements, we speak of a hypothetical global clock and denote its value by $T$.
-For denoting local time values, we use the lowercase letters $t$ and $s$.
+For local time values, we use the lowercase letters $t$ and $s$.
 
 We represent the local clock of the agent $A_i$ as an increasing and divergent function $c_i : \R_{\geq 0} \to \R_{\geq 0}$ that maps a global time $T$ to a local time $c_i(T)$ of $A_i$.
 We denote by $c_i^{-1}$ the inverse of the local clock function $c_i$.
@@ -57,7 +54,7 @@ We assume that signals have \emph{bounded variability} with respect to the globa
 	A \emph{distributed signal} is a pair $(S, {\hb})$ where $S = (x_1, \ldots, x_n)$ is a vector of signals and ${\hb}$ is the happened-before relation between events in signals extended with the partial synchrony assumption as follows.
 	\begin{itemize}
 		\item For every agent, the events of its signals are totally ordered, i.e., for all $1 \leq i,j \leq n$ with $\pi(x_i) = \pi(x_j)$ and all $(t, x_i(t)) \in E_i$ and $(t', x_j(t')) \in E_j$, if $t < t'$ then $(t, x_i(t)) \hb (t', x_j(t'))$.
-		\item Every pair of events whose timestamps are more than $2 \varepsilon$ apart is totally ordered, i.e., for all $1 \leq i,j \leq n$ and all $(t, x_i(t)) \in E_i$ and $(t', x_j(t')) \in E_j$, if $t + 2\varepsilon < t'$ then $(t, x_i(t)) \hb (t', x_j(t'))$. %TODO: strict or nonstrict?
+		\item Every pair of events whose timestamps are at least $2 \varepsilon$ apart is totally ordered, i.e., for all $1 \leq i,j \leq n$ and all $(t, x_i(t)) \in E_i$ and $(t', x_j(t')) \in E_j$, if $t + 2\varepsilon \leq t'$ then $(t, x_i(t)) \hb (t', x_j(t'))$. \bluenote{to confirm: $t + 2\varepsilon \leq t'$ or $t + 2\varepsilon < t'$}
 	\end{itemize}
 \end{definition}
 
@@ -74,8 +71,8 @@ We assume that signals have \emph{bounded variability} with respect to the globa
 We denote by $\CC(T)$ the (infinite) set of consistent cuts at global time $T$.
 Given a consistent cut $C$, its \emph{frontier} $\fr(C) \subseteq C$ is the set consisting of the last events in $C$ of each signal, i.e., $\fr(C) = \bigcup_{i = 1}^{n} \{ (t, x_i(t)) \in E_i \cap C \st \forall t' > t : (t', x_i(t')) \notin E_i \cap C \}$.
 
-A \emph{consistent cut flow} is a function $f : I \to 2^E$, where $I \subset \R_{\geq 0}$ is a left-closed right-open interval, that maps a global clock value $T$ to the frontier of a consistent cut at time $T$, i.e., $f(T) \in \{\fr(C) \st C \in \CC(T)\}$.
-Moreover, for all $T,T' \in I$ and $1 \leq i \leq n$, if $T < T'$, then for every pair of events $(c_j(T), x_i(c_j(T))) \in f(T)$ and $(c_j(T'), x_i(c_j(T'))) \in f(T')$ we have $(c_j(T), x_i(c_j(T))) \hb (c_j(T'), x_i(c_j(T')))$, where $A_j = \pi(x_i)$.
+A \emph{consistent cut flow} is a function $f : \R_{\geq 0} \to 2^E$ that maps a global clock value $T$ to the frontier of a consistent cut at time $T$, i.e., $f(T) \in \{\fr(C) \st C \in \CC(T)\}$.
+Moreover, for all $T,T' \in I$ and $1 \leq i \leq n$ where $A_j = \pi(x_i)$, if $T < T'$, then for every pair of events $(c_j(T), x_i(c_j(T))) \in f(T)$ and $(c_j(T'), x_i(c_j(T'))) \in f(T')$ we have $(c_j(T), x_i(c_j(T))) \hb (c_j(T'), x_i(c_j(T')))$.
 We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distributed signal $(S,{\hb})$.
 
 \begin{example}
@@ -88,19 +85,20 @@ Let $\AP$ be a set of atomic propositions.
 The syntax is given by the following grammar where $p \in \AP$ and $I \subseteq \R_{\geq 0}$ is an interval.
 $$ \varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \land \varphi ~|~ \varphi \until_I \varphi$$
 
-A trace $w = (x_1, \ldots, x_n)$ is a vector of synchronous signals $x_i : [0,d) \to \R$.
-We express atomic propositions as functions of trace values at a time point $t$, i.e., a proposition $p \in \AP$ is defined as $f_p(x_1(t), \ldots, x_n(t)) > 0$ where $f_p : \R^n \to \R$ is a function.
+A \emph{trace} is a vector of synchronous signals of finite duration.
+We express atomic propositions as functions of trace values at a time point $T$, i.e., a proposition $p \in \AP$ over a trace $w = (x_1, \ldots, x_n)$ is defined as $f_p(x_1(T), \ldots, x_n(T)) > 0$ where $f_p : \R^n \to \R$ is a function.
+Note that given a trace over a temporal domain $[0,D)$, a time value $T \in [0,D)$, and an interval $I \subseteq \R_{\geq 0}$, we write $T \oplus I = \{T + i \st i \in I\} \cap [0,D)$.
 
 Below we recall the infinite-trace qualitative semantics of STL defined over $\B$.
-Let $w = (x_1, \ldots, x_n)$ be a trace with $x_i : [0,d) \to \R$ for all $1 \leq i \leq n$, and $\varphi_1, \varphi_2$ be STL formulas.
-We assume that $t,t',t'' \in [0,d)$.
+Let $D \in \R_{> 0}$ and $w = (x_1, \ldots, x_n)$ with $x_i : [0,D) \to \R$ for all $1 \leq i \leq n$.
+Let $\varphi_1, \varphi_2$ be STL formulas and let $T \in [0,D)$.
 
 \small
 \begin{align*}
-	[w,t \models p]_{\mathsf{STL}} &\iff f_p(x_1(t), \ldots, x_n(t)) > 0 \\
-	[w,t \models \lnot \varphi]_{\mathsf{STL}} &\iff \overline{[w,t \models \varphi]_{\mathsf{STL}}} \\
-	[w,t \models \varphi_1 \land \varphi_2]_{\mathsf{STL}} &\iff [w,t \models \varphi_1]_{\mathsf{STL}} \land [w,t \models \varphi_2]_{\mathsf{STL}} \\
-	[w,t \models \varphi_1 \until_I \varphi_2]_{\mathsf{STL}} &\iff \exists t' \in t \oplus I : [w,t' \models \varphi_2]_{\mathsf{STL}} \land \forall t'' \in (t, t') : [w,t'' \models \varphi_1]_{\mathsf{STL}} \\
+	[w,T \models p]_{\mathsf{STL}} &\iff f_p(x_1(T), \ldots, x_n(T)) > 0 \\
+	[w,T \models \lnot \varphi]_{\mathsf{STL}} &\iff \overline{[w,T \models \varphi]_{\mathsf{STL}}} \\
+	[w,T \models \varphi_1 \land \varphi_2]_{\mathsf{STL}} &\iff [w,T \models \varphi_1]_{\mathsf{STL}} \land [w,T \models \varphi_2]_{\mathsf{STL}} \\
+	[w,T \models \varphi_1 \until_I \varphi_2]_{\mathsf{STL}} &\iff \exists T' \in T \oplus I : [w,T' \models \varphi_2]_{\mathsf{STL}} \land \forall T'' \in (T, T') : [w,T'' \models \varphi_1]_{\mathsf{STL}} \\
 %	[w,t \models \LTLf_I \varphi_1] &\iff \exists t' \in t \oplus I : [w,t' \models \varphi_1] \\
 %	[w,t \models \LTLg_I \varphi_1] &\iff \forall t' \in t \oplus I : [w,t' \models \varphi_1] \\
 \end{align*}
@@ -118,6 +116,6 @@ The non-strict variant can be defined in terms of the strict one as follows: $\v
 Finally, we simply write $[w \models \varphi]$ for $[w,0 \models \varphi]$.
 
 The semantics above is defined for infinite traces while a distributed signal has finite length.
-To bridge this gap, we take the standard extension to a 3-valued semantics:
-Given a finite-length synchronous trace $w$ and an STL formula $\varphi$, 
+To bridge this gap, we take the standard extension to a 3-valued semantics.
+Given a finite-length trace $w$ and an STL formula $\varphi$, 
 we define $[w \models \varphi]_3 = \top$ iff $[w w' \models \varphi]_{\mathsf{STL}}$ for every infinite-length signal $w'$, define $[w \models \varphi]_3 = \bot$ iff $[w w' \models \lnot \varphi]_{\mathsf{STL}}$ for every infinite-length signal $w'$, and $[w \models \varphi]_3 = \?$ otherwise.

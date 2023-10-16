@@ -1,7 +1,7 @@
 \section{The Offline Algorithm}
-The algorithm consists of a preprocessing steps followed by the monitoring algorithm.
-First, we update the structure of the input formula to enable the local evaluation of the subformulas whose signals belong to the same agent.
-This allows preserving the total order among the edges of these signals.
+The algorithm consists of a preprocessing step followed by the monitoring algorithm.
+First, we update the structure of the input formula to enable the local evaluation of some subformulas whose signals belong to the same agent.
+This allows preserving the total order among the edges of the corresponding signals.
 Then, the monitoring step evaluates the updated subformulas incrementally on the refined input signal.
 
 Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots x_n$.
@@ -11,29 +11,29 @@ Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal of $n$ s
 	\begin{enumerate}[label=\arabic*.]
 		\item
 		Enumerate the subformulas of $\varphi$ such that each formula has an enumeration number smaller than the numbers of all its subformulas.
-		Let $\varphi_0, \ldots, \varphi_m$ be such an enumeration.
-		Note that $\varphi_0 = \varphi$.
+		Let $\varphi_1, \ldots, \varphi_m$ be such an enumeration.
+		Note that $\varphi_1 = \varphi$.
 		
 		\item
-		Recall that the propositions $\AP$ of $\varphi$ are functions of the values of $x_1, \ldots, x_n$ at a given time point $t$.
+%		Recall that the propositions $\AP$ of $\varphi$ are functions of the values of $x_1, \ldots, x_n$ at a given time point $t$.
 		For each agent $A_i$, let $P_i$ be the set of subformulas of $\varphi$ such that for every $\psi \in P_i$ we have
 		(i) $\pi(x) = A_i$ for each signal $x$ that occurs in $\psi$,
 		(ii) the temporal operators $\psi$ contains, if any, are untimed, and
 		(iii) for each subformula $\psi'$ of $\varphi$ such that $\psi$ is a subformula of $\psi'$, the first two conditions are violated.
 		For each $\psi \in P_i$, if $\psi$ is not an atomic proposition, define a fresh proposition.
-		Let $\AP_{\textit{new}} = \{q_1, \ldots, q_L\}$ be the set of fresh propositions and let $\mathsf{f} : \AP_{\textit{new} }\to \{\varphi_0, \ldots, \varphi_m\}$ be function that maps each fresh proposition to the corresponding subformula of $\varphi$.
+		Let $\AP_{\textit{new}} = \{q_1, \ldots, q_M\}$ be the set of fresh propositions and let $\mathsf{f} : \AP_{\textit{new} }\to \{\varphi_1, \ldots, \varphi_m\}$ be function that maps each fresh proposition to the corresponding subformula of $\varphi$.
 %		and let $\AP' = \AP_{\textit{new}} \cup \AP$.
 %		Let $\mathsf{f} : \AP' \to \{\varphi_0, \ldots, \varphi_m\}$ be function that maps each fresh proposition in $\AP_{\textit{new}}$ to the corresponding subformula and each (nonfresh) proposition of $\varphi$  in $\AP$ to itself.
 		
 		\item
-		For each fresh proposition $q_i \in \AP_{\textit{new}}$, replace in $\varphi$ the subformula $\mathsf{f}(q_i)$ with the expression $y_i > 0$ where $y_i$ is the satisfaction signal of the subformula $\mathsf{f}(q_i)$ \alert{with respect to the finite-trace semantics of STL}.
+		For each fresh proposition $q_i \in \AP_{\textit{new}}$, replace in $\varphi$ the subformula $\mathsf{f}(q_i)$ with the expression $y_i > 0$ where $y_i$ is the satisfaction signal of the subformula $\mathsf{f}(q_i)$ \alert{with respect to the 2-valued finite-trace semantics of STL}. \rednote{the way it's defined can be taken this way too}
 		Let $\varphi'$ be the obtained formula.
-		Let $\varphi_0', \ldots, \varphi_{m'}'$ be the subformulas of $\varphi'$ satisfying the enumeration invariant given above.
-		Note that $\varphi_0'$  and $\varphi$ are semantically equivalent. %some redundancy to handle here
+		Let $\varphi_1', \ldots, \varphi_{m'}'$ be the subformulas of $\varphi'$ satisfying the enumeration invariant given above.
+		Note that $\varphi_1'$  and $\varphi$ are semantically equivalent. %some redundancy to handle here
 		
 		\item
 		We define a new distributed signal appropriately extending $(S,{\hb})$ with the fresh propositions.
-		Let $(S', {\hb}')$ be a distributed signal with $S' = (x_1, \ldots, x_n, y_1, \ldots, y_L)$ and ${\hb}'$ the smallest extension of ${\hb}$ from $S$ to $S'$ satisfying \Cref{defn:hb}. 
+		Let $(S', {\hb}')$ be a distributed signal with $S' = (x_1, \ldots, x_n, y_1, \ldots, y_M)$ and ${\hb}'$ the smallest extension of ${\hb}$ from $S$ to $S'$ satisfying \Cref{defn:hb}. 
 		%where $y_i$ is the satisfaction signal of the proposition $q_i \in \AP_{\textit{new}}$ for each $1 \leq i \leq L$, 
 		
 	\end{enumerate}
@@ -41,21 +41,30 @@ Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal of $n$ s
 	\item Monitoring
 	\begin{enumerate}[label=\arabic*.]
 		\item
-		Let $G_{S'}^{\varphi'}= \{ [t_0, t_1), \ldots, [t_k, t_{k+1}) \}$ be the extended canonical segmentation of $(S', {\hb}')$ with respect to $\varphi'$.
+		Let $G_{S'} = \{ [t_1, t_2), \ldots, [t_k, t_{k+1}) \}$ be the canonical segmentation of $(S', {\hb}')$.
 		
 		\item
-		For $i = k .. 0$, for $j = m' .. 0$, compute $[S', t_i \models \varphi_j']$.
+		For $i = k .. 1$, for $j = m' .. 1$, compute $[S', t_i \models \varphi_j']$.
 		
 		\item
-		Output $\first([S' \models \varphi_0'])$.
+		Output \alert{$\first([S',0 \models \varphi_1'])$}.
 	\end{enumerate}
 \end{enumerate}
 
+\begin{example}
+	\TODO
+\end{example}
+
 \begin{claim}
-	For every distributed signal $(S, {\hb})$ of bounded clock skew $\varepsilon$ and bounded variability $\delta$, the output $V$ of the monitoring algorithm contains ... % NOT ACCURATE ENOUGH
-%	$V$ contains $\destutter([S, {\hb} \models \varphi])$
+	For every distributed signal $(S, {\hb})$ of bounded clock skew $\varepsilon$ and bounded variability $\delta$, the output of the monitoring algorithm contains the set $\{ [w \models \varphi]_3 \st w \in \tr(S, {\hb}) \}$.
 \end{claim}
+\begin{proof}
+	\TODO
+\end{proof}
 
 \begin{claim}
 	The preprocessing part runs in time and space ..., and the monitoring part runs in time and space linear in the size of the input formula and the number of edges in the input signal. \rednote{we need a bound on the length of value expressions to prove this}
 \end{claim}
+\begin{proof}
+	\TODO
+\end{proof}
