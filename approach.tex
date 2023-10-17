@@ -1,5 +1,8 @@
 \section{Our Approach}
 
+\TODO: discuss: precise solution without and with $\varepsilon$ and $\delta$, over-approximations
+
+
 We assume a central monitor that knows the values of $\delta$ and $\varepsilon$ as well as the initial values of the signals.
 
 \subsection{Uncertainty Regions and Canonical Segmentations} \label{sec:segment}
@@ -27,12 +30,12 @@ Let $d' = \max(d, \max (\bigcup_{i = 1}^{n} F_i))$, which corresponds to the dur
 We define $F_S = \{0, d'\} \cup \bigcup_{i = 1}^{n} F_i$ and let $(a_j)_{1 \leq j \leq |F|}$ be an increasing sequence of clock values corresponding to the elements of $F$.
 We define the \emph{canonical segmentation} of $(S,{\hb})$ as $G_S = \{I_1, \ldots, I_{|F| - 1}\}$ where $I_j = [a_j, a_{j+1})$ for all $1 \leq j < |F|$.
 
-\begin{example}
+\begin{example} \label{ex:canonseg}
 	Let $(S, {\hb})$ be a distributed signal with $S = (x_1, x_2)$ over the temporal domain $[0,8)$ such that $\pi(x_1) \neq \pi(x_2)$.
 	Suppose $x_1(0) = 0$ and $x_2(0) = 1$ and let $\varepsilon = 2$ and $\delta = 3$.	
 	Consider the case where $x_1$ has a rising edge $(3,1)$ and a falling edge $(5,0)$ while $x_2$ only has a falling edge $(4,0)$.
-	Taking into account only the clock skew would give us the uncertainty regions $(1,5)$ and $(3,7)$.
-	However, the computation of uncertainty regions take into account both also the bounded variability.
+	For $x_1$, taking into account only the clock skew would give us the uncertainty regions $(1,5)$ and $(3,7)$.
+	However, the computation of uncertainty regions take into account also the bounded variability.
 	Intuitively, if the rising edge of $x_1$ occurs at global time 1, considering bounded variability, its falling edge occurs at the earliest at global time 4 instead of 3.
 	Conversely, if the falling edge occurs at global time 7 then its rising edge occurs at the latest at global time 4 instead of 5.
 	Then, we obtain $F_1 = \{1, 4, 7\}$ and $F_2 = \{2, 6\}$, therefore $F_S = \{0, 1, 2, 4, 6, 7, 8\}$.
@@ -47,15 +50,28 @@ Let $\Sigma$ be a finite alphabet corresponding to a set of signal values.
 A \emph{value expression} is a finite word in $\destutter(\Sigma^*)$.
 Given $m \geq 2$ and value expressions $u_1, \ldots, u_m$, we define their \emph{asynchronous product} to encode their potential interleavings as follows:
 \small
-$$u_1 \otimes \ldots \otimes u_m = \left\lbrace  (v_1, \ldots, v_m) \st \max_{1 \leq i \leq m} |u_i| \leq k \leq \sum_{i = 1}^{m} |u_i|, v_i \in \stutter_k(u_i) \text{ for all } 1 \leq i \leq m \right\rbrace$$  
+$$u_1 \otimes \ldots \otimes u_m = \left\lbrace  \destutter(v_1, \ldots, v_m) \st \max_{1 \leq i \leq m} |u_i| \leq k \leq \sum_{i = 1}^{m} |u_i|, v_i \in \stutter_k(u_i) \text{ for all } 1 \leq i \leq m \right\rbrace$$  
 \normalsize
 By extension, given $L_1, \ldots L_m \subseteq \destutter(\Sigma^*$), we have $L_1 \otimes \ldots \otimes L_m = \{ u_1 \otimes \ldots \otimes u_m \st u_i \in L_i \text{ for all } 1 \leq i \leq m\}$.
 
 For $u_1, \ldots, u_m$ and a function $f : \Sigma^m \to \R$, we refer to the set of value expressions that can be obtained by applying $f$ to their asynchronous product as follows: $f(u_1, \ldots, u_m) = \destutter(\{(f(v_1[i], \ldots, v_m[i]))_{1 \leq i \leq |v_1|} \st (v_1, \ldots, v_m) \in u_1 \otimes \ldots \otimes u_m\})$.
-Moreover, for $c \in \R$, we write $f(u_1, \ldots, u_m) \geq c$ to denote the set $\destutter(\{(f(v_1[i], \ldots, v_m[i]) \geq c)_{1 \leq i \leq |v_1|} \st (v_1, \ldots, v_m) \in u_1 \otimes \ldots \otimes u_m\})$ where $f(v_1[i], \ldots, v_m[i]) \geq c$ is 1 if the inequality holds, and it is 0 otherwise.
+Moreover, for $c \in \R$, we write $f(u_1, \ldots, u_m) > c$ to denote the set $\destutter(\{(f(v_1[i], \ldots, v_m[i]) > c)_{1 \leq i \leq |v_1|} \st (v_1, \ldots, v_m) \in u_1 \otimes \ldots \otimes u_m\})$ where $f(v_1[i], \ldots, v_m[i]) > c$ is 1 if the inequality holds, and it is 0 otherwise.
 
-\begin{example}
-	\TODO
+\begin{example} \label{ex:valexpr}
+	Let $\Sigma = \{2, 3, 5, 7\}$ and consider the value expressions $u_1 = 2 \cdot 5$ and $u_2 = 3 \cdot 7$.
+	These expressions respectively model the behaviors of potentially asynchronous signals whose values change from 2 to 5 and from 3 to 7.
+	To compute their asynchronous product, we range the stuttering from $k = 2$ to $k = 4$.
+	For $k = 2$, we obtain the tuple $(2 \cdot 5, 3 \cdot 7)$.
+	For $k = 3$, stuttering $u_1$ leads to $2 \cdot 2 \cdot 5$ or $2 \cdot 5 \cdot 5$ while stuttering $u_2$ gives us $3 \cdot 3 \cdot 7$ or $3 \cdot 7 \cdot 7$.
+	Putting them together, we get the new tuples $(2 \cdot 2 \cdot 5, 3 \cdot 7 \cdot 7)$ and $(2 \cdot 5 \cdot 5, 3 \cdot 3 \cdot 7)$ while the others yield $(2 \cdot 5, 3 \cdot 7)$ once destuttered, which we obtained earlier.
+	For $k = 4$, all the tuples coincide with the earlier ones once destuttered.
+	Intuitively, $(2 \cdot 5, 3 \cdot 7)$ captures the case when the rising edges of the corresponding signals occur simultaneously.
+	Similarly, $(2 \cdot 2 \cdot 5, 3 \cdot 7 \cdot 7)$ corresponds to the edge of $u_2$ happening before that of $u_1$, and $(2 \cdot 5 \cdot 5, 3 \cdot 3 \cdot 7)$ vice versa.
+	
+	Now, to compute the function $u_2 - u_1$ we apply the function letter by letter to the tuples in their asynchronous product.
+	For example, applying it to $(2 \cdot 5, 3 \cdot 7)$ results in $(3 - 2) \cdot (7 - 5)$, and thus $v_1 = 1 \cdot 2$.
+	Similarly, we get $v_2 = 1 \cdot 5 \cdot 2$ and $v_3 = 1 \cdot -2 \cdot 2$ from the rest.
+	Finally, if we take the constraint that $u_2 - u_1  > 0$, the expressions $v_1$ and $v_2$ coincide after destuttering and result in $1$, while $v_3$ gives us $1 \cdot 0 \cdot 1$.
 \end{example}
 
 As we will detail in the next section, after computing the value expressions of real-valued signals, we compute those of satisfaction signals of atomic propositions and use these boolean value expressions in the evaluation of the STL formula.
@@ -98,7 +114,14 @@ We additionally define $\psi_1 \sqcup \psi_2 = \lnot (\lnot \psi_1 \sqcap \lnot 
 Moreover, one can easily verify that $\destutter(\Sigma^*)$ is closed under these operations.
 
 \begin{example}
-	\TODO: boolean value expressions and the semantics
+	Let $\psi_1 = \{ 0, 01 \}$ and $\psi_2 = \{ 010 \}$.
+	We show the computation of $\psi_1 \until^0 \psi_2$ and $\psi_1 \until^1 \psi_2$.
+	First, we compute the asynchronous product as we demonstrated in \cref{ex:valexpr}: $\llbracket \psi_1 \rrbracket \otimes \llbracket \psi_2 \rrbracket = \{ (000,010), (011,010), (001,010), (0011,0110), (0111,0010), (0001,0100)\}$.
+	Next, we apply the bitwise until operations to each pair in the set.
+	To demonstrate, let us consider the pair $(0111,0010)$.
+	The until operators can be applied bit by bit using the standard recursive definition $p \until q = q \lor (p \land \LTLnext (p \until q))$ where $\until^0$ assumes the value of the undefined next bit is 0 whereas $\until^1$ assumes it is 1.
+	Applying the operators, we get $0111 \mathsf{U}^0 0010 = 0110$ and $0111 \mathsf{U}^1 0010 = 0111$, which respectively yield $010$ and $01$ after destuttering.
+	Applying the operations to each pair and destuttering, we obtain $\psi_1 \until^0 \psi_2 = \{ 010 \}$ and $\psi_1 \until^1 \psi_2 = \{ 010, 01, 0101\}$.
 \end{example}
 
 \subsection{The Overapproximation Logic}
@@ -109,7 +132,7 @@ This leads to an overapproximation of the set of possible behaviors since we los
 
 Let $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots x_n$, let $G_S$ be its canonical segmentation, and let $\varphi$ be the STL formula to be evaluated.
 %For a given STL formula $\varphi$, let $B_\varphi$ be the set of finite and positive bounds that occur in the timed operators of $\varphi$.
-%Recall the set $F$ we used in \Cref{sec:segment} to define the canonical segmentation of $(S,{\hb})$.
+%Recall the set $F$ we used in \cref{sec:segment} to define the canonical segmentation of $(S,{\hb})$.
 %To take into account the timed operators in $\varphi$, we extend $F$ as follows:
 %$F_\varphi = F \cup \{t - b \st t \in F, b \in B_\varphi, t > b\}$.
 %Now, let $d_1, \ldots, d_M$ be the elements of $F_\varphi$ in increasing order.
@@ -139,12 +162,20 @@ We compute the value expressions of signals for the canonical segmentation as fo
 \end{itemize}
 
 \begin{example}
-	\TODO: canonical segmentation and its value expressions, refer to previous examples
+	Recall the distributed signal in \cref{ex:canonseg}.
+	Initially, before we compute $\gamma$ for each segment and signal, the signals have the following value expressions as demonstrated in \alert{FIGURE}.
+	Considering the canonical segmentation, the computed values of $\gamma$ are as in \alert{FIGURE}.
+	For example, the value $\gamma(I_2,1) = \pfx(01) = \{0, 01\}$ because $I_2 = [1,2)$ is a subset of the uncertainty interval $[1,4)$ of $x_1$ and their left end points coincide.
+	Similarly, $\gamma(I_4,2) = \sfx(10) = \{ 10, 0\}$ because the right end points of $I_4 = [4,6)$ and the uncertainty interval $[2,5)$ of $x_2$ coincide.
 \end{example}
+
+\begin{figure}
+	\caption{\TODO (a)... (b)...}
+\end{figure}
 
 Given a set $L \subseteq \Sigma^*$, we define $\first(L) = \{ u[0] \st u \in L\}$.
 Let $\tau_S : [0,d) \to G_S$ be a function that maps each time stamp to the interval of the canonical segmentation that it belongs to, i.e., $\tau_S(t) = [t', t'')$ where $t' \leq t < t''$ and $[t', t'') \in G_S$.
-We say that two intervals $I, J \subseteq [0,d)$ with the end points $a_i < b_i$ and $a_j < b_j$ are of the same type when the following holds: $a_i \in I$ iff $a_j \in J$, and $b_i \in I$ iff $b_j \in J$.
+We say that two intervals $I, J \subseteq [0,d)$ with the end points $a_i < b_i$ and $a_j < b_j$ are of the same type iff the following holds: $(a_i \in I \iff a_j \in~J) \land (b_i \in I \iff b_j \in J)$.
 %For $t_1, t_2 \in [0,d)$, if $\tau_S(t_1) \neq \tau_S(t_2)$, let $(J_i)_{1 \leq i \leq k}$ the (potentially empty) sequence of intervals that are strictly between $\tau_S(t_1)$ and $\tau_S(t_2)$.
 
 Let $(S, {\hb})$ be a distributed signal of $n$ signals, $t \in [0,d)$ be a time value such that $\tau_S(t) = [t', t'')$.
@@ -190,3 +221,7 @@ We define the \emph{profile} of $I \subseteq [0,d)$ with respect to $S$ and $\va
 		\end{cases}
 	\end{equation*}
 \normalsize
+
+\begin{example}
+	\TODO: until takes into account the next value by looking at the first bit of the next interval. demonstrate timed eventually or always.
+\end{example}

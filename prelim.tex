@@ -6,15 +6,17 @@ An interval $I \subseteq \R$ of reals with the end points $a < b$ has length $|b
 
 Let $\Sigma$ be a finite alphabet.
 We denote by $\Sigma^*$ the set of finite words over $\Sigma$ and by $\epsilon$ the empty word.
-For $u \in \Sigma^*$, we respectively write $\pfx(u)$ and $\sfx(u)$ for the sets of prefixes and suffixes of $u$.
-Moreover, we let $\infx(u) = \{v \in \Sigma^* \st \exists x,y \in \Sigma^* : u = xvy\}$.
+For $u \in \Sigma^*$, we respectively write $\pfx(u)$ and $\sfx(u)$ for the sets of nonempty prefixes and suffixes of $u$.
+Moreover, we let $\infx(u) = \{v \in \Sigma^* \st \exists x,y \in \Sigma^* : u = xvy \land v \neq \epsilon\}$.
 For a nonempty word $u \in \Sigma^*$ and $1 \leq i \leq |u|$ we denote by $u[i]$ the $i$th letter of $u$, by $u[..i]$ the prefix of $u$ of length $i$, and by $u[i..]$ the suffix of $u$ of length $|u| - i + 1$. 
 Given $u \in \Sigma^*$ and $\ell \geq 1$, we denote by $u^\ell$ the word obtained by concatenating $u$ by itself $\ell - 1$ times.
 
 We define the function $\destutter : \Sigma^* \to \Sigma^*$ inductively as follows.
 For all $\sigma \in \Sigma \cup \{\epsilon\}$, let $\destutter(\sigma) = \sigma$.
-For all $u \in \Sigma^*$ such that $u = \sigma_1 \sigma_2 v$ for some $\sigma_1,\sigma_2 \in \Sigma$ and $v \in \Sigma^*$, let $\destutter(u) = \destutter(\sigma_2 v)$ if $\sigma_1 = \sigma_2$, and  $\destutter(u) = \sigma_1 \cdot \destutter(\sigma_2 v)$ if $\sigma_1 \neq \sigma_2$.
+For all $u \in \Sigma^*$ such that $u = \sigma_1 \sigma_2 v$ for some $\sigma_1,\sigma_2 \in \Sigma$ and $v \in \Sigma^*$, let (i) $\destutter(u) = \destutter(\sigma_2 v)$ if $\sigma_1 = \sigma_2$, and (ii) $\destutter(u) = \sigma_1 \cdot \destutter(\sigma_2 v)$ otherwise.
 By extension, for a set $L \subseteq \Sigma^*$ of finite words, we write $\destutter(L) = \{\destutter(u) \st u \in L\}$.
+Given a tuple $(u_1, \ldots, u_m)$ of finite words of the same length, we write $\destutter(u_1, \ldots, u_m)$ for the extension of $\destutter$ defined as expected: requiring the equality condition in (i) to hold for all the words in the tuple.
+
 
 Moreover, given an integer $k \geq 0$, we define $\stutter_k : \Sigma^* \to \Sigma^*$ such that $\stutter_k(u) = \{v \in \Sigma^* \st |v| = k \land \destutter(v) = \destutter(u)\}$ if $k \geq |u|$, and $\stutter_k(u) = \emptyset$ otherwise.
 
