@@ -56,7 +56,7 @@ We assume that signals have \emph{bounded variability} with respect to the globa
 	A \emph{distributed signal} is a pair $(S, {\hb})$ where $S = (x_1, \ldots, x_n)$ is a vector of signals and ${\hb}$ is the happened-before relation between events in signals extended with the partial synchrony assumption as follows.
 	\begin{itemize}
 		\item For every agent, the events of its signals are totally ordered, i.e., for all $1 \leq i,j \leq n$ with $\pi(x_i) = \pi(x_j)$ and all $(t, x_i(t)) \in E_i$ and $(t', x_j(t')) \in E_j$, if $t < t'$ then $(t, x_i(t)) \hb (t', x_j(t'))$.
-		\item Every pair of events whose timestamps are at least $2 \varepsilon$ apart is totally ordered, i.e., for all $1 \leq i,j \leq n$ and all $(t, x_i(t)) \in E_i$ and $(t', x_j(t')) \in E_j$, if $t + 2\varepsilon \leq t'$ then $(t, x_i(t)) \hb (t', x_j(t'))$. \bluenote{to confirm: $t + 2\varepsilon \leq t'$ or $t + 2\varepsilon < t'$}
+		\item Every pair of events whose timestamps are at least $2 \varepsilon$ apart is totally ordered, i.e., for all $1 \leq i,j \leq n$ and all $(t, x_i(t)) \in E_i$ and $(t', x_j(t')) \in E_j$, if $t + 2\varepsilon \leq t'$ then $(t, x_i(t)) \hb (t', x_j(t'))$. \ege{To be confirmed: $t + 2\varepsilon \leq t'$ or $t + 2\varepsilon < t'$?}
 	\end{itemize}
 \end{definition}
 
@@ -89,9 +89,10 @@ $$ \varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \land \varphi ~|~ \varphi \until_
 
 A \emph{trace} is a vector of synchronous signals of finite duration.
 We express atomic propositions as functions of trace values at a time point $T$, i.e., a proposition $p \in \AP$ over a trace $w = (x_1, \ldots, x_n)$ is defined as $f_p(x_1(T), \ldots, x_n(T)) > 0$ where $f_p : \R^n \to \R$ is a function.
-Note that given a trace over a temporal domain $[0,D)$, a time value $T \in [0,D)$, and an interval $I \subseteq \R_{\geq 0}$, we write $T \oplus I = \{T + i \st i \in I\} \cap [0,D)$.
+Note that given a trace over a temporal domain $[0,D)$ and intervals $I,J \subseteq \R_{\geq 0}$, we write $I \oplus J = \{i + j \st i \in I \land j \in J\} \cap [0,D)$.
+We use the shorthand notation $T$ for the singleton set $\{T\}$.
 
-Below we recall the infinite-trace qualitative semantics of STL defined over $\B$.
+Below we recall the infinite-trace qualitative semantics of STL defined over $\B$. \ege{The same semantics can be applied to finite traces and infinite traces separately.}
 Let $D \in \R_{> 0}$ and $w = (x_1, \ldots, x_n)$ with $x_i : [0,D) \to \R$ for all $1 \leq i \leq n$.
 Let $\varphi_1, \varphi_2$ be STL formulas and let $T \in [0,D)$.
 
