@@ -1,9 +1,11 @@
 \section{Our Approach}
 
-\TODO: discuss: precise solution without and with $\varepsilon$ and $\delta$, over-approximations
+A precise solution to the monitoring problem at hand would include considering all interleavings of the concurrent events in the given distributed signal.
+The partial synchrony assumption helps reduce the number of such interleaving, however, the state-of-the-art leveraging this assumption relies on off-the-shelf SMT solvers and thus are not able to provide theoretical guarantees on running time and memory consumption~\cite{GangulyMB20,MomtazAB23}.
+In order to design a dedicated monitoring algorithm with provable guarantees, we introduce the bounded variability assumption and an inexpensive method to overapproximate the set of behaviors of the distributed signal.
+We assume a central monitor that knows the values of $\varepsilon$ and $\delta$ as well as the initial values of the signals.
 
-
-We assume a central monitor that knows the values of $\delta$ and $\varepsilon$ as well as the initial values of the signals.
+%TODO: add a short paragraph explaining each subsection
 
 \subsection{Uncertainty Regions and Canonical Segmentations} \label{sec:segment}
 
@@ -182,7 +184,7 @@ We say that two intervals $I, J \subseteq [0,d)$ with the end points $a_i < b_i$
 
 Let $(S, {\hb})$ be a distributed signal of $n$ signals, $t \in [0,d)$ be a time value such that $\tau_S(t) = [t', t'')$.
 Let $I \subseteq \R_{\geq 0}$ be a time interval with the end points $a < b$.
-Note that timed until can be expressed using timed eventually, timed globally, and untimed until~\cite{DBLP:journals/sttt/MalerN13}.
+Note that timed until can be expressed using timed eventually, timed globally, and untimed until~\cite{MalerN13}.
 We provide the semantics of our logic following this observation.
 
 \scriptsize
