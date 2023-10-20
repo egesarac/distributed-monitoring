@@ -73,4 +73,20 @@ Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal of $n$ s
 \end{claim}
 \begin{proof}
 	\TODO %first bound the length of value expressions using bounded variability
+	
+	Let $(S {\hb})$ be a distributed signal of $n$ signals.
+	Let $\varepsilon$ be the maximum clock skew and $\delta$ the bounded variability constant.
+	Let $g$ be the number of edges of the signal.
+	
+	Computing the canonical segmentation $G_S$ takes $O(g (n + \log g))$ time and $O(g)$ space.
+	
+	Computing the initial value expressions w.r.t. local uncertainty intervals takes $O(n g)$ time and space.
+	
+	Computing the initial value expressions $\gamma$ w.r.t. $G_S$ takes $O(n g 2^g)$ time and space.
+	%for each signal : for each segment : for each element in the segment's current value expression (for general signals this is exponential in the number of uncertainty intervals containing the segment, linear for alternating bits) : extend the current element in at most 3 ways (length of the value expression is 2, for infix we get 3 elements) =  O(n g 2^g 3)
+	% 2^g is potentially too conservative?
+	
+	Bound on the lengths of boolean value expressions of atomic propositions:
+	
+	Bound on the size of boolean value expression sets of atomic propositions:
 \end{proof}

@@ -143,24 +143,35 @@ Let $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots x_n$, let $G
 We want to compute the set of value expressions of each signal in every interval in the canonical segmentation $G_S$.
 For this, we first let $\gamma(I, i) = \{\epsilon\}$ for all $I \in G_S$ and $1 \leq i \leq n$, then incrementally add value expressions to $\gamma(I, i)$ to capture the potential behaviors of $x_i$ in the interval $I$.
 
-For each $x_i$, consider the set $X_i = \cup_{1 \leq j < |D_i|} \{K_{i,j}\}$ of its uncertainty regions, i.e.,  $K_{i,j} = [l_j, h_j)$ where $l_j = \theta_{\text{lo}}(x_i, t_j)$ and $h_j = \theta_{\text{hi}}(x_i, t_j)$.
+For each $x_i$, consider the set $X_i = \cup_{1 \leq j < |D_i|} \{K_{i,j}\}$ of its uncertainty regions, i.e.,  $K_{i,j} = [l_{i,j}, h_{i,j})$ where $l_{i,j} = \theta_{\text{lo}}(x_i, t_j)$ and $h_{i,j} = \theta_{\text{hi}}(x_i, t_j)$.
 These intervals have the value expression $v_{i,j} = \nu_1 \nu_2$ if $\lim_{s \to t_j^-} x_i(s) = \nu_1$ and $\lim_{s \to t_j^+} x_i(s) = \nu_2$.
 %We denote the value expression of interval $K_{i,j}$ by $v_{i,j}$.
 Note that the value expressions of the remaining intervals are constant.
 Below we ``synchronize'' the uncertainty regions by splitting their value expressions accordingly.
 
 Let $G_S = \{I_1, \ldots, I_m\}$ where $I_k = [a_k, a_{k+1})$ for all $1 \leq k \leq m$.
-For each $1 \leq i \leq n$ and $1 \leq k \leq m$ let $Y_{k,i} = \{ K_{i,j} \in X_i \st I_k \subseteq K_{i,j}\}$ be the uncertainty regions of $x_i$ that contain the interval $I_k$.
+For each $1 \leq i \leq n$ and $1 \leq k \leq m$ let $Y_{k,i} = \{ K_{i,j} \in X_i \st I_k \subseteq K_{i,j}\}$ be the uncertainty regions of $x_i$ that contain the interval $I_k$ where $K_{i,j} = [l_{i,j}, h_{i,j})$ are given in increasing order of left end points.
 %For each interval $I \in G_S$ where $I = [l,h)$ and each $1 \leq i \leq n$, let $Y_{I,i} = \{ K_{i,j} \in X_i \st I \subseteq K_{i,j}\}$ be the uncertainty regions of $x_i$ that contain the interval $I$.
-We compute the value expressions of signals for the canonical segmentation as follows.
+We compute the value expressions of signals for the canonical segmentation as follows. 
+%\begin{itemize}
+%	\item For each $1 \leq i \leq n$ in increasing order, for each $1 \leq k \leq m$ in increasing order, and for each $K_{i,j} = [l_j, h_j) \in Y_{k,i}$ in increasing order of their starting points, do the following:
+%	\begin{itemize}
+%		\item If $l_j = a_k$ and $a_{k+1} = h_j$, then $\gamma(I_k, i) = \destutter(\gamma(I_k, i) \cdot \{v_{i,j}\})$.
+%		\item If $l_j = a_k$ and $a_{k+1} < h_j$, then $\gamma(I_k, i) = \destutter(\gamma(I_k, i) \cdot \pfx(v_{i,j}))$.
+%		\item If $l_j < a_k$ and $a_{k+1} = h_j$, then $\gamma(I_k, i) = \destutter(\gamma(I_k, i) \cdot \sfx(v_{i,j}))$.
+%		\item If $l_j < a_k$ and $a_{k+1} < h_j$, then $\gamma(I_k, i) = \destutter(\gamma(I_k, i) \cdot \infx(v_{i,j}))$.
+%	\end{itemize}
+%\end{itemize}
 \begin{itemize}
-	\item For each $1 \leq i \leq n$ in increasing order, for each $1 \leq k \leq m$ in increasing order, and for each $K_{i,j} = [l_j, h_j) \in Y_{k,i}$ in increasing order of their starting points, do the following:
+	\item For each $1 \leq i \leq n$ in increasing order, for each $1 \leq k \leq m$ in increasing order, compute the set $Z_{k,i} = \operatorname{op}_1(v_{i,1}) \cdot \ldots \cdot \operatorname{op}_{|Y_{k,i}|}(v_{i,|Y_{k,i}|})$ where, for $1 \leq j \leq |Y_{k,i}|$,
 	\begin{itemize}
-		\item If $l_j = a_k$ and $a_{k+1} = h_j$, then $\gamma(I_k, i) = \gamma(I_k, i) \cdot \{v_{i,j}\}$.
-		\item If $l_j = a_k$ and $a_{k+1} < h_j$, then $\gamma(I_k, i) = \gamma(I_k, i) \cdot \pfx(v_{i,j})$.
-		\item If $l_j < a_k$ and $a_{k+1} = h_j$, then $\gamma(I_k, i) = \gamma(I_k, i) \cdot \sfx(v_{i,j})$.
-		\item If $l_j < a_k$ and $a_{k+1} < h_j$, then $\gamma(I_k, i) = \gamma(I_k, i) \cdot \infx(v_{i,j})$.
+		\item if $l_{i,j} = a_k$ and $a_{k+1} = h_{i,j}$ then $\operatorname{op}_j(v_{i,j}) = \{v_{i,j}\}$,
+		\item if $l_{i,j} = a_k$ and $a_{k+1} < h_{i,j}$ then $\operatorname{op}_j(v_{i,j}) = \pfx(v_{i,j})$,
+		\item if $l_{i,j} < a_k$ and $a_{k+1} = h_{i,j}$ then $\operatorname{op}_j(v_{i,j}) = \sfx(v_{i,j})$,
+		\item if $l_{i,j} < a_k$ and $a_{k+1} < h_{i,j}$ then $\operatorname{op}_j(v_{i,j}) = \infx(v_{i,j})$,
+		\item if $j \geq 2$, then $\operatorname{op}_j(v_{i,j}) = \operatorname{op}_j(v_{i,j}) \cup \{\epsilon\}$.
 	\end{itemize}
+	\item Update $\gamma(I_k, i) = \destutter(\gamma(I_k, i) \cdot Z_{k,i})$.
 \end{itemize}
 
 \begin{example}
@@ -168,7 +179,7 @@ We compute the value expressions of signals for the canonical segmentation as fo
 	Initially, before we compute $\gamma$ for each segment and signal, the signals have the following value expressions as demonstrated in \cref{fig:canonseg}a.
 	Considering the canonical segmentation, the computed values of $\gamma$ are as in \cref{fig:canonseg}b.
 	For example, the value $\gamma(I_2,1) = \pfx(01) = \{0, 01\}$ because $I_2 = [1,2)$ is a subset of the uncertainty interval $[1,4)$ of $x_1$ and their left end points coincide.
-	Similarly, $\gamma(I_4,2) = \sfx(10) = \{ 10, 0\}$ because the right end points of $I_4 = [4,6)$ and the uncertainty interval $[2,5)$ of $x_2$ coincide.
+	Similarly, $\gamma(I_4,2) = \sfx(10) = \{ 10, 0\}$ because the right end points of $I_4 = [4,6)$ and the uncertainty interval $[2,6)$ of $x_2$ coincide.
 \end{example}
 
 \begin{figure} 
