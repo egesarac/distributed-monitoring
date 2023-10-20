@@ -132,7 +132,7 @@ Using these, first we compute the value expressions for atomic propositions, and
 We assume that, at any segment, the signals can realize any value expression of the segment.
 This leads to an overapproximation of the set of possible behaviors since we lose the relationship between value expressions with respect to the signals' edges.
 
-Let $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots x_n$, let $G_S$ be its canonical segmentation, and let $\varphi$ be the STL formula to be evaluated.
+Let $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots x_n$, and let $G_S$ be its canonical segmentation. %, and let $\varphi$ be the STL formula to be evaluated.
 %For a given STL formula $\varphi$, let $B_\varphi$ be the set of finite and positive bounds that occur in the timed operators of $\varphi$.
 %Recall the set $F$ we used in \cref{sec:segment} to define the canonical segmentation of $(S,{\hb})$.
 %To take into account the timed operators in $\varphi$, we extend $F$ as follows:
@@ -140,8 +140,8 @@ Let $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots x_n$, let $G
 %Now, let $d_1, \ldots, d_M$ be the elements of $F_\varphi$ in increasing order.
 %We extend the canonical segmentation $G_S$ as follows:
 %$G_S^\varphi = \{I_1', \ldots I_{M-1}'\}$ where $I_i' = [d_i, d_{i+1})$.
-We want to compute the set of value expressions of each signal in every interval in the canonical segmentation $G_S$.
-For this, we first let $\gamma(I, i) = \{\epsilon\}$ for all $I \in G_S$ and $1 \leq i \leq n$, then incrementally add value expressions to $\gamma(I, i)$ to capture the potential behaviors of $x_i$ in the interval $I$.
+We want to compute the set of value expressions of each signal in every interval in the canonical segmentation $G_S$ where $\gamma(I, i)$ captures the potential behaviors of $x_i$ in the interval $I \in G_S$
+%For this, we first let $\gamma(I, i) = \{\epsilon\}$ for all $I \in G_S$ and $1 \leq i \leq n$, then incrementally add value expressions to $\gamma(I, i)$ to capture the potential behaviors of $x_i$ in the interval $I$.
 
 For each $x_i$, consider the set $X_i = \cup_{1 \leq j < |D_i|} \{K_{i,j}\}$ of its uncertainty regions, i.e.,  $K_{i,j} = [l_{i,j}, h_{i,j})$ where $l_{i,j} = \theta_{\text{lo}}(x_i, t_j)$ and $h_{i,j} = \theta_{\text{hi}}(x_i, t_j)$.
 These intervals have the value expression $v_{i,j} = \nu_1 \nu_2$ if $\lim_{s \to t_j^-} x_i(s) = \nu_1$ and $\lim_{s \to t_j^+} x_i(s) = \nu_2$.
@@ -171,7 +171,7 @@ We compute the value expressions of signals for the canonical segmentation as fo
 		\item if $l_{i,j} < a_k$ and $a_{k+1} < h_{i,j}$ then $\operatorname{op}_j(v_{i,j}) = \infx(v_{i,j})$,
 		\item if $j \geq 2$, then $\operatorname{op}_j(v_{i,j}) = \operatorname{op}_j(v_{i,j}) \cup \{\epsilon\}$.
 	\end{itemize}
-	\item Update $\gamma(I_k, i) = \destutter(\gamma(I_k, i) \cdot Z_{k,i})$.
+	\item Let $\gamma(I_k, i) = \destutter(Z_{k,i})$.
 \end{itemize}
 
 \begin{example}
