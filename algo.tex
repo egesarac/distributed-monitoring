@@ -82,11 +82,16 @@ Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal of $n$ s
 	
 	Computing the initial value expressions w.r.t. local uncertainty intervals takes $O(n g)$ time and space.
 	
-	Computing the initial value expressions $\gamma$ w.r.t. $G_S$ takes $O(n g 2^g)$ time and space.
-	%for each signal : for each segment : for each element in the segment's current value expression (for general signals this is exponential in the number of uncertainty intervals containing the segment, linear for alternating bits) : extend the current element in at most 3 ways (length of the value expression is 2, for infix we get 3 elements) =  O(n g 2^g 3)
-	% 2^g is potentially too conservative?
+	Computing the initial value expressions $\gamma$ w.r.t. $G_S$ takes $O(n g \alert{2^{\frac{2\varepsilon}{\delta}}})$ time and space. \ege{To be checked.}
+	%for each signal : for each segment : for each element in the segment's current value expression (for general signals this is exponential in the number of uncertainty intervals containing the segment (which is at most 2epsilon/delta?), linear for alternating bits) : extend the current element in at most 3 ways (length of the value expression is 2, for infix we get 3 elements) =  O(n g 2^... 3)
 	
-	Bound on the lengths of boolean value expressions of atomic propositions:
+	Bound on the lengths of boolean value expressions of atomic propositions: the same as that of general value expressions -- linear in the number of uncertainty intervals it is contained in, i.e., \alert{$O(\frac{2\varepsilon}{\delta})$}.
 	
-	Bound on the size of boolean value expression sets of atomic propositions:
+	Bound on the lengths of boolean value expressions of other subformulas: previous expression times depth of formula (due to blow up with $\land$) except for timed operators, then it is plus $O(\frac{b-a}{\delta})$.
+	
+	Bound on the size of boolean value expression sets of atomic propositions: linear in the number of uncertainty intervals it is contained in (instead of exponential as in the general case), i.e., \alert{$O(\frac{2\varepsilon}{\delta})$}, because here the value expressions are alternating bit sequences.
+	
+	Bound on the size of boolean value expression sets of other subformulas: 
+	
+	
 \end{proof}
