@@ -3,4 +3,10 @@ Let $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots, x_n$ with t
 A consistent cut flow $f \in \CCF(S,{\hb})$ yields a concrete trace $w_f = (x'_1, \ldots x'_n)$ on a temporal domain $[0,d_f)$ where $d_f \in \R_{> 0}$ such that $(c_j(T), x_i(c_j(T))) \in f(T)$ implies $x_i'(T) = x_i(c_j(T))$ for all $1 \leq i \leq n$ and $T \in [0, d_f)$, where $A_j = \pi(x_i)$.
 The set of traces of $(S,{\hb})$ is given by $\tr(S,{\hb}) = \{ w_f \st f \in \CCF(S,{\hb})\}$.
 
-Given a distributed signal $(S, {\hb})$, an STL formula $\varphi$, a maximum clock skew $\varepsilon > 0$, and a bounded variability constant $\delta > 0$, we aim to compute $\{ [w \models \varphi]_3 \st w \in \tr(S, {\hb}) \}$, i.e., the set of possible truth values obtained from evaluating $\varphi$ on $(S, {\hb})$ over the standard 3-valued semantics.
+We are interested in how the satisfaction signals of the traces of $(S,{\hb})$ evolve over time.
+Let $\varphi$ be an STL formula and $w \in \tr(S,{\hb})$ be a trace of length $D$.
+We denote by $y_w^\varphi : [0,D) \to \{0,1\}$ the signal defined as $y_w^\varphi(t) = 1$ if $[w, t \models \varphi]_{\mathsf{STL}} = \top$ and $y_w^\varphi(t) = 0$ if $[w, t \models \varphi]_{\mathsf{STL}} = \bot$ for all $t\in [0,D)$.
+We let $D_{y_w^\varphi} = \{ (t_1, y_w^\varphi(t_1)), \ldots, (t_k, y_w^\varphi(t_k)) \}$ be the set of edges of $y_w^\varphi$ given in increasing order of time stamps, and define $v(y_w^\varphi) = v_0 v_1 \ldots v_k$ where $v_0 = y_w^\varphi(0)$ and $v_i = y_w^\varphi(t_i)$ for all $1 \leq i \leq k$.
+
+
+Given a distributed signal $(S, {\hb})$, an STL formula $\varphi$, a maximum clock skew $\varepsilon > 0$, and a bounded variability constant $\delta > 0$, we aim to compute $\mathsf{Goal}(\varphi, S, {\hb}, \varepsilon, \delta) = \{ v(y_w^\varphi) \st w \in \tr(S, {\hb}) \}$, i.e., the set of sequences of truth values obtained from evaluating $\varphi$ on the traces of $(S, {\hb})$ using the finite-trace semantics of STL.

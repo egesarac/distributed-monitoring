@@ -1,6 +1,6 @@
 \section{Preliminaries}
 
-We define $\B = \{ \bot, \top \}$ as the set of boolean truth values where $\bot < \top$ and they complement each other.
+We define $\B = \{ \bot, \top \}$ as the set of boolean truth values where $\bot < \top$ and they complement each other, i.e., $\overline{\bot} = \top$ and $\overline{\top} = \bot$.
 We denote by $\R$ the set of reals, $\R_{\geq 0}$ the set of nonnegative reals, and $\R_{> 0}$ the set of positive reals.
 An interval $I \subseteq \R$ of reals with the end points $a < b$ has length $|b-a|$.
 
@@ -52,6 +52,8 @@ We respectively denote by $D_{x_i}^\uparrow$ and $D_{x_i}^\downarrow$ the sets o
 
 We assume that signals have \emph{bounded variability} with respect to the global clock: for each signal $x_i$ and every pair $(t, x_i(t)), (t', x_i(t')) \in D_{x_i}$ of edges, we have $|c_j^{-1}(t) - c_j^{-1}(t')| \geq \delta$, where $A_j = \pi(x_i)$ is the agent that produces $x_i$ and $\delta \in \R_{\geq 0}$ is the bounded variability constant.
 
+\rednote{this assumption should be integrated somewhere below}
+
 \begin{definition} \label{defn:hb}
 	A \emph{distributed signal} is a pair $(S, {\hb})$ where $S = (x_1, \ldots, x_n)$ is a vector of signals and ${\hb}$ is the happened-before relation between events in signals extended with the partial synchrony assumption as follows.
 	\begin{itemize}
@@ -75,6 +77,7 @@ Given a consistent cut $C$, its \emph{frontier} $\fr(C) \subseteq C$ is the set 
 
 A \emph{consistent cut flow} is a function $f : \R_{\geq 0} \to 2^E$ that maps a global clock value $T$ to the frontier of a consistent cut at time $T$, i.e., $f(T) \in \{\fr(C) \st C \in \CC(T)\}$.
 Moreover, for all $T,T' \in I$ and $1 \leq i \leq n$ where $A_j = \pi(x_i)$, if $T < T'$, then for every pair of events $(c_j(T), x_i(c_j(T))) \in f(T)$ and $(c_j(T'), x_i(c_j(T'))) \in f(T')$ we have $(c_j(T), x_i(c_j(T))) \hb (c_j(T'), x_i(c_j(T')))$.
+\rednote{maybe here, if T and T' are not distant enough then the same signal cannot have an edge?}
 We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distributed signal $(S,{\hb})$.
 
 \begin{example}
@@ -92,14 +95,14 @@ We express atomic propositions as functions of trace values at a time point $T$,
 Note that given a trace over a temporal domain $[0,D)$ and intervals $I,J \subseteq \R_{\geq 0}$, we write $I \oplus J = \{i + j \st i \in I \land j \in J\} \cap [0,D)$.
 We use the shorthand notation $T$ for the singleton set $\{T\}$.
 
-Below we recall the infinite-trace qualitative semantics of STL defined over $\B$. \ege{The same semantics can be applied to finite traces and infinite traces separately.}
+Below we recall the finite-trace qualitative semantics of STL defined over $\B$.
 Let $D \in \R_{> 0}$ and $w = (x_1, \ldots, x_n)$ with $x_i : [0,D) \to \R$ for all $1 \leq i \leq n$.
 Let $\varphi_1, \varphi_2$ be STL formulas and let $T \in [0,D)$.
 
 \small
 \begin{align*}
 	[w,T \models p]_{\mathsf{STL}} &\iff f_p(x_1(T), \ldots, x_n(T)) > 0 \\
-	[w,T \models \lnot \varphi]_{\mathsf{STL}} &\iff \overline{[w,T \models \varphi]_{\mathsf{STL}}} \\
+	[w,T \models \lnot \varphi_1]_{\mathsf{STL}} &\iff \overline{[w,T \models \varphi_1]_{\mathsf{STL}}} \\
 	[w,T \models \varphi_1 \land \varphi_2]_{\mathsf{STL}} &\iff [w,T \models \varphi_1]_{\mathsf{STL}} \land [w,T \models \varphi_2]_{\mathsf{STL}} \\
 	[w,T \models \varphi_1 \until_I \varphi_2]_{\mathsf{STL}} &\iff \exists T' \in T \oplus I : [w,T' \models \varphi_2]_{\mathsf{STL}} \land \forall T'' \in (T, T') : [w,T'' \models \varphi_1]_{\mathsf{STL}} \\
 %	[w,t \models \LTLf_I \varphi_1] &\iff \exists t' \in t \oplus I : [w,t' \models \varphi_1] \\
@@ -107,6 +110,7 @@ Let $\varphi_1, \varphi_2$ be STL formulas and let $T \in [0,D)$.
 \end{align*}
 \normalsize
 
+We simply write $[w \models \varphi]$ for $[w,0 \models \varphi]$.
 We additionally use the following standard abbreviations: 
 $\true = p \lor \lnot p$,
 $\false = \lnot \true$,
@@ -116,9 +120,8 @@ $\LTLg_I \varphi = \lnot \LTLf_I \lnot \varphi$.
 Moreover, the untimed temporal operators are defined through their timed counterparts on the interval $(0,\infty)$, e.g., $\varphi_1 \until \varphi_2 = \varphi_1 \until_{(0,\infty)} \varphi_2$.
 Note that our interpretation of the untimed until operator is strict.
 The non-strict variant can be defined in terms of the strict one as follows: $\varphi_1 \underline{\until} \varphi_2 = \varphi_2 \lor (\varphi_1 \land (\varphi_1 \until \varphi_2))$.
-Finally, we simply write $[w \models \varphi]$ for $[w,0 \models \varphi]$.
 
-The semantics above is defined for infinite traces while a distributed signal has finite length.
-To bridge this gap, we take the standard extension to a 3-valued semantics.
-Given a finite-length trace $w$ and an STL formula $\varphi$, 
-we define $[w \models \varphi]_3 = \top$ iff $[w w' \models \varphi]_{\mathsf{STL}}$ for every infinite-length signal $w'$, define $[w \models \varphi]_3 = \bot$ iff $[w w' \models \lnot \varphi]_{\mathsf{STL}}$ for every infinite-length signal $w'$, and $[w \models \varphi]_3 = \?$ otherwise.
+%The semantics above is defined for infinite traces while a distributed signal has finite length.
+%To bridge this gap, we take the standard extension to a 3-valued semantics.
+%Given a finite-length trace $w$ and an STL formula $\varphi$, 
+%we define $[w \models \varphi]_3 = \top$ iff $[w w' \models \varphi]_{\mathsf{STL}}$ for every infinite-length signal $w'$, define $[w \models \varphi]_3 = \bot$ iff $[w w' \models \lnot \varphi]_{\mathsf{STL}}$ for every infinite-length signal $w'$, and $[w \models \varphi]_3 = \?$ otherwise.
