@@ -52,8 +52,6 @@ We respectively denote by $D_{x_i}^\uparrow$ and $D_{x_i}^\downarrow$ the sets o
 
 We assume that signals have \emph{bounded variability} with respect to the global clock: for each signal $x_i$ and every pair $(t, x_i(t)), (t', x_i(t')) \in D_{x_i}$ of edges, we have $|c_j^{-1}(t) - c_j^{-1}(t')| \geq \delta$, where $A_j = \pi(x_i)$ is the agent that produces $x_i$ and $\delta \in \R_{\geq 0}$ is the bounded variability constant.
 
-\rednote{this assumption should be integrated somewhere below}
-
 \begin{definition} \label{defn:hb}
 	A \emph{distributed signal} is a pair $(S, {\hb})$ where $S = (x_1, \ldots, x_n)$ is a vector of signals and ${\hb}$ is the happened-before relation between events in signals extended with the partial synchrony assumption as follows.
 	\begin{itemize}
@@ -71,13 +69,14 @@ We assume that signals have \emph{bounded variability} with respect to the globa
 	A set $C \subseteq E$ is a \emph{consistent cut} iff for every event in $C$, all events that happened before  it also belong to $C$, i.e., for all $e, e' \in E$, if $e \in C$ and $e' \hb e$, then $e' \in C$.
 \end{definition}
 
-%todo: check below 2 paragraphs for consistency with using a reference clock
 We denote by $\CC(T)$ the (infinite) set of consistent cuts at global time $T$.
 Given a consistent cut $C$, its \emph{frontier} $\fr(C) \subseteq C$ is the set consisting of the last events in $C$ of each signal, i.e., $\fr(C) = \bigcup_{i = 1}^{n} \{ (t, x_i(t)) \in E_i \cap C \st \forall t' > t : (t', x_i(t')) \notin E_i \cap C \}$.
 
 A \emph{consistent cut flow} is a function $f : \R_{\geq 0} \to 2^E$ that maps a global clock value $T$ to the frontier of a consistent cut at time $T$, i.e., $f(T) \in \{\fr(C) \st C \in \CC(T)\}$.
-Moreover, for all $T,T' \in I$ and $1 \leq i \leq n$ where $A_j = \pi(x_i)$, if $T < T'$, then for every pair of events $(c_j(T), x_i(c_j(T))) \in f(T)$ and $(c_j(T'), x_i(c_j(T'))) \in f(T')$ we have $(c_j(T), x_i(c_j(T))) \hb (c_j(T'), x_i(c_j(T')))$.
-\rednote{maybe here, if T and T' are not distant enough then the same signal cannot have an edge?}
+%Moreover, for all $T,T' \in \R_{\geq 0}$ and $1 \leq i \leq n$ where $A_j = \pi(x_i)$, (i) if $T < T'$, then for every pair of events $(c_j(T), x_i(c_j(T))) \in f(T)$ and $(c_j(T'), x_i(c_j(T'))) \in f(T')$ we have $(c_j(T), x_i(c_j(T))) \hb (c_j(T'), x_i(c_j(T')))$, and
+%(ii) if $T < T'$ and $T + \delta > T'$, then for every pair of events $(c_j(T), x_i(c_j(T))) \in f(T)$ and $(c_j(T'), x_i(c_j(T'))) \in f(T')$ we have $(c_j(T), x_i(c_j(T))) \notin D_{x_i}$ or  $(c_j(T'), x_i(c_j(T'))) \notin D_{x_i}$.
+For all $T,T' \in \R_{\geq 0}$ and $1 \leq i \leq n$ where $A_j = \pi(x_i)$, if $T < T'$, then for every pair of events $(c_j(T), x_i(c_j(T))) \in f(T)$ and $(c_j(T'), x_i(c_j(T'))) \in f(T')$ we have $(c_j(T), x_i(c_j(T))) \hb (c_j(T'), x_i(c_j(T')))$.
+%\alert{Moreover, if we further have $T + \delta > T'$, then $(c_j(T), x_i(c_j(T))) \notin D_{x_i}$ or  $(c_j(T'), x_i(c_j(T'))) \notin D_{x_i}$.}
 We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distributed signal $(S,{\hb})$.
 
 \begin{example}
