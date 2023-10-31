@@ -9,13 +9,17 @@ Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal of $n$ s
 	Note that $\varphi_1 = \varphi$.
 	
 	\item
-	Let $G_{S} = \{ [t_1, t_2), \ldots, [t_k, t_{k+1}) \}$ be the canonical segmentation of $(S, {\hb})$.
+	Compute the canonical segmentation $G_{S} = \{ [t_1, t_2), \ldots, [t_\ell, t_{\ell+1}) \}$ of $(S, {\hb})$.
 	
 	\item
-	For $i = k .. 1$, for $j = m .. 1$, compute $[S, t_i \models \varphi_j]$.
+	Compute the value expressions of signals with respect to the canonical segmentation, i.e., for each $1 \leq j \leq \ell$ and $1 \leq i \leq n$, compute $\gamma([t_j, t_{j+1}), i)$.
 	
 	\item
-	Output the set $\mathsf{Out}(\varphi, S, {\hb}, \varepsilon, \delta) = \destutter([S,t_1 \models \varphi_1] \cdot \ldots \cdot [S,t_k \models \varphi_1])$ of value expressions. %\TODO: match the semantics -- \alert{$\first([S',0 \models \varphi_1'])$}.
+	Compute the value expressions of subformulas with respect to the canonical segmentation, i.e., for each $1 \leq j \leq \ell$ and $1 \leq k \leq m$, compute $[S, t_j \models \varphi_k]$
+	%For $i = k .. 1$, for $j = m .. 1$, compute $[S, t_i \models \varphi_j]$.
+	
+	\item
+	Output the set $\mathsf{Out}(\varphi, S, {\hb}, \varepsilon, \delta) = \destutter([S,t_1 \models \varphi_1] \cdot \ldots \cdot [S,t_\ell \models \varphi_1])$ of value expressions. %\TODO: match the semantics -- \alert{$\first([S',0 \models \varphi_1'])$}.
 \end{enumerate}
 
 \begin{claim}
@@ -30,26 +34,49 @@ Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal of $n$ s
 	\TODO: The algorithm runs in ... %time and space in the size of the input formula and the number of edges in the input signal.
 \end{claim}
 \begin{proof}
-	\TODO %first bound the length of value expressions using bounded variability
-	
-	Let $(S {\hb})$ be a distributed signal of $n$ signals.
 	Let $\varepsilon$ be the maximum clock skew and $\delta$ the bounded variability constant.
-	Let $g$ be the number of edges of the signal.
+	Let $n$ be the number of signals, $g$ be the number of edges of the signal, and $m$ be the size of the input formula.
+		
+	\begin{enumerate}
+		\item 
+		Enumerating the subformulas take $O(m)$ time and space.
+		
+		\item 
+		Computing the canonical segmentation takes $O(gn)$ time and $O(g)$ space. % could do O(g logg) time too
+		
+		\item \ege{To be checked.}
+		Computing the value expressions of signals takes \alert{$O(n g^3 3^g)$} time and \alert{$O(g^2 3^g)$} space.
+		For each $j$ and $i$ computing the set $Y_{j,i}$ of uncertainty intervals takes $O(g)$ time and space.
+		Computing each set $\operatorname{op}(v)$ takes constant time and space.
+		Concatenating these sets takes $O(3^g)$ time and space, and it results in a set of value expressions of size $O(3^g)$ where each element is of length $O(g^2)$.
+		Destuttering the final set takes $O(g^2 3^g)$ time and space.\\
+		Note: the maximum number of uncertainty intervals that contain a canonical segment is $\frac{2\varepsilon}{\delta}$, which implies $|\gamma(I_j, i)| = O(4^{\frac{2\varepsilon}{\delta}})$ for all $j$ and $i$, and $|v| = O(\frac{2\varepsilon}{\delta})$ for all $v \in \gamma(I_j, i)$.
+		
+		\item \TODO:
+		Computing the value expressions of subformulas takes $O(g m ...)$ time %O()
+		and $O(...)$ space. %O()
+		
+		\item \TODO:
+		Computing the output takes $O()$ time %O(g * numElts + g * maxLen)?
+		and $O(...)$ space. %O(g * numElts * maxLen)? 
+	\end{enumerate}
 	
-	Computing the canonical segmentation $G_S$ takes $O(g (n + \log g))$ time and $O(g)$ space.
+%	max num of uncertainty intervals that contain a canonical segment = $\frac{2\varepsilon}{\delta}$
+%	
+%	$|\gamma(I_j, i)| = O(4^{\frac{2\varepsilon}{\delta}})$
+%	
+%	$v \in \gamma(I_j, i) \implies |v| = O(\frac{2\varepsilon}{\delta})$
 	
-	Computing the initial value expressions w.r.t. local uncertainty intervals takes $O(n g)$ time and space.
-	
-	Computing the initial value expressions $\gamma$ w.r.t. $G_S$ takes $O(n g \alert{2^{\frac{2\varepsilon}{\delta}}})$ time and space. \ege{To be checked.}
-	%for each signal : for each segment : for each element in the segment's current value expression (for general signals this is exponential in the number of uncertainty intervals containing the segment (which is at most 2epsilon/delta?), linear for alternating bits) : extend the current element in at most 3 ways (length of the value expression is 2, for infix we get 3 elements) =  O(n g 2^... 3)
-	
-	Bound on the lengths of boolean value expressions of atomic propositions: the same as that of general value expressions -- linear in the number of uncertainty intervals it is contained in, i.e., \alert{$O(\frac{2\varepsilon}{\delta})$}.
-	
-	Bound on the lengths of boolean value expressions of other subformulas: previous expression times depth of formula (due to blow up with $\land$) except for timed operators, then it is plus $O(\frac{b-a}{\delta})$.
-	
-	Bound on the size of boolean value expression sets of atomic propositions: linear in the number of uncertainty intervals it is contained in (instead of exponential as in the general case), i.e., \alert{$O(\frac{2\varepsilon}{\delta})$}, because here the value expressions are alternating bit sequences.
-	
-	Bound on the size of boolean value expression sets of other subformulas: 
-	
-	
+%	Computing the initial value expressions w.r.t. local uncertainty intervals takes $O(n g)$ time and space.
+%	
+%	Computing the initial value expressions $\gamma$ w.r.t. $G_S$ takes $O(n g \alert{2^{\frac{2\varepsilon}{\delta}}})$ time and space. \ege{To be checked.}
+%	%for each signal : for each segment : for each element in the segment's current value expression (for general signals this is exponential in the number of uncertainty intervals containing the segment (which is at most 2epsilon/delta?), linear for alternating bits) : extend the current element in at most 3 ways (length of the value expression is 2, for infix we get 3 elements) =  O(n g 2^... 3)
+%	
+%	Bound on the lengths of boolean value expressions of atomic propositions: the same as that of general value expressions -- linear in the number of uncertainty intervals it is contained in, i.e., \alert{$O(\frac{2\varepsilon}{\delta})$}.
+%	
+%	Bound on the lengths of boolean value expressions of other subformulas: previous expression times depth of formula (due to blow up with $\land$) except for timed operators, then it is plus $O(\frac{b-a}{\delta})$.
+%	
+%	Bound on the size of boolean value expression sets of atomic propositions: linear in the number of uncertainty intervals it is contained in (instead of exponential as in the general case), i.e., \alert{$O(\frac{2\varepsilon}{\delta})$}, because here the value expressions are alternating bit sequences.
+%	
+%	Bound on the size of boolean value expression sets of other subformulas: 
 \end{proof}
