@@ -56,6 +56,11 @@ $$u_1 \otimes \ldots \otimes u_m = \left\lbrace  \destutter(v_1, \ldots, v_m) \s
 \normalsize
 By extension, given $L_1, \ldots L_m \subseteq \destutter(\Sigma^*$), we have $L_1 \otimes \ldots \otimes L_m = \{ u_1 \otimes \ldots \otimes u_m \st u_i \in L_i \text{ for all } 1 \leq i \leq m\}$.
 
+\dejan{The operation $\otimes$ shall be associative. Why not define $u_1 \otimes u_2$ instead of $u_1 \otimes \ldots \otimes u_m$? It should simplify the definition. I propose (modulo $k$ which I think is not correct in the below def):
+$$
+u_1 \otimes u_2 = \{ \destutter(v_1, v_2)~|~v_i \in \stutter_k(u_i), \text{ where } k = |u_1| + |u_2|\}
+$$}
+
 For $u_1, \ldots, u_m$ and a function $f : \Sigma^m \to \R$, we refer to the set of value expressions that can be obtained by applying $f$ to their asynchronous product as follows: $f(u_1, \ldots, u_m) = \destutter(\{(f(v_1[i], \ldots, v_m[i]))_{1 \leq i \leq |v_1|} \st (v_1, \ldots, v_m) \in u_1 \otimes \ldots \otimes u_m\})$.
 Moreover, for $c \in \R$, we write $f(u_1, \ldots, u_m) > c$ to denote the set $\destutter(\{(f(v_1[i], \ldots, v_m[i]) > c)_{1 \leq i \leq |v_1|} \st (v_1, \ldots, v_m) \in u_1 \otimes \ldots \otimes u_m\})$ where $f(v_1[i], \ldots, v_m[i]) > c$ is 1 if the inequality holds, and it is 0 otherwise.
 
@@ -131,6 +136,8 @@ Given a distributed signal $(S,{\hb})$, our logic maps a segmentation of $(S,{\h
 Using these, first we compute the value expressions for atomic propositions, and then inductively evaluate the subformulas.
 We assume that, at any segment, the signals can realize any value expression of the segment.
 This leads to an overapproximation of the set of possible behaviors since we lose the relationship between value expressions with respect to the signals' edges.
+
+\dejan{I suggest adding a concrete example that illustrates where the overapproximation comes from.}
 
 Let $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots x_n$, and let $G_S$ be its canonical segmentation. %, and let $\varphi$ be the STL formula to be evaluated.
 %For a given STL formula $\varphi$, let $B_\varphi$ be the set of finite and positive bounds that occur in the timed operators of $\varphi$.
