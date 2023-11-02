@@ -135,9 +135,25 @@ Moreover, one can easily verify that $\destutter(\Sigma^*)$ is closed under thes
 Given a distributed signal $(S,{\hb})$, our logic maps a segmentation of $(S,{\hb})$ to a set of value expressions.
 Using these, first we compute the value expressions for atomic propositions, and then inductively evaluate the subformulas.
 We assume that, at any segment, the signals can realize any value expression of the segment.
+In particular, we treat any combination of value expressions from consecutive segments as a valid encoding of a potential behavior.
 This leads to an overapproximation of the set of possible behaviors since we lose the relationship between value expressions with respect to the signals' edges.
+Below we show an example of a signal with a single rising edge whose segmentation and the corresponding value expressions encode also a behavior with two rising edges and a falling edge.
 
-\dejan{I suggest adding a concrete example that illustrates where the overapproximation comes from.}
+\begin{example}
+	Let $(S,{\hb})$ be a distributed signal with the maximum clock skew $\varepsilon = 1$ and $x : [0,5) \to \R$ be a signal in $S$ with $x(0) = 0$ and a single rising edge $(3, 1)$.
+	The uncertainty interval of this edge is $(2,4) \subset [0,5)$.
+	Now, consider the segmentation $\{ [0,2), [2,3), [3,4), [4,5) \}$.
+	The value expression for $x$ in the segment $[0,2)$ is $0$ and in $[4,5)$ it is $1$ because these segments do not overlap with any uncertainty interval of $x$.
+	The remaining two segments split the uncertainty interval in two.
+	Accordingly, the corresponding value expressions take into account whether the rising edge has occurred yet or not.
+	For $[2,3)$, we obtain the value expressions $0$ and $01$, respectively corresponding to the cases where the rising edge occurs in this segment or not.
+	Similarly, for $[3,4)$ we get $01$ and $1$.
+	Then, the resulting set of behaviors is $\{ 0 \cdot 0 \cdot 01 \cdot 1, 0 \cdot 01 \cdot 1 \cdot 1, 0 \cdot 0 \cdot 1 \cdot 1, 0 \cdot 01 \cdot 01 \cdot 1 \}$.
+	The first behavior encodes the case where the rising edge occurs in the segment $(3,4)$, the second one in $(2,3)$, and the third one exactly at time $3$.
+	However, the fourth behavior encodes a rising edge in $(2,3)$, a falling edge exactly at time $3$, and another rising edge in $(3,4)$.
+	This stems from neglecting the relationship between the value expressions of consecutive segments.
+	While each of these value expressions are valid in isolation (i.e., the signal can display the behavior $01$ in each segment separately), allowing this combination (i.e., $01 \cdot 01$) results in an overapproximation by encoding a behavior that is not a potential behavior of the given signal.
+\end{example}
 
 Let $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots x_n$, and let $G_S$ be its canonical segmentation. %, and let $\varphi$ be the STL formula to be evaluated.
 %For a given STL formula $\varphi$, let $B_\varphi$ be the set of finite and positive bounds that occur in the timed operators of $\varphi$.
