@@ -26,8 +26,21 @@ Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal of $n$ s
 	The algorithm is correct.
 	For all STL formulas $\varphi$, and distributed signals $(S, {\hb})$ of bounded clock skew $\varepsilon$ and bounded variability $\delta$, we have $\mathsf{Goal}(\varphi, S, {\hb}, \varepsilon, \delta) \subseteq \mathsf{Out}(\varphi, S, {\hb}, \varepsilon, \delta)$.
 \end{claim}
-\begin{proof}
-	\TODO: easy to see by the semantics of value expressions
+\begin{proof} \ege{To be checked.}
+	Let $\varphi$ be an STL formula, $(S, {\hb})$ be a distributed signal of bounded clock skew $\varepsilon$ and bounded variability $\delta$ with $S = (x_1, \ldots, x_n)$.
+	
+	Recall that each element of $\mathsf{Goal}(\varphi, S, {\hb}, \varepsilon, \delta)$ is a value expression for the satisfaction signal of $\varphi$ for some trace of $(S,{\hb})$.
+	Let $v \in \mathsf{Goal}(\varphi, S, {\hb}, \varepsilon, \delta)$ be arbitrary.
+	To conclude that $v \in \mathsf{Out}(\varphi, S, {\hb}, \varepsilon, \delta)$, we argue that the semantics of our logic explores all admissible interleavings (subject to ${\hb}$, $\varepsilon$, and $\delta$) of the edges of $S$.
+	
+	First, notice that the canonical segmentation $G_S = \{ I_1, \ldots, I_\ell \}$ of $(S,{\hb})$ and the function $\gamma$ computing the corresponding value expressions for the signals capture all potential behaviors of the individual signals in $S$.
+	In particular, for each trace $w = (x_1', \ldots, x_n')$ of $(S,{\hb})$ and for each $i$, it is easy to see that $\mu(x_i') \in \destutter(\gamma(I_1, i) \ldots \gamma(I_\ell, i))$.
+	
+	Now, we argue that the semantics of our logic preserve this property.
+	For atomic propositions and conjunction, simply observe that the asynchronous product operation captures all the admissible interleavings.
+	For untimed until, observe that we consider the asynchronous product and apply bitwise-until operations whose definitions coincide with the usual recursive definitions.
+	For timed eventually and timed always, observe that the profiles of intervals capture all potential overlappings of the operation's interval and the canonical segments, to which we apply the corresponding bitwise operations which coincide with the usual definitions.
+	The case of negation is trivial.
 \end{proof}
 
 \begin{claim}
