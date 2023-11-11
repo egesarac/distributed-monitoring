@@ -1,8 +1,8 @@
 \section{Our Approach}
 
 A precise solution to the monitoring problem at hand would include considering all interleavings of the concurrent events in the given distributed signal.
-The partial synchrony assumption helps reduce the number of such interleaving, however, the state-of-the-art leveraging this assumption relies on off-the-shelf SMT solvers and thus are not able to provide theoretical guarantees on running time and memory consumption~\cite{GangulyMB20,MomtazAB23}.
-In order to design a dedicated monitoring algorithm with provable guarantees, we introduce the bounded variability assumption and an inexpensive method to overapproximate the set of behaviors of the distributed signal.
+The partial synchrony assumption helps reduce the number of such interleavings, however, the state-of-the-art leveraging this assumption relies on off-the-shelf SMT solvers and thus are not able to provide theoretical guarantees on running time and memory consumption~\cite{GangulyMB20,MomtazAB23}.
+In order to design a dedicated monitoring algorithm with provable guarantees, we introduce the bounded variability assumption and a method to overapproximate the set of behaviors of the distributed signal.
 We assume a central monitor that knows the values of $\varepsilon$ and $\delta$ as well as the initial values of the signals.
 
 %TODO: add a short paragraph explaining each subsection
@@ -17,7 +17,7 @@ To systematically reason about uncertainty regions of signals, we use the notion
 Given a temporal domain $I = [0,d) \subset \R_{\geq 0}$, a \emph{segmentation} of $I$ is a partition of $I$ into finitely many intervals $I_1, \ldots, I_k$ of the form $I_j = [t_j, t_{j+1})$ such that $t_j < t_{j+1}$ for all $1 \leq j \leq k$.
 By extension, a segmentation of a collection of signals with the same temporal domain $I$ is a segmentation of $I$.
 
-Let $x : [0,d) \to \R$ be a signal and $D_x = \{(t_1, x(t_1)), \ldots, (t_m, x(t_m))\}$ be the set of edges of $x$, given in an increasing order of local clock values.
+Let $x : [0,d) \to \R$ be a signal and $E_x = \{(t_1, x(t_1)), \ldots, (t_m, x(t_m))\}$ be the set of edges of $x$, given in an increasing order of local clock values.
 For $1 \leq i \leq m$, we let 
 \begin{align*}
 	\theta_{\text{lo}}(x,t_i) &= \max\{0, \max_{j \in \{1, i\}} t_j - \varepsilon - (j-i)\delta\} \text{, and} \\
@@ -27,58 +27,66 @@ Intuitively, $\theta_{\text{lo}}$ and $\theta_{\text{hi}}$ give us the lower and
 We use these to describe a canonical segmentation of a distributed signal.
 
 Let $(S,{\hb})$ be a distributed signal of $n$ signals.
-For each signal $x_i$, let $F_i = \{\theta_{\text{lo}}(x_i, t_j) \st (t_j, x_i(t_j)) \in D_{x_i}\} \cup \{\theta_{\text{hi}}(x_i, t_j) \st (t_j, x_i(t_j)) \in D_{x_i}\}$ be the set of bounds on its uncertainty regions.
+For each signal $x_i$, let $F_i = \{\theta_{\text{lo}}(x_i, t_j) \st (t_j, x_i(t_j)) \in E_i\} \cup \{\theta_{\text{hi}}(x_i, t_j) \st (t_j, x_i(t_j)) \in E_i \}$ be the set of bounds on its uncertainty regions.
 Let $d' = \max(d, \max (\bigcup_{i = 1}^{n} F_i))$, which corresponds to the duration of the distributed signal with respect to the global clock.
 We define $F_S = \{0, d'\} \cup \bigcup_{i = 1}^{n} F_i$ and let $(a_j)_{1 \leq j \leq |F|}$ be an increasing sequence of clock values corresponding to the elements of $F$.
 We define the \emph{canonical segmentation} of $(S,{\hb})$ as $G_S = \{I_1, \ldots, I_{|F| - 1}\}$ where $I_j = [a_j, a_{j+1})$ for all $1 \leq j < |F|$.
 
 \begin{example} \label{ex:canonseg}
 	Let $(S, {\hb})$ be a distributed signal with $S = (x_1, x_2)$ over the temporal domain $[0,8)$ such that $\pi(x_1) \neq \pi(x_2)$.
-	Suppose $x_1(0) = 0$ and $x_2(0) = 1$ and let $\varepsilon = 2$ and $\delta = 3$.	
-	Consider the case where $x_1$ has a rising edge $(3,1)$ and a falling edge $(5,0)$ while $x_2$ only has a falling edge $(4,0)$.
+	Suppose $x_1(0) = 2$ and $x_2(0) = 3$, and let $\varepsilon = 2$ and $\delta = 3$.	
+	Consider the case where $x_1$ has a rising edge $(3,5)$ and a falling edge $(5,3)$ while $x_2$ has a rising edge $(2,7)$ and a falling edge $(5,2)$.
 	For $x_1$, taking into account only the clock skew would give us the uncertainty regions $(1,5)$ and $(3,7)$.
 	However, the computation of uncertainty regions take into account also the bounded variability.
 	Intuitively, if the rising edge of $x_1$ occurs at global time 1, considering bounded variability, its falling edge occurs at the earliest at global time 4 instead of 3.
 	Conversely, if the falling edge occurs at global time 7 then its rising edge occurs at the latest at global time 4 instead of 5.
-	Then, we obtain $F_1 = \{1, 4, 7\}$ and $F_2 = \{2, 6\}$, therefore $F_S = \{0, 1, 2, 4, 6, 7, 8\}$.
-	This leads to the canonical segmentation $G_S = \{[0,1), [1,2) ,[2,4) ,[4,6) ,[6,7) ,[7,8)\}$.		
+	Then, we obtain $F_1 = \{1, 4, 7\}$.
+	For $x_2$, the uncertainty regions are $(0,4)$ and $(3,7)$, which gives us $F_2 = \{0, 3, 4, 7\}$; and therefore, $F_S = \{0, 1, 3, 4, 7, 8\}$.
+	This leads to the canonical segmentation $G_S = \{[0,1), [1,3) ,[3,4) ,[4,7) ,[7,8)\}$.		
 \end{example}
+
+\begin{figure} 
+	\centering
+	\includegraphics[scale=0.45]{canonseg.png}
+	\caption{The values of $x_1$ (solid) and $x_2$ (dashed) over time. The edges are marked with black balls and their uncertainty regions are given as light gray boxes around the edges. The resulting canonical segmentation $G_S$ is shown below the graphical representation of the signals.\label{fig:canonseg}}
+\end{figure}
+
+
 
 \subsection{Value Expressions}
 In uncertainty regions, although the monitor is not able to determine the exact value of a signal at a time point, it knows how the signal values change.
-To capture this information, we use short sequences of possible signal values capturing how a signal behaves within a segment and several operations on them to propagate the information from real-valued signals to truth values subformulas.
+To capture this information, we use short sequences of possible signal values capturing how a signal behaves within a segment and several operations on them to propagate the information from real-valued signals to truth values of subformulas.
 
 Let $\Sigma$ be a finite alphabet corresponding to a set of signal values.
 A \emph{value expression} is a finite word in $\destutter(\Sigma^*)$.
-Given $m \geq 2$ and value expressions $u_1, \ldots, u_m$, we define their \emph{asynchronous product} to encode their potential interleavings as follows:
+Given value expressions $u_1$ and $u_2$, we define their \emph{asynchronous product} to encode their potential interleavings as follows:
 \small
-$$u_1 \otimes \ldots \otimes u_m = \left\lbrace  \destutter(v_1, \ldots, v_m) \st \max_{1 \leq i \leq m} |u_i| \leq k \leq \sum_{i = 1}^{m} |u_i|, v_i \in \stutter_k(u_i) \text{ for all } 1 \leq i \leq m \right\rbrace$$  
+$$u_1 \otimes u_2 = \{ \destutter(v_1, v_2) \st v_i \in \stutter_k(u_i), \text{ where } k = |u_1| + |u_2| - 1\}$$  
 \normalsize
-By extension, given $L_1, \ldots L_m \subseteq \destutter(\Sigma^*$), we have $L_1 \otimes \ldots \otimes L_m = \{ u_1 \otimes \ldots \otimes u_m \st u_i \in L_i \text{ for all } 1 \leq i \leq m\}$.
+Given $L_1, L_2 \subseteq \destutter(\Sigma^*)$, we write $L_1 \otimes L_2 = \{ u_1 \otimes u_2 \st u_i \in L_i\}$.
 
-\dejan{The operation $\otimes$ shall be associative. Why not define $u_1 \otimes u_2$ instead of $u_1 \otimes \ldots \otimes u_m$? It should simplify the definition. I propose (modulo $k$ which I think is not correct in the below def):
-$$
-u_1 \otimes u_2 = \{ \destutter(v_1, v_2)~|~v_i \in \stutter_k(u_i), \text{ where } k = |u_1| + |u_2|\}
-$$}
-
-For $u_1, \ldots, u_m$ and a function $f : \Sigma^m \to \R$, we refer to the set of value expressions that can be obtained by applying $f$ to their asynchronous product as follows: $f(u_1, \ldots, u_m) = \destutter(\{(f(v_1[i], \ldots, v_m[i]))_{1 \leq i \leq |v_1|} \st (v_1, \ldots, v_m) \in u_1 \otimes \ldots \otimes u_m\})$.
-Moreover, for $c \in \R$, we write $f(u_1, \ldots, u_m) > c$ to denote the set $\destutter(\{(f(v_1[i], \ldots, v_m[i]) > c)_{1 \leq i \leq |v_1|} \st (v_1, \ldots, v_m) \in u_1 \otimes \ldots \otimes u_m\})$ where $f(v_1[i], \ldots, v_m[i]) > c$ is 1 if the inequality holds, and it is 0 otherwise.
+For value expressions $u_1, u_2$ and a function $f : \Sigma^2 \to \R$, we refer to the set of value expressions that can be obtained by applying $f$ to their asynchronous product as follows: $f(u_1, u_2) = \destutter(\{(f(v_1[i], v_2[i]))_{1 \leq i \leq k} \st (v_1, v_2) \in u_1 \otimes u_2 \text{ and } k = |v_1| \})$.
+Moreover, for $c \in \R$, we write $f(u_1, u_2) > c$ to denote the set $\destutter(\{(f(v_1[i], v_2[i]) > c)_{1 \leq i \leq k} \st (v_1, v_2) \in u_1 \otimes u_2 \text{ and } k = |v_1|\})$ where $f(v_1[i], v_2[i]) > c$ is 1 if the inequality holds, and it is 0 otherwise.
+We naturally extend these definitions to functions of arbitrary (finite) arity.
 
 \begin{example} \label{ex:valexpr}
-	Let $\Sigma = \{2, 3, 5, 7\}$ and consider the value expressions $u_1 = 2 \cdot 5$ and $u_2 = 3 \cdot 7$.
-	These expressions respectively model the behaviors of potentially asynchronous signals whose values change from 2 to 5 and from 3 to 7.
-	To compute their asynchronous product, we range the stuttering from $k = 2$ to $k = 4$.
-	For $k = 2$, we obtain the tuple $(2 \cdot 5, 3 \cdot 7)$.
-	For $k = 3$, stuttering $u_1$ leads to $2 \cdot 2 \cdot 5$ or $2 \cdot 5 \cdot 5$ while stuttering $u_2$ gives us $3 \cdot 3 \cdot 7$ or $3 \cdot 7 \cdot 7$.
-	Putting them together, we get the new tuples $(2 \cdot 2 \cdot 5, 3 \cdot 7 \cdot 7)$ and $(2 \cdot 5 \cdot 5, 3 \cdot 3 \cdot 7)$ while the others yield $(2 \cdot 5, 3 \cdot 7)$ once destuttered, which we obtained earlier.
-	For $k = 4$, all the tuples coincide with the earlier ones once destuttered.
-	Intuitively, $(2 \cdot 5, 3 \cdot 7)$ captures the case when the rising edges of the corresponding signals occur simultaneously.
-	Similarly, $(2 \cdot 2 \cdot 5, 3 \cdot 7 \cdot 7)$ corresponds to the edge of $u_2$ happening before that of $u_1$, and $(2 \cdot 5 \cdot 5, 3 \cdot 3 \cdot 7)$ vice versa.
+	Recall the distributed signal $(S, {\hb})$ in \cref{ex:canonseg}.
+	To encode the behavior of $x_1$ and $x_2$, let $\Sigma = \{2, 3, 5, 7\}$.
+	One possible behavior of these signals is that the rising edge of $x_1$ and the falling edge of $x_2$ occur in the segment $[3,4)$.
+	We represent this case by taking the value expression $u_1 = 2 \cdot 5$ for $x_1$ and $u_2 = 7 \cdot 2$ for $x_2$ in the segment $[3,4)$.
+	To capture the potential interleavings of these edges, we compute the asynchronous product $u_1 \otimes u_2$ of these value expressions.
+	Stuttering $u_1$ and $u_2$ up to length 3 and taking their product gives us
+	$(2 \cdot 2 \cdot 5, 7 \cdot 7 \cdot 2)$,
+	$(2 \cdot 2 \cdot 5, 7 \cdot 2 \cdot 2)$,
+	$(2 \cdot 5 \cdot 5, 7 \cdot 7 \cdot 2)$, and
+	$(2 \cdot 5 \cdot 5, 7 \cdot 2 \cdot 2)$.
+	Observe that the first and the last pairs are equivalent after destuttering and they encode the case when the rising and falling edges occur exactly at the same time with respect to the global clock.
+	On the other hand, the second (resp. third) pair encodes the case when the falling edge of $x_2$ occurs before (resp. after) the rising edge of $x_1$.
 	
-	Now, to compute the function $u_2 - u_1$ we apply the function letter by letter to the tuples in their asynchronous product.
-	For example, applying it to $(2 \cdot 5, 3 \cdot 7)$ results in $(3 - 2) \cdot (7 - 5)$, and thus $v_1 = 1 \cdot 2$.
-	Similarly, we get $v_2 = 1 \cdot 5 \cdot 2$ and $v_3 = 1 \cdot -2 \cdot 2$ from the rest.
-	Finally, if we take the constraint that $u_2 - u_1  > 0$, the expressions $v_1$ and $v_2$ coincide after destuttering and result in $1$, while $v_3$ gives us $1 \cdot 0 \cdot 1$.
+	Now, to compute the function $u_2 - u_1$ we apply the function letter by letter to the pairs in their asynchronous product.
+	For example, applying it to $(2 \cdot 5, 7 \cdot 2)$ results in $(7 - 2) \cdot (2 - 5) = 5 \cdot -3$.
+	Similarly, we get $5 \cdot 0 \cdot -3$ and $5 \cdot 2 \cdot -3$ from the remaining pairs.
+	Finally, if we take the constraint $u_2 - u_1  > 0$, all the expressions coincide after destuttering and result in $1 \cdot 0$.
 \end{example}
 
 As we will detail in the next section, after computing the value expressions of real-valued signals, we compute those of satisfaction signals of atomic propositions and use these boolean value expressions in the evaluation of the STL formula.
@@ -98,8 +106,9 @@ Moreover, $\mathsf{U}^0$ corresponds to the standard (strong) \emph{until} opera
 As usual, $\mathsf{A} u = u \mathsf{U}^1 0^\ell$ and $\mathsf{E} u = 1^\ell \mathsf{U}^0 u$.
 This distinction will be useful later when we evaluate value expressions segment by segment.
 
-Below we use finite words from $\destutter(\Sigma^*)$ to denote how the values of a satisfaction signal evolve through intervals that include uncertainty and interleavings.
-We use the following grammar to encode such expressions.
+A single boolean value expression encodes how a satisfaction signal evolves through an interval.
+We use sets of such expressions, i.e., subsets of $\destutter(\Sigma^*)$, to represent the potential behaviors of satisfaction signals arising from different interleavings of events.
+The following grammar encodes these sets.
 $$ \psi := 0 ~|~ 1 ~|~ \lnot \psi  ~|~ \psi \sqcap \psi ~|~ \psi \cdot \psi ~|~ \psi \until^0 \psi ~|~ \psi \until^1 \psi $$ %~|~ \psi + \psi   ~|~ \LTLf \psi ~|~ \LTLg \psi $$  %~|~ \psi \triangleleft \psi ~|~ \psi \triangleright \psi ~|~ \psi \diamond \psi
 
 We denote by $\Psi$ the set of all expressions generated by the above grammar.
@@ -120,15 +129,21 @@ Letting $\psi_1, \psi_2 \in \Psi$, we inductively define the semantics for our e
 We additionally define $\psi_1 \sqcup \psi_2 = \lnot (\lnot \psi_1 \sqcap \lnot \psi_2)$, $\LTLf \psi = 1 \until^0 \psi$, and $\LTLg \psi = \psi \until^1 0$, and 
 Moreover, one can easily verify that $\destutter(\Sigma^*)$ is closed under these operations.
 
-\begin{example}
-	Let $\psi_1 = \{ 0, 01 \}$ and $\psi_2 = \{ 010 \}$.
-	We show the computation of $\psi_1 \until^0 \psi_2$ and $\psi_1 \until^1 \psi_2$.
-	First, we compute the asynchronous product as we demonstrated in \cref{ex:valexpr}: $\llbracket \psi_1 \rrbracket \otimes \llbracket \psi_2 \rrbracket = \{ (000,010), (011,010), (001,010), (0011,0110), (0111,0010), (0001,0100)\}$.
-	Next, we apply the bitwise until operations to each pair in the set.
-	To demonstrate, let us consider the pair $(0111,0010)$.
-	The until operators can be applied bit by bit using the standard recursive definition $p \until q = q \lor (p \land \LTLnext (p \until q))$ where $\until^0$ assumes the value of the undefined next bit is 0 whereas $\until^1$ assumes it is 1.
-	Applying the operators, we get $0111 \mathsf{U}^0 0010 = 0110$ and $0111 \mathsf{U}^1 0010 = 0111$, which respectively yield $010$ and $01$ after destuttering.
-	Applying the operations to each pair and destuttering, we obtain $\psi_1 \until^0 \psi_2 = \{ 010 \}$ and $\psi_1 \until^1 \psi_2 = \{ 010, 01, 0101\}$.
+\begin{example} \label{ex:bitwiseuntil}
+	Recall the distributed signal $(S, {\hb})$ in \cref{ex:canonseg}.
+	Using the propositions $p = (x_1 > 3)$ and $q = (x_2 > 6)$, we show how one computes $\until^0$ and $\until^1$.
+	In \cref{ex:valexpr}, we focused on the scenario in which the rising edge of $x_1$ and the falling edge of $x_2$ occurs in the segment $[3,4)$.
+	In this scenario, we represent the behavior of the satisfaction signal of $p$ in the segment $[3,4)$ by the value expression $01$, and that of $q$ by $10$.
+	For $p$, the only other option is that the rising edge of $x_1$ occurs earlier, which leads to the value expression $1$.
+	For $q$, the alternatives include the expressions $01$ and $1$, respectively encoding the scenarios in which the rising edge of $x_2$ occurs in $[3,4)$, and no edges of $x_2$ occur in $[3,4)$.
+	Let us represent these potential behaviors by the sets $L_p = \{ 01, 1 \}$ and $L_q = \{ 10, 01, 1\}$.
+
+	To compute $L_p \until^0 L_q$ and $L_p \until^1 L_q$, we compute the asynchronous product $L_p \otimes L_q$ and apply the corresponding bitwise-until operators on each pair in the product.
+	Note that the bitwise-until operators can be applied bit by bit, in the same spirit as the standard recursive definition $p \until q = q \lor (p \land \LTLnext (p \until q))$ for LTL, where $\until^0$ assumes the value of the undefined next bit is $0$ whereas $\until^1$ assumes it is $1$.
+	To demonstrate, let us consider the pair $(11,10) \in L_p \otimes L_q$, encoding the case where the rising edge of $x_1$ occurs before the segment $[3,4)$ and the falling edge of $x_2$ occurs in $[3,4)$.
+	Then, we have (i) $11 \mathsf{U}^0 10 = 10$, and (ii) $11 \mathsf{U}^1 10 = 11$ which gives us $1$ after destuttering.
+	These expressions respectively correspond to the behaviors of the satisfaction signal of $p \until q$ in $[3,4)$ in this scenario where the next segment starts with a behavior that (i) violates the formula, and (ii) satisfies it.
+	Repeating these for each pair in the asynchronous product, we obtain $L_p \until^0 L_q = \{1, 01, 10 \}$ and $L_p \until^1 L_q = \{1, 01, 101 \}$.
 \end{example}
 
 \subsection{The Overapproximation Logic}
@@ -137,22 +152,15 @@ Using these, first we compute the value expressions for atomic propositions, and
 We assume that, at any segment, the signals can realize any value expression of the segment.
 In particular, we treat any combination of value expressions from consecutive segments as a valid encoding of a potential behavior.
 This leads to an overapproximation of the set of possible behaviors since we lose the relationship between value expressions with respect to the signals' edges.
-Below we show an example of a signal with a single rising edge whose segmentation and the corresponding value expressions encode also a behavior with two rising edges and a falling edge.
 
 \begin{example}
-	Let $(S,{\hb})$ be a distributed signal with the maximum clock skew $\varepsilon = 1$ and $x : [0,5) \to \R$ be a signal in $S$ with $x(0) = 0$ and a single rising edge $(3, 1)$.
-	The uncertainty interval of this edge is $(2,4) \subset [0,5)$.
-	Now, consider the segmentation $\{ [0,2), [2,3), [3,4), [4,5) \}$.
-	The value expression for $x$ in the segment $[0,2)$ is $0$ and in $[4,5)$ it is $1$ because these segments do not overlap with any uncertainty interval of $x$.
-	The remaining two segments split the uncertainty interval in two.
-	Accordingly, the corresponding value expressions take into account whether the rising edge has occurred yet or not.
-	For $[2,3)$, we obtain the value expressions $0$ and $01$, respectively corresponding to the cases where the rising edge occurs in this segment or not.
-	Similarly, for $[3,4)$ we get $01$ and $1$.
-	Then, the resulting set of behaviors is $\{ 0 \cdot 0 \cdot 01 \cdot 1, 0 \cdot 01 \cdot 1 \cdot 1, 0 \cdot 0 \cdot 1 \cdot 1, 0 \cdot 01 \cdot 01 \cdot 1 \}$.
-	The first behavior encodes the case where the rising edge occurs in the segment $(3,4)$, the second one in $(2,3)$, and the third one exactly at time $3$.
-	However, the fourth behavior encodes a rising edge in $(2,3)$, a falling edge exactly at time $3$, and another rising edge in $(3,4)$.
-	This stems from neglecting the relationship between the value expressions of consecutive segments.
-	While each of these value expressions are valid in isolation (i.e., the signal can display the behavior $01$ in each segment separately), allowing this combination (i.e., $01 \cdot 01$) results in an overapproximation by encoding a behavior that is not a potential behavior of the given signal.
+	Recall the distributed signal $(S, {\hb})$ and its canonical segmentation $G_S$ in \cref{ex:canonseg}.
+	The signal $x_1$ has a rising edge with an uncertainty interval of $(1,4)$, and the canonical segmentation contains the segments $[1,3)$ and $[3,4)$, effectively splitting the uncertainty interval of this edge.
+	To cover all possible behaviors of the distributed signal, we allow the encoding of the rising edge of $x_1$ both in the segment $[1,3)$ and in $[3,4)$.
+	This results in the value expression $2 \cdot 5$ being contained in both the set of value expressions of $x_1$ for $[1,3)$ and for $[3,4)$.
+	However, when we reason on possible the behaviors of $x_1$, we simply take the product of the sets of possible behaviors for each segment and neglect the knowledge that $x_1$ has a single rising edge changing its value from 2 to 5.
+	In particular, our method considers the value expression $2 \cdot 5 \cdot 2 \cdot 5$ as a valid potential behavior of $x_1$ in the interval $[1,4)$ although this is not possible.
+	While each of these value expressions are valid in isolation (i.e., $x_1$ can display the behavior $2$ in $[1,3)$ and $2 \cdot 5$ in $[3,4)$, or $2 \cdot 5$ in $[1,3)$ and $5$ in $[3,4)$), allowing this combination (i.e., $2 \cdot 5 \cdot 2 \cdot 5$) results in an overapproximation by encoding a behavior that is not a potential behavior of the given signal.
 \end{example}
 
 Let $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots x_n$, and let $G_S$ be its canonical segmentation. %, and let $\varphi$ be the STL formula to be evaluated.
@@ -166,7 +174,7 @@ Let $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots x_n$, and le
 We want to compute the set of value expressions of each signal in every interval in the canonical segmentation $G_S$ where $\gamma(I, i)$ captures the potential behaviors of $x_i$ in the interval $I \in G_S$
 %For this, we first let $\gamma(I, i) = \{\epsilon\}$ for all $I \in G_S$ and $1 \leq i \leq n$, then incrementally add value expressions to $\gamma(I, i)$ to capture the potential behaviors of $x_i$ in the interval $I$.
 
-For each $x_i$, consider the set $X_i = \cup_{1 \leq j < |D_i|} \{K_{i,j}\}$ of its uncertainty regions, i.e.,  $K_{i,j} = [l_{i,j}, h_{i,j})$ where $l_{i,j} = \theta_{\text{lo}}(x_i, t_j)$ and $h_{i,j} = \theta_{\text{hi}}(x_i, t_j)$.
+For each $x_i$, consider the set $X_i = \cup_{1 \leq j < |E_i|} \{K_{i,j}\}$ of its uncertainty regions, i.e.,  $K_{i,j} = [l_{i,j}, h_{i,j})$ where $l_{i,j} = \theta_{\text{lo}}(x_i, t_j)$ and $h_{i,j} = \theta_{\text{hi}}(x_i, t_j)$.
 These intervals have the value expression $v_{i,j} = \nu_1 \nu_2$ if $\lim_{s \to t_j^-} x_i(s) = \nu_1$ and $\lim_{s \to t_j^+} x_i(s) = \nu_2$.
 %We denote the value expression of interval $K_{i,j}$ by $v_{i,j}$.
 Note that the value expressions of the remaining intervals are constant.
@@ -199,16 +207,16 @@ We compute the value expressions of signals for the canonical segmentation as fo
 
 \begin{example}
 	Recall the distributed signal in \cref{ex:canonseg}.
-	Initially, before we compute $\gamma$ for each segment and signal, the signals have the following value expressions as demonstrated in \cref{fig:canonseg}a.
-	Considering the canonical segmentation, the computed values of $\gamma$ are as in \cref{fig:canonseg}b.
-	For example, the value $\gamma(I_2,1) = \pfx(01) = \{0, 01\}$ because $I_2 = [1,2)$ is a subset of the uncertainty interval $[1,4)$ of $x_1$ and their left end points coincide.
-	Similarly, $\gamma(I_4,2) = \sfx(10) = \{ 10, 0\}$ because the right end points of $I_4 = [4,6)$ and the uncertainty interval $[2,6)$ of $x_2$ coincide.
+	Initially, before we compute $\gamma$ for each segment and signal, the signals have the value expressions as demonstrated in \cref{fig:valexpr}a.
+	Considering the canonical segmentation, the computed values of $\gamma$ are as in \cref{fig:valexpr}b.
+	For example, the value $\gamma([1,3),1) = \destutter(\pfx(2 \cdot 5)) = \{2, 2 \cdot 5\}$ because $[1,3)$ is a subset of the uncertainty interval $[1,4)$ of $x_1$ and only their left end points coincide.
+	Similarly, $\gamma([3,4),2) = \destutter(\sfx(3 \cdot 7) \cdot (\pfx(7 \cdot 2) \cup \{\epsilon\})) = \{3 \cdot 7, 3 \cdot 7 \cdot 2, 7, 7 \cdot 2\}$ because the right (resp. left) end points of $[3,4)$ and the uncertainty interval $[0,4)$ (resp. $[3,7)$) of $x_2$ coincide.
 \end{example}
 
 \begin{figure} 
 	\centering
-	\includegraphics[scale=0.4]{canonseg.png}
-	\caption{(a) Uncertainty regions and their value expressions before the segmentation. (b) The canonical segmentation of the signal and the corresponding value expressions.\label{fig:canonseg}}
+	\includegraphics[scale=0.4]{valexpr.png}
+	\caption{(a) Uncertainty regions and their value expressions before the segmentation. (b) The canonical segmentation of the signal and the corresponding value expressions.\label{fig:valexpr}}
 \end{figure}
 
 Given a set $L \subseteq \Sigma^*$, we define $\first(L) = \{ u[0] \st u \in L\}$.
@@ -260,39 +268,42 @@ We define the \emph{profile} of $I \subseteq [0,d)$ with respect to $S$ and $\va
 	\end{equation*}
 \normalsize
 
-\begin{example}
-	Recall the distributed signal  in \cref{ex:canonseg} and \cref{ex:valexpr} whose behavior is given in \cref{fig:canonseg}.
-	Let $p = (x_2 > 0)$ and $q = (x_1 > 0)$ be atomic propositions
-	
+\begin{example}TODO
+	Recall the distributed signal in \cref{ex:canonseg}.
+	Let $p = (x_1 > 3)$ and $q = (x_2 > 6)$ be atomic propositions as in \cref{ex:bitwiseuntil}.
+		
 	First, we consider the STL formula $p \until q$.
-	The value expressions of the satisfaction signals of $p$ and $q$ are the same as in \cref{fig:canonseg}b.
+	The value expressions of the satisfaction signals of $p$ and $q$ are respectively computed by bitwise comparison of the value expressions of $x_1$ with 3 and $x_2$ with 6.
+	The resulting expressions for $q$ are given in \cref{fig:profiles}.
 	We compute the values of $p \until q$ starting from the last segment $[7,8)$, which gives us $0 \mathsf{U}^0 0 = 0$.
-	After handling the segment $[6,7)$ and obtain $\{ 00 \mathsf{U}^0 10, 0 \mathsf{U}^0 0 \} = \{10, 0\}$, we move to the segment $[4,6)$.
-	Note that $\first(\{10, 0\}) = \{1,0\}$, therefore we compute the union of $\{10, 0\} \until^0 \{1, 10\}$ and $\{10, 0\} \until^1 \{1, 10\}$, which gives us $\{1, 10\}$.
-	Continuing this way, we obtain the expressions $\{1, 01\}$ for $[2,4)$ and $\{1,0\}$ for the other two segments.
+	After handling the segment $[4,7)$ and obtain $\{ 10 \mathsf{U}^0 10, 10 \mathsf{U}^0 0 \} = \{10, 0\}$, we move to the segment $[3,4)$.
+	Note that $\first(\{10, 0\}) = \{1,0\}$, therefore we compute the union of $\{01, 1\} \until^0 \{01, 010, 1, 10\}$ and $\{01, 1\} \until^1 \{01, 010, 1, 10\}$ for the segment $[3,4)$, and continue similarly with $[1,3)$ and $[0,1)$.
+%	Continuing this way, we obtain the expressions $\{...\}$ for $[1,3)$ and $\{...\}$ for $[0,1)$.
 	
-	Now, we consider the STL formula $\LTLeventualy_{[0,1.5]} p$.
-	We show the evaluation of the value expressions corresponding to the segment $[4,6)$.
-	We first need to compute the set $\mathsf{profilesBetween}([0,1.5], (x_1, x_2), p, [4,6.5))$.
+	Now, we consider the STL formula $\LTLeventualy_{[0,1.5]} q$.
+	We show the evaluation of the value expressions corresponding to the segment $[1,3)$.
+	We first need to compute the set $\mathsf{profilesBetween}([0,1.5], (x_1, x_2), p, [1,4.5))$.
 	We show in \cref{fig:profiles} the intervals representing the profiles we need to compute.
-	Note that the interval $[6, 7.5]$ is not included since it is not a subset of $[0, 1.5] \oplus [4,6) = [4,7.5)$.
-	Let us denote by $V_t$ the set of value expression of the segment starting with $t$.
+	Note that the interval $[4, 5.5]$ is not included since it is not a subset of $[0, 1.5] \oplus [3,4) = [0,5.5)$.
+	Let us denote by $R_t$ the set of value expression of the segment starting at time $t$.
 	Then, the six intervals in \cref{fig:profiles} correspond to the following profiles in order:
 	\begin{enumerate}
-		\item $\mathsf{Pr}_1 = \pfx(V_4) = \{1, 10, 0\}$
-		\item $\mathsf{Pr}_2 = \infx(V_4) = \{1, 10, 0\}$
-		\item $\mathsf{Pr}_3 = \sfx(V_4) \cdot \first(V_6) = \{100, 00\}$
-		\item $\mathsf{Pr}_4 = \sfx(V_4) \cdot \pfx(V_6) = \{100, 00\}$
-		\item $\mathsf{Pr}_5 = \sfx(V_4) \cdot V_6 \cdot \first(V_7) = \{1000, 000\}$
-		\item $\mathsf{Pr}_6 = \sfx(V_4) \cdot V_6 \cdot \pfx(V_7)= \{1000, 000\}$
+		\item $\mathsf{Pr}_1 = \pfx(R_1)$
+		\item $\mathsf{Pr}_2 = \infx(R_1)$
+		\item $\mathsf{Pr}_3 = \sfx(R_1) \cdot \first(R_3)$
+		\item $\mathsf{Pr}_4 = \sfx(R_1) \cdot \pfx(R_3)$
+		\item $\mathsf{Pr}_5 = \sfx(R_1) \cdot R_3 \cdot \first(R_4)$
+		\item $\mathsf{Pr}_6 = \sfx(R_1) \cdot R_3 \cdot \pfx(R_4)$
 	\end{enumerate}
-	Applying the bitwise-eventually operator $\mathsf{E}$ to each results in the same expressions.
-	Concatenating the profiles and finally destuttering gives us the result.	
-	For example, the value expression 101010101010 is in the set because each profile contains an expression equivalent to 10 after destuttering and we overapproximate the set of possible behaviors by neglecting the bookkeeping of edges.
+	Applying the bitwise-eventually operator $\mathsf{E}$ to each, concatenating the resulting sets and finally destuttering gives us the set of value expressions for $\LTLeventualy_{[0,1.5]} q$ in the segment $[1,3)$.
+	For example, the value expression $0 10 10 10 10$ is in this set because the first two profiles each contain $0$ and the last four profiles each contain an expression equivalent to $10$ after destuttering.
+	
+	This example also shows how our method overapproximates the set of possible behaviors by neglecting the bookkeeping of edges.
+	For example, in reality, if $x_2$ has its rising edge in $[1,3)$, then it cannot have its falling edge in $[3,4)$ due to bounded variability constant $\delta = 3$.	
 \end{example}
 
 \begin{figure}
 	\centering
-	\includegraphics[scale=0.45]{profiles.png}
-	\caption{The intervals representing the profiles needed to compute $\LTLeventualy_{[0,1.5]} p$ in $[4,6)$. \label{fig:profiles}}
+	\includegraphics[scale=0.5]{profiles.png}
+	\caption{The intervals representing the profiles needed to compute $\LTLeventualy_{[0,1.5]} q$ in $[1,3)$. \label{fig:profiles}}
 \end{figure}

@@ -18,7 +18,7 @@ By extension, for a set $L \subseteq \Sigma^*$ of finite words, we write $\destu
 Given a tuple $(u_1, \ldots, u_m)$ of finite words of the same length, we write $\destutter(u_1, \ldots, u_m)$ for the extension of $\destutter$ defined as expected: requiring the equality condition in (i) to hold for all the words in the tuple.
 
 
-Moreover, given an integer $k \geq 0$, we define $\stutter_k : \Sigma^* \to \Sigma^*$ such that $\stutter_k(u) = \{v \in \Sigma^* \st |v| = k \land \destutter(v) = \destutter(u)\}$ if $k \geq |u|$, and $\stutter_k(u) = \emptyset$ otherwise.
+Moreover, given an integer $k \geq 0$, we define $\stutter_k : \Sigma^* \to \Sigma^*$ such that $\stutter_k(u) = \{v \in \Sigma^* \st |v| = k \land \destutter(v) = \destutter(u)\}$ if $k \geq |\destutter(u)|$, and $\stutter_k(u) = \emptyset$ otherwise.
 
 \subsection{Signal Model}
 
@@ -44,19 +44,18 @@ We denote by $c_i^{-1}$ the inverse of the local clock function $c_i$.
 We assume that the system is \emph{partially synchronous}: the agents use a clock synchronization algorithm that guarantees a bounded clock skew with respect to the global clock, i.e., $|c_i(T) - T| < \varepsilon$ for all $1 \leq i \leq N$ and $T \in \R_{\geq 0}$, where $\varepsilon \in \R_{> 0}$ is the maximum clock skew.
 
 An \emph{event} of a given signal $x_i$ is a pair $(t, x_i(t))$ where $t$ is a local clock value.
-We denote by $E_i$ the set of events of signal $x_i$.
+We denote by $V_i$ the set of events of signal $x_i$.
 An \emph{edge} of $x_i$ is an event $(t, x_i(t))$ such that $\lim_{s \to t^-} x_i(s) \neq \lim_{s \to t^+} x_i(s)$.
 In particular, it is a \emph{rising} edge if $\lim_{s \to t^-} x_i(s) < \lim_{s \to t^+} x_i(s)$, and a \emph{falling} edge otherwise.
-We respectively denote by $D_{x_i}^\uparrow$ and $D_{x_i}^\downarrow$ the sets of rising and falling edges of $x_i$, and we let $D_{x_i} = D_{x_i}^\uparrow \cup D_{x_i}^\downarrow$.
-%Moreover, we let $D = \bigcup_{i = 1}^{n} D_{x_i}$ to denote the set of events of a distributed signal $S = (x_1, \ldots, x_n)$ 
+We respectively denote by $E_i^\uparrow$ and $E_i^\downarrow$ the sets of rising and falling edges of $x_i$, and we let $E_i = E_i^\uparrow \cup E_i^\downarrow$.
 
-We assume that signals have \emph{bounded variability} with respect to the global clock: for each signal $x_i$ and every pair $(t, x_i(t)), (t', x_i(t')) \in D_{x_i}$ of edges, we have $|c_j^{-1}(t) - c_j^{-1}(t')| \geq \delta$, where $A_j = \pi(x_i)$ is the agent that produces $x_i$ and $\delta \in \R_{\geq 0}$ is the bounded variability constant.
+We assume that signals have \emph{bounded variability} with respect to the global clock: for each signal $x_i$ and every pair $(t, x_i(t)), (t', x_i(t')) \in E_i$ of edges, we have $|c_j^{-1}(t) - c_j^{-1}(t')| \geq \delta$, where $A_j = \pi(x_i)$ is the agent that produces $x_i$ and $\delta \in \R_{\geq 0}$ is the bounded variability constant.
 
 \begin{definition} \label{defn:hb}
 	A \emph{distributed signal} is a pair $(S, {\hb})$ where $S = (x_1, \ldots, x_n)$ is a vector of signals and ${\hb}$ is the happened-before relation between events in signals extended with the partial synchrony assumption as follows.
 	\begin{itemize}
-		\item For every agent, the events of its signals are totally ordered, i.e., for all $1 \leq i,j \leq n$ with $\pi(x_i) = \pi(x_j)$ and all $(t, x_i(t)) \in E_i$ and $(t', x_j(t')) \in E_j$, if $t < t'$ then $(t, x_i(t)) \hb (t', x_j(t'))$.
-		\item Every pair of events whose timestamps are at least $2 \varepsilon$ apart is totally ordered, i.e., for all $1 \leq i,j \leq n$ and all $(t, x_i(t)) \in E_i$ and $(t', x_j(t')) \in E_j$, if $t + 2\varepsilon \leq t'$ then $(t, x_i(t)) \hb (t', x_j(t'))$. \ege{To be confirmed: $t + 2\varepsilon \leq t'$ or $t + 2\varepsilon < t'$?}
+		\item For every agent, the events of its signals are totally ordered, i.e., for all $1 \leq i,j \leq n$ with $\pi(x_i) = \pi(x_j)$ and all $(t, x_i(t)) \in V_i$ and $(t', x_j(t')) \in V_j$, if $t < t'$ then $(t, x_i(t)) \hb (t', x_j(t'))$.
+		\item Every pair of events whose timestamps are at least $2 \varepsilon$ apart is totally ordered, i.e., for all $1 \leq i,j \leq n$ and all $(t, x_i(t)) \in V_i$ and $(t', x_j(t')) \in V_j$, if $t + 2\varepsilon \leq t'$ then $(t, x_i(t)) \hb (t', x_j(t'))$. \ege{To be confirmed: $t + 2\varepsilon \leq t'$ or $t + 2\varepsilon < t'$?}
 	\end{itemize}
 \end{definition}
 
@@ -65,18 +64,15 @@ We assume that signals have \emph{bounded variability} with respect to the globa
 \end{example}
 
 \begin{definition}
-	Let $(S, {\hb})$ be a distributed signal of $n$ signals, and $E = \bigcup_{i = 1}^{n} E_i$ be the set of its events.
-	A set $C \subseteq E$ is a \emph{consistent cut} iff for every event in $C$, all events that happened before  it also belong to $C$, i.e., for all $e, e' \in E$, if $e \in C$ and $e' \hb e$, then $e' \in C$.
+	Let $(S, {\hb})$ be a distributed signal of $n$ signals, and $V = \bigcup_{i = 1}^{n} V_i$ be the set of its events.
+	A set $C \subseteq V$ is a \emph{consistent cut} iff for every event in $C$, all events that happened before  it also belong to $C$, i.e., for all $e, e' \in V$, if $e \in C$ and $e' \hb e$, then $e' \in C$.
 \end{definition}
 
 We denote by $\CC(T)$ the (infinite) set of consistent cuts at global time $T$.
-Given a consistent cut $C$, its \emph{frontier} $\fr(C) \subseteq C$ is the set consisting of the last events in $C$ of each signal, i.e., $\fr(C) = \bigcup_{i = 1}^{n} \{ (t, x_i(t)) \in E_i \cap C \st \forall t' > t : (t', x_i(t')) \notin E_i \cap C \}$.
+Given a consistent cut $C$, its \emph{frontier} $\fr(C) \subseteq C$ is the set consisting of the last events in $C$ of each signal, i.e., $\fr(C) = \bigcup_{i = 1}^{n} \{ (t, x_i(t)) \in V_i \cap C \st \forall t' > t : (t', x_i(t')) \notin V_i \cap C \}$.
 
-A \emph{consistent cut flow} is a function $f : \R_{\geq 0} \to 2^E$ that maps a global clock value $T$ to the frontier of a consistent cut at time $T$, i.e., $f(T) \in \{\fr(C) \st C \in \CC(T)\}$.
-%Moreover, for all $T,T' \in \R_{\geq 0}$ and $1 \leq i \leq n$ where $A_j = \pi(x_i)$, (i) if $T < T'$, then for every pair of events $(c_j(T), x_i(c_j(T))) \in f(T)$ and $(c_j(T'), x_i(c_j(T'))) \in f(T')$ we have $(c_j(T), x_i(c_j(T))) \hb (c_j(T'), x_i(c_j(T')))$, and
-%(ii) if $T < T'$ and $T + \delta > T'$, then for every pair of events $(c_j(T), x_i(c_j(T))) \in f(T)$ and $(c_j(T'), x_i(c_j(T'))) \in f(T')$ we have $(c_j(T), x_i(c_j(T))) \notin D_{x_i}$ or  $(c_j(T'), x_i(c_j(T'))) \notin D_{x_i}$.
+A \emph{consistent cut flow} is a function $f : \R_{\geq 0} \to 2^V$ that maps a global clock value $T$ to the frontier of a consistent cut at time $T$, i.e., $f(T) \in \{\fr(C) \st C \in \CC(T)\}$.
 For all $T,T' \in \R_{\geq 0}$ and $1 \leq i \leq n$ where $A_j = \pi(x_i)$, if $T < T'$, then for every pair of events $(c_j(T), x_i(c_j(T))) \in f(T)$ and $(c_j(T'), x_i(c_j(T'))) \in f(T')$ we have $(c_j(T), x_i(c_j(T))) \hb (c_j(T'), x_i(c_j(T')))$.
-%\alert{Moreover, if we further have $T + \delta > T'$, then $(c_j(T), x_i(c_j(T))) \notin D_{x_i}$ or  $(c_j(T'), x_i(c_j(T'))) \notin D_{x_i}$.}
 We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distributed signal $(S,{\hb})$.
 
 \begin{example}
@@ -91,7 +87,7 @@ $$ \varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \land \varphi ~|~ \varphi \until_
 
 A \emph{trace} is a vector of synchronous signals of finite duration.
 We express atomic propositions as functions of trace values at a time point $T$, i.e., a proposition $p \in \AP$ over a trace $w = (x_1, \ldots, x_n)$ is defined as $f_p(x_1(T), \ldots, x_n(T)) > 0$ where $f_p : \R^n \to \R$ is a function.
-Note that given a trace over a temporal domain $[0,D)$ and intervals $I,J \subseteq \R_{\geq 0}$, we write $I \oplus J = \{i + j \st i \in I \land j \in J\} \cap [0,D)$.
+Note that given a trace over a temporal domain $[0,D)$ and intervals $I,J \subseteq \R_{\geq 0}$, we write $I \oplus J = \{i + j \st i \in I \land j \in J\}$.
 We use the shorthand notation $T$ for the singleton set $\{T\}$.
 
 Below we recall the finite-trace qualitative semantics of STL defined over $\B$.
@@ -103,7 +99,7 @@ Let $\varphi_1, \varphi_2$ be STL formulas and let $T \in [0,D)$.
 	[w,T \models p]_{\mathsf{STL}} &\iff f_p(x_1(T), \ldots, x_n(T)) > 0 \\
 	[w,T \models \lnot \varphi_1]_{\mathsf{STL}} &\iff \overline{[w,T \models \varphi_1]_{\mathsf{STL}}} \\
 	[w,T \models \varphi_1 \land \varphi_2]_{\mathsf{STL}} &\iff [w,T \models \varphi_1]_{\mathsf{STL}} \land [w,T \models \varphi_2]_{\mathsf{STL}} \\
-	[w,T \models \varphi_1 \until_I \varphi_2]_{\mathsf{STL}} &\iff \exists T' \in T \oplus I : [w,T' \models \varphi_2]_{\mathsf{STL}} \land \forall T'' \in (T, T') : [w,T'' \models \varphi_1]_{\mathsf{STL}} \\
+	[w,T \models \varphi_1 \until_I \varphi_2]_{\mathsf{STL}} &\iff \exists T' \in (T \oplus I) \cap [0,D) : [w,T' \models \varphi_2]_{\mathsf{STL}} \land \forall T'' \in (T, T') : [w,T'' \models \varphi_1]_{\mathsf{STL}} \\
 %	[w,t \models \LTLf_I \varphi_1] &\iff \exists t' \in t \oplus I : [w,t' \models \varphi_1] \\
 %	[w,t \models \LTLg_I \varphi_1] &\iff \forall t' \in t \oplus I : [w,t' \models \varphi_1] \\
 \end{align*}
