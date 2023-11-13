@@ -163,43 +163,25 @@ This leads to an overapproximation of the set of possible behaviors since we los
 	While each of these value expressions are valid in isolation (i.e., $x_1$ can display the behavior $2$ in $[1,3)$ and $2 \cdot 5$ in $[3,4)$, or $2 \cdot 5$ in $[1,3)$ and $5$ in $[3,4)$), allowing this combination (i.e., $2 \cdot 5 \cdot 2 \cdot 5$) results in an overapproximation by encoding a behavior that is not a potential behavior of the given signal.
 \end{example}
 
-Let $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots x_n$, and let $G_S$ be its canonical segmentation. %, and let $\varphi$ be the STL formula to be evaluated.
-%For a given STL formula $\varphi$, let $B_\varphi$ be the set of finite and positive bounds that occur in the timed operators of $\varphi$.
-%Recall the set $F$ we used in \cref{sec:segment} to define the canonical segmentation of $(S,{\hb})$.
-%To take into account the timed operators in $\varphi$, we extend $F$ as follows:
-%$F_\varphi = F \cup \{t - b \st t \in F, b \in B_\varphi, t > b\}$.
-%Now, let $d_1, \ldots, d_M$ be the elements of $F_\varphi$ in increasing order.
-%We extend the canonical segmentation $G_S$ as follows:
-%$G_S^\varphi = \{I_1', \ldots I_{M-1}'\}$ where $I_i' = [d_i, d_{i+1})$.
-We want to compute the set of value expressions of each signal in every interval in the canonical segmentation $G_S$ where $\gamma(I, i)$ captures the potential behaviors of $x_i$ in the interval $I \in G_S$
-%For this, we first let $\gamma(I, i) = \{\epsilon\}$ for all $I \in G_S$ and $1 \leq i \leq n$, then incrementally add value expressions to $\gamma(I, i)$ to capture the potential behaviors of $x_i$ in the interval $I$.
+Let $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots x_n$, and let $G_S$ be its canonical segmentation.
+We want to compute the set of value expressions of each signal in each segment in the canonical segmentation $G_S$.
+We denote by $\gamma(I, i)$ the value expression capturing the behavior of $x_i$ in the interval $I \in G_S$ and describe its computation below.
 
-For each $x_i$, consider the set $X_i = \cup_{1 \leq j < |E_i|} \{K_{i,j}\}$ of its uncertainty regions, i.e.,  $K_{i,j} = [l_{i,j}, h_{i,j})$ where $l_{i,j} = \theta_{\text{lo}}(x_i, t_j)$ and $h_{i,j} = \theta_{\text{hi}}(x_i, t_j)$.
-These intervals have the value expression $v_{i,j} = \nu_1 \nu_2$ if $\lim_{s \to t_j^-} x_i(s) = \nu_1$ and $\lim_{s \to t_j^+} x_i(s) = \nu_2$.
-%We denote the value expression of interval $K_{i,j}$ by $v_{i,j}$.
-Note that the value expressions of the remaining intervals are constant.
-Below we ``synchronize'' the uncertainty regions by splitting their value expressions accordingly.
+For each $x_i$, let $X_i = \{ J_{i,j} \st 1 \leq j < |E_i| \}$ be the set of its uncertainty regions, where $J_{i,j} = [l_{i,j}, h_{i,j})$ such that $l_{i,j} = \theta_{\text{lo}}(x_i, t_j)$ and $h_{i,j} = \theta_{\text{hi}}(x_i, t_j)$, and $t_j$ is the $j$th edge of $x_i$ in increasing order of local clock values.
+These intervals have the value expression $v_{i,j} = \nu_1 \nu_2$ where $\nu_1 = \lim_{s \to t_j^-} x_i(s)$ and $\nu_2 = \lim_{s \to t_j^+} x_i(s)$, and the remaining intervals have constant value expressions.
 
-Let $G_S = \{I_1, \ldots, I_m\}$ where $I_k = [a_k, a_{k+1})$ for all $1 \leq k \leq m$.
-For each $1 \leq i \leq n$ and $1 \leq k \leq m$ let $Y_{k,i} = \{ K_{i,j} \in X_i \st I_k \subseteq K_{i,j}\}$ be the uncertainty regions of $x_i$ that contain the interval $I_k$ where $K_{i,j} = [l_{i,j}, h_{i,j})$ are given in increasing order of left end points.
-%For each interval $I \in G_S$ where $I = [l,h)$ and each $1 \leq i \leq n$, let $Y_{I,i} = \{ K_{i,j} \in X_i \st I \subseteq K_{i,j}\}$ be the uncertainty regions of $x_i$ that contain the interval $I$.
-We compute the value expressions of signals for the canonical segmentation as follows. 
-%\begin{itemize}
-%	\item For each $1 \leq i \leq n$ in increasing order, for each $1 \leq k \leq m$ in increasing order, and for each $K_{i,j} = [l_j, h_j) \in Y_{k,i}$ in increasing order of their starting points, do the following:
-%	\begin{itemize}
-%		\item If $l_j = a_k$ and $a_{k+1} = h_j$, then $\gamma(I_k, i) = \destutter(\gamma(I_k, i) \cdot \{v_{i,j}\})$.
-%		\item If $l_j = a_k$ and $a_{k+1} < h_j$, then $\gamma(I_k, i) = \destutter(\gamma(I_k, i) \cdot \pfx(v_{i,j}))$.
-%		\item If $l_j < a_k$ and $a_{k+1} = h_j$, then $\gamma(I_k, i) = \destutter(\gamma(I_k, i) \cdot \sfx(v_{i,j}))$.
-%		\item If $l_j < a_k$ and $a_{k+1} < h_j$, then $\gamma(I_k, i) = \destutter(\gamma(I_k, i) \cdot \infx(v_{i,j}))$.
-%	\end{itemize}
-%\end{itemize}
+First,  we ``synchronize'' the uncertainty regions of the signals in $S$ by splitting their value expressions accordingly.
+Let $G_S = \{I_1, \ldots, I_K\}$ where $I_k = [s_k, s_{k+1})$ for all $1 \leq k \leq K$.
+For each $1 \leq i \leq n$ and $1 \leq k \leq K$ let $Y_{k,i} = \{ J_{i,j} \in X_i \st I_k \subseteq J_{i,j}\}$ be the uncertainty regions of $x_i$ that contain the interval $I_k$ where $J_{i,j}$ are as above.
+Let $M = |Y_{k,i}|$.
+Now, we compute the value expressions of signals for the canonical segmentation. 
 \begin{itemize}
-	\item For each $1 \leq i \leq n$ in increasing order, for each $1 \leq k \leq m$ in increasing order, compute the set $Z_{k,i} = \operatorname{op}_1(v_{i,1}) \cdot \ldots \cdot \operatorname{op}_{|Y_{k,i}|}(v_{i,|Y_{k,i}|})$ where, for $1 \leq j \leq |Y_{k,i}|$,
+	\item For each $1 \leq i \leq n$ in increasing order and for each $1 \leq k \leq K$ in increasing order, compute the set $Z_{k,i} = \operatorname{op}_1(v_{i,1}) \cdot \ldots \cdot \operatorname{op}_{M}(v_{i,M})$ where, for $1 \leq j \leq M$,
 	\begin{itemize}
-		\item if $l_{i,j} = a_k$ and $a_{k+1} = h_{i,j}$ then $\operatorname{op}_j(v_{i,j}) = \{v_{i,j}\}$,
-		\item if $l_{i,j} = a_k$ and $a_{k+1} < h_{i,j}$ then $\operatorname{op}_j(v_{i,j}) = \pfx(v_{i,j})$,
-		\item if $l_{i,j} < a_k$ and $a_{k+1} = h_{i,j}$ then $\operatorname{op}_j(v_{i,j}) = \sfx(v_{i,j})$,
-		\item if $l_{i,j} < a_k$ and $a_{k+1} < h_{i,j}$ then $\operatorname{op}_j(v_{i,j}) = \infx(v_{i,j})$,
+		\item if $l_{i,j} = s_k$ and $s_{k+1} = h_{i,j}$ then $\operatorname{op}_j(v_{i,j}) = \{v_{i,j}\}$,
+		\item if $l_{i,j} = s_k$ and $s_{k+1} < h_{i,j}$ then $\operatorname{op}_j(v_{i,j}) = \pfx(v_{i,j})$,
+		\item if $l_{i,j} < s_k$ and $s_{k+1} = h_{i,j}$ then $\operatorname{op}_j(v_{i,j}) = \sfx(v_{i,j})$,
+		\item if $l_{i,j} < s_k$ and $s_{k+1} < h_{i,j}$ then $\operatorname{op}_j(v_{i,j}) = \infx(v_{i,j})$,
 		\item if $j \geq 2$, then $\operatorname{op}_j(v_{i,j}) = \operatorname{op}_j(v_{i,j}) \cup \{\epsilon\}$.
 	\end{itemize}
 	\item Let $\gamma(I_k, i) = \destutter(Z_{k,i})$.
@@ -219,14 +201,13 @@ We compute the value expressions of signals for the canonical segmentation as fo
 	\caption{(a) Uncertainty regions and their value expressions before the segmentation. (b) The canonical segmentation of the signal and the corresponding value expressions.\label{fig:valexpr}}
 \end{figure}
 
-Given a set $L \subseteq \Sigma^*$, we define $\first(L) = \{ u[0] \st u \in L\}$.
-Let $\tau_S : [0,d) \to G_S$ be a function that maps each time stamp to the interval of the canonical segmentation that it belongs to, i.e., $\tau_S(t) = [t', t'')$ where $t' \leq t < t''$ and $[t', t'') \in G_S$.
-We say that two intervals $I, J \subseteq [0,d)$ with the end points $a_i < b_i$ and $a_j < b_j$ are of the same type iff the following holds: $(a_i \in I \iff a_j \in~J) \land (b_i \in I \iff b_j \in J)$.
+Let $\tau_S : [0,d) \to G_S$ be a function that maps each clock value to the interval in the canonical segmentation that it belongs to, i.e., $\tau_S(t) = [t',t'')$ where $t' \leq t < t''$ and $[t',t'') \in G_S$.
+We say that two intervals $I, J \subseteq [0,d)$ with the end points $a_i < b_i$ and $a_j < b_j$ are of the \emph{same type} iff the following holds: $(a_i \in I \iff a_j \in~J) \land (b_i \in I \iff b_j \in J)$.
 %For $t_1, t_2 \in [0,d)$, if $\tau_S(t_1) \neq \tau_S(t_2)$, let $(J_i)_{1 \leq i \leq k}$ the (potentially empty) sequence of intervals that are strictly between $\tau_S(t_1)$ and $\tau_S(t_2)$.
 
 Let $(S, {\hb})$ be a distributed signal of $n$ signals, $t \in [0,d)$ be a time value such that $\tau_S(t) = [t', t'')$.
 Let $I \subseteq \R_{\geq 0}$ be a time interval with the end points $a < b$.
-Note that timed until can be expressed using timed eventually, timed globally, and untimed until~\cite{MalerN13}.
+Note that timed until can be expressed using timed eventually, timed always, and untimed until operators~\cite{MalerN13}.
 We provide the semantics of our logic following this observation.
 
 \scriptsize
@@ -234,21 +215,23 @@ We provide the semantics of our logic following this observation.
 	[S,t \models p] &=  f_p(\gamma(\tau_S(t), 1), \ldots, \gamma(\tau_S(t), n)) > 0 \\
 	[S,t \models \lnot \varphi] &= \lnot [S,t \models \varphi] \\
 	[S,t \models \varphi_1 \land \varphi_2] &= [S,t \models \varphi_1] \sqcap [S,t \models \varphi_2] \\
-	[S,t \models \varphi_1 \until \varphi_2] &= \destutter(\{ [S,t \models \varphi_1] \until^b [S,t \models \varphi_2] \st \text{ if $t'' < d$ then $b \in \first([S,t'' \models \varphi_1 \until \varphi_2])$, otherwise $b = 0$} \}) \\
+	[S,t \models \varphi_1 \until \varphi_2] &= \destutter(\{ [S,t \models \varphi_1] \until^b [S,t \models \varphi_2] \st \text{ if $t'' < d$ then $b \in \first([S,t'' \models \varphi_1 \until \varphi_2])$ else $b = 0$} \}) \\
 	[S,t \models \LTLf_I \varphi] &= \destutter(\{ \mathsf{E}(\textit{Pr}_1) \cdot \ldots \cdot \mathsf{E}(\textit{Pr}_M) \}) \text{ where $\textit{Pr}_i \in \mathsf{profilesBetween}(I, S, \varphi, [t',t''))$ for all $1 \leq i \leq M$} \\
 	[S,t \models \LTLg_I \varphi] &= \destutter(\{ \mathsf{A}(\textit{Pr}_1) \cdot \ldots \cdot \mathsf{A}(\textit{Pr}_M) \}) \text{ where $\textit{Pr}_i \in \mathsf{profilesBetween}(I, S, \varphi, [t',t''))$ for all $1 \leq i \leq M$}
 \end{align*}
 \normalsize
 
-For $s_1, s_2 \in [0,d)$, we denote by $\mathsf{profilesBetween}(I, S, \varphi, J) = \{\textit{Pr}_1, \ldots, \textit{Pr}_M\}$ the set of ``profiles'' with respect to $S$ and $\varphi$ of intervals that are a subset of $I \oplus J$ and are of the same length and type as $I$, given in an increasing order of starting points of the intervals they correspond to.
-Intuitively, the profile of an interval with respect to a segmentation and a formula captures the behaviors of the given formula's satisfaction signal in that interval in terms of the value expressions of its canonical segmentation.
+Intuitively, the \emph{profile} of an interval $I$ with respect to $S$ and $\varphi$ captures the value expressions for the satisfaction of $\varphi$ in $I$.
+Then, $\mathsf{profilesBetween}(I, S, \varphi, J)$ is the set of profiles, with respect to $S$ and $\varphi$, of intervals of the same length and type as $I$ that coincide with the segments in $I \oplus J$.
+Note that, although there are infinitely many such intervals, there are only finitely many ways these intervals can coincide with the segments in $I \oplus J$, resulting in finitely many profiles for them.
 We formalize this below.
 
 Let $I \subseteq [0,d)$ be an interval with the end points $a < b$.
-Given $t \in [0,d)$, we let $\mathsf{end}(t, S)$ be true iff $t=d$ or $\tau_S(t) = [t, t')$ for some $t' \in [0,d)$.
-Let $(H_i)_{1 \leq i \leq K}$ be a (possibly empty) sequence of intervals where $H_i = [d_i, d_{i+1}) \in G_S$ and $a < d_i < d_{i+1} < b$ for all $1 \leq i \leq K$ and $K$ is the number of intervals in $G_S$ whose endpoints are strictly between $a$ and $b$.
-We denote by $Q(S, a, b)$ the concatenation of the value expressions of the intervals $H_1, \ldots, H_K$, i.e., $Q(S, a, b) = [S, d_1 \models \varphi] \cdot \ldots \cdot [S, d_K \models \varphi]$.
-We define the \emph{profile} of $I \subseteq [0,d)$ with respect to $S$ and $\varphi$ as follows.
+Given $t \in [0,d)$, we let $\mathsf{end}(t, S)$ be true iff $t=d$ or $\tau_S(t) = [t, t')$ for some $t' > t$.
+Let $Q$ be the number of intervals in $G_S$ whose endpoints are strictly between $a$ and $b$.
+Let $(H_k)_{1 \leq k \leq Q}$ be a (possibly empty) sequence of intervals of the canonical segmentation whose endpoints are strictly between $a$ and $b$, i.e., $H_k = [d_i, d_{i+1}) \in G_S$ and $a < d_i < d_{i+1} < b$ for all $1 \leq i \leq Q$.
+We denote by $\kappa(S, a, b)$ the concatenation of the value expressions of $\varphi$ for the intervals in this sequence, i.e., $\kappa(S, a, b) = [S, s_1 \models \varphi] \cdot \ldots \cdot [S, s_Q \models \varphi]$.
+We define the \emph{profile} of $I \subseteq [0,d)$ with the end points $a < b$ with respect to $S$ and $\varphi$ as follows.
 
 \scriptsize
 	\begin{equation*} 
@@ -258,17 +241,17 @@ We define the \emph{profile} of $I \subseteq [0,d)$ with respect to $S$ and $\va
 			\pfx([S, a \models \varphi]) &\text{if $\tau_S(a) = \tau_S(b) \land \mathsf{end}(a, S)$} \\
 			%		\sfx([S, a \models \varphi]) &\text{if $\tau_S(a) = \tau_S(b) \land \lnot\mathsf{start}(a, S) \land \mathsf{end}(b, S)$} \\
 			\infx([S, a \models \varphi]) &\text{if $\tau_S(a) = \tau_S(b) \land \lnot\mathsf{end}(a, S)$} \\
-			[S, a \models \varphi] \cdot Q(S, a, b) \cdot \first([S, b \models \varphi]) &\text{if $\tau_S(a) \neq \tau_S(b) \land \mathsf{end}(a, S) \land \mathsf{end}(b, S) \land b \in I$} \\
-			[S, a \models \varphi] \cdot Q(S, a, b) &\text{if $\tau_S(a) \neq \tau_S(b) \land \mathsf{end}(a, S) \land \mathsf{end}(b, S) \land b \notin I$} \\
-			[S, a \models \varphi] \cdot Q(S, a, b) \cdot \pfx([S, a \models \varphi]) &\text{if $\tau_S(a) \neq \tau_S(b) \land \mathsf{end}(a, S) \land \lnot\mathsf{end}(b, S)$} \\
-			\sfx([S, a \models \varphi]) \cdot Q(S, a, b) \cdot \first([S, b \models \varphi]) &\text{if $\tau_S(a) \neq \tau_S(b) \land \lnot\mathsf{end}(a, S) \land \mathsf{end}(b, S) \land b \in I$} \\
-			\sfx([S, a \models \varphi]) \cdot Q(S, a, b) &\text{if $\tau_S(a) \neq \tau_S(b) \land \lnot\mathsf{end}(a, S) \land \mathsf{end}(b, S) \land b \notin I$} \\
-			\sfx([S, a \models \varphi]) \cdot Q(S, a, b) \cdot \pfx([S, b \models \varphi]) &\text{if $\tau_S(a) \neq \tau_S(b) \land \lnot\mathsf{end}(a, S) \land \lnot\mathsf{end}(b, S)$} 
+			[S, a \models \varphi] \cdot \kappa(S, a, b) \cdot \first([S, b \models \varphi]) &\text{if $\tau_S(a) \neq \tau_S(b) \land \mathsf{end}(a, S) \land \mathsf{end}(b, S) \land b \in I$} \\
+			[S, a \models \varphi] \cdot \kappa(S, a, b) &\text{if $\tau_S(a) \neq \tau_S(b) \land \mathsf{end}(a, S) \land \mathsf{end}(b, S) \land b \notin I$} \\
+			[S, a \models \varphi] \cdot \kappa(S, a, b) \cdot \pfx([S, a \models \varphi]) &\text{if $\tau_S(a) \neq \tau_S(b) \land \mathsf{end}(a, S) \land \lnot\mathsf{end}(b, S)$} \\
+			\sfx([S, a \models \varphi]) \cdot \kappa(S, a, b) \cdot \first([S, b \models \varphi]) &\text{if $\tau_S(a) \neq \tau_S(b) \land \lnot\mathsf{end}(a, S) \land \mathsf{end}(b, S) \land b \in I$} \\
+			\sfx([S, a \models \varphi]) \cdot \kappa(S, a, b) &\text{if $\tau_S(a) \neq \tau_S(b) \land \lnot\mathsf{end}(a, S) \land \mathsf{end}(b, S) \land b \notin I$} \\
+			\sfx([S, a \models \varphi]) \cdot \kappa(S, a, b) \cdot \pfx([S, b \models \varphi]) &\text{if $\tau_S(a) \neq \tau_S(b) \land \lnot\mathsf{end}(a, S) \land \lnot\mathsf{end}(b, S)$} 
 		\end{cases}
 	\end{equation*}
 \normalsize
 
-\begin{example}TODO
+\begin{example}
 	Recall the distributed signal in \cref{ex:canonseg}.
 	Let $p = (x_1 > 3)$ and $q = (x_2 > 6)$ be atomic propositions as in \cref{ex:bitwiseuntil}.
 		
@@ -281,11 +264,10 @@ We define the \emph{profile} of $I \subseteq [0,d)$ with respect to $S$ and $\va
 %	Continuing this way, we obtain the expressions $\{...\}$ for $[1,3)$ and $\{...\}$ for $[0,1)$.
 	
 	Now, we consider the STL formula $\LTLeventualy_{[0,1.5]} q$.
-	We show the evaluation of the value expressions corresponding to the segment $[1,3)$.
-	We first need to compute the set $\mathsf{profilesBetween}([0,1.5], (x_1, x_2), p, [1,4.5))$.
-	We show in \cref{fig:profiles} the intervals representing the profiles we need to compute.
-	Note that the interval $[4, 5.5]$ is not included since it is not a subset of $[0, 1.5] \oplus [3,4) = [0,5.5)$.
-	Let us denote by $R_t$ the set of value expression of the segment starting at time $t$.
+	We show the evaluation of the value expressions for the segment $[1,3)$.
+	First, we need to compute the set $\mathsf{profilesBetween}([0,1.5], (x_1, x_2), p, [1,4.5))$.
+	We show in \cref{fig:profiles} the profiles corresponding to how intervals of the same length and type as $[0,1.5]$ can intersect with the segments covering $[0,1.5] \oplus [1,3)$.
+	Let us denote by $R_t$ the set of value expression of the segment starting at time $t$, given in \cref{fig:profiles}.
 	Then, the six intervals in \cref{fig:profiles} correspond to the following profiles in order:
 	\begin{enumerate}
 		\item $\mathsf{Pr}_1 = \pfx(R_1)$
@@ -298,8 +280,8 @@ We define the \emph{profile} of $I \subseteq [0,d)$ with respect to $S$ and $\va
 	Applying the bitwise-eventually operator $\mathsf{E}$ to each, concatenating the resulting sets and finally destuttering gives us the set of value expressions for $\LTLeventualy_{[0,1.5]} q$ in the segment $[1,3)$.
 	For example, the value expression $0 10 10 10 10$ is in this set because the first two profiles each contain $0$ and the last four profiles each contain an expression equivalent to $10$ after destuttering.
 	
-	This example also shows how our method overapproximates the set of possible behaviors by neglecting the bookkeeping of edges.
-	For example, in reality, if $x_2$ has its rising edge in $[1,3)$, then it cannot have its falling edge in $[3,4)$ due to bounded variability constant $\delta = 3$.	
+	We remark that this example also shows how our method overapproximates the set of possible behaviors by neglecting the bookkeeping of edges.
+	For example, in reality, if $x_2$ has its rising edge in $[1,3)$, then it cannot have its falling edge in $[3,4)$ due to bounded variability constant $\delta = 3$.
 \end{example}
 
 \begin{figure}
