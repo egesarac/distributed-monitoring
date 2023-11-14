@@ -9,38 +9,43 @@ Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal of $n$ s
 	Note that $\varphi_1 = \varphi$.
 	
 	\item
-	Compute the canonical segmentation $G_{S} = \{ [t_1, t_2), \ldots, [t_\ell, t_{\ell+1}) \}$ of $(S, {\hb})$.
+	Compute the canonical segmentation $G_{S} = \{ [t_1, t_2), \ldots, [t_k, t_{k+1}) \}$ of $(S, {\hb})$.
 	
 	\item
-	Compute the value expressions of signals with respect to the canonical segmentation, i.e., for each $1 \leq j \leq \ell$ and $1 \leq i \leq n$, compute $\gamma([t_j, t_{j+1}), i)$.
+	Compute the value expressions of signals with respect to the canonical segmentation, i.e., for each $1 \leq j \leq k$ and $1 \leq i \leq n$, compute $\gamma([t_j, t_{j+1}), i)$.
 	
 	\item
-	Compute the value expressions of subformulas with respect to the canonical segmentation, i.e., for each $1 \leq j \leq \ell$ and $1 \leq k \leq m$, compute $[S, t_j \models \varphi_k]$
-	%For $i = k .. 1$, for $j = m .. 1$, compute $[S, t_i \models \varphi_j]$.
+	Compute the value expressions of subformulas with respect to the canonical segmentation, i.e., for each $1 \leq j \leq k$ and $1 \leq \ell \leq m$, compute $[S, t_j \models \varphi_\ell]$.
 	
 	\item
-	Output the set $\mathsf{Out}(\varphi, S, {\hb}, \varepsilon, \delta) = \destutter([S,t_1 \models \varphi_1] \cdot \ldots \cdot [S,t_\ell \models \varphi_1])$ of value expressions. %\TODO: match the semantics -- \alert{$\first([S',0 \models \varphi_1'])$}.
+	Output the set $\mathsf{Out}(\varphi, S, {\hb}, \varepsilon, \delta) = \destutter([S,t_1 \models \varphi_1] \cdot \ldots \cdot [S,t_k \models \varphi_1])$ of value expressions. 
 \end{enumerate}
 
-\begin{claim}
-	The algorithm is correct.
-	For all STL formulas $\varphi$, and distributed signals $(S, {\hb})$ of bounded clock skew $\varepsilon$ and bounded variability $\delta$, we have $\mathsf{Goal}(\varphi, S, {\hb}, \varepsilon, \delta) \subseteq \mathsf{Out}(\varphi, S, {\hb}, \varepsilon, \delta)$.
-\end{claim}
-\begin{proof} \ege{To be checked.}
+\begin{theorem}
+%	The algorithm is correct.
+	For all STL formulas $\varphi$ and distributed signals $(S, {\hb})$ of bounded clock skew $\varepsilon$ and bounded variability $\delta$, we have $\mathsf{Goal}(\varphi, S, {\hb}, \varepsilon, \delta) \subseteq \mathsf{Out}(\varphi, S, {\hb}, \varepsilon, \delta)$.
+\end{theorem}
+\begin{proof}
 	Let $\varphi$ be an STL formula, $(S, {\hb})$ be a distributed signal of bounded clock skew $\varepsilon$ and bounded variability $\delta$ with $S = (x_1, \ldots, x_n)$.
 	
 	Recall that each element of $\mathsf{Goal}(\varphi, S, {\hb}, \varepsilon, \delta)$ is a value expression for the satisfaction signal of $\varphi$ for some trace of $(S,{\hb})$.
 	Let $v \in \mathsf{Goal}(\varphi, S, {\hb}, \varepsilon, \delta)$ be arbitrary.
 	To conclude that $v \in \mathsf{Out}(\varphi, S, {\hb}, \varepsilon, \delta)$, we argue that the semantics of our logic explores all admissible interleavings (subject to ${\hb}$, $\varepsilon$, and $\delta$) of the edges of $S$.
 	
-	First, notice that the canonical segmentation $G_S = \{ I_1, \ldots, I_\ell \}$ of $(S,{\hb})$ and the function $\gamma$ computing the corresponding value expressions for the signals capture all potential behaviors of the individual signals in $S$.
-	In particular, for each trace $w = (x_1', \ldots, x_n')$ of $(S,{\hb})$ and for each $i$, it is easy to see that $\mu(x_i') \in \destutter(\gamma(I_1, i) \ldots \gamma(I_\ell, i))$.
+	First, notice that the canonical segmentation $G_S = \{ I_1, \ldots, I_k \}$ and the function $\gamma$ that maps each segment in $G_S$ and signal in $S$ to a value expression capture all potential behaviors of the individual signals in $S$.
+	In particular, we claim that for each trace $w = (x_1', \ldots, x_n') \in \tr(S, {\hb}, \delta)$ and for each $i$, we have $\mu(x_i') \in \destutter(\gamma(I_1, i) \ldots \gamma(I_k, i))$.
+	This holds because (i) each signal $x_i'$ has the same edges as $x_i$ modulo the time stamps, and (ii) for each $x_i$ and each uncertainty interval $J$ of $x_i$, the value expression of $J$ can be reconstructed by some choice of elements from the sequence of $\gamma$ values corresponding to the value expressions of the canonical segments that are contained in $J$.
 	
 	Now, we argue that the semantics of our logic preserve this property.
-	For atomic propositions and conjunction, simply observe that the asynchronous product operation captures all the admissible interleavings.
-	For untimed until, observe that we consider the asynchronous product and apply bitwise-until operations whose definitions coincide with the usual recursive definitions.
-	For timed eventually and timed always, observe that the profiles of intervals capture all potential overlappings of the operation's interval and the canonical segments, to which we apply the corresponding bitwise operations which coincide with the usual definitions.
-	The case of negation is trivial.
+	One key observation is that the asynchronous product of two sets of value expressions captures all the admissible interleavings of the edges involved in each potential behavior encoded as a value expression these sets.
+	Then, the cases of atomic propositions, negation, and conjunction are trivial.
+	For untimed until, the definitions of the bitwise-temporal operations coincide with their discrete counterparts, therefore they are correct for each interleaving.
+	For timed eventually and always, in addition to the arguments above, observe that the function $\mathsf{profilesBetween}$ enumerates all possible relations between the operator's interval $I$ and the segments we compute the satisfaction over.
+	
+%	For atomic propositions and conjunction, simply observe that the asynchronous product operation captures all the admissible interleavings of the edges involved.
+%	For untimed until, observe that we consider the asynchronous product and apply bitwise-until operations whose definitions coincide with the usual recursive definitions.
+%	For timed eventually and timed always, observe that the profiles of intervals capture all potential overlappings of the operation's interval and the canonical segments, to which we apply the corresponding bitwise operations which coincide with the usual definitions.
+%	The case of negation is trivial.
 \end{proof}
 
 \begin{claim}

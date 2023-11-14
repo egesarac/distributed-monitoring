@@ -221,10 +221,11 @@ We provide the semantics of our logic following this observation.
 \end{align*}
 \normalsize
 
-Intuitively, the \emph{profile} of an interval $I$ with respect to $S$ and $\varphi$ captures the value expressions for the satisfaction of $\varphi$ in $I$.
+The \emph{profile} of an interval $I$ with respect to $S$ and $\varphi$ captures the value expressions for the satisfaction of $\varphi$ in $I$.
 Then, $\mathsf{profilesBetween}(I, S, \varphi, J)$ is the set of profiles, with respect to $S$ and $\varphi$, of intervals of the same length and type as $I$ that coincide with the segments in $I \oplus J$.
-Note that, although there are infinitely many such intervals, there are only finitely many ways these intervals can coincide with the segments in $I \oplus J$, resulting in finitely many profiles for them.
-We formalize this below.
+Intuitively, we aim to compute how the satisfaction signal of $\varphi$ behaves in $I$ while we slide $I$ over $I \oplus J$.
+Observe that, although there are infinitely many such windows due to denseness of time, there are only finitely many ways these windows can ``relate'' with the segments in $I \oplus J$, resulting in finitely many profiles for them.
+We formalize and demonstrate this below.
 
 Let $I \subseteq [0,d)$ be an interval with the end points $a < b$.
 Given $t \in [0,d)$, we let $\mathsf{end}(t, S)$ be true iff $t=d$ or $\tau_S(t) = [t, t')$ for some $t' > t$.
@@ -265,8 +266,14 @@ We define the \emph{profile} of $I \subseteq [0,d)$ with the end points $a < b$ 
 	
 	Now, we consider the STL formula $\LTLeventualy_{[0,1.5]} q$.
 	We show the evaluation of the value expressions for the segment $[1,3)$.
+	Intuitively, to compute $\LTLeventualy_{[0,1.5]} q$ in the segment $[1,3)$, one can consider a sliding window 
+	
+	 we need to compute the satisfaction of $q$ in each of these profiles 
+	
 	First, we need to compute the set $\mathsf{profilesBetween}([0,1.5], (x_1, x_2), p, [1,4.5))$.
 	We show in \cref{fig:profiles} the profiles corresponding to how intervals of the same length and type as $[0,1.5]$ can intersect with the segments covering $[0,1.5] \oplus [1,3)$.
+	
+	
 	Let us denote by $R_t$ the set of value expression of the segment starting at time $t$, given in \cref{fig:profiles}.
 	Then, the six intervals in \cref{fig:profiles} correspond to the following profiles in order:
 	\begin{enumerate}
@@ -277,7 +284,12 @@ We define the \emph{profile} of $I \subseteq [0,d)$ with the end points $a < b$ 
 		\item $\mathsf{Pr}_5 = \sfx(R_1) \cdot R_3 \cdot \first(R_4)$
 		\item $\mathsf{Pr}_6 = \sfx(R_1) \cdot R_3 \cdot \pfx(R_4)$
 	\end{enumerate}
-	Applying the bitwise-eventually operator $\mathsf{E}$ to each, concatenating the resulting sets and finally destuttering gives us the set of value expressions for $\LTLeventualy_{[0,1.5]} q$ in the segment $[1,3)$.
+	Recall the sliding window analogy:
+	One can imagine that we obtain these profiles by sliding a closed window of length $1.5$ over the segment $[1,3)$.
+	Although there are infinitely many such windows, there are finitely many profiles; for example, $[1.2,2.7]$ and $[1.4,2.9]$ are equivalent for our purposes.
+	This is because they are both strictly contained in $[1,3)$, meaning that they capture the events of $q$ that may occur strictly between the interval's endpoints.
+	
+	Applying the bitwise-eventually operator $\mathsf{E}$ to each profile, concatenating the resulting sets, and finally destuttering gives us the set of value expressions for $\LTLeventualy_{[0,1.5]} q$ in the segment $[1,3)$.
 	For example, the value expression $0 10 10 10 10$ is in this set because the first two profiles each contain $0$ and the last four profiles each contain an expression equivalent to $10$ after destuttering.
 	
 	We remark that this example also shows how our method overapproximates the set of possible behaviors by neglecting the bookkeeping of edges.
