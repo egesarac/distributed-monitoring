@@ -167,12 +167,12 @@ Let $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots x_n$, and le
 We want to compute the set of value expressions of each signal in each segment in the canonical segmentation $G_S$.
 We denote by $\gamma(I, i)$ the value expression capturing the behavior of $x_i$ in the interval $I \in G_S$ and describe its computation below.
 
-For each $x_i$, let $X_i = \{ J_{i,j} \st 1 \leq j < |E_i| \}$ be the set of its uncertainty regions, where $J_{i,j} = [l_{i,j}, h_{i,j})$ such that $l_{i,j} = \theta_{\text{lo}}(x_i, t_j)$ and $h_{i,j} = \theta_{\text{hi}}(x_i, t_j)$, and $t_j$ is the $j$th edge of $x_i$ in increasing order of local clock values.
+For each $x_i$, let $X_i = \{ J_{i,j} \st 1 \leq j < |E_i| \}$ be the set of its uncertainty regions, where each $J_{i,j} = [l_{i,j}, h_{i,j})$ is such that $l_{i,j} = \theta_{\text{lo}}(x_i, t_j)$ and $h_{i,j} = \theta_{\text{hi}}(x_i, t_j)$, and $t_j$ is the $j$th edge of $x_i$ in increasing order of local clock values.
 These intervals have the value expression $v_{i,j} = \nu_1 \nu_2$ where $\nu_1 = \lim_{s \to t_j^-} x_i(s)$ and $\nu_2 = \lim_{s \to t_j^+} x_i(s)$, and the remaining intervals have constant value expressions.
 
 First,  we ``synchronize'' the uncertainty regions of the signals in $S$ by splitting their value expressions accordingly.
 Let $G_S = \{I_1, \ldots, I_K\}$ where $I_k = [s_k, s_{k+1})$ for all $1 \leq k \leq K$.
-For each $1 \leq i \leq n$ and $1 \leq k \leq K$ let $Y_{k,i} = \{ J_{i,j} \in X_i \st I_k \subseteq J_{i,j}\}$ be the uncertainty regions of $x_i$ that contain the interval $I_k$ where $J_{i,j}$ are as above.
+For each $1 \leq i \leq n$ and $1 \leq k \leq K$, let $Y_{k,i} = \{ J_{i,j} \in X_i \st I_k \subseteq J_{i,j}\}$ be the uncertainty regions of $x_i$ that contain the interval $I_k$ where $J_{i,j}$ are as above.
 Let $M = |Y_{k,i}|$.
 Now, we compute the value expressions of signals for the canonical segmentation. 
 \begin{itemize}
@@ -230,7 +230,7 @@ We formalize and demonstrate this below.
 Let $I \subseteq [0,d)$ be an interval with the end points $a < b$.
 Given $t \in [0,d)$, we let $\mathsf{end}(t, S)$ be true iff $t=d$ or $\tau_S(t) = [t, t')$ for some $t' > t$.
 Let $Q$ be the number of intervals in $G_S$ whose endpoints are strictly between $a$ and $b$.
-Let $(H_k)_{1 \leq k \leq Q}$ be a (possibly empty) sequence of intervals of the canonical segmentation whose endpoints are strictly between $a$ and $b$, i.e., $H_k = [d_i, d_{i+1}) \in G_S$ and $a < d_i < d_{i+1} < b$ for all $1 \leq i \leq Q$.
+Let $(H_k)_{1 \leq k \leq Q}$ be a (possibly empty) sequence of intervals of the canonical segmentation whose endpoints are strictly between $a$ and $b$, i.e., $H_k = [d_k, d_{k+1}) \in G_S$ and $a < d_k < d_{k+1} < b$ for all $1 \leq i \leq Q$.
 We denote by $\kappa(S, a, b)$ the concatenation of the value expressions of $\varphi$ for the intervals in this sequence, i.e., $\kappa(S, a, b) = [S, s_1 \models \varphi] \cdot \ldots \cdot [S, s_Q \models \varphi]$.
 We define the \emph{profile} of $I \subseteq [0,d)$ with the end points $a < b$ with respect to $S$ and $\varphi$ as follows.
 
