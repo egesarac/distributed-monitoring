@@ -65,12 +65,14 @@ Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal of $n$ s
 		Then, merging the lists of values obtained in the previous step can be done in $O(gn)$ time.
 		
 		\item
-		Computing the value expressions of signals takes $2^{O(g)}$ time and space.
+		Computing the value expressions of signals takes $O(n 2^{O(g)})$ time and space.
 		Computing all the sets $Y_{k,i}$ of uncertainty intervals takes $O(gn)$ time and $O(g)$ space (we can piggyback this to the previous step).
 		Computing each set $\operatorname{op}(v)$ takes $O(1)$ time and space, and since each $Y_{k,i}$ contains $O(g)$ elements, it takes $O(g^2)$ time and space in total.
 		Note that each $\operatorname{op}(v)$ contains at most 4 elements of length at most 2.
 		Computing each set $Z_{k,i}$ takes $2^{O(g)}$ time and space due to concatenation (destuttering can be done on-the-fly with $O(1)$ overhead for each element of $Z_{k,i}$).
 		Note that each set $Z_{k,i}$ contains $2^{O(g)}$ elements of length $O(g)$.
+		Since there are $n$ signals and $O(g)$ segments, there are $O(gn)$ such sets; and since $O(g) \cdot 2^{O(g)} = 2^{O(g)}$, this step takes $O(n 2^{O(g)})$ time and space.
+		
 %		Computing the value expressions of signals takes \alert{$O(n g^3 3^g)$} time and \alert{$O(g^2 3^g)$} space.
 %		For each $j$ and $i$ computing the set $Y_{j,i}$ of uncertainty intervals takes $O(g)$ time and space.
 %		Computing each set $\operatorname{op}(v)$ takes constant time and space.
@@ -79,12 +81,12 @@ Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal of $n$ s
 %		Note: the maximum number of uncertainty intervals that contain a canonical segment is $\frac{2\varepsilon}{\delta}$, which implies $|\gamma(I_j, i)| = O(4^{\frac{2\varepsilon}{\delta}})$ for all $j$ and $i$, and $|v| = O(\frac{2\varepsilon}{\delta})$ for all $v \in \gamma(I_j, i)$.
 		
 		\item \TODO:
-		Computing the value expressions of subformulas takes $O(g m ...)$ time %O()
+		Computing the value expressions of subformulas takes $O(...)$ time %O(g m ...)
 		and $O(...)$ space. %O()
 		
 		
 		\item \TODO:
-		Computing the output takes $O()$ time %O(g * numElts + g * maxLen)?
+		Computing the output takes $O(...)$ time %O(g * numElts + g * maxLen)?
 		and $O(...)$ space. %O(g * numElts * maxLen)? 
 	\end{enumerate}
 	
