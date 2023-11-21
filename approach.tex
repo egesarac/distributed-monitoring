@@ -66,7 +66,7 @@ $$u_1 \otimes u_2 = \{ \destutter(v_1, v_2) \st v_i \in \stutter_k(u_i), \text{ 
 Given $L_1, L_2 \subseteq \destutter(\Sigma^*)$, we write $L_1 \otimes L_2 = \{ u_1 \otimes u_2 \st u_i \in L_i\}$.
 
 For value expressions $u_1, u_2$ and a function $f : \Sigma^2 \to \R$, we refer to the set of value expressions that can be obtained by applying $f$ to their asynchronous product as follows: $f(u_1, u_2) = \destutter(\{(f(v_1[i], v_2[i]))_{1 \leq i \leq k} \st (v_1, v_2) \in u_1 \otimes u_2 \text{ and } k = |v_1| \})$.
-Moreover, for $c \in \R$, we write $f(u_1, u_2) > c$ to denote the set $\destutter(\{(f(v_1[i], v_2[i]) > c)_{1 \leq i \leq k} \st (v_1, v_2) \in u_1 \otimes u_2 \text{ and } k = |v_1|\})$ where $f(v_1[i], v_2[i]) > c$ is 1 if the inequality holds, and it is 0 otherwise.
+Moreover, for $c \in \R$, we write $f(u_1, u_2) > c$ to denote the set $\destutter(\{(f(v_1[i], v_2[i]) > c)_{1 \leq i \leq k} \st (v_1, v_2) \in u_1 \otimes u_2 \text{ and } k = |v_1|\})$ where, for each $i$, the value of $f(v_1[i], v_2[i]) > c$ is 1 if the inequality holds, and it is 0 otherwise.
 We naturally extend these definitions to functions of arbitrary (finite) arity.
 
 \begin{example} \label{ex:valexpr}
