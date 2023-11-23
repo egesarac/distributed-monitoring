@@ -71,7 +71,7 @@ Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal of $n$ s
 		We store their end points in a list of size $O(g)$, which we sort in $O(g \log g)$ time.
 		
 		\item
-%		Computing the value expressions of signals takes $2^{O(g \log n)}$ time and space:
+%		Computing the value expressions of signals takes $2^{O(g + \log n)}$ time and space:
 %		Computing all the sets $Y_{k,i}$ of uncertainty intervals takes $O(gn)$ time and $O(g)$ space (we can piggyback this to the previous step).
 %		Computing each set $\operatorname{op}(v)$ takes $O(1)$ time and space, and since each $Y_{k,i}$ contains $O(g)$ elements, % this seems unlikely in practice
 %		it takes $O(g^2)$ time and space in total.
@@ -79,18 +79,18 @@ Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal of $n$ s
 %		Computing each set $Z_{k,i}$ takes $2^{O(g)}$ time and space due to concatenation (destuttering can be done on-the-fly with $O(1)$ overhead for each element of $Z_{k,i}$).
 %		Note that each set $\gamma(I_k, i)$ contains $2^{O(g)}$ elements of length $O(g)$.
 %		Since there are $n$ signals and $O(g)$ segments, there are $O(gn)$ such sets, and thus this step takes $2^{O(g \log n)}$ time and space. 
-		%%$O(g) \cdot 2^{O(g)} = 2^{O(g)}$ and $O(n) \cdot 2^{O(g)} = 2^{O(g  \log n)}$
+		%%$O(g) \cdot 2^{O(g)} = 2^{O(g)}$ and $O(n) \cdot 2^{O(g)} = 2^{O(g + \log n)}$
 			
 		
-		Computing the value expressions of signals takes $2^{O(\frac{\varepsilon}{\delta}  \log(gn))}$ time and space:
+		Computing the value expressions of signals takes $2^{O(\frac{\varepsilon}{\delta} + \log g + \log n)}$ time and space:
 		Note that each set $Y_{k,i}$ has at most $\frac{4 \varepsilon}{\delta}$ elements. % which is less than $n  \lceil \frac{d + \varepsilon}{\delta} \rceil$ assuming $n \geq 2$ and $d > \varepsilon$.
 		Computing all the sets $Y_{k,i}$ of uncertainty intervals takes $O(g^2)$ time.
 		Note that each set $Y_{k,i}$ has at most $\frac{4 \varepsilon}{\delta}$ elements, so the computation takes $O(\frac{g \varepsilon}{\delta})$ space.
 		Computing each set $\operatorname{op}(v)$ takes $O(1)$ time and space, and since each $Y_{k,i}$ contains $O(\frac{\varepsilon}{\delta})$ elements, it takes $O(\frac{g \varepsilon}{\delta})$ time and space in total.
 		Note that each $\operatorname{op}(v)$ contains at most 4 elements of length at most 2, and there are $O(\frac{\varepsilon}{\delta})$ many of them for each $k$ and $i$.
-		Computing each set $Z_{k,i}$ takes $2^{O(\frac{\varepsilon}{\delta})}$ time and space due to concatenation (destuttering can be done on-the-fly with $O(1)$ overhead for each element of $Z_{k,i}$).
+		Computing each set $Z_{k,i}$ takes $2^{O(\frac{\varepsilon}{\delta})}$ time and space due to concatenation (destuttering can be done on-the-fly with $O(1)$ overhead for each element of $\operatorname{op}(v)$). %$Z_{k,i}$
 		Note that each set $\gamma(I_k, i)$ contains $2^{O(\frac{\varepsilon}{\delta})}$ elements of length $O(\frac{\varepsilon}{\delta})$.
-		Since there are $n$ signals and $O(g)$ segments, there are $O(gn)$ such sets, and thus this step takes $2^{O(\frac{\varepsilon}{\delta}  \log(gn))}$ time and space. 
+		Since there are $n$ signals and $O(g)$ segments, there are $O(gn)$ such sets, and thus this step takes $2^{O(\frac{\varepsilon}{\delta} + \log g + \log n)}$ time and space. 
 	
 %		Computing the value expressions of signals takes $...$ time and space:
 %		Computing all the sets $Y_{k,i}$ of uncertainty intervals takes $O(\frac{n^2 (d + \varepsilon)}{\delta})$ time and $O(\frac{n (d + \varepsilon)}{\delta})$ space (we can piggyback this to the previous step).
