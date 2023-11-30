@@ -23,12 +23,14 @@ Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal of $n$ s
 
 \begin{theorem}
 %	The algorithm is correct.
+	
+
 	For all STL formulas $\varphi$ and distributed signals $(S, {\hb})$ of bounded clock skew $\varepsilon$ and bounded variability $\delta$, we have $\mathsf{Goal}(\varphi, S, {\hb}, \varepsilon, \delta) \subseteq \mathsf{Out}(\varphi, S, {\hb}, \varepsilon, \delta)$.
 \end{theorem}
 \begin{proof}
 	Let $\varphi$ be an STL formula, $(S, {\hb})$ be a distributed signal of bounded clock skew $\varepsilon$ and bounded variability $\delta$ with $S = (x_1, \ldots, x_n)$.
 	
-	Recall that each element of $\mathsf{Goal}(\varphi, S, {\hb}, \varepsilon, \delta)$ is a value expression for the satisfaction signal of $\varphi$ for some trace of $(S,{\hb})$.
+	Recall that each element of $\mathsf{Goal}(\varphi, S, {\hb}, \varepsilon, \delta)$ is a boolean value expression for the satisfaction signal of $\varphi$ for some trace of $(S,{\hb})$.
 	Let $v \in \mathsf{Goal}(\varphi, S, {\hb}, \varepsilon, \delta)$ be arbitrary.
 	To conclude that $v \in \mathsf{Out}(\varphi, S, {\hb}, \varepsilon, \delta)$, we argue that the semantics of our logic explores all admissible interleavings (subject to ${\hb}$, $\varepsilon$, and $\delta$) of the edges of $S$.
 	
@@ -59,14 +61,16 @@ Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal of $n$ s
 		
 	\begin{enumerate}
 		\item 
-		Enumerating the subformulas take $O(m)$ time and space.
+%		Enumerating the subformulas take $O(m)$ time and space.
+		Enumerating the subformulas take time and space linear in $m$.
 		
 		\item 
 %		Computing the canonical segmentation takes $O(gn)$ time and $O(g)$ space: % could do O(g logg) time too
 %		Knowing the edges of the signals, computing their uncertainty intervals takes $O(g)$ time in total and results in $O(g)$ values to be stored.
 %		Then, merging the lists of values obtained in the previous step can be done in $O(gn)$ time.
 
-		Computing the canonical segmentation takes $O(g \log g)$ time and $O(g)$ space: % could do O(g logg) time too
+%		Computing the canonical segmentation takes $O(g \log g)$ time and $O(g)$ space.
+		Computing the canonical segmentation takes loglinear time and linear space in $g$.
 		Knowing the edges of the signals, computing their uncertainty intervals takes $O(1)$ time each.
 		We store their end points in a list of size $O(g)$, which we sort in $O(g \log g)$ time.
 		
@@ -82,7 +86,8 @@ Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal of $n$ s
 		%%$O(g) \cdot 2^{O(g)} = 2^{O(g)}$ and $O(n) \cdot 2^{O(g)} = 2^{O(g + \log n)}$
 			
 		
-		Computing the value expressions of signals takes $2^{O(\frac{\varepsilon}{\delta} + \log g + \log n)}$ time and space:
+%		Computing the value expressions of signals takes $2^{O(\frac{\varepsilon}{\delta} + \log g + \log n)}$ time and space.
+		Computing the value expressions of signals takes time and space linear in $g$ and $n$ and exponential in $O(\frac{\varepsilon}{\delta})$.
 		Note that each set $Y_{k,i}$ has at most $\frac{4 \varepsilon}{\delta}$ elements. % which is less than $n  \lceil \frac{d + \varepsilon}{\delta} \rceil$ assuming $n \geq 2$ and $d > \varepsilon$.
 		Computing all the sets $Y_{k,i}$ of uncertainty intervals takes $O(g^2)$ time.
 		Note that each set $Y_{k,i}$ has at most $\frac{4 \varepsilon}{\delta}$ elements, so the computation takes $O(\frac{g \varepsilon}{\delta})$ space.
@@ -112,7 +117,28 @@ Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal of $n$ s
 		\item \TODO:
 		Computing the value expressions of subformulas takes $O(...)$ time %O(g m ...)
 		and $O(...)$ space. %O()
-		For atomic propositions, we obtain 
+		
+		
+		For an atomic proposition $p$, we take as input the $\gamma$ sets of each segment and the signals involved in $p$.
+		Recall from the previous step that each $\gamma$ contains $2^{O(\frac{\varepsilon}{\delta})}$ elements of length $O(\frac{\varepsilon}{\delta})$.
+		Then, the set of value expressions of an atomic proposition, which is a function of $n$ signals, contains elements of length $O(\frac{n\varepsilon}{\delta})$ due to the asynchronous product, and $O(\frac{n\varepsilon}{\delta})$ elements due to destuttering.
+		Note that the asynchronous product of $n$ signals contains $2^{O(\frac{n\varepsilon}{\delta})}$ elements of length $O(\frac{n\varepsilon}{\delta})$, therefore the computation takes $2^{O(\frac{n\varepsilon}{\delta})}$ time and space. %% check
+		
+		We investigate the remaining operations where the input is set(s) of boolean value expressions of $\alpha$ elements of length at most $\beta$.
+%		Note that the asynchronous product of two such sets results in expressions of length $O(\beta)$, which corresponds to a number of elements of $O(\beta)$ due to destuttering.
+		
+		For negation, it is easy to see that the computation takes $O(\alpha \beta)$ time and space since we iterate over each bit and negate.
+		The resulting set of value expressions has $\alpha$ elements of length at most $\beta$.
+		%TODO: there is a more efficient way using the 2d-box representation. note this somewhere and check all the statements.
+		
+%		For conjunction, for each pair in the asynchronous product we compute the corresponding set of value expressions in time 
+%		This part of the computation takes $O(\alpha^2 \)$ time and $O(\beta)$ space. 
+%		Due to the asynchronous product, 
+		
+		
+		
+		
+		
 		
 		
 		
