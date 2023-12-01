@@ -118,18 +118,31 @@ Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal of $n$ s
 		Computing the value expressions of subformulas takes $O(...)$ time %O(g m ...)
 		and $O(...)$ space. %O()
 		
-		
 		For an atomic proposition $p$, we take as input the $\gamma$ sets of each segment and the signals involved in $p$.
 		Recall from the previous step that each $\gamma$ contains $2^{O(\frac{\varepsilon}{\delta})}$ elements of length $O(\frac{\varepsilon}{\delta})$.
-		Then, the set of value expressions of an atomic proposition, which is a function of $n$ signals, contains elements of length $O(\frac{n\varepsilon}{\delta})$ due to the asynchronous product, and $O(\frac{n\varepsilon}{\delta})$ elements due to destuttering.
-		Note that the asynchronous product of $n$ signals contains $2^{O(\frac{n\varepsilon}{\delta})}$ elements of length $O(\frac{n\varepsilon}{\delta})$, therefore the computation takes $2^{O(\frac{n\varepsilon}{\delta})}$ time and space. %% check
+		Then, to compute the corresponding $n$-ary function $f_p$, we need to compute the asynchronous product of $n$ real-valued signals.
+		This computation takes $2^{O(\frac{n\varepsilon}{\delta})}$ time and space, and the product contains $2^{O(\frac{n\varepsilon}{\delta})}$ elements of length $O(\frac{n\varepsilon}{\delta})$.
+		We assume that, for a single-letter alignment in the product, application of $f_p$ and comparison with zero take $O(1)$ time, and thus $2^{O(\frac{n\varepsilon}{\delta})}$ time in total.
+		During these computations, we compute the boolean value expressions while destuttering on the fly
+		We compute from this set the boolean value expressions, which takes $2^{O(\frac{n\varepsilon}{\delta})}$ time.
 		
-		We investigate the remaining operations where the input is set(s) of boolean value expressions of $\alpha$ elements of length at most $\beta$.
-%		Note that the asynchronous product of two such sets results in expressions of length $O(\beta)$, which corresponds to a number of elements of $O(\beta)$ due to destuttering.
 		
-		For negation, it is easy to see that the computation takes $O(\alpha \beta)$ time and space since we iterate over each bit and negate.
-		The resulting set of value expressions has $\alpha$ elements of length at most $\beta$.
-		%TODO: there is a more efficient way using the 2d-box representation. note this somewhere and check all the statements.
+%		Note that a set of boolean value expressions has $O(L)$ elements if its longest element has length $L$. % not necessarily the other way around
+%		Then, the asynchronous product of two such sets also has $O(L)$ elements since the longest element there has length $2L$.
+		
+%		Note that the every set of boolean value expressions contains  in a set whose size and elements' length are of the same order due to destuttering.
+%		Note that the asynchronous product of two sets of boolean value expressions results in a set whose size and elements' length are of the same order due to destuttering.
+		
+		We investigate the remaining operations where we take the inputs as sets of boolean value expressions of $O(\alpha)$ elements of length $O(\beta)$.
+		First, we remark that boolean value expressions can be represented by a pair in $\{0,1\} \times \N$, encoding their first bit and their length.
+		This allows computing their negation in $O(1)$ time and their conjunction in $O(\beta_1 + \beta_2)$ time.
+		
+		\TODO:
+		For negation, it is easy to see that the computation takes $O(\alpha)$ time and space.
+		For conjunction, we only look at the longest combinations of elements that give us 0..0, 0..1, 1..0, 1..1, so it $O(\beta_1 + \beta_2)$, resulting in a set of size $O(\beta_1 + \beta_2)$.
+		For until, the same approach seems to work.
+		For bounded eventually/always, ...
+		For practical purposes, we implement unbounded eventually/always directly, which take $O(1)$ time.
 		
 %		For conjunction, for each pair in the asynchronous product we compute the corresponding set of value expressions in time 
 %		This part of the computation takes $O(\alpha^2 \)$ time and $O(\beta)$ space. 
