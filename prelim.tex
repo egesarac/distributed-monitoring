@@ -69,24 +69,42 @@ $T$.
 %
 For local time values, we use the lowercase letters $t$ and $s$.
 
-We represent the local clock of the agent $A_i$ as an increasing and divergent function $c_i : \R_{\geq 0} \to \R_{\geq 0}$ that maps a global time $T$ to a local time $c_i(T)$ of $A_i$.
+We represent the local clock of the agent $A_i$ as an increasing and divergent function $c_i : 
+\R_{\geq 0} \to \R_{\geq 0}$ that maps a global time $T$ to a local time $c_i(T)$ of $A_i$.
+%
 We denote by $c_i^{-1}$ the inverse of the local clock function $c_i$.
+%
 We assume that the system is \emph{partially synchronous}: the agents use a clock synchronization algorithm that guarantees a bounded clock skew with respect to the global clock, i.e., $|c_i(T) - T| < \varepsilon$ for all $1 \leq i \leq N$ and $T \in \R_{\geq 0}$, where $\varepsilon \in \R_{> 0}$ is the maximum clock skew.
+\borzoo{Another way is $|c(i) - c(j)| < \epsilon$}
 
-An \emph{event} of a given signal $x_i$ is a pair $(t, x_i(t))$ where $t$ is a local clock value.
+
+
+An \emph{event} of a given signal $x_i$ is a pair $(t, x_i(t))$, where $t$ is a local clock value.
 We denote by $V_i$ the set of events of signal $x_i$.
+%
 An \emph{edge} of $x_i$ is an event $(t, x_i(t))$ such that $\lim_{s \to t^-} x_i(s) \neq \lim_{s \to t^+} x_i(s)$.
 In particular, it is a \emph{rising} edge if $\lim_{s \to t^-} x_i(s) < \lim_{s \to t^+} x_i(s)$, and a \emph{falling} edge otherwise.
 We respectively denote by $E_i^\uparrow$ and $E_i^\downarrow$ the sets of rising and falling edges of $x_i$, and we let $E_i = E_i^\uparrow \cup E_i^\downarrow$.
 
-We assume that signals have \emph{bounded variability} with respect to the global clock: for each signal $x_i$ and every pair $(t, x_i(t)), (t', x_i(t')) \in E_i$ of edges, we have $|c_j^{-1}(t) - c_j^{-1}(t')| \geq \delta$, where $A_j = \pi(x_i)$ is the agent that produces $x_i$ and $\delta \in \R_{\geq 0}$ is the bounded variability constant.
+We assume that signals have \emph{bounded variability} with respect to the global clock: for each 
+signal $x_i$ and every pair $(t, x_i(t)), (t', x_i(t')) \in E_i$ of edges, we have $|c_j^{-1}(t) - 
+c_j^{-1}(t')| \geq \delta$, where $A_j = \pi(x_i)$ is the agent that produces $x_i$ and $\delta \in 
+\R_{\geq 0}$ is the bounded variability constant. \borzoo{Do we really need the agent here?}
 
 \begin{definition} \label{defn:hb}
-	A \emph{distributed signal} is a pair $(S, {\hb})$ where $S = (x_1, \ldots, x_n)$ is a vector of signals and ${\hb}$ is the happened-before relation between events in signals extended with the partial synchrony assumption as follows.
+	A \emph{distributed signal} is a pair $(S, {\hb})$, where $S = (x_1, \ldots, x_n)$ is a vector of 
+	signals and ${\hb}$ is the happened-before relation between events in signals extended with the 
+	partial synchrony assumption as follows.
 	\begin{itemize}
-		\item For every agent, the events of its signals are totally ordered, i.e., for all $1 \leq i,j \leq n$ with $\pi(x_i) = \pi(x_j)$ and all $(t, x_i(t)) \in V_i$ and $(t', x_j(t')) \in V_j$, if $t < t'$ then $(t, x_i(t)) \hb (t', x_j(t'))$.
+		\item For every agent, the events of its signals are totally ordered, i.e., for all $1 \leq i,j \leq n$ 
+		with $\pi(x_i) = \pi(x_j)$ and all $(t, x_i(t)) \in V_i$ and $(t', x_j(t')) \in V_j$, if $t < t'$ then $(t, 
+		x_i(t)) \hb (t', x_j(t'))$.
+		\borzoo{I do think $\pi$ is unnecessary. We can assume each agent produces a distinct signal.}
 		\item Every pair of events whose timestamps are at least $2 \varepsilon$ apart is totally ordered, i.e., for all $1 \leq i,j \leq n$ and all $(t, x_i(t)) \in V_i$ and $(t', x_j(t')) \in V_j$, if $t + 2\varepsilon \leq t'$ then $(t, x_i(t)) \hb (t', x_j(t'))$. \ege{To be confirmed: $t + 2\varepsilon \leq t'$ or $t + 2\varepsilon < t'$?} 
-\dejan{$t + 2\varepsilon \leq t'$, if $t$ and $t'$ are exactly separated by $2\varepsilon$, they are still totally ordered, because when projected to the global time, the first event happens in the worst case in the left limit of $t+\varepsilon$ and the second event in its right limit.}
+\dejan{$t + 2\varepsilon \leq t'$, if $t$ and $t'$ are exactly separated by $2\varepsilon$, they are 
+still totally ordered, because when projected to the global time, the first event happens in the worst 
+case in the left limit of $t+\varepsilon$ and the second event in its right limit.} \borzoo{Let's discuss 
+this.}
 	\end{itemize}
 \end{definition}
 
