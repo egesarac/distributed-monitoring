@@ -117,11 +117,22 @@ this.}
 	A set $C \subseteq V$ is a \emph{consistent cut} iff for every event in $C$, all events that happened before  it also belong to $C$, i.e., for all $e, e' \in V$, if $e \in C$ and $e' \hb e$, then $e' \in C$.
 \end{definition}
 
+\borzoo{Let's use consistent notation: $E$ for events.}
+
 We denote by $\CC(T)$ the (infinite) set of consistent cuts at global time $T$.
 Given a consistent cut $C$, its \emph{frontier} $\fr(C) \subseteq C$ is the set consisting of the last events in $C$ of each signal, i.e., $\fr(C) = \bigcup_{i = 1}^{n} \{ (t, x_i(t)) \in V_i \cap C \st \forall t' > t : (t', x_i(t')) \notin V_i \cap C \}$.
 
-A \emph{consistent cut flow} is a function $f : \R_{\geq 0} \to 2^V$ that maps a global clock value $T$ to the frontier of a consistent cut at time $T$, i.e., $f(T) \in \{\fr(C) \st C \in \CC(T)\}$.
-For all $T,T' \in \R_{\geq 0}$ and $1 \leq i \leq n$ where $A_j = \pi(x_i)$, if $T < T'$, then for every pair of events $(c_j(T), x_i(c_j(T))) \in f(T)$ and $(c_j(T'), x_i(c_j(T'))) \in f(T')$ we have $(c_j(T), x_i(c_j(T))) \hb (c_j(T'), x_i(c_j(T')))$.
+\begin{definition}
+A \emph{consistent cut flow} is a function $f : \R_{\geq 0} \to 2^V$ that 
+maps a global clock value $T$ to the frontier of a consistent cut at time 
+$T$, i.e., $f(T) \in \{\fr(C) \st C \in \CC(T)\}$.
+\end{definition}
+
+
+For all $T,T' \in \R_{\geq 0}$ and $1 \leq i \leq n$ where $A_j = \pi(x_i)$, if 
+$T < T'$, then for every pair of events $(c_j(T), x_i(c_j(T))) \in f(T)$ and 
+$(c_j(T'), x_i(c_j(T'))) \in f(T')$ we have $(c_j(T), x_i(c_j(T))) \hb (c_j(T'), 
+x_i(c_j(T')))$.
 We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distributed signal $(S,{\hb})$.
 
 \begin{example}
@@ -135,7 +146,12 @@ The syntax is given by the following grammar where $p \in \AP$ and $I \subseteq 
 $$ \varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \land \varphi ~|~ \varphi \until_I \varphi$$
 
 A \emph{trace} is a vector of synchronous signals of finite duration.
-We express atomic propositions as functions of trace values at a time point $T$, i.e., a proposition $p \in \AP$ over a trace $w = (x_1, \ldots, x_n)$ is defined as $f_p(x_1(T), \ldots, x_n(T)) > 0$ where $f_p : \R^n \to \R$ is a function. \dejan{$f$ is already used for the consistent cut flow. I would suggest that we change the symbol for CCF.}
+We express atomic propositions as functions of trace values at a time point 
+$T$, i.e., a proposition $p \in \AP$ over a trace $w = (x_1, \ldots, x_n)$ is 
+defined as $f_p(x_1(T), \ldots, x_n(T)) > 0$ where $f_p : \R^n \to \R$ is a 
+function. \dejan{$f$ is already used for the consistent cut flow. I would 
+suggest that we change the symbol for CCF.}
+\borzoo{yes I agree. I think we used small ccf for that.}
 Note that given a trace over a temporal domain $[0,D)$ and intervals $I,J \subseteq \R_{\geq 0}$, we write $I \oplus J = \{i + j \st i \in I \land j \in J\}$.
 We use the shorthand notation $T$ for the singleton set $\{T\}$. 
 \dejan{We are talking both about $x_i(t)$ and $x_i(T)$ and these two things have a different meaning. I do not know whether we should say something more about it. $x_i(t)$ is the trace observation on the agent $A_i$ and its local clock, while $x_i(T)$ is the (unknown) real value of the signal wrt the global time.}
@@ -161,6 +177,7 @@ We additionally use the following standard abbreviations:
 $\true = p \lor \lnot p$,
 $\false = \lnot \true$,
 $ \varphi_1 \lor \varphi_2 = \lnot \varphi_1 \land \lnot \varphi_2$,
+\borzoo{disjunction should go first ;)}
 $\LTLf_I \varphi = \true \until_I \varphi$, and
 $\LTLg_I \varphi = \lnot \LTLf_I \lnot \varphi$.
 Moreover, the untimed temporal operators are defined through their timed counterparts on the interval $(0,\infty)$, e.g., $\varphi_1 \until \varphi_2 = \varphi_1 \until_{(0,\infty)} \varphi_2$.
