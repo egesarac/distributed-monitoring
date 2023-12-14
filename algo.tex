@@ -126,6 +126,7 @@ Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal of $n$ s
 			Therefore, we only need to compute the conjunctions of the longest elements of each type in each set (if they exist), which takes $O(\beta_1 + \beta_2)$ time and space for each segment, and thus $O(g (\beta_1 + \beta_2))$ time and space in total.
 			The resulting sets each contain $O(\beta_1 + \beta_2)$ elements of length $O(\beta_1 + \beta_2)$.
 			Note that each conjunction potentially doubles the set size.
+			\ege{The explanation needs to be improved.}
 			
 			\item
 			For the until operator, observe that 
@@ -137,19 +138,14 @@ Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal of $n$ s
 			
 			\item
 			For the bounded temporal operators, first note that there are $O(g)$ profiles to be considered.
-			Computing a profile may include a concatenation of $O(g)$ sets of value expressions (due to $\kappa$ when $I$ is large), thus it takes $2^{O(g \log \alpha)}$ time and space, resulting in a set of $O(\alpha (g + \beta))$ elements of length $O(\alpha (g + \beta))$.
+			Computing a profile may include a concatenation of $O(g)$ sets of value expressions (due to $\kappa$ when $I$ is large), thus it takes $2^{O(g \log \alpha)}$ time, resulting in a set of $O(\alpha (g + \beta))$ elements of length $O(\alpha (g + \beta))$.
 			Computing the bitwise temporal operators on such a set takes $O(\alpha (g + \beta))$ time, resulting in a set of $O(1)$ elements of length $O(1)$.
 			Concatenating the resulting sets of $O(g)$ profiles thus takes $O(g)$ time and space, resulting in a set of $O(g)$ elements of length $O(g)$.			
 			
 			\item
-			\TODO: explain the worst case and update the statement.
-			
-			
-%			The worst case occurs when the input formula consists of conjunctions only. \ege{To be checked.}
-%			This leads to $O(\frac{m n \epsilon}{\delta})$ work at each level of the syntax tree of the formula.
-%			Therefore, in total for $O(\log m)$ levels and $O(g)$ segments, it takes 
-			
-%			This leads to doubling the set size and the expression length at each level, resulting at the root in an expression of size 
+			\TODO: explain the worst case and update the statement.\\
+			Only conjunctions: $2^{O(\alpha + \log g + \log m)}$, output with $O(m \alpha)$ elements of length $O(m \alpha)$.\\
+%			Only eventually/always: $2^{O(\alpha + \log g)} + 2^{O(g \log \alpha)} + 2^{O(g + \log m)}$, output with $O(1)$ elements of length $O(1)$.
 		\end{itemize}
 
 		\item
