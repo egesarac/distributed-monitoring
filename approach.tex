@@ -270,13 +270,10 @@ We define the \emph{profile} of $I \subseteq [0,d)$ with the end points $a < b$ 
 	
 	Now, we consider the STL formula $\LTLeventualy_{[0,1.5]} q$.
 	We show the evaluation of the value expressions for the segment $[1,3)$.
-	Intuitively, to compute $\LTLeventualy_{[0,1.5]} q$ in the segment $[1,3)$, one can consider a sliding window 
-	
-	 we need to compute the satisfaction of $q$ in each of these profiles 
-	
+	Intuitively, to compute $\LTLeventualy_{[0,1.5]} q$ in the segment $[1,3)$, one can consider a sliding window over the interval $[1,4.5)$ and compute how the behavior of the satisfaction signal of $q$ changes as the window slides.
+		
 	First, we need to compute the set $\mathsf{profilesBetween}([0,1.5], (x_1, x_2), p, [1,4.5))$.
 	We show in \cref{fig:profiles} the profiles corresponding to how intervals of the same length and type as $[0,1.5]$ can intersect with the segments covering $[0,1.5] \oplus [1,3)$.
-	
 	
 	Let us denote by $R_t$ the set of value expression of the segment starting at time $t$, given in \cref{fig:profiles}.
 	Then, the six intervals in \cref{fig:profiles} correspond to the following profiles in order:

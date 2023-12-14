@@ -97,57 +97,67 @@ Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal of $n$ s
 			Finally, since there are $n$ signals and $O(g)$ segments, computing all the sets $\gamma(I_k, i)$ takes $2^{O(\frac{\varepsilon}{\delta} + \log g + \log n)}$ time and space.
 		\end{itemize}
 
-		\item \TODO:
+		\item
 		\textbf{Computing the value expressions of subformulas takes $O(...)$ time and $O(...)$ space.}
 		\begin{itemize}
 			\item
-			For an atomic proposition $p$,
+			For an atomic proposition $p$, we take as input the $\gamma$ sets of each segment and the signals involved in $p$.
+			Recall from the previous step that each $\gamma$ contains $2^{O(\frac{\varepsilon}{\delta})}$ elements of length $O(\frac{\varepsilon}{\delta})$.
+			To compute the corresponding $n$-ary function $f_p$ in a given segment $I_k$, we need to compute the asynchronous product $\gamma(I_k, 1) \otimes \ldots \otimes \gamma(I_k, n)$.
+			This computation takes $2^{O(\frac{n\varepsilon}{\delta})}$ time and space, and the product contains $2^{O(\frac{n\varepsilon}{\delta})}$ elements of length $O(\frac{n\varepsilon}{\delta})$.
+			We assume that, for a single-letter alignment of the tuples in the product, applying $f_p$ and comparing the output with zero take $O(1)$ time, and thus $2^{O(\frac{n\varepsilon}{\delta})}$ time for a single segment.
+			During these computations, we compute the boolean value expressions by destuttering on the fly.
+			Repeating the steps for each segment takes $2^{O(\frac{n\varepsilon}{\delta} + \log g)}$ time, resulting in $O(g)$ sets of boolean value expressions, each containing $O(\frac{n\varepsilon}{\delta})$ elements of length $O(\frac{n\varepsilon}{\delta})$.
 			
 			\item 
+			We investigate the remaining operations where we take the inputs as sets of boolean value expressions of $O(\alpha)$ elements of length $O(\beta)$.
+			We remark that a set of boolean value expressions can be represented as two bit vectors marking the positions corresponding to elements in the set.
+			For example, the set $U = \{0, 01, 10, 101\}$ can be represented as $u_0 = 011$ and $u_1 = 110$ where $u_\sigma$ encodes the elements that start with letter $\sigma$ and a position $i$ is marked with 1 iff $U$ contains an element of length $i$ that starts with $\sigma$.
 			
 			\item 
+			To compute the negation of a set of value expressions, we simply store a boolean flag that effectively swaps the names of the corresponding bit vectors.
+			Since this flag applies to all segments at once, it takes $O(1)$ time and space in total.
+						
+			\item
+			For the conjunction of two sets of value expressions, first observe the following:
+			(i) for all $u,v \in \destutter(\Sigma^*)$, we can compute $u \land v$ in $O(|u|+|v|)$ time and space, and
+			(ii) for all $u, u', v, v' \in \destutter(\Sigma^*)$ such that $u$ and $u'$ start and end with the same letter, $v$ and $v'$ start and end with the same letter, $|u'| \leq |u|$ and $|v'| \leq |v|$, we have $u' \land v' \subseteq u \land v$.
+			These statements hold because the conjunction of two boolean value expressions cannot have more edges can the sum of the number of edges of the inputs, and they can be aligned to obtain an output with any smaller number of edges. \ege{There are some corner cases to consider, but this is almost true.}
+			Therefore, we only need to compute the conjunctions of the longest elements of each type in each set (if they exist), which takes $O(\beta_1 + \beta_2)$ time and space for each segment, and thus $O(g (\beta_1 + \beta_2))$ time and space in total.
+			The resulting sets each contain $O(\beta_1 + \beta_2)$ elements of length $O(\beta_1 + \beta_2)$.
+			Note that each conjunction potentially doubles the set size.
+			
+			\item
+			For the until operator, observe that 
+			(i) for all $u,v \in \destutter(\Sigma^*)$, we can compute $u \land v$ in $O(|v|)$ time and space, and
+			(ii) for all $u, u', v, v' \in \destutter(\Sigma^*)$ such that $u$ and $u'$ start and end with the same letter, $v$ and $v'$ start and end with the same letter, $|u'| \leq |u|$ and $|v'| \leq |v|$, we have $u' \until v' \subseteq u \until v$.
+			These hold for similar reasons as for conjunction, but now the number of edges in the output depends on the number of edges of $v$ and not of $u$. \ege{To be checked.}
+			Therefore, the computation takes $O(\beta_2)$ time and space for each segment, and thus $O(g \beta_2)$ time and space in total.
+			The resulting sets each contain $O(\beta_2)$ elements of length $O(\beta_2)$.
+			
+			\item
+			For the bounded temporal operators, first note that there are $O(g)$ profiles to be considered.
+			Computing a profile may include a concatenation of $O(g)$ sets of value expressions (due to $\kappa$ when $I$ is large), thus it takes $2^{O(g \log \alpha)}$ time and space, resulting in a set of $O(\alpha (g + \beta))$ elements of length $O(\alpha (g + \beta))$.
+			Computing the bitwise temporal operators on such a set takes $O(\alpha (g + \beta))$ time, resulting in a set of $O(1)$ elements of length $O(1)$.
+			Concatenating the resulting sets of $O(g)$ profiles thus takes $O(g)$ time and space, resulting in a set of $O(g)$ elements of length $O(g)$.			
+			
+			\item
+			\TODO: explain the worst case and update the statement.
+			
+			
+%			The worst case occurs when the input formula consists of conjunctions only. \ege{To be checked.}
+%			This leads to $O(\frac{m n \epsilon}{\delta})$ work at each level of the syntax tree of the formula.
+%			Therefore, in total for $O(\log m)$ levels and $O(g)$ segments, it takes 
+			
+%			This leads to doubling the set size and the expression length at each level, resulting at the root in an expression of size 
 		\end{itemize}
-		
-		For an atomic proposition $p$, we take as input the $\gamma$ sets of each segment and the signals involved in $p$.
-		Recall from the previous step that each $\gamma$ contains $2^{O(\frac{\varepsilon}{\delta})}$ elements of length $O(\frac{\varepsilon}{\delta})$.
-		Then, to compute the corresponding $n$-ary function $f_p$, we need to compute the asynchronous product of $n$ real-valued signals.
-		This computation takes $2^{O(\frac{n\varepsilon}{\delta})}$ time and space, and the product contains $2^{O(\frac{n\varepsilon}{\delta})}$ elements of length $O(\frac{n\varepsilon}{\delta})$.
-		We assume that, for a single-letter alignment in the product, application of $f_p$ and comparison with zero take $O(1)$ time, and thus $2^{O(\frac{n\varepsilon}{\delta})}$ time in total.
-		During these computations, we compute the boolean value expressions while destuttering on the fly
-		We compute from this set the boolean value expressions, which takes $2^{O(\frac{n\varepsilon}{\delta})}$ time.
-		
-		
-%		Note that a set of boolean value expressions has $O(L)$ elements if its longest element has length $L$. % not necessarily the other way around
-%		Then, the asynchronous product of two such sets also has $O(L)$ elements since the longest element there has length $2L$.
-		
-%		Note that the every set of boolean value expressions contains  in a set whose size and elements' length are of the same order due to destuttering.
-%		Note that the asynchronous product of two sets of boolean value expressions results in a set whose size and elements' length are of the same order due to destuttering.
-		
-		We investigate the remaining operations where we take the inputs as sets of boolean value expressions of $O(\alpha)$ elements of length $O(\beta)$.
-		First, we remark that boolean value expressions can be represented by a pair in $\{0,1\} \times \N$, encoding their first bit and their length.
-		This allows computing their negation in $O(1)$ time and their conjunction in $O(\beta_1 + \beta_2)$ time.
-		
-		\TODO:
-		For negation, it is easy to see that the computation takes $O(\alpha)$ time and space.
-		For conjunction, we only look at the longest combinations of elements that give us 0..0, 0..1, 1..0, 1..1, so it $O(\beta_1 + \beta_2)$, resulting in a set of size $O(\beta_1 + \beta_2)$.
-		For until, the same approach seems to work.
-		For bounded eventually/always, ...
-		For practical purposes, we implement unbounded eventually/always directly, which take $O(1)$ time.
-		
-%		For conjunction, for each pair in the asynchronous product we compute the corresponding set of value expressions in time 
-%		This part of the computation takes $O(\alpha^2 \)$ time and $O(\beta)$ space. 
-%		Due to the asynchronous product, 
-		
-		
-		
-		
-		
-		
-		
-		
-		\item \TODO:
-		Computing the output takes $O(...)$ time %O(g * numElts + g * maxLen)?
-		and $O(...)$ space. %O(g * numElts * maxLen)? 
+
+		\item
+		\textbf{Computing the output takes $2^{O(g \log X)}$ time and $O(g Y)$ space.}
+		We concatenate $O(g)$ sets of value expressions for the root formula, which contains in the worst case $O(X)$ elements of length $O(Y)$.
+		This can be done together with on-the-fly destuttering in $2^{O(g \log X)}$ time and $O(g Y)$ space.
+		\TODO: replace $X$ and $Y$ based on the worst case above.
+
 	\end{enumerate}
 	
 %	max num of uncertainty intervals that contain a canonical segment = $\frac{2\varepsilon}{\delta}$

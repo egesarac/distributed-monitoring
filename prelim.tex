@@ -47,10 +47,12 @@ A function $f : A \to B$ is
 \emph{left-limited} iff $\lim_{a' \to a^-} f(a') < \infty$ for all $a \in A$;
 \emph{non-Zeno} iff for every bounded interval $I \subseteq A$ there are finitely many $a \in I$ such that $f$ is not continuous at $a$.
 \borzoo{$a'$ is not quantified.}
+\ege{$a'$ is the limit variable -- maybe swapping $a'$ and $a$ helps?}
 
 \begin{definition}
 	A \emph{signal} is a right-continuous, left-limited, non-Zeno, piecewise-constant function $x : [0,d) \to \R$ where $d \in \R_{> 0}$ is the duration of $x$ and $[0,d)$ is its temporal domain.
 \dejan{why do we need the signal to be left-limited?}
+\ege{I think we don't need it since we only focus on piecewise-constant signals.}
 \end{definition}
 
 We consider an asynchronous and loosely-coupled message-passing system of $N \geq 2$ reliable 
@@ -118,20 +120,21 @@ this.}
 \end{definition}
 
 \borzoo{Let's use consistent notation: $E$ for events.}
+\ege{I use $E$ for edges (which we refer to often) and $V$ for events (which only appear in preliminaries).}
 
 We denote by $\CC(T)$ the (infinite) set of consistent cuts at global time $T$.
 Given a consistent cut $C$, its \emph{frontier} $\fr(C) \subseteq C$ is the set consisting of the last events in $C$ of each signal, i.e., $\fr(C) = \bigcup_{i = 1}^{n} \{ (t, x_i(t)) \in V_i \cap C \st \forall t' > t : (t', x_i(t')) \notin V_i \cap C \}$.
 
 \begin{definition}
-A \emph{consistent cut flow} is a function $f : \R_{\geq 0} \to 2^V$ that 
+A \emph{consistent cut flow} is a function $\ccf : \R_{\geq 0} \to 2^V$ that 
 maps a global clock value $T$ to the frontier of a consistent cut at time 
-$T$, i.e., $f(T) \in \{\fr(C) \st C \in \CC(T)\}$.
+$T$, i.e., $\ccf(T) \in \{\fr(C) \st C \in \CC(T)\}$.
 \end{definition}
 
 
 For all $T,T' \in \R_{\geq 0}$ and $1 \leq i \leq n$ where $A_j = \pi(x_i)$, if 
-$T < T'$, then for every pair of events $(c_j(T), x_i(c_j(T))) \in f(T)$ and 
-$(c_j(T'), x_i(c_j(T'))) \in f(T')$ we have $(c_j(T), x_i(c_j(T))) \hb (c_j(T'), 
+$T < T'$, then for every pair of events $(c_j(T), x_i(c_j(T))) \in \ccf(T)$ and 
+$(c_j(T'), x_i(c_j(T'))) \in \ccf(T')$ we have $(c_j(T), x_i(c_j(T))) \hb (c_j(T'), 
 x_i(c_j(T')))$.
 We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distributed signal $(S,{\hb})$.
 
@@ -151,10 +154,11 @@ $T$, i.e., a proposition $p \in \AP$ over a trace $w = (x_1, \ldots, x_n)$ is
 defined as $f_p(x_1(T), \ldots, x_n(T)) > 0$ where $f_p : \R^n \to \R$ is a 
 function. \dejan{$f$ is already used for the consistent cut flow. I would 
 suggest that we change the symbol for CCF.}
-\borzoo{yes I agree. I think we used small ccf for that.}
+\borzoo{yes I agree. I think we used small ccf for that.} \ege{Done.}
 Note that given a trace over a temporal domain $[0,D)$ and intervals $I,J \subseteq \R_{\geq 0}$, we write $I \oplus J = \{i + j \st i \in I \land j \in J\}$.
 We use the shorthand notation $T$ for the singleton set $\{T\}$. 
 \dejan{We are talking both about $x_i(t)$ and $x_i(T)$ and these two things have a different meaning. I do not know whether we should say something more about it. $x_i(t)$ is the trace observation on the agent $A_i$ and its local clock, while $x_i(T)$ is the (unknown) real value of the signal wrt the global time.}
+\ege{I try to use $x_i(T)$ only when the signals are synchronous (i.e., for talking about traces). When there is asynchrony, I write $x_i(c_j(T)))$ where $A_j$ is the agent producing $x_i$.}
 
 Below we recall the finite-trace qualitative semantics of STL defined over $\B$.
 Let $D \in \R_{> 0}$ and $w = (x_1, \ldots, x_n)$ with $x_i : [0,D) \to \R$ for all $1 \leq i \leq n$.
@@ -176,7 +180,7 @@ We simply write $[w \models \varphi]$ for $[w,0 \models \varphi]$.
 We additionally use the following standard abbreviations: 
 $\true = p \lor \lnot p$,
 $\false = \lnot \true$,
-$ \varphi_1 \lor \varphi_2 = \lnot \varphi_1 \land \lnot \varphi_2$,
+$ \varphi_1 \lor \varphi_2 = \lnot (\lnot \varphi_1 \land \lnot \varphi_2)$,
 \borzoo{disjunction should go first ;)}
 $\LTLf_I \varphi = \true \until_I \varphi$, and
 $\LTLg_I \varphi = \lnot \LTLf_I \lnot \varphi$.
