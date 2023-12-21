@@ -77,7 +77,7 @@ We represent the local clock of the agent $A_i$ as an increasing and divergent f
 We denote by $c_i^{-1}$ the inverse of the local clock function $c_i$.
 %
 We assume that the system is \emph{partially synchronous}: the agents use a clock synchronization algorithm that guarantees a bounded clock skew with respect to the global clock, i.e., $|c_i(T) - T| < \varepsilon$ for all $1 \leq i \leq N$ and $T \in \R_{\geq 0}$, where $\varepsilon \in \R_{> 0}$ is the maximum clock skew.
-\borzoo{Another way is $|c(i) - c(j)| < \epsilon$}
+\borzoo{Another way is $|c(i) - c(j)| < \epsilon$} \anik{$|c_i(T) - c_j(T)| < \epsilon$ for all $1 \leq i,j \leq N$ and $T \in \R_{\geq 0}$}
 
 
 
@@ -90,7 +90,7 @@ We respectively denote by $E_i^\uparrow$ and $E_i^\downarrow$ the sets of rising
 
 We assume that signals have \emph{bounded variability} with respect to the global clock: for each 
 signal $x_i$ and every pair $(t, x_i(t)), (t', x_i(t')) \in E_i$ of edges, we have $|c_j^{-1}(t) - 
-c_j^{-1}(t')| \geq \delta$, where $A_j = \pi(x_i)$ is the agent that produces $x_i$ and $\delta \in 
+c_j^{-1}(t')| \geq \delta$  \anik{for all $1 \leq j \leq N$}, where $A_j = \pi(x_i)$ is the agent that produces $x_i$ and $\delta \in 
 \R_{\geq 0}$ is the bounded variability constant. \borzoo{Do we really need the agent here?}
 
 \begin{definition} \label{defn:hb}
@@ -98,7 +98,7 @@ c_j^{-1}(t')| \geq \delta$, where $A_j = \pi(x_i)$ is the agent that produces $x
 	signals and ${\hb}$ is the happened-before relation between events in signals extended with the 
 	partial synchrony assumption as follows.
 	\begin{itemize}
-		\item For every agent, the events of its signals are totally ordered, i.e., for all $1 \leq i,j \leq n$ 
+		\item For every agent, the events of its signals are totally ordered, i.e., for all $1 \leq i,j \leq n$ \anik{Use either `n' or `N' consistently} 
 		with $\pi(x_i) = \pi(x_j)$ and all $(t, x_i(t)) \in V_i$ and $(t', x_j(t')) \in V_j$, if $t < t'$ then $(t, 
 		x_i(t)) \hb (t', x_j(t'))$.
 		\borzoo{I do think $\pi$ is unnecessary. We can assume each agent produces a distinct signal.}
