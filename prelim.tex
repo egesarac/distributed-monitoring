@@ -43,16 +43,13 @@ Moreover, given an integer $k \geq 0$, we define $\stutter_k : \Sigma^* \to \Sig
 Let $A,B \subset \R$.
 %
 A function $f : A \to B$ is
-\emph{right-continuous} \; iff \; $\lim_{a' \to a^+} f(a') = f(a)$ for all $a \in A$;
-\emph{left-limited} iff $\lim_{a' \to a^-} f(a') < \infty$ for all $a \in A$;
+\emph{right-continuous} iff $\lim_{a \to c^+} f(a) = f(c)$ for all $c \in A$, and
+%\emph{left-limited} iff $\lim_{a \to c^-} f(a) < \infty$ for all $c \in A$;
 \emph{non-Zeno} iff for every bounded interval $I \subseteq A$ there are finitely many $a \in I$ such that $f$ is not continuous at $a$.
-\borzoo{$a'$ is not quantified.}
-\ege{$a'$ is the limit variable -- maybe swapping $a'$ and $a$ helps?}
+
 
 \begin{definition}
-	A \emph{signal} is a right-continuous, left-limited, non-Zeno, piecewise-constant function $x : [0,d) \to \R$ where $d \in \R_{> 0}$ is the duration of $x$ and $[0,d)$ is its temporal domain.
-\dejan{why do we need the signal to be left-limited?}
-\ege{I think we don't need it since we only focus on piecewise-constant signals.}
+	A \emph{signal} is a right-continuous, non-Zeno, piecewise-constant function $x : [0,d) \to \R$ where $d \in \R_{> 0}$ is the duration of $x$ and $[0,d)$ is its temporal domain.
 \end{definition}
 
 We consider an asynchronous and loosely-coupled message-passing system of $N \geq 2$ reliable 
@@ -102,11 +99,7 @@ c_j^{-1}(t')| \geq \delta$, where $A_j = \pi(x_i)$ is the agent that produces $x
 		with $\pi(x_i) = \pi(x_j)$ and all $(t, x_i(t)) \in V_i$ and $(t', x_j(t')) \in V_j$, if $t < t'$ then $(t, 
 		x_i(t)) \hb (t', x_j(t'))$.
 		\borzoo{I do think $\pi$ is unnecessary. We can assume each agent produces a distinct signal.}
-		\item Every pair of events whose timestamps are at least $2 \varepsilon$ apart is totally ordered, i.e., for all $1 \leq i,j \leq n$ and all $(t, x_i(t)) \in V_i$ and $(t', x_j(t')) \in V_j$, if $t + 2\varepsilon \leq t'$ then $(t, x_i(t)) \hb (t', x_j(t'))$. \ege{To be confirmed: $t + 2\varepsilon \leq t'$ or $t + 2\varepsilon < t'$?} 
-\dejan{$t + 2\varepsilon \leq t'$, if $t$ and $t'$ are exactly separated by $2\varepsilon$, they are 
-still totally ordered, because when projected to the global time, the first event happens in the worst 
-case in the left limit of $t+\varepsilon$ and the second event in its right limit.} \borzoo{Let's discuss 
-this.}
+		\item Every pair of events whose timestamps are at least $2 \varepsilon$ apart is totally ordered, i.e., for all $1 \leq i,j \leq n$ and all $(t, x_i(t)) \in V_i$ and $(t', x_j(t')) \in V_j$, if $t + 2\varepsilon \leq t'$ then $(t, x_i(t)) \hb (t', x_j(t'))$.
 	\end{itemize}
 \end{definition}
 
@@ -118,9 +111,6 @@ this.}
 	Let $(S, {\hb})$ be a distributed signal of $n$ signals, and $V = \bigcup_{i = 1}^{n} V_i$ be the set of its events.
 	A set $C \subseteq V$ is a \emph{consistent cut} iff for every event in $C$, all events that happened before  it also belong to $C$, i.e., for all $e, e' \in V$, if $e \in C$ and $e' \hb e$, then $e' \in C$.
 \end{definition}
-
-\borzoo{Let's use consistent notation: $E$ for events.}
-\ege{I use $E$ for edges (which we refer to often) and $V$ for events (which only appear in preliminaries).}
 
 We denote by $\CC(T)$ the (infinite) set of consistent cuts at global time $T$.
 Given a consistent cut $C$, its \emph{frontier} $\fr(C) \subseteq C$ is the set consisting of the last events in $C$ of each signal, i.e., $\fr(C) = \bigcup_{i = 1}^{n} \{ (t, x_i(t)) \in V_i \cap C \st \forall t' > t : (t', x_i(t')) \notin V_i \cap C \}$.
@@ -152,9 +142,7 @@ A \emph{trace} is a vector of synchronous signals of finite duration.
 We express atomic propositions as functions of trace values at a time point 
 $T$, i.e., a proposition $p \in \AP$ over a trace $w = (x_1, \ldots, x_n)$ is 
 defined as $f_p(x_1(T), \ldots, x_n(T)) > 0$ where $f_p : \R^n \to \R$ is a 
-function. \dejan{$f$ is already used for the consistent cut flow. I would 
-suggest that we change the symbol for CCF.}
-\borzoo{yes I agree. I think we used small ccf for that.} \ege{Done.}
+function.
 Note that given a trace over a temporal domain $[0,D)$ and intervals $I,J \subseteq \R_{\geq 0}$, we write $I \oplus J = \{i + j \st i \in I \land j \in J\}$.
 We use the shorthand notation $T$ for the singleton set $\{T\}$. 
 \dejan{We are talking both about $x_i(t)$ and $x_i(T)$ and these two things have a different meaning. I do not know whether we should say something more about it. $x_i(t)$ is the trace observation on the agent $A_i$ and its local clock, while $x_i(T)$ is the (unknown) real value of the signal wrt the global time.}
@@ -178,10 +166,9 @@ Let $\varphi_1, \varphi_2$ be STL formulas and let $T \in [0,D)$.
 
 We simply write $[w \models \varphi]$ for $[w,0 \models \varphi]$.
 We additionally use the following standard abbreviations: 
-$\true = p \lor \lnot p$,
-$\false = \lnot \true$,
+$\false = p \land \lnot p$,
+$\true = \lnot \false$,
 $ \varphi_1 \lor \varphi_2 = \lnot (\lnot \varphi_1 \land \lnot \varphi_2)$,
-\borzoo{disjunction should go first ;)}
 $\LTLf_I \varphi = \true \until_I \varphi$, and
 $\LTLg_I \varphi = \lnot \LTLf_I \lnot \varphi$.
 Moreover, the untimed temporal operators are defined through their timed counterparts on the interval $(0,\infty)$, e.g., $\varphi_1 \until \varphi_2 = \varphi_1 \until_{(0,\infty)} \varphi_2$.
