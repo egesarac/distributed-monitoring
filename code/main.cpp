@@ -6,9 +6,76 @@
 #include <tuple>
 #include <map>
 #include <set>
+#include <bitset>
 #include <algorithm>
-//#include <boost>
+//#include <boost/dynamic_bitset.hpp>
 using namespace std;
+//using namespace boost;
+
+#define SIZE 8
+
+
+
+vector<bitset<SIZE>> bitsetConjunction(const vector<bitset<SIZE>> &v1, const vector<bitset<SIZE>> &v2) {
+    vector<bitset<SIZE>> vv(2);
+
+    // get max length for types 00 01 10 11 in v1 and v2, find max length in their conjunction, set the appropriate smaller lengths in vv, check 1 separately
+
+    bitset<SIZE> evenMask; // set all even bits
+    bitset<SIZE> oddMask; // set all odd bits
+
+    vector<int> len1(4);
+
+    // len1[0] = largest even 1-index of v1[0] - 1
+    // len1[1] = largest odd 1-index of v1[0] - 1
+    // len1[2] = largest even 1-index of v1[1] - 1
+    // len1[3] = largest odd 1-index of v1[1] - 1
+    // careful with zero-length cases
+    // same for len2
+
+    // len3 for the result, pairs correspond to (len1[.], len2[.]) 
+    // 0 : max of 00 01 02 03 10 12 20 21 30, minus 1
+    // 1 : max of 11 13 31, minus 1
+    // 2 : max of 22 23 32, minus 1
+    // 3 : 33 minus 1, check for vv[1][0] separately
+
+    // set vv[0][len3[0]] and all vv[0][i] for smaller i of the same parity
+    // same for the rest, except for vv[1][0]
+
+    return vv;
+}
+
+vector<bitset<SIZE>> bitsetNegation(const vector<bitset<SIZE>> &v) {
+    vector<bitset<SIZE>> vv(2);
+
+    vv[0] = v[1];
+    vv[1] = v[0];
+
+    return vv;
+}
+
+void convertIntoBitset(vector<vector<vector<bitset<SIZE>>>> &aps, vector<vector<set<string>>> &valExprs) {
+    aps.resize(valExprs.size());
+
+    for (int i = 0; i < valExprs.size(); i++) {
+            aps[i].resize(valExprs[i].size());
+
+            for (int j = 0; j < valExprs[i].size(); j++) {
+                aps[i][j].resize(2);
+                
+                for (auto s : valExprs[i][j]) {
+                    if (!s.empty()) {
+                        string temp = s;
+                        temp.erase(remove(temp.begin(), temp.end(), ';'), temp.end());
+                        
+                        int k = (temp[0] == '0') ? 0 : 1;
+                        int l = temp.length() - 1;
+                        aps[i][j][k].set(l, true);
+                    }
+                }
+            }
+        }
+}
 
 set<string> concatWithDestutter(const set<string> &set1, const set<string> &set2) {
     set<string> result;
@@ -68,6 +135,7 @@ int main() {
     
     /* get spec */ 
     // TODO
+    int m = 4;
     double eps = 2;
     double del = 2;
 
@@ -146,7 +214,6 @@ int main() {
     }
 
     /* compute the canonical segmentation */
-
     set<int> segmentation_temp;
 
     for (const auto &s : uncertainties) {
@@ -214,7 +281,7 @@ int main() {
             }
 
             if (valExprs[i][j].size() == 1) {
-                int kk = 0;
+                int kk = 1;
                 while (kk < uncertainties[i].size() && uncertainties[i][kk][1] <= segmentation[j]) {
                     kk++;
                 }
@@ -222,6 +289,16 @@ int main() {
             }
         }
     }
+
+
+
+    /* translate string value expressions to bit vector representation */
+
+    vector<vector<vector<bitset<SIZE>>>> aps;
+
+    convertIntoBitset(aps, valExprs);
+
+    int test;
 
 
     return 0;
