@@ -14,33 +14,73 @@ using namespace std;
 
 #define SIZE 8
 
+bitset<SIZE> evenMask;
+bitset<SIZE> oddMask;
 
+template<std::size_t N>
+int msb(const std::bitset<N> &bs) {
+  static_assert(N <= (CHAR_BIT * sizeof(unsigned long)), "bitset is too big");
+  auto n = bs.to_ulong();
+  // C++20 will have std::countl_zero() but in the meantime:
+  //assert(n != 0); // clz is undefined if n is 0. Maybe return -1 in this case?
+  if (n == 0) return -1;
+  return (CHAR_BIT * sizeof n) - __builtin_clzl(n) - 1;
+}
 
-vector<bitset<SIZE>> bitsetConjunction(const vector<bitset<SIZE>> &v1, const vector<bitset<SIZE>> &v2) {
-    vector<bitset<SIZE>> vv(2);
+template<std::size_t N>
+vector<vector<bitset<N>>> bitsetConjunction(const vector<vector<bitset<N>>> &v1, const vector<vector<bitset<N>>> &v2) {
+    vector<vector<bitset<N>>> vv(v1.size());
 
-    // get max length for types 00 01 10 11 in v1 and v2, find max length in their conjunction, set the appropriate smaller lengths in vv, check 1 separately
+    for (auto & v : vv) {
+        v.resize(2);
+    }
 
-    bitset<SIZE> evenMask; // set all even bits
-    bitset<SIZE> oddMask; // set all odd bits
+    for (int i = 0; i < v1.size(); i++) {
+        vector<int> len1(4);
+        len1[0] = msb(v1[i][0] & evenMask) + 1;
+        len1[1] = msb(v1[i][0] & oddMask) + 1;
+        len1[2] = msb(v1[i][1] & oddMask) + 1;
+        len1[3] = msb(v1[i][1] & evenMask) + 1;
 
-    vector<int> len1(4);
+        vector<int> len2(4);
+        len2[0] = msb(v2[i][0] & evenMask) + 1;
+        len2[1] = msb(v2[i][0] & oddMask) + 1;
+        len2[2] = msb(v2[i][1] & oddMask) + 1;
+        len2[3] = msb(v2[i][1] & evenMask) + 1;
 
-    // len1[0] = largest even 1-index of v1[0] - 1
-    // len1[1] = largest odd 1-index of v1[0] - 1
-    // len1[2] = largest even 1-index of v1[1] - 1
-    // len1[3] = largest odd 1-index of v1[1] - 1
-    // careful with zero-length cases
-    // same for len2
+        for (int i = 0; i < 4; i++) {
+            if (len1[i] == 0) {
+                len1[i] = INT_MIN / 2 + 2;
+            }
 
-    // len3 for the result, pairs correspond to (len1[.], len2[.]) 
-    // 0 : max of 00 01 02 03 10 12 20 21 30, minus 1
-    // 1 : max of 11 13 31, minus 1
-    // 2 : max of 22 23 32, minus 1
-    // 3 : 33 minus 1, check for vv[1][0] separately
+            if (len2[i] == 0) {
+                len2[i] = INT_MIN / 2 + 2;
+            }
+        }
 
-    // set vv[0][len3[0]] and all vv[0][i] for smaller i of the same parity
-    // same for the rest, except for vv[1][0]
+        vector<int> len(4);
+        // TODO: fix below, the selected pair must be both nonzero, if all have one zero component then the result is also zero ---- above loop could work
+        len[0] = max({len1[0]+len2[0], len1[0]+len2[1], len1[0]+len2[2], len1[0]+len2[3], len1[1]+len2[0], len1[1]+len2[2], len1[1]+len2[3], len1[2]+len2[0], len1[2]+len2[1], len1[3]+len2[0]}) - 1;
+        len[1] = max({len1[1]+len2[1], len1[1]+len2[3], len1[3]+len2[1]}) - 1;
+        len[2] = max({len1[2]+len2[2], len1[2]+len2[3], len1[3]+len2[2]}) - 1;
+        len[3] = len1[3] + len2[3] - 1;
+        
+        for (int j = 0; j < 4; j++) {
+            int ctr = len[j] - 1;
+
+            while (ctr >= 0) {
+                vv[i][j / 2].set(ctr, true);
+                ctr = ctr - 2;
+            }
+        }
+
+        if (v1[i][1][0] && v2[i][1][0]) {
+            vv[i][1].set(0, true);
+        }
+        else {
+            vv[i][1].set(0, false);
+        }
+    }
 
     return vv;
 }
@@ -135,7 +175,7 @@ int main() {
     
     /* get spec */ 
     // TODO
-    int m = 4;
+    int m;
     double eps = 2;
     double del = 2;
 
@@ -296,9 +336,18 @@ int main() {
 
     vector<vector<vector<bitset<SIZE>>>> aps;
 
+    for (int i = 0; i < SIZE; i++) {
+        if (i % 2 == 0) {
+            evenMask.set(i, true);
+        }
+        else {
+            oddMask.set(i, true);
+        }
+    }
+
     convertIntoBitset(aps, valExprs);
 
-    int test;
+    vector<vector<bitset<SIZE>>> v = bitsetConjunction(aps[0], aps[1]);
 
 
     return 0;
