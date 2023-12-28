@@ -28,6 +28,69 @@ int msb(const std::bitset<N> &bs) {
 }
 
 template<std::size_t N>
+vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &v1, const vector<vector<bitset<N>>> &v2) {
+    vector<vector<bitset<N>>> vv(v1.size());
+
+    for (auto & v : vv) {
+        v.resize(2);
+    }
+
+    for (int i = 0; i < v1.size(); i++) {
+        vector<int> len1(4);
+        len1[0] = msb(v1[i][0] & evenMask) + 1;
+        len1[1] = msb(v1[i][0] & oddMask) + 1;
+        len1[2] = msb(v1[i][1] & oddMask) + 1;
+        len1[3] = msb(v1[i][1] & evenMask) + 1;
+
+        if (len1[0] == 1 && len1[1] == 0 && len1[2] == 0 && len1[3] == 0) {
+            vv[i] = v2[i];
+            continue;
+        }
+        
+        vector<int> len2(4);
+        len2[0] = msb(v2[i][0] & evenMask) + 1;
+        len2[1] = msb(v2[i][0] & oddMask) + 1;
+        len2[2] = msb(v2[i][1] & oddMask) + 1;
+        len2[3] = msb(v2[i][1] & evenMask) + 1;
+
+        // reduces to checking 'eventually'
+        if (len1[0] == 0 && len1[1] == 0 && len1[2] == 0 && len1[3] == 1) {
+            if (v2[i][0][0] == true) {
+                vv[i][0][0] = true;
+            }
+
+            if (max(len2[1], len2[3]) > 0) {
+                vv[i][1][0] = true;
+            }
+
+            if (max(len2[0] - 1, len2[2]) > 0) {
+                vv[i][1][1] = true;
+            }
+
+            continue;
+        }
+
+        // TODO: fix below (or confirm its true?)
+        vector<int> len(4);
+        len[0] = len2[0];
+        len[1] = len2[1];
+        len[2] = (max(len1[2], len1[3]) > 0) ? max(len2[2], len2[0] - 1) : len2[2];
+        len[3] = (max(len1[2], len1[3]) > 0) ? max(len2[3], len2[1] - 1) : len2[3];
+        
+        for (int j = 0; j < 4; j++) {
+            int ctr = len[j] - 1;
+
+            while (ctr >= 0) {
+                vv[i][j / 2].set(ctr, true);
+                ctr = ctr - 2;
+            }
+        }
+    }
+
+    return vv;
+}
+
+template<std::size_t N>
 vector<vector<bitset<N>>> bitsetConjunction(const vector<vector<bitset<N>>> &v1, const vector<vector<bitset<N>>> &v2) {
     vector<vector<bitset<N>>> vv(v1.size());
 
@@ -347,7 +410,7 @@ int main() {
 
     convertIntoBitset(aps, valExprs);
 
-    vector<vector<bitset<SIZE>>> v = bitsetConjunction(aps[0], aps[1]);
+    vector<vector<bitset<SIZE>>> v = bitsetUntil(aps[0], aps[1]);
 
 
     return 0;
