@@ -27,6 +27,107 @@ int msb(const std::bitset<N> &bs) {
   return (CHAR_BIT * sizeof n) - __builtin_clzl(n) - 1;
 }
 
+set<string> stutterOnce(const set<string> &S) {
+    set<string> out;
+
+    for (const auto &s : S) {
+        for (int i = 0; i < s.length(); i++) {
+            string sl = s.substr(0, i);
+            string sr = s.substr(i, s.length());
+
+            out.insert(sl + s[i] + sr);
+        }
+    } 
+
+    return out;
+}
+
+set<string> stutter2k(const set<string> &S, const int &k) {
+    int len = S.begin()->length();
+    int iter = k - len;
+    
+    set<string> out = S;
+    for (int i = 0; i < iter; i++) {
+        set<string> temp = stutterOnce(out);
+        out = temp;
+    }
+
+    return out;
+}
+
+template<std::size_t N>
+set<string> bitset2stringset(const vector<bitset<N>> &v) {
+    set<string> out;
+
+    for (int i = 0; i < N; i++) {
+        if (v[0][i] == true) {
+            string s = "";
+
+            for (int j = 0; j <= i; j++) {
+                if (j % 2 == 0) {
+                    s += "0";
+                }
+                else {
+                    s += "1";
+                }
+            }
+
+            out.insert(s);
+        }
+
+        if (v[1][i] == true) {
+            string s = "";
+
+            for (int j = 0; j <= i; j++) {
+                if (j % 2 == 0) {
+                    s += "1";
+                }
+                else {
+                    s += "0";
+                }
+            }
+
+            out.insert(s);
+        }
+    } 
+
+    return out;
+}
+
+template<std::size_t N>
+vector<set<pair<string, string>>> asyncProd(const vector<vector<bitset<N>>> &v1, const vector<vector<bitset<N>>> &v2) {
+    vector<set<pair<string, string>>> out(v1.size());
+
+    for (int i = 0; i < v1.size(); i++) {
+        set<string> S1 = bitset2stringset(v1[i]);
+        set<string> S2 = bitset2stringset(v2[i]);
+
+        for (auto s1 : S1) {
+            for (auto s2 : S2) {
+                set<string> temp1, temp2;
+                temp1.insert(s1);
+                temp2.insert(s2);
+
+                if (s1.length() < s2.length()) {
+                    temp1 = stutter2k(temp1, s2.length());
+                }
+                else if (s1.length() > s2.length()) {
+                    temp2 = stutter2k(temp2, s1.length());
+                }
+
+                for (auto t1 : temp1) {
+                    for (auto t2 : temp2) {
+                        out[i].insert(make_pair(t1, t2)); // TODO: fix here, need to stutter each pair up to length |t1|+|t2|-1 and add all 
+                        // TODO: don't insert longer redundant pairs, or only insert the pairs of length |t1|+|t2|-1 ???
+                    }
+                }
+            }
+        }
+    }
+
+    return out;
+}
+
 template<std::size_t N>
 vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &v1, const vector<vector<bitset<N>>> &v2) {
     vector<vector<bitset<N>>> vv(v1.size());
@@ -410,8 +511,7 @@ int main() {
 
     convertIntoBitset(aps, valExprs);
 
-    vector<vector<bitset<SIZE>>> v = bitsetUntil(aps[0], aps[1]);
-
+    vector<set<pair<string, string>>> test = asyncProd(aps[0], aps[1]);
 
     return 0;
 }
