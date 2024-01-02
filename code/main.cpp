@@ -6,6 +6,7 @@
 #include <tuple>
 #include <map>
 #include <set>
+#include <set>
 #include <bitset>
 #include <algorithm>
 //#include <boost/dynamic_bitset.hpp>
@@ -94,6 +95,21 @@ set<string> bitset2stringset(const vector<bitset<N>> &v) {
     return out;
 }
 
+pair<string, string> destuttterPair(const string &t1, const string &t2) {
+    string s1 = t1.substr(0,1);
+    string s2 = t2.substr(0,1);
+    int len = t1.length();
+
+    for (int i = 1; i < len; i++) {
+        if (t1[i - 1] != t1[i]  || t2[i - 1] != t2[i]) {
+            s1 += t1[i];
+            s2 += t2[i];
+        }
+    }
+
+    return make_pair(s1, s2);
+}
+
 template<std::size_t N>
 vector<set<pair<string, string>>> asyncProd(const vector<vector<bitset<N>>> &v1, const vector<vector<bitset<N>>> &v2) {
     vector<set<pair<string, string>>> out(v1.size());
@@ -105,20 +121,16 @@ vector<set<pair<string, string>>> asyncProd(const vector<vector<bitset<N>>> &v1,
         for (auto s1 : S1) {
             for (auto s2 : S2) {
                 set<string> temp1, temp2;
+
                 temp1.insert(s1);
                 temp2.insert(s2);
 
-                if (s1.length() < s2.length()) {
-                    temp1 = stutter2k(temp1, s2.length());
-                }
-                else if (s1.length() > s2.length()) {
-                    temp2 = stutter2k(temp2, s1.length());
-                }
+                temp1 = stutter2k(temp1, s1.length() + s2.length() - 1);
+                temp2 = stutter2k(temp2, s1.length() + s2.length() - 1);
 
                 for (auto t1 : temp1) {
                     for (auto t2 : temp2) {
-                        out[i].insert(make_pair(t1, t2)); // TODO: fix here, need to stutter each pair up to length |t1|+|t2|-1 and add all 
-                        // TODO: don't insert longer redundant pairs, or only insert the pairs of length |t1|+|t2|-1 ???
+                        out[i].insert(destuttterPair(t1, t2));
                     }
                 }
             }
@@ -128,9 +140,108 @@ vector<set<pair<string, string>>> asyncProd(const vector<vector<bitset<N>>> &v1,
     return out;
 }
 
+vector<set<string>> prodUntil(vector<set<pair<string, string>>> product) {
+    vector<set<string>> out(product.size());
+
+    vector<set<char>> firstBits(product.size() + 1);
+    firstBits[product.size()].insert('0');
+
+
+    for (int i = product.size() - 1; i >= 0; i--) {
+        set<string> temp;
+
+        for (const auto &p : product[i]) {
+            int len = p.second.length();
+
+            for (const auto b : firstBits[i + 1]) { // no need to compute twice, just change the last bit (from p.second if b=0, from p.first if b=1) 
+                string s = "";
+                s += b;
+
+                for (int j = len - 1; j >= 0; j--) {
+                    if (p.second[j] == '1' || (p.first[j] == '1' && s[len - 1 - j] == '1')) {
+                        s += "1";
+                    }
+                    else {
+                        s += "0";
+                    }  
+                }
+                
+                s = s.substr(1, s.length());
+                string ss = s.substr(0,1);
+                for (int j = 1; j < len; j++) {
+                    if (s[j - 1] != s[j]) {
+                        ss += s[j];
+                    }
+                }
+
+                string sss(ss);
+                std::reverse(sss.begin(), sss.end());
+
+                temp.insert(sss);
+            }
+        }
+
+        for (const auto &t : temp) {
+            firstBits[i].insert(t[0]);
+        }
+
+        out[i] = temp;
+    }
+
+    return out;
+}
+
+vector<set<string>> prodConjunction(vector<set<pair<string, string>>> product) {
+    vector<set<string>> out(product.size());
+
+    for (int i = 0; i < product.size(); i++) {
+        set<string> temp;
+
+        for (const auto &p : product[i]) {
+            int len = p.first.length();
+            string s = "";
+
+            for (int j = 0; j < len; j++) {
+                if (p.first[j] == '1' && p.second[j] == '1') {
+                    s += "1";
+                }
+                else {
+                    s += "0";
+                }
+            }
+
+            string ss = s.substr(0,1);
+            for (int j = 1; j < len; j++) {
+                if (s[j - 1] != s[j]) {
+                    ss += s[j];
+                }
+            }
+
+            temp.insert(ss);
+        }
+
+        out[i] = temp;
+    }
+
+    return out;
+}
+
+template<std::size_t N>
+bool isEqual (vector<set<string>> productResult, vector<vector<bitset<N>>> bitsetResult) {
+    for (int i = 0; i < productResult.size(); i++) {
+        set<string> S = bitset2stringset(bitsetResult[i]);
+
+        if (S != productResult[i]) {
+            cout << i << endl;
+        }
+    }
+
+    return true;
+}
+
 template<std::size_t N>
 vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &v1, const vector<vector<bitset<N>>> &v2) {
-    vector<vector<bitset<N>>> vv(v1.size());
+    vector<vector<bitset<N>>> vv(v1.size()); // TODO: fix 2, need to use the first bits of the next segment of the until
 
     for (auto & v : vv) {
         v.resize(2);
@@ -138,24 +249,25 @@ vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &v1, const
 
     for (int i = 0; i < v1.size(); i++) {
         vector<int> len1(4);
-        len1[0] = msb(v1[i][0] & evenMask) + 1;
-        len1[1] = msb(v1[i][0] & oddMask) + 1;
-        len1[2] = msb(v1[i][1] & oddMask) + 1;
-        len1[3] = msb(v1[i][1] & evenMask) + 1;
+        len1[0] = msb(v1[i][0] & evenMask) + 1; // 0...0
+        len1[1] = msb(v1[i][0] & oddMask) + 1; // 0...1
+        len1[2] = msb(v1[i][1] & oddMask) + 1; // 1...0
+        len1[3] = msb(v1[i][1] & evenMask) + 1; // 1...1
 
+        vector<int> len2(4);
+        len2[0] = msb(v2[i][0] & evenMask) + 1; // 0...0
+        len2[1] = msb(v2[i][0] & oddMask) + 1; // 0...1
+        len2[2] = msb(v2[i][1] & oddMask) + 1; // 1...0
+        len2[3] = msb(v2[i][1] & evenMask) + 1; // 1...1
+
+        /*FIX BELOW*/
+
+        // the special cases where v1 only has expressions of length 1
         if (len1[0] == 1 && len1[1] == 0 && len1[2] == 0 && len1[3] == 0) {
             vv[i] = v2[i];
             continue;
         }
-        
-        vector<int> len2(4);
-        len2[0] = msb(v2[i][0] & evenMask) + 1;
-        len2[1] = msb(v2[i][0] & oddMask) + 1;
-        len2[2] = msb(v2[i][1] & oddMask) + 1;
-        len2[3] = msb(v2[i][1] & evenMask) + 1;
-
-        // reduces to checking 'eventually'
-        if (len1[0] == 0 && len1[1] == 0 && len1[2] == 0 && len1[3] == 1) {
+        else if (len1[0] == 0 && len1[1] == 0 && len1[2] == 0 && len1[3] == 1) {
             if (v2[i][0][0] == true) {
                 vv[i][0][0] = true;
             }
@@ -170,13 +282,27 @@ vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &v1, const
 
             continue;
         }
+        else if (len1[0] == 1 && len1[1] == 0 && len1[2] == 0 && len1[3] == 1) {
+            vv[i] = v2[i];
 
-        // TODO: fix below (or confirm its true?)
+            if (max(len2[1], len2[3]) > 0) {
+                vv[i][1][0] = true;
+            }
+
+            if (max(len2[0] - 1, len2[2]) > 0) {
+                vv[i][1][1] = true;
+            }
+
+            continue;
+        }
+        
         vector<int> len(4);
         len[0] = len2[0];
         len[1] = len2[1];
         len[2] = (max(len1[2], len1[3]) > 0) ? max(len2[2], len2[0] - 1) : len2[2];
         len[3] = (max(len1[2], len1[3]) > 0) ? max(len2[3], len2[1] - 1) : len2[3];
+
+        /*FIX ABOVE*/
         
         for (int j = 0; j < 4; j++) {
             int ctr = len[j] - 1;
@@ -201,16 +327,16 @@ vector<vector<bitset<N>>> bitsetConjunction(const vector<vector<bitset<N>>> &v1,
 
     for (int i = 0; i < v1.size(); i++) {
         vector<int> len1(4);
-        len1[0] = msb(v1[i][0] & evenMask) + 1;
-        len1[1] = msb(v1[i][0] & oddMask) + 1;
-        len1[2] = msb(v1[i][1] & oddMask) + 1;
-        len1[3] = msb(v1[i][1] & evenMask) + 1;
+        len1[0] = msb(v1[i][0] & evenMask) + 1; // 0...0
+        len1[1] = msb(v1[i][0] & oddMask) + 1; // 0...1
+        len1[2] = msb(v1[i][1] & oddMask) + 1; // 1...0
+        len1[3] = msb(v1[i][1] & evenMask) + 1; // 1...1
 
         vector<int> len2(4);
-        len2[0] = msb(v2[i][0] & evenMask) + 1;
-        len2[1] = msb(v2[i][0] & oddMask) + 1;
-        len2[2] = msb(v2[i][1] & oddMask) + 1;
-        len2[3] = msb(v2[i][1] & evenMask) + 1;
+        len2[0] = msb(v2[i][0] & evenMask) + 1; // 0...0
+        len2[1] = msb(v2[i][0] & oddMask) + 1; // 0...1
+        len2[2] = msb(v2[i][1] & oddMask) + 1; // 1...0
+        len2[3] = msb(v2[i][1] & evenMask) + 1; // 1...1
 
         for (int i = 0; i < 4; i++) {
             if (len1[i] == 0) {
@@ -223,11 +349,25 @@ vector<vector<bitset<N>>> bitsetConjunction(const vector<vector<bitset<N>>> &v1,
         }
 
         vector<int> len(4);
-        // TODO: fix below, the selected pair must be both nonzero, if all have one zero component then the result is also zero ---- above loop could work
+        
         len[0] = max({len1[0]+len2[0], len1[0]+len2[1], len1[0]+len2[2], len1[0]+len2[3], len1[1]+len2[0], len1[1]+len2[2], len1[1]+len2[3], len1[2]+len2[0], len1[2]+len2[1], len1[3]+len2[0]}) - 1;
         len[1] = max({len1[1]+len2[1], len1[1]+len2[3], len1[3]+len2[1]}) - 1;
         len[2] = max({len1[2]+len2[2], len1[2]+len2[3], len1[3]+len2[2]}) - 1;
         len[3] = len1[3] + len2[3] - 1;
+
+        // len[0] and len[3] have to be odd, the others even 
+        if (len[0] >= 0 && len[0] % 2 == 0) {
+            len[0]--;
+        }
+        if (len[1] >= 0 && len[1] % 2 == 1) {
+            len[1]--;
+        }
+        if (len[2] >= 0 && len[2] % 2 == 1) {
+            len[2]--;
+        }
+        if (len[3] >= 0 && len[3] % 2 == 0) {
+            len[3]--;
+        }
         
         for (int j = 0; j < 4; j++) {
             int ctr = len[j] - 1;
@@ -249,8 +389,9 @@ vector<vector<bitset<N>>> bitsetConjunction(const vector<vector<bitset<N>>> &v1,
     return vv;
 }
 
-vector<bitset<SIZE>> bitsetNegation(const vector<bitset<SIZE>> &v) {
-    vector<bitset<SIZE>> vv(2);
+template<std::size_t N>
+vector<bitset<N>> bitsetNegation(const vector<bitset<N>> &v) {
+    vector<bitset<N>> vv(2);
 
     vv[0] = v[1];
     vv[1] = v[0];
@@ -258,27 +399,30 @@ vector<bitset<SIZE>> bitsetNegation(const vector<bitset<SIZE>> &v) {
     return vv;
 }
 
-void convertIntoBitset(vector<vector<vector<bitset<SIZE>>>> &aps, vector<vector<set<string>>> &valExprs) {
-    aps.resize(valExprs.size());
+template<std::size_t N>
+vector<vector<vector<bitset<N>>>> convertIntoBitset(vector<vector<set<string>>> &valExprs) {
+    vector<vector<vector<bitset<N>>>> aps(valExprs.size());
 
     for (int i = 0; i < valExprs.size(); i++) {
-            aps[i].resize(valExprs[i].size());
+        aps[i].resize(valExprs[i].size());
 
-            for (int j = 0; j < valExprs[i].size(); j++) {
-                aps[i][j].resize(2);
+        for (int j = 0; j < valExprs[i].size(); j++) {
+            aps[i][j].resize(2);
                 
-                for (auto s : valExprs[i][j]) {
-                    if (!s.empty()) {
-                        string temp = s;
-                        temp.erase(remove(temp.begin(), temp.end(), ';'), temp.end());
+            for (auto s : valExprs[i][j]) {
+                if (!s.empty()) {
+                    string temp = s;
+                    temp.erase(remove(temp.begin(), temp.end(), ';'), temp.end());
                         
-                        int k = (temp[0] == '0') ? 0 : 1;
-                        int l = temp.length() - 1;
-                        aps[i][j][k].set(l, true);
-                    }
+                    int k = (temp[0] == '0') ? 0 : 1;
+                    int l = temp.length() - 1;
+                    aps[i][j][k].set(l, true);
                 }
             }
         }
+    }
+
+    return aps;
 }
 
 set<string> concatWithDestutter(const set<string> &set1, const set<string> &set2) {
@@ -336,7 +480,6 @@ set<string> concatWithDestutter(const set<string> &set1, const set<string> &set2
 
 
 int main() {
-    
     /* get spec */ 
     // TODO
     int m;
@@ -494,11 +637,8 @@ int main() {
         }
     }
 
-
-
     /* translate string value expressions to bit vector representation */
-
-    vector<vector<vector<bitset<SIZE>>>> aps;
+    
 
     for (int i = 0; i < SIZE; i++) {
         if (i % 2 == 0) {
@@ -509,9 +649,18 @@ int main() {
         }
     }
 
-    convertIntoBitset(aps, valExprs);
+    vector<vector<vector<bitset<SIZE>>>> aps = convertIntoBitset<SIZE>(valExprs);
+    //vector<vector<bitset<SIZE>>> testBitConj = bitsetConjunction(aps[0], aps[1]);
+    vector<vector<bitset<SIZE>>> testBitUnt = bitsetUntil(aps[0], aps[1]);
 
-    vector<set<pair<string, string>>> test = asyncProd(aps[0], aps[1]);
+    vector<set<pair<string, string>>> pr = asyncProd(aps[0], aps[1]);
+    //vector<set<string>> testProdConj = prodConjunction(pr);
+    vector<set<string>> testProdUnt = prodUntil(pr);
+
+    //bool resConj = isEqual(testProdConj, testBitConj);
+    bool resUnt = isEqual(testProdUnt, testBitUnt);
+
+    int ret0;
 
     return 0;
 }
