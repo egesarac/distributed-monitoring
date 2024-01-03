@@ -103,6 +103,17 @@ set<string> bitset2stringset(const vector<bitset<N>> &v) {
     return out;
 }
 
+template<std::size_t N>
+vector<set<string>> bitset2stringset_withSegments(const vector<vector<bitset<N>>> &v) {
+    vector<set<string>> out(v.size());
+
+    for (int i = 0; i < v.size(); i++) {
+        out[i] = bitset2stringset(v[i]);
+    }
+
+    return out;
+}
+
 pair<string, string> destuttterPair(const string &t1, const string &t2) {
     string s1 = t1.substr(0,1);
     string s2 = t2.substr(0,1);
@@ -148,6 +159,119 @@ vector<set<pair<string, string>>> asyncProd(const vector<vector<bitset<N>>> &v1,
     return out;
 }
 
+vector<set<string>> prodAlways(vector<set<string>> product) {
+    vector<set<string>> out(product.size());
+
+    bool firstBit0 = false;
+    bool firstBit1 = true;
+
+    for (int i = product.size() - 1; i >= 0; i--) {
+        if (firstBit0 == true) {
+            out[i].insert("0");
+        }
+            
+        if (firstBit1 == true) {
+            bool f1 = false;
+            bool f2 = false;
+            bool f3 = false; 
+
+            for (const auto &s : product[i]) {
+                if (s == "1") {
+                    out[i].insert("1");
+                    f1 = true;
+                }
+
+                else if (s == "0" || s.substr(s.length() - 2, 2) == "10") {
+                    out[i].insert("0");
+                    f2 = true;
+                }
+
+                else {
+                    out[i].insert("01");
+                    f3 = true;
+                }
+
+                if (f1 && f2 && f3) {
+                    break;
+                }
+            }
+        }
+
+        if (out[i].find("0") != out[i].end() || out[i].find("01") != out[i].end()) {
+            firstBit0 = true;
+        }
+        else {
+            firstBit0 = false;
+        }
+
+        if (out[i].find("1") != out[i].end()) {
+            firstBit1 = true;
+        }
+        else {
+            firstBit1 = false;
+        }
+    }
+
+    return out;
+}
+
+vector<set<string>> prodEventually(vector<set<string>> product) {
+    vector<set<string>> out(product.size());
+
+    bool firstBit0 = true;
+    bool firstBit1 = false;
+
+    for (int i = product.size() - 1; i >= 0; i--) {
+
+        if (firstBit0 == true) {
+            bool f1 = false;
+            bool f2 = false;
+            bool f3 = false; 
+
+            for (const auto &s : product[i]) {
+                if (s == "0") {
+                    out[i].insert("0");
+                    f1 = true;
+                }
+
+                else if (s == "1" || s.substr(s.length() - 2, 2) == "01") {
+                    out[i].insert("1");
+                    f2 = true;
+                }
+
+                else {
+                    out[i].insert("10");
+                    f3 = true;
+                }
+
+                if (f1 && f2 && f3) {
+                    break;
+                }
+            }
+        }
+            
+        if (firstBit1 == true) {
+            out[i].insert("1");
+        }
+
+        if (out[i].find("0") != out[i].end()) {
+            firstBit0 = true;
+        }
+        else {
+            firstBit0 = false;
+        }
+
+        if (out[i].find("1") != out[i].end() || out[i].find("10") != out[i].end()) {
+            firstBit1 = true;
+        }
+        else {
+            firstBit1 = false;
+        }
+    }
+
+    return out;
+}
+
 vector<set<string>> prodUntil0(vector<set<pair<string, string>>> product) {
     vector<set<string>> out(product.size());
 
@@ -161,7 +285,7 @@ vector<set<string>> prodUntil0(vector<set<pair<string, string>>> product) {
         for (const auto &p : product[i]) {
             int len = p.second.length();
 
-            for (const auto b : firstBits[i + 1]) { // no need to compute twice, just change the last bit (from p.second if b=0, from p.first if b=1) 
+            for (const auto b : firstBits[i + 1]) { // no need to compute twice, just change the last bit (from p.second if b=0, from p.first if b=1) ???
                 string s = "";
                 s += b;
 
@@ -212,7 +336,7 @@ vector<set<string>> prodUntil1(vector<set<pair<string, string>>> product) {
         for (const auto &p : product[i]) {
             int len = p.second.length();
 
-            for (const auto b : firstBits[i + 1]) { // no need to compute twice, just change the last bit (from p.second if b=0, from p.first if b=1) 
+            for (const auto b : firstBits[i + 1]) {
                 string s = "";
                 s += b;
 
@@ -299,6 +423,98 @@ bool isEqual (vector<set<string>> productResult, vector<vector<bitset<N>>> bitse
     }
 
     return flag;
+}
+
+template<std::size_t N>
+vector<vector<bitset<N>>> bitsetAlways(const vector<vector<bitset<N>>> &v1) {
+    vector<vector<bitset<N>>> vv(v1.size()); 
+
+    for (auto & v : vv) {
+        v.resize(2);
+    }
+
+    bool firstBit0 = false;
+    bool firstBit1 = true;
+
+    for (int i = v1.size() - 1; i >= 0; i--) {
+        if (firstBit0 == true) {
+            vv[i][0][0] = true;
+        }
+
+        if (firstBit1 == true) {
+            vector<int> len1(4);
+            len1[0] = msb(v1[i][0] & evenMask) + 1; // 0...0
+            len1[1] = msb(v1[i][0] & oddMask) + 1; // 0...1
+            len1[2] = msb(v1[i][1] & oddMask) + 1; // 1...0
+            //len1[3] = msb(v1[i][1] & evenMask) + 1; // 1...1
+            
+            vv[i][0][0] = (max(len1[0], len1[2]) > 0); 
+            vv[i][0][1] = (len1[1] > 0);
+            vv[i][1][0] = v1[i][1][0];
+        }
+
+        if ((vv[i][0][0] == true) || (vv[i][0][1] == true)) {
+            firstBit0 = true;
+        }
+        else {
+            firstBit0 = false;
+        }
+
+        if (vv[i][1][0] == true) {
+            firstBit1 = true;
+        }
+        else {
+            firstBit1 = false;
+        }
+    }
+
+    return vv;
+}
+
+template<std::size_t N>
+vector<vector<bitset<N>>> bitsetEventually(const vector<vector<bitset<N>>> &v1) {
+    vector<vector<bitset<N>>> vv(v1.size()); 
+
+    for (auto & v : vv) {
+        v.resize(2);
+    }
+
+    bool firstBit0 = true;
+    bool firstBit1 = false;
+
+    for (int i = v1.size() - 1; i >= 0; i--) {
+        if (firstBit0 == true) {
+            vector<int> len1(4);
+            //len1[0] = msb(v1[i][0] & evenMask) + 1; // 0...0
+            len1[1] = msb(v1[i][0] & oddMask) + 1; // 0...1
+            len1[2] = msb(v1[i][1] & oddMask) + 1; // 1...0
+            len1[3] = msb(v1[i][1] & evenMask) + 1; // 1...1
+            
+            vv[i][0][0] = v1[i][0][0];
+            vv[i][1][0] = (max(len1[1], len1[3]) > 0);
+            vv[i][1][1] = (len1[2] > 0);            
+        }
+
+        if (firstBit1 == true) {
+            vv[i][1][0] = true;
+        }
+
+        if (vv[i][0][0] == true) {
+            firstBit0 = true;
+        }
+        else {
+            firstBit0 = false;
+        }
+
+        if ((vv[i][1][0] == true) || (vv[i][1][1] == true)) {
+            firstBit1 = true;
+        }
+        else {
+            firstBit1 = false;
+        }
+    }
+
+    return vv;
 }
 
 template<std::size_t N>
@@ -785,17 +1001,14 @@ int main() {
         }
     }
 
-
+    /*
     vector<vector<vector<bitset<SIZE>>>> aps(2);
     for (auto &v : aps) {
         v.resize(1);
         v[0].resize(2);
     }
-    
-
 
     uniform_int_distribution<> rrr(0, 128);
-
     //random_device rd;  // a seed source for the random number engine
     //mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
     int sd = 1234;
@@ -822,8 +1035,42 @@ int main() {
 
     //bool resConj = isEqual(testProdConj, testBitConj);
     //bool resUnt = isEqual(testProdUnt, testBitUnt);
+    */
 
-    int ret0;
+
+
+
+
+    /*
+    // CONJUNCTION
+    vector<vector<vector<bitset<SIZE>>>> aps = convertIntoBitset<SIZE>(valExprs);
+    vector<vector<bitset<SIZE>>> testBitConj = bitsetConjunction(aps[0], aps[1]);
+    vector<set<pair<string, string>>> pr = asyncProd(aps[0], aps[1]);
+    vector<set<string>> testProdConj = prodConjunction(pr);
+    bool resConj = isEqual(testProdConj, testBitConj);
+    */
+
+    /*
+    // EVENTUALLY
+    vector<vector<vector<bitset<SIZE>>>> aps = convertIntoBitset<SIZE>(valExprs);
+    vector<vector<bitset<SIZE>>> testBitEv0 = bitsetEventually(aps[0]);
+    vector<vector<bitset<SIZE>>> testBitEv1 = bitsetEventually(aps[1]);
+    vector<set<string>> testProdEv0 = prodEventually(bitset2stringset_withSegments(aps[0]));
+    vector<set<string>> testProdEv1 = prodEventually(bitset2stringset_withSegments(aps[1]));
+    bool resEv0 = isEqual(testProdEv0, testBitEv0);
+    bool resEv1 = isEqual(testProdEv1, testBitEv1);
+    */
+
+    /*
+    // ALWAYS
+    vector<vector<vector<bitset<SIZE>>>> aps = convertIntoBitset<SIZE>(valExprs);
+    vector<vector<bitset<SIZE>>> testBitAl0 = bitsetAlways(aps[0]);
+    vector<vector<bitset<SIZE>>> testBitAl1 = bitsetAlways(aps[1]);
+    vector<set<string>> testProdAl0 = prodAlways(bitset2stringset_withSegments(aps[0]));
+    vector<set<string>> testProdAl1 = prodAlways(bitset2stringset_withSegments(aps[1]));
+    bool resAl0 = isEqual(testProdAl0, testBitAl0);
+    bool resAl1 = isEqual(testProdAl1, testBitAl1);
+    */
 
     return 0;
 }
