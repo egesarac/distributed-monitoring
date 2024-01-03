@@ -13,7 +13,7 @@
 using namespace std;
 //using namespace boost;
 
-#define SIZE 10
+#define SIZE 100
 
 bitset<SIZE> evenMask;
 bitset<SIZE> oddMask;
@@ -582,26 +582,39 @@ vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &v1, const
             len_strong[2] = (max(len1[2], len1[3]) > 0) ? max(len2[2], len2[0] - 1) : len2[2];
             len_strong[3] = (max(len1[2], len1[3]) > 0) ? max(len2[3], len2[1] - 1) : len2[3];
 
-            if (len_strong[0] >= 0 && len_strong[0] % 2 == 0) {
+            if (len_strong[0] > 0 && len_strong[0] % 2 == 0) {
                 len_strong[0]--;
             }
-            if (len_strong[1] >= 0 && len_strong[1] % 2 == 1) {
+            if (len_strong[1] > 0 && len_strong[1] % 2 == 1) {
                 len_strong[1]--;
             }
-            if (len_strong[2] >= 0 && len_strong[2] % 2 == 1) {
+            if (len_strong[2] > 0 && len_strong[2] % 2 == 1) {
                 len_strong[2]--;
             }
-            if (len_strong[3] >= 0 && len_strong[3] % 2 == 0) {
+            if (len_strong[3] > 0 && len_strong[3] % 2 == 0) {
                 len_strong[3]--;
             }
 
             for (int j = 0; j < 4; j++) {
                 int ctr = len_strong[j] - 1;
 
-                while (ctr >= 0) {
-                    vv[i][j / 2].set(ctr, true);
-                    ctr = ctr - 2;
+                if (j == 0) {
+                    if (ctr > -1) {
+                        vv[i][j / 2].set(ctr, true);
+                        
+                        while (ctr > 0) { 
+                            vv[i][j / 2].set(ctr, true);
+                            ctr = ctr - 2;
+                        }
+                    }
                 }
+                else {
+                    while (ctr >= 0) { 
+                        vv[i][j / 2].set(ctr, true);
+                        ctr = ctr - 2;
+                    }
+                }
+                
             }
         }
 
@@ -990,7 +1003,6 @@ int main() {
     }
 
     /* translate string value expressions to bit vector representation */
-    
 
     for (int i = 0; i < SIZE; i++) {
         if (i % 2 == 0) {
@@ -1001,45 +1013,71 @@ int main() {
         }
     }
 
-    /*
+    
     vector<vector<vector<bitset<SIZE>>>> aps(2);
     for (auto &v : aps) {
         v.resize(1);
         v[0].resize(2);
     }
 
-    uniform_int_distribution<> rrr(0, 128);
+    uniform_int_distribution<> rrr(0, 16);
     //random_device rd;  // a seed source for the random number engine
     //mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
     int sd = 1234;
     mt19937 gn(sd);
+    //rrr(gn)
+
+    int NN = 8;
+    for (int i = NN - 1; i >= 0; i -= 2) {
+        string s0(NN, '0');
+        s0[i] = '1';
+
+        for (int j = NN - 1; j >= 0; j -= 2) {
+            string s1(NN, '0');
+            s1[j] = '1';
+
+            bitset<SIZE> e00("0");
+            bitset<SIZE> e01(s0);
+            bitset<SIZE> e10("0");
+            bitset<SIZE> e11(s1);
+
+            aps[0][0][0] = e00;
+            aps[0][0][1] = e01;
+            aps[1][0][0] = e10;
+            aps[1][0][1] = e11;
+
+            //vector<vector<vector<bitset<SIZE>>>> aps = convertIntoBitset<SIZE>(valExprs);
+            vector<vector<bitset<SIZE>>> testBitUnt = bitsetUntil(aps[0], aps[1]);
+
+            vector<set<pair<string, string>>> pr = asyncProd(aps[0], aps[1]);
+            vector<set<string>> testProdUnt0 = prodUntil0(pr);
+
+            if (!isEqual(testProdUnt0, testBitUnt)) {
+                cout << "check: " << i  << " " << j << endl;
+            }
+            
+            
+            /*vector<set<string>> testProdUnt1 = prodUntil1(pr);
+
+            for (int k = 0; k < testProdUnt0.size(); k++) {
+                if (testProdUnt0[k] != testProdUnt1[k]) {
+                    cout << "check: " << i  << " " << j << " "  << k << endl;
+                }
+            }*/
+        }
+    }
     
-    bitset<SIZE> e00(rrr(gn));
-    bitset<SIZE> e01(rrr(gn));
-    bitset<SIZE> e10(rrr(gn));
-    bitset<SIZE> e11(rrr(gn));
+    
 
-    aps[0][0][0] = e00;
-    aps[0][0][1] = e01;
-    aps[1][0][0] = e10;
-    aps[1][0][1] = e11;
 
-    //vector<vector<vector<bitset<SIZE>>>> aps = convertIntoBitset<SIZE>(valExprs);
-    //vector<vector<bitset<SIZE>>> testBitConj = bitsetConjunction(aps[0], aps[1]);
-    //vector<vector<bitset<SIZE>>> testBitUnt = bitsetUntil(aps[0], aps[1]);
 
-    vector<set<pair<string, string>>> pr = asyncProd(aps[0], aps[1]);
-    //vector<set<string>> testProdConj = prodConjunction(pr);
-    vector<set<string>> testProdUnt0 = prodUntil0(pr);
-    vector<set<string>> testProdUnt1 = prodUntil1(pr);
-
-    //bool resConj = isEqual(testProdConj, testBitConj);
-    //bool resUnt = isEqual(testProdUnt, testBitUnt);
+    /*
+    // UNTIL
+    vector<vector<vector<bitset<SIZE>>>> aps = convertIntoBitset<SIZE>(valExprs);
+    vector<vector<bitset<SIZE>>> testBitUnt = bitsetUntil(aps[0], aps[1]);
+    vector<set<string>> testProdUnt = prodUntil(pr);
+    bool resUnt = isEqual(testProdUnt, testBitUnt);
     */
-
-
-
-
 
     /*
     // CONJUNCTION
