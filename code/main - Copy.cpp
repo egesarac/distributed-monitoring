@@ -20,6 +20,13 @@ bitset<SIZE> oddMask;
 
 template<std::size_t N>
 int msb(const bitset<N> &bs) {
+  /*static_assert(N <= (CHAR_BIT * sizeof(unsigned long)), "bitset is too big");
+  auto n = bs.to_ulong();
+  // C++20 will have std::countl_zero() but in the meantime:
+  //assert(n != 0); // clz is undefined if n is 0. Maybe return -1 in this case?
+  if (n == 0) return -1;
+  return (CHAR_BIT * sizeof n) - __builtin_clzl(n) - 1;*/
+
     for (int i = bs.size() - 1; i >= 0; i--) {
         if (bs[i] == true) {
             return i;
@@ -511,7 +518,7 @@ vector<vector<bitset<N>>> bitsetEventually(const vector<vector<bitset<N>>> &v1) 
 }
 
 template<std::size_t N>
-vector<vector<bitset<N>>> bitsetUntil(vector<vector<bitset<N>>> v1, vector<vector<bitset<N>>> v2) {
+vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &v1, const vector<vector<bitset<N>>> &v2) {
     vector<vector<bitset<N>>> vv(v1.size()); 
 
     for (auto & v : vv) {
@@ -535,9 +542,6 @@ vector<vector<bitset<N>>> bitsetUntil(vector<vector<bitset<N>>> v1, vector<vecto
         len2[3] = msb(v2[i][1] & evenMask) + 1; // 1...1
 
         if (firstBit0 == true) {
-            
-
-
             // the special cases where v1 only has expressions of length 1
             if (len1[0] == 1 && len1[1] == 0 && len1[2] == 0 && len1[3] == 0) {
                 vv[i] = v2[i];
@@ -577,6 +581,21 @@ vector<vector<bitset<N>>> bitsetUntil(vector<vector<bitset<N>>> v1, vector<vecto
             len_strong[1] = len2[1];
             len_strong[2] = (max(len1[2], len1[3]) > 0) ? max(len2[2], len2[0] - 1) : len2[2];
             len_strong[3] = (max(len1[2], len1[3] - 1) > 0) ? max(len2[3], len2[1] - 1) : len2[3];
+
+            /*
+            if (len_strong[0] > 0 && len_strong[0] % 2 == 0) {
+                len_strong[0]--;
+            }
+            if (len_strong[1] > 0 && len_strong[1] % 2 == 1) {
+                len_strong[1]--;
+            }
+            if (len_strong[2] > 0 && len_strong[2] % 2 == 1) {
+                len_strong[2]--;
+            }
+            if (len_strong[3] > 0 && len_strong[3] % 2 == 0) {
+                len_strong[3]--;
+            }
+            */
 
             int ctr;
             
@@ -632,6 +651,28 @@ vector<vector<bitset<N>>> bitsetUntil(vector<vector<bitset<N>>> v1, vector<vecto
                 vv[i][1][ctr] = true;
                 ctr -= 2;
             }
+
+            /*for (int j = 0; j < 4; j++) {
+                int ctr = len_strong[j] - 1;
+
+                if (j == 0) {
+                    if (ctr > -1) {
+                        vv[i][j / 2].set(ctr, true);
+                        
+                        while (ctr > 0) { 
+                            vv[i][j / 2].set(ctr, true);
+                            ctr = ctr - 2;
+                        }
+                    }
+                }
+                else {
+                    while (ctr >= 0) { 
+                        vv[i][j / 2].set(ctr, true);
+                        ctr = ctr - 2;
+                    }
+                }
+                
+            }*/
         }
 
         if (firstBit1 == true) {
@@ -1038,7 +1079,7 @@ int main() {
         v[0].resize(2);
     }
 
-    /*
+    
     // RANDOM INPUT
     uniform_int_distribution<> rrr(0, 16);
     //random_device rd;  // a seed source for the random number engine
@@ -1060,26 +1101,25 @@ int main() {
             cout << "check: " << i << endl;
         }    
     }
-    */
+    
 
     
-    
+    /*
     // CONTROLLED INPUT
     aps[0][0][0] = bitset<SIZE>("0");
-    aps[0][0][1] = bitset<SIZE>("10000000");
-    aps[1][0][0] = bitset<SIZE>("1000000");
-    aps[1][0][1] = bitset<SIZE>("0");
+    aps[0][0][1] = bitset<SIZE>("10");
+    aps[1][0][0] = bitset<SIZE>("0");
+    aps[1][0][1] = bitset<SIZE>("1000");
 
-    //vector<vector<bitset<SIZE>>> testBit = bitsetUntil(aps[0], aps[1]);
+    vector<vector<bitset<SIZE>>> testBit = bitsetUntil(aps[0], aps[1]);
     vector<set<pair<string, string>>> pr = asyncProd(aps[0], aps[1]);
     //cout << i << " " << pr[0].size() << endl;
     vector<set<string>> testProd = prodUntil0(pr);
 
-    /*if (!isEqual(testProd, testBit)) {
+    if (!isEqual(testProd, testBit)) {
         cout << "check" << endl;
-    } */
-    
-    int asdf = 0;
+    } 
+    */
     
 
 
