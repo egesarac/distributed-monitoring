@@ -9,9 +9,7 @@
 #include <set>
 #include <bitset>
 #include <algorithm>
-//#include <boost/dynamic_bitset.hpp>
 using namespace std;
-//using namespace boost;
 
 #define SIZE 100
 
@@ -353,6 +351,10 @@ vector<set<string>> prodUntil1(vector<set<pair<string, string>>> product) {
                 string sss(ss);
                 std::reverse(sss.begin(), sss.end());
 
+                /*if (sss == "1010") {
+                    int x=0;
+                }*/
+
                 temp.insert(sss);
             }
         }
@@ -439,10 +441,10 @@ vector<vector<bitset<N>>> bitsetAlways(const vector<vector<bitset<N>>> &v1) {
             len1[0] = msb(v1[i][0] & evenMask) + 1; // 0...0
             len1[1] = msb(v1[i][0] & oddMask) + 1; // 0...1
             len1[2] = msb(v1[i][1] & oddMask) + 1; // 1...0
-            //len1[3] = msb(v1[i][1] & evenMask) + 1; // 1...1
+            len1[3] = msb(v1[i][1] & evenMask) + 1; // 1...1
             
             vv[i][0][0] = (max(len1[0], len1[2]) > 0); 
-            vv[i][0][1] = (len1[1] > 0);
+            vv[i][0][1] = (max(len1[1], len1[3]-2) > 0);
             vv[i][1][0] = v1[i][1][0];
         }
 
@@ -478,14 +480,14 @@ vector<vector<bitset<N>>> bitsetEventually(const vector<vector<bitset<N>>> &v1) 
     for (int i = v1.size() - 1; i >= 0; i--) {
         if (firstBit0 == true) {
             vector<int> len1(4);
-            //len1[0] = msb(v1[i][0] & evenMask) + 1; // 0...0
+            len1[0] = msb(v1[i][0] & evenMask) + 1; // 0...0
             len1[1] = msb(v1[i][0] & oddMask) + 1; // 0...1
             len1[2] = msb(v1[i][1] & oddMask) + 1; // 1...0
             len1[3] = msb(v1[i][1] & evenMask) + 1; // 1...1
             
             vv[i][0][0] = v1[i][0][0];
             vv[i][1][0] = (max(len1[1], len1[3]) > 0);
-            vv[i][1][1] = (len1[2] > 0);            
+            vv[i][1][1] = (max(len1[0]-2, len1[2]) > 0);
         }
 
         if (firstBit1 == true) {
@@ -511,117 +513,107 @@ vector<vector<bitset<N>>> bitsetEventually(const vector<vector<bitset<N>>> &v1) 
 }
 
 template<std::size_t N>
-vector<vector<bitset<N>>> bitsetUntil(vector<vector<bitset<N>>> v1, vector<vector<bitset<N>>> v2) {
-    vector<vector<bitset<N>>> vv(v1.size()); 
+vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &vv1, const vector<vector<bitset<N>>> &vv2) {
+    vector<vector<bitset<N>>> vv(vv1.size()); 
 
     for (auto & v : vv) {
         v.resize(2);
     }
 
-    bool firstBit0 = true;
-    bool firstBit1 = false;
+    bool firstBit0 = false;
+    bool firstBit1 = true;
 
-    for (int i = v1.size() - 1; i >= 0; i--) {
-        vector<int> len1(4);
-        len1[0] = msb(v1[i][0] & evenMask) + 1; // 0...0
-        len1[1] = msb(v1[i][0] & oddMask) + 1; // 0...1
-        len1[2] = msb(v1[i][1] & oddMask) + 1; // 1...0
-        len1[3] = msb(v1[i][1] & evenMask) + 1; // 1...1
-
-        vector<int> len2(4);
-        len2[0] = msb(v2[i][0] & evenMask) + 1; // 0...0
-        len2[1] = msb(v2[i][0] & oddMask) + 1; // 0...1
-        len2[2] = msb(v2[i][1] & oddMask) + 1; // 1...0
-        len2[3] = msb(v2[i][1] & evenMask) + 1; // 1...1
-
+    for (int i = vv1.size() - 1; i >= 0; i--) {
         if (firstBit0 == true) {
-            
+            vector<vector<bitset<N>>> v1 = vv1;
+            vector<vector<bitset<N>>> v2 = vv2;
 
+            // handling the corner cases of 0 U x, 1 U x, x U 0, x U 1
+            if (v1[i][0][0] == true) {
+                vv[i][0] = vv[i][0] | v2[i][0];
+                vv[i][1] = vv[i][1] | v2[i][1];
+                v1[i][0][0] = false;
+            }
 
-            // the special cases where v1 only has expressions of length 1
-            if (len1[0] == 1 && len1[1] == 0 && len1[2] == 0 && len1[3] == 0) {
-                vv[i] = v2[i];
+            if (v1[i][1][0] == true) {
+                vector<int> temp(4);
+                temp[0] = msb(v2[i][0] & evenMask) + 1; // 0...0
+                temp[1] = msb(v2[i][0] & oddMask) + 1; // 0...1
+                temp[2] = msb(v2[i][1] & oddMask) + 1; // 1...0
+                temp[3] = msb(v2[i][1] & evenMask) + 1; // 1...1
+                
+                vv[i][0][0] = v2[i][0][0];
+                vv[i][1][0] = (max(temp[1], temp[3]) > 0);
+                vv[i][1][1] = (max(temp[0]-2, temp[2]) > 0);
+
+                v1[i][1][0] = false;
+            }
+
+            if (v2[i][0][0] == true) {
+                vv[i][0][0] = true;
+                v2[i][0][0] = false;
+            }
+
+            if (v2[i][1][0] == true) {
+                vv[i][1][0] = true;
+                v2[i][1][0] = false;
+            }
+
+            if ((v1[i][0].none() && v1[i][1].none()) || (v2[i][0].none() && v2[i][1].none())) {
                 continue;
             }
-            else if (len1[0] == 0 && len1[1] == 0 && len1[2] == 0 && len1[3] == 1) {
-                if (v2[i][0][0] == true) {
-                    vv[i][0][0] = true;
-                }
 
-                if (max(len2[1], len2[3]) > 0) {
-                    vv[i][1][0] = true;
-                }
+            vector<int> len1(4);
+            len1[0] = msb(v1[i][0] & evenMask) + 1; // 0...0
+            len1[1] = msb(v1[i][0] & oddMask) + 1; // 0...1
+            len1[2] = msb(v1[i][1] & oddMask) + 1; // 1...0
+            len1[3] = msb(v1[i][1] & evenMask) + 1; // 1...1
 
-                if (max(len2[0] - 1, len2[2]) > 0) {
-                    vv[i][1][1] = true;
-                }
+            vector<int> len2(4);
+            len2[0] = msb(v2[i][0] & evenMask) + 1; // 0...0
+            len2[1] = msb(v2[i][0] & oddMask) + 1; // 0...1
+            len2[2] = msb(v2[i][1] & oddMask) + 1; // 1...0
+            len2[3] = msb(v2[i][1] & evenMask) + 1; // 1...1
 
-                continue;
-            }
-            else if (len1[0] == 1 && len1[1] == 0 && len1[2] == 0 && len1[3] == 1) {
-                vv[i] = v2[i];
-
-                if (max(len2[1], len2[3]) > 0) {
-                    vv[i][1][0] = true;
-                }
-
-                if (max(len2[0] - 1, len2[2]) > 0) {
-                    vv[i][1][1] = true;
-                }
-
-                continue;
-            }
-            
             vector<int> len_strong(4);
             len_strong[0] = len2[0];
             len_strong[1] = len2[1];
-            len_strong[2] = (max(len1[2], len1[3]) > 0) ? max(len2[2], len2[0] - 1) : len2[2];
-            len_strong[3] = (max(len1[2], len1[3] - 1) > 0) ? max(len2[3], len2[1] - 1) : len2[3];
+            len_strong[2] = (max(len1[2], len1[3]) > 0) ? max(len2[2], len2[0]-1) : len2[2];
+            len_strong[3] = (max(len1[2], len1[3]) > 0) ? max(len2[3], len2[1]-1) : len2[3];
 
             int ctr;
             
-            // 0...0 !!!!
+            // 0...0
             ctr = len_strong[0] - 1;
-            if (len1[2] == 2 || ctr == 0) {
-                if (ctr > -1) {
+            if (ctr > -1) {
+                if (len1[2] == 2 && len1[0] < 3 && len1[1] < 2 && len1[3] < 3) {
                     vv[i][0][ctr] = true;
                 }
-            }
-            else {
-                while (ctr > 0) { 
-                    vv[i][0][ctr] = true;
-                    ctr -= 2;
+                else {
+                    while (ctr > 0) {
+                        vv[i][0][ctr] = true;
+                        ctr -= 2;
+                    }
                 }
-            }
-            if (v2[i][0][0] == true) {
-                vv[i][0][0] = true;
             }
 
-            // 0...1 !!!
+            // 0...1
             ctr = len_strong[1] - 1;
-            if (len1[2] == 2 && max(len1[0], len1[1]) < 2) {
-                /*vv[i][0] = vv[i][0] | (v)
-                
-                for (int cc = ctr; cc >= 0; cc -= 2) {
-                 //   if ()
-                }*/
-
-                if (ctr > -1) {
+            if (ctr > -1) {
+                if (len1[2] == 2 && len1[0] < 3 && len1[1] < 2 && len1[3] < 3) {
                     vv[i][0][ctr] = true;
                 }
-            }
-            else {
-                while (ctr > 0) { // >=
-                    vv[i][0][ctr] = true;
-                    ctr -= 2;
+                else {
+                    while (ctr > 0) {
+                        vv[i][0][ctr] = true;
+                        ctr -= 2;
+                    }
                 }
             }
-
-            
 
             // 1...0
             ctr = len_strong[2] - 1;
-            while (ctr >= 0) { 
+            while (ctr > 0) { 
                 vv[i][1][ctr] = true;
                 ctr -= 2;
             }
@@ -635,63 +627,157 @@ vector<vector<bitset<N>>> bitsetUntil(vector<vector<bitset<N>>> v1, vector<vecto
         }
 
         if (firstBit1 == true) {
-            // the special cases where v1 only has expressions of length 1
-            if (len1[0] == 1 && len1[1] == 0 && len1[2] == 0 && len1[3] == 0) {
-                vv[i] = v2[i];
-                continue;
+            vector<vector<bitset<N>>> v1 = vv1;
+            vector<vector<bitset<N>>> v2 = vv2;
+
+            // handling the corner cases of 0Ux=x, 1Ux=1, xU0=Ax, xU1=1
+            if (v1[i][0][0] == true) {
+                vv[i][0] = vv[i][0] | vv2[i][0];
+                vv[i][1] = vv[i][1] | vv2[i][1];
+                v1[i][0][0] = false;
             }
-            else if (len1[0] == 0 && len1[1] == 0 && len1[2] == 0 && len1[3] == 1) {
+
+            if (v1[i][1][0] == true) {
                 vv[i][1][0] = true;
-                continue;
+                v1[i][1][0] = false;
             }
-            else if (len1[0] == 1 && len1[1] == 0 && len1[2] == 0 && len1[3] == 1) {
-                vv[i] = v2[i];
+
+            if (v2[i][0][0] == true) {
+                vector<int> temp(4);
+                temp[0] = msb(vv1[i][0] & evenMask) + 1; // 0...0
+                temp[1] = msb(vv1[i][0] & oddMask) + 1; // 0...1
+                temp[2] = msb(vv1[i][1] & oddMask) + 1; // 1...0
+                temp[3] = msb(vv1[i][1] & evenMask) + 1; // 1...1
+                
+                vv[i][0][0] = (max(temp[0], temp[2]) > 0); 
+                vv[i][0][1] = (max(temp[1], temp[3]-2) > 0);
+                vv[i][1][0] = vv1[i][1][0];
+
+                v2[i][0][0] = false;
+            }
+
+            if (v2[i][1][0] == true) {
                 vv[i][1][0] = true;
+                v2[i][1][0] = false;
+            }
+
+            if ((v1[i][0].none() && v1[i][1].none()) || (v2[i][0].none() && v2[i][1].none())) {
                 continue;
             }
-            
+
+            vector<int> len1(4);
+            len1[0] = msb(v1[i][0] & evenMask) + 1; // 0...0
+            len1[1] = msb(v1[i][0] & oddMask) + 1; // 0...1
+            len1[2] = msb(v1[i][1] & oddMask) + 1; // 1...0
+            len1[3] = msb(v1[i][1] & evenMask) + 1; // 1...1
+
+            vector<int> len2(4);
+            len2[0] = msb(v2[i][0] & evenMask) + 1; // 0...0
+            len2[1] = msb(v2[i][0] & oddMask) + 1; // 0...1
+            len2[2] = msb(v2[i][1] & oddMask) + 1; // 1...0
+            len2[3] = msb(v2[i][1] & evenMask) + 1; // 1...1
+
             vector<int> len_weak(4);
-            len_weak[0] = (max(len1[0], len1[2]) > 0) ? len2[0] : 0;
-            //len_weak[1] = (max(len1[1], len1[3]) > 0) ? max(len2[0], ): len2[1];
+            len_weak[0] = (max(len1[0], len1[2]) > 0) ? (len2[0]) : 0;
+            len_weak[1] = ((max(len1[1], len1[3]) > 0) && len2[0] > 0) ? (max(len2[0]+1, len2[1])) : len2[1];
 
-            len_weak[2] = (max(len1[2], len1[3]) > 0) ? max(len2[2], len2[0] - 1) : len2[2];
-            len_weak[3] = (max(len1[2], len1[3]) > 0) ? max(len2[3], len2[1] - 1) : len2[3];
-
-            if (len_weak[0] >= 0 && len_weak[0] % 2 == 0) {
-                len_weak[0]--;
-            }
-            if (len_weak[1] >= 0 && len_weak[1] % 2 == 1) {
-                len_weak[1]--;
-            }
-            if (len_weak[2] >= 0 && len_weak[2] % 2 == 1) {
-                len_weak[2]--;
-            }
-            if (len_weak[3] >= 0 && len_weak[3] % 2 == 0) {
-                len_weak[3]--;
-            }
-
-            for (int j = 0; j < 4; j++) {
-                int ctr = len_weak[j] - 1;
-
-                while (ctr >= 0) {
-                    vv[i][j / 2].set(ctr, true);
-                    ctr = ctr - 2;
+            if (len1[0] > 0 || len1[2] > 0) {
+                if (len1[2] > 0 && len2[0] > 0) {
+                    len_weak[2] = max(len2[2], len2[0]-1);
+                }
+                else {
+                    len_weak[2] = len2[2];
                 }
             }
-        }
+            else {
+                len_weak[2] = 0;
+            }
 
-        if (vv[i][0].any() == true) {
-            firstBit0 = true;
-        }
-        else {
-            firstBit0 = false;
-        }
+            if (len1[3] > 0) {
+                len_weak[3] = max({len2[0], len2[1]-1, len2[2]+1, len2[3]});
+            }
+            else if (len1[2] > 0 && len1[1] > 0) {
+                len_weak[3] = max({len2[1]-1, len2[2]+1, len2[3]});
+            }
+            else if (len1[2] > 0) {
+                len_weak[3] = max(len2[1]-1, len2[3]);
+            }
+            else if (len1[1] > 0) {
+                len_weak[3] = max(len2[2]+1, len2[3]);
+            }
+            else {
+                len_weak[3] = len2[3];
+            }
+            
 
-        if (vv[i][1].any() == true) {
-            firstBit1 = true;
-        }
-        else {
-            firstBit1 = false;
+            int ctr;
+            
+            // 0...0
+            ctr = len_weak[0] - 1;
+            if (ctr > -1) {
+                if (len1[2] == 2 && len1[0] == 0) {
+                    while (ctr > 0) {
+                        vv[i][0][ctr] = vv2[i][0][ctr];
+                        ctr -= 2;
+                    }
+                    //vv[i][0][ctr] = true;
+                }
+                else {
+                    while (ctr > 0) {
+                        vv[i][0][ctr] = true;
+                        ctr -= 2;
+                    }
+                }
+            }
+
+            // 0...1
+            ctr = len_weak[1] - 1;
+            if (ctr > -1) {
+                if (len1[2] == 2 && len1[0] == 0 && len1[1] == 0 && len1[3] == 0) {
+                   while (ctr > 0) {
+                        vv[i][0][ctr] = vv2[i][0][ctr];
+                        ctr -= 2;
+                    }
+                    //vv[i][0][ctr] = true;
+                }
+                else {
+                    while (ctr > 0) {
+                        vv[i][0][ctr] = true;
+                        ctr -= 2;
+                    }
+                }
+            }
+            
+
+            // 1...0
+            ctr = len_weak[2] - 1;
+            if (ctr > -1) {
+                if (len1[2] == 2 && len1[0] == 0 && len2[2] == 0) {
+                    while (ctr > 0) {
+                        vv[i][1][ctr] = vv2[i][1][ctr];
+                        ctr -= 2;
+                    }
+                    int cc = len2[0] - 2;
+                    while (cc > 0) {
+                        vv[i][1][cc] = true;
+                        cc -= 2;
+                    }
+                    //vv[i][1][ctr] = true;
+                }
+                else {
+                    while (ctr > 0) {
+                        vv[i][1][ctr] = true;
+                        ctr -= 2;
+                    }
+                }
+            }
+
+            // 1...1
+            ctr = len_weak[3] - 1;
+            while (ctr >= 0) { 
+                vv[i][1][ctr] = true;
+                ctr -= 2;
+            }
         }
     }
 
@@ -699,14 +785,16 @@ vector<vector<bitset<N>>> bitsetUntil(vector<vector<bitset<N>>> v1, vector<vecto
 }
 
 template<std::size_t N>
-vector<vector<bitset<N>>> bitsetConjunction(vector<vector<bitset<N>>> v1, vector<vector<bitset<N>>> v2) {
-    vector<vector<bitset<N>>> vv(v1.size());
+vector<vector<bitset<N>>> bitsetConjunction(const vector<vector<bitset<N>>> &vv1, const vector<vector<bitset<N>>> &vv2) {
+    vector<vector<bitset<N>>> vv(vv1.size());
 
     for (auto & v : vv) {
         v.resize(2);
     }
 
-    for (int i = 0; i < v1.size(); i++) {
+    for (int i = 0; i < vv1.size(); i++) {
+        vector<vector<bitset<N>>> v1 = vv1;
+        vector<vector<bitset<N>>> v2 = vv2;
         // handling the corner cases of conjunction with 0 or 1
         if (v1[i][0][0] == true) {
             vv[i][0][0] = true;
@@ -1038,13 +1126,14 @@ int main() {
         v[0].resize(2);
     }
 
-    /*
+    
     // RANDOM INPUT
-    uniform_int_distribution<> rrr(0, 16);
+    uniform_int_distribution<> rrr(0, 32);
     //random_device rd;  // a seed source for the random number engine
     //mt19937 gn(rd()); // mersenne_twister_engine seeded with rd()
-    for (int i = 9; i < 100; i++) {
+    for (int i = 0; i < 1000; i++) { //486 bad input
         int sd = i;
+        cout << "seed " << sd << endl;
         mt19937 gn(sd);
         for (int j = 0; j < 4; j++) {
             aps[j/2][0][j%2] = rrr(gn);
@@ -1054,33 +1143,32 @@ int main() {
 
         vector<set<pair<string, string>>> pr = asyncProd(aps[0], aps[1]);
         //cout << i << " " << pr[0].size() << endl;
-        vector<set<string>> testProd = prodUntil0(pr);
+        vector<set<string>> testProd = prodUntil1(pr);
 
         if (!isEqual(testProd, testBit)) {
             cout << "check: " << i << endl;
         }    
     }
-    */
-
+    
+    int asdf = 0;
     
     
+    /*
     // CONTROLLED INPUT
-    aps[0][0][0] = bitset<SIZE>("0");
-    aps[0][0][1] = bitset<SIZE>("10000000");
-    aps[1][0][0] = bitset<SIZE>("1000000");
-    aps[1][0][1] = bitset<SIZE>("0");
+    aps[0][0][0] = bitset<SIZE>("");
+    aps[0][0][1] = bitset<SIZE>("10");
+    aps[1][0][0] = bitset<SIZE>("");
+    aps[1][0][1] = bitset<SIZE>("100000");
 
     //vector<vector<bitset<SIZE>>> testBit = bitsetUntil(aps[0], aps[1]);
     vector<set<pair<string, string>>> pr = asyncProd(aps[0], aps[1]);
     //cout << i << " " << pr[0].size() << endl;
-    vector<set<string>> testProd = prodUntil0(pr);
+    vector<set<string>> testProd = prodUntil1(pr);
 
-    /*if (!isEqual(testProd, testBit)) {
+    if (!isEqual(testProd, testBit)) {
         cout << "check" << endl;
-    } */
-    
-    int asdf = 0;
-    
+    }
+    int asdf = 0;*/
 
 
     /*
