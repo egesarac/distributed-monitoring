@@ -276,7 +276,7 @@ vector<set<string>> prodUntil0(vector<set<pair<string, string>>> product) {
         for (const auto &p : product[i]) {
             int len = p.second.length();
 
-            for (const auto b : firstBits[i + 1]) { // no need to compute twice, just change the last bit (from p.second if b=0, from p.first if b=1) ???
+            for (const auto b : firstBits[i + 1]) {
                 string s = "";
                 s += b;
 
@@ -350,10 +350,6 @@ vector<set<string>> prodUntil1(vector<set<pair<string, string>>> product) {
 
                 string sss(ss);
                 std::reverse(sss.begin(), sss.end());
-
-                /*if (sss == "1010") {
-                    int x=0;
-                }*/
 
                 temp.insert(sss);
             }
@@ -542,9 +538,9 @@ vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &vv1, cons
                 temp[2] = msb(v2[i][1] & oddMask) + 1; // 1...0
                 temp[3] = msb(v2[i][1] & evenMask) + 1; // 1...1
                 
-                vv[i][0][0] = v2[i][0][0];
-                vv[i][1][0] = (max(temp[1], temp[3]) > 0);
-                vv[i][1][1] = (max(temp[0]-2, temp[2]) > 0);
+                vv[i][0][0] = vv[i][0][0] || v2[i][0][0];
+                vv[i][1][0] = vv[i][1][0] || (max(temp[1], temp[3]) > 0);
+                vv[i][1][1] = vv[i][1][1] || (max(temp[0]-2, temp[2]) > 0);
 
                 v1[i][1][0] = false;
             }
@@ -586,8 +582,11 @@ vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &vv1, cons
             // 0...0
             ctr = len_strong[0] - 1;
             if (ctr > -1) {
-                if (len1[2] == 2 && len1[0] < 3 && len1[1] < 2 && len1[3] < 3) {
-                    vv[i][0][ctr] = true;
+                if (len1[2] == 2 && len1[0] == 0 && len1[1] == 0 && len1[3] == 0) {
+                    while (ctr > 0) {
+                        vv[i][0][ctr] = vv2[i][0][ctr];
+                        ctr -= 2;
+                    }
                 }
                 else {
                     while (ctr > 0) {
@@ -600,8 +599,11 @@ vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &vv1, cons
             // 0...1
             ctr = len_strong[1] - 1;
             if (ctr > -1) {
-                if (len1[2] == 2 && len1[0] < 3 && len1[1] < 2 && len1[3] < 3) {
-                    vv[i][0][ctr] = true;
+                if (len1[2] == 2 && len1[0] == 0 && len1[1] == 0 && len1[3] == 0) {
+                    while (ctr > 0) {
+                        vv[i][0][ctr] = vv2[i][0][ctr];
+                        ctr -= 2;
+                    }
                 }
                 else {
                     while (ctr > 0) {
@@ -649,9 +651,9 @@ vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &vv1, cons
                 temp[2] = msb(vv1[i][1] & oddMask) + 1; // 1...0
                 temp[3] = msb(vv1[i][1] & evenMask) + 1; // 1...1
                 
-                vv[i][0][0] = (max(temp[0], temp[2]) > 0); 
-                vv[i][0][1] = (max(temp[1], temp[3]-2) > 0);
-                vv[i][1][0] = vv1[i][1][0];
+                vv[i][0][0] = vv[i][0][0] || (max(temp[0], temp[2]) > 0); 
+                vv[i][0][1] = vv[i][0][1] || (max(temp[1], temp[3]-2) > 0);
+                vv[i][1][0] = vv[i][1][0] || vv1[i][1][0];
 
                 v2[i][0][0] = false;
             }
@@ -694,24 +696,38 @@ vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &vv1, cons
             }
 
             if (len1[3] > 0) {
-                len_weak[3] = max({len2[0], len2[1]-1, len2[2]+1, len2[3]});
+                if (len2[2] > 0) {
+                    len_weak[3] = max({len2[0], len2[1]-1, len2[2]+1, len2[3]});
+                }
+                else {
+                    len_weak[3] = max({len2[0], len2[1]-1, len2[3]});
+                }
             }
             else if (len1[2] > 0 && len1[1] > 0) {
-                len_weak[3] = max({len2[1]-1, len2[2]+1, len2[3]});
+                if (len2[2] > 0) {
+                    len_weak[3] = max({len2[1]-1, len2[2]+1, len2[3]});
+                }
+                else {
+                    len_weak[3] = max(len2[1]-1, len2[3]);
+                }
             }
             else if (len1[2] > 0) {
                 len_weak[3] = max(len2[1]-1, len2[3]);
             }
             else if (len1[1] > 0) {
-                len_weak[3] = max(len2[2]+1, len2[3]);
+                if (len2[2] > 0) {
+                    len_weak[3] = max(len2[2]+1, len2[3]);
+                }
+                else {
+                    len_weak[3] = len2[3];
+                }
             }
             else {
                 len_weak[3] = len2[3];
             }
             
-
             int ctr;
-            
+
             // 0...0
             ctr = len_weak[0] - 1;
             if (ctr > -1) {
@@ -720,7 +736,6 @@ vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &vv1, cons
                         vv[i][0][ctr] = vv2[i][0][ctr];
                         ctr -= 2;
                     }
-                    //vv[i][0][ctr] = true;
                 }
                 else {
                     while (ctr > 0) {
@@ -738,7 +753,6 @@ vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &vv1, cons
                         vv[i][0][ctr] = vv2[i][0][ctr];
                         ctr -= 2;
                     }
-                    //vv[i][0][ctr] = true;
                 }
                 else {
                     while (ctr > 0) {
@@ -747,7 +761,6 @@ vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &vv1, cons
                     }
                 }
             }
-            
 
             // 1...0
             ctr = len_weak[2] - 1;
@@ -762,7 +775,6 @@ vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &vv1, cons
                         vv[i][1][cc] = true;
                         cc -= 2;
                     }
-                    //vv[i][1][ctr] = true;
                 }
                 else {
                     while (ctr > 0) {
@@ -1126,7 +1138,7 @@ int main() {
         v[0].resize(2);
     }
 
-    
+    /*
     // RANDOM INPUT
     uniform_int_distribution<> rrr(0, 32);
     //random_device rd;  // a seed source for the random number engine
@@ -1149,9 +1161,42 @@ int main() {
             cout << "check: " << i << endl;
         }    
     }
+    */
+
+
+    // EXHAUSTIVE INPUT
+    int numBits = 4;
+    int numBitsTwice = 2 * numBits;
+    unsigned long long bound = (1 << numBitsTwice);
+
+    unsigned int mask0 = (1 << numBits) - 1;
+    unsigned int mask1 = ~mask0;
+
+    for (int i = 1; i < bound; i++) {
+        aps[0][0][0] = bitset<SIZE>(i & mask0);
+        aps[0][0][1] = bitset<SIZE>((i & mask1) >> numBits);
+        
+        for (int j = 1; j < bound; j++) {
+            aps[1][0][0] = bitset<SIZE>(j & mask0);
+            aps[1][0][1] = bitset<SIZE>((j & mask1) >> numBits);
+
+            vector<vector<bitset<SIZE>>> testBit = bitsetUntil(aps[0], aps[1]);
+            vector<set<pair<string, string>>> pr = asyncProd(aps[0], aps[1]);
+            vector<set<string>> testProd = prodUntil1(pr);
+
+            if (!isEqual(testProd, testBit)) {
+                cout << "check: " << i << " " << j << endl;
+            }
+        }
+
+        /*vector<vector<bitset<SIZE>>> testBit = bitsetAlways(aps[0]);
+        vector<set<string>> testProd = prodAlways(bitset2stringset_withSegments(aps[0]));
+        if (!isEqual(testProd, testBit)) {
+            cout << "check: " << i << endl;
+        }*/
+    }
     
-    int asdf = 0;
-    
+    int x = 0;
     
     /*
     // CONTROLLED INPUT
