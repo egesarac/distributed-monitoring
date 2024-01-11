@@ -150,7 +150,7 @@ vector<set<pair<string, string>>> asyncProd(const vector<vector<bitset<N>>> &v1,
     return out;
 }
 
-vector<set<string>> prodAlways(vector<set<string>> product) {
+vector<set<string>> prodAlways(const vector<set<string>> &product) {
     vector<set<string>> out(product.size());
 
     bool firstBit0 = false;
@@ -206,7 +206,7 @@ vector<set<string>> prodAlways(vector<set<string>> product) {
     return out;
 }
 
-vector<set<string>> prodEventually(vector<set<string>> product) {
+vector<set<string>> prodEventually(const vector<set<string>> &product) {
     vector<set<string>> out(product.size());
 
     bool firstBit0 = true;
@@ -263,7 +263,7 @@ vector<set<string>> prodEventually(vector<set<string>> product) {
     return out;
 }
 
-vector<set<string>> prodUntil0(vector<set<pair<string, string>>> product) {
+vector<set<string>> prodUntil0(const vector<set<pair<string, string>>> &product) {
     vector<set<string>> out(product.size());
 
     vector<set<char>> firstBits(product.size() + 1);
@@ -314,7 +314,7 @@ vector<set<string>> prodUntil0(vector<set<pair<string, string>>> product) {
     return out;
 }
 
-vector<set<string>> prodUntil1(vector<set<pair<string, string>>> product) {
+vector<set<string>> prodUntil1(const vector<set<pair<string, string>>> &product) {
     vector<set<string>> out(product.size());
 
     vector<set<char>> firstBits(product.size() + 1);
@@ -365,7 +365,7 @@ vector<set<string>> prodUntil1(vector<set<pair<string, string>>> product) {
     return out;
 }
 
-vector<set<string>> prodConjunction(vector<set<pair<string, string>>> product) {
+vector<set<string>> prodConjunction(const vector<set<pair<string, string>>> &product) {
     vector<set<string>> out(product.size());
 
     for (int i = 0; i < product.size(); i++) {
@@ -400,6 +400,30 @@ vector<set<string>> prodConjunction(vector<set<pair<string, string>>> product) {
     return out;
 }
 
+vector<set<string>> prodNegation(const vector<set<string>> &product) {
+    vector<set<string>> out(product.size());
+
+    for (int i = 0; i < product.size(); i++) {
+        for (const auto &p : product[i]) {
+            int len = p.length();
+            string s = "";
+
+            for (int j = 0; j < len; j++) {
+                if (p[j] == '1') {
+                    s += "0";
+                }
+                else {
+                    s += "1";
+                }
+            }
+
+            out[i].insert(s);
+        }
+    }
+
+    return out;
+}
+
 template<std::size_t N>
 bool isEqual (vector<set<string>> productResult, vector<vector<bitset<N>>> bitsetResult) {
     bool flag = true;
@@ -414,6 +438,169 @@ bool isEqual (vector<set<string>> productResult, vector<vector<bitset<N>>> bitse
     }
 
     return flag;
+}
+
+pair<int, int> getNextIntervalForProfiles(const vector<int> &segmentation, const int &t1, const int &t2, const bool &leftOpen, const bool &rightOpen) { //TODO: real valued time points
+    int s1, s2;
+
+    return make_pair(s1, s2);
+}
+
+template<std::size_t N>
+vector<vector<bitset<N>>> getProfiles(vector<vector<bitset<N>>> v, vector<int> segmentation, const double &t1, const double &t2, const double &a, const double &b, const bool &leftOpen, const bool &rightOpen) { //TODO: real valued time points
+    vector<vector<bitset<N>>> profiles;
+
+    // to handle the cases where the window falls out of the signal
+    segmentation.push_back(INT32_MAX);
+    vector<bitset<N>> temp(2);
+    temp[0][0] = true;
+    v.push_back(temp);
+
+    vector<vector<int>> breakpoints(2);
+
+    breakpoints[0].push_back(t1 + a);
+    int low0 = upper_bound(segmentation.begin(), segmentation.end(), t1 + a) - segmentation.begin();
+    int high0 = lower_bound(segmentation.begin(), segmentation.end(), t2 + a) - segmentation.begin();
+    for (int i = low0; i <= high0; i++) {
+        breakpoints[0].push_back(segmentation[i]);
+    }
+    if (segmentation[high0] < t2 + a) {
+        breakpoints[0].push_back(t2 + a);
+    }
+
+    breakpoints[1].push_back(t1 + b);
+    int low1 = upper_bound(segmentation.begin(), segmentation.end(), t1 + b) - segmentation.begin();
+    int high1 = lower_bound(segmentation.begin(), segmentation.end(), t2 + b) - segmentation.begin();
+    for (int i = low1; i <= high1; i++) {
+        breakpoints[1].push_back(segmentation[i]);
+    }
+    if (segmentation[high1] < t2 + b) {
+        breakpoints[1].push_back(t2 + b);
+    }
+
+    int l0 = breakpoints[0].size();
+    int l1 = breakpoints[1].size();
+
+    int i0 = 0;
+    int i1 = 0;
+
+    while (i0 < l0 && i1 < l1) {
+        // find the relation of the current window to the segments, determine which actions to carry for the profile (prefix, suffix, etc)
+
+
+        // check if we can fit another profile before this one
+
+
+        /*alternative to above: add artificial breakpoints to capture the check step
+            while populating the breakpoints vector, add for each x first the value x-dbl_min then x
+            first implement this, then check the other
+        */
+
+
+        // slide the window
+        if (breakpoints[0][i0 + 1] - breakpoints[0][i0] < breakpoints[1][i1 + 1] - breakpoints[1][i1]) {
+            breakpoints[1][i1] += (breakpoints[0][i0 + 1] - breakpoints[0][i0]);
+            i0++;
+        }
+        else if (breakpoints[0][i0 + 1] - breakpoints[0][i0] > breakpoints[1][i1 + 1] - breakpoints[1][i1]) {
+            breakpoints[0][i0] += (breakpoints[1][i1 + 1] - breakpoints[1][i1]);
+            i1++;
+
+        }
+        else {
+            breakpoints[1][i1] += (breakpoints[0][i0 + 1] - breakpoints[0][i0]);
+            i0++;
+            i1++;
+        }
+    }
+
+
+
+
+
+
+
+    /*
+    while (flag) {
+        do something
+
+        tie(x, y) = getNextIntervalForProfiles(...);
+    }
+    */
+
+    int x = t1 + a;
+    int y = min(t2 + b, segmentation[segmentation.size() - 1]);
+    int low = lower_bound(segmentation.begin(), segmentation.end(), x) - segmentation.begin();
+    int high = upper_bound(segmentation.begin(), segmentation.end(), y) - segmentation.begin();
+    /*if (segmentation[high - 1] == y) {
+        high--;
+    }*/
+
+    for (int i = low; i < high; i++) {
+        //if (lower_bound(segmentation.begin(), segmentation.end(), x))
+    }
+
+    return profiles;
+}
+
+template<std::size_t N>
+vector<vector<bitset<N>>> bitsetInfix(vector<vector<bitset<N>>> v1) {
+    for (int i = 0; i < v1.size(); i++) {
+        int maxInd = max(msb(v1[i][0] & (evenMask | oddMask)), msb(v1[i][1] & (evenMask | oddMask)));
+
+        for (int j = 0; j < maxInd; j++) {
+            v1[i][0][j] = true;
+            v1[i][1][j] = true;
+        }
+    }
+
+    return v1;
+}
+
+template<std::size_t N>
+vector<vector<bitset<N>>> bitsetSuffix(vector<vector<bitset<N>>> v1) {
+    for (int i = 0; i < v1.size(); i++) {
+        int maxInd0 = max(msb(v1[i][0] & evenMask), msb(v1[i][1] & oddMask));
+        int maxInd1 = max(msb(v1[i][0] & oddMask), msb(v1[i][1] & evenMask));
+
+        for (int j = maxInd0; j >= 0; j--) {
+            if (j % 2 == 0) {
+                v1[i][0][j] = true;
+            }
+            else {
+                v1[i][1][j] = true;
+            }
+        }
+
+        for (int j = maxInd1; j >= 0; j--) {
+            if (j % 2 == 0) {
+                v1[i][1][j] = true;
+            }
+            else {
+                v1[i][0][j] = true;
+            }
+        }
+    }
+
+    return v1;
+}
+
+template<std::size_t N>
+vector<vector<bitset<N>>> bitsetPrefix(vector<vector<bitset<N>>> v1) {
+    for (int i = 0; i < v1.size(); i++) {
+        int maxInd0 = msb(v1[i][0] & (evenMask | oddMask));
+        int maxInd1 = msb(v1[i][1] & (evenMask | oddMask));
+
+        for (int j = 0; j <= maxInd0; j++) {
+            v1[i][0][j] = true;
+        }
+
+        for (int j = 0; j <= maxInd1; j++) {
+            v1[i][1][j] = true;
+        }
+    }
+
+    return v1;
 }
 
 template<std::size_t N>
@@ -841,11 +1028,11 @@ vector<vector<bitset<N>>> bitsetConjunction(const vector<vector<bitset<N>>> &vv1
 
         for (int i = 0; i < 4; i++) {
             if (len1[i] == 0) {
-                len1[i] = INT_MIN / 2 + 2;
+                len1[i] = INT32_MIN / 2 + 2;
             }
 
             if (len2[i] == 0) {
-                len2[i] = INT_MIN / 2 + 2;
+                len2[i] = INT32_MIN / 2 + 2;
             }
         }
 
@@ -875,13 +1062,12 @@ vector<vector<bitset<N>>> bitsetConjunction(const vector<vector<bitset<N>>> &vv1
 }
 
 template<std::size_t N>
-vector<bitset<N>> bitsetNegation(const vector<bitset<N>> &v) {
-    vector<bitset<N>> vv(2);
+vector<vector<bitset<N>>> bitsetNegation(vector<vector<bitset<N>>> v) {
+    for (auto &vv : v) {
+        std::reverse(vv.begin(), vv.end()); // swaps the bitvector0 and bitvector1 for each segment
+    }
 
-    vv[0] = v[1];
-    vv[1] = v[0];
-
-    return vv;
+    return v;
 }
 
 template<std::size_t N>
@@ -1165,7 +1351,7 @@ int main() {
 
 
     // EXHAUSTIVE INPUT
-    int numBits = 4;
+    int numBits = 8;
     int numBitsTwice = 2 * numBits;
     unsigned long long bound = (1 << numBitsTwice);
 
@@ -1175,7 +1361,7 @@ int main() {
     for (int i = 1; i < bound; i++) {
         aps[0][0][0] = bitset<SIZE>(i & mask0);
         aps[0][0][1] = bitset<SIZE>((i & mask1) >> numBits);
-        
+
         for (int j = 1; j < bound; j++) {
             aps[1][0][0] = bitset<SIZE>(j & mask0);
             aps[1][0][1] = bitset<SIZE>((j & mask1) >> numBits);
@@ -1189,11 +1375,15 @@ int main() {
             }
         }
 
-        /*vector<vector<bitset<SIZE>>> testBit = bitsetAlways(aps[0]);
-        vector<set<string>> testProd = prodAlways(bitset2stringset_withSegments(aps[0]));
+        /*vector<vector<bitset<SIZE>>> testBit = bitsetNegation(aps[0]);
+        vector<set<string>> testProd = prodNegation(bitset2stringset_withSegments(aps[0]));
         if (!isEqual(testProd, testBit)) {
             cout << "check: " << i << endl;
         }*/
+        
+        /*vector<vector<bitset<SIZE>>> test1 = bitsetPrefix(aps[0]);
+        vector<vector<bitset<SIZE>>> test2 = bitsetSuffix(aps[0]);
+        vector<vector<bitset<SIZE>>> test3 = bitsetInfix(aps[0]);*/
     }
     
     int x = 0;
