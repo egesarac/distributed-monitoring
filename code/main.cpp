@@ -1164,6 +1164,9 @@ int main() {
     double minVal = -10;
     double maxVal = 10;
 
+    // integer time stamps, boolean values
+    // TODO: update to real time stamps and values
+    
     //random_device rd;  // a seed source for the random number engine
     //mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
     int seed = 1234;
@@ -1207,7 +1210,6 @@ int main() {
             signals[i].push_back(make_pair(edge.first, edge.second));
         }
     }
-    
 
     /* compute the uncertainty intervals */
     vector<vector<vector<int>>> uncertainties(n);
@@ -1249,7 +1251,8 @@ int main() {
 
     int numSegments = segmentation.size() - 1;
 
-    /* compute the value expressions TODO: check and improve*/
+    /* compute the value expressions */
+    // TODO: check and improve
     vector<vector<set<string>>> valExprs(n);
     
     for (int i = 0; i < n; i++) {
@@ -1307,6 +1310,9 @@ int main() {
             }
         }
     }
+
+    /* translate real-valued signals to atomic propositions */
+    // TODO
 
     /* translate string value expressions to bit vector representation */
     for (int i = 0; i < SIZE; i++) {
