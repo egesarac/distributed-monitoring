@@ -9,6 +9,8 @@
 #include <set>
 #include <bitset>
 #include <algorithm>
+#include <limits>
+#include <cfloat>
 using namespace std;
 
 #define SIZE 100
@@ -447,7 +449,33 @@ pair<int, int> getNextIntervalForProfiles(const vector<int> &segmentation, const
 }
 
 template<std::size_t N>
-vector<vector<bitset<N>>> getProfiles(vector<vector<bitset<N>>> v, vector<int> segmentation, const double &t1, const double &t2, const double &a, const double &b, const bool &leftOpen, const bool &rightOpen) { //TODO: real valued time points
+vector<bitset<N>> bitsetConcat(const vector<bitset<N>> &v1, const vector<bitset<N>> &v2) {
+    vector<bitset<N>> out(2);
+    // TODO: check and fix -- v1 empty? 
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j <= msb(v1[i]); j++) {
+            if (v1[i][j] == true) {
+                for (int x = 0; x < 2; x++) {
+                    for (int y = 0; y <= msb(v2[x]); y++) {
+                        if (v2[x][y] == true) {
+                            if ((i == x && j % 2 == 1) || (i != x && j % 2 == 0)) {
+                                out[i][j + y + 1] = true;
+                            }
+                            else {
+                                out[i][j + y] = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return out;
+}
+
+template<std::size_t N>
+vector<vector<bitset<N>>> getProfiles(vector<vector<bitset<N>>> v, vector<double> segmentation, const double &t1, const double &t2, const double &a, const double &b, const bool &leftClosed, const bool &rightClosed) { //TODO: real valued time points
     vector<vector<bitset<N>>> profiles;
 
     // to handle the cases where the window falls out of the signal
@@ -456,37 +484,43 @@ vector<vector<bitset<N>>> getProfiles(vector<vector<bitset<N>>> v, vector<int> s
     temp[0][0] = true;
     v.push_back(temp);
 
-    vector<vector<int>> breakpoints(2);
+    vector<vector<double>> breakpoints(2);
 
+
+    // TODO: check and improve
     breakpoints[0].push_back(t1 + a);
     int low0 = upper_bound(segmentation.begin(), segmentation.end(), t1 + a) - segmentation.begin();
-    int high0 = lower_bound(segmentation.begin(), segmentation.end(), t2 + a) - segmentation.begin();
+    int high0 = lower_bound(segmentation.begin(), segmentation.end(), t2 + a) - segmentation.begin() - 1;
     for (int i = low0; i <= high0; i++) {
+        breakpoints[0].push_back(segmentation[i] - 0.000001);
         breakpoints[0].push_back(segmentation[i]);
     }
     if (segmentation[high0] < t2 + a) {
+        breakpoints[0].push_back(t2 + a - 0.000001);
         breakpoints[0].push_back(t2 + a);
     }
 
     breakpoints[1].push_back(t1 + b);
     int low1 = upper_bound(segmentation.begin(), segmentation.end(), t1 + b) - segmentation.begin();
-    int high1 = lower_bound(segmentation.begin(), segmentation.end(), t2 + b) - segmentation.begin();
+    int high1 = lower_bound(segmentation.begin(), segmentation.end(), t2 + b) - segmentation.begin() - 1;
     for (int i = low1; i <= high1; i++) {
+        breakpoints[1].push_back(segmentation[i] - 0.000001);
         breakpoints[1].push_back(segmentation[i]);
     }
     if (segmentation[high1] < t2 + b) {
+        breakpoints[1].push_back(t2 + b - 0.000001);
         breakpoints[1].push_back(t2 + b);
     }
 
-    int l0 = breakpoints[0].size();
-    int l1 = breakpoints[1].size();
+    int l0 = breakpoints[0].size() - 1; // to ignore the last interval
+    int l1 = breakpoints[1].size() - 1;
 
     int i0 = 0;
     int i1 = 0;
 
     while (i0 < l0 && i1 < l1) {
         // find the relation of the current window to the segments, determine which actions to carry for the profile (prefix, suffix, etc)
-
+    
 
         // check if we can fit another profile before this one
 
@@ -495,6 +529,46 @@ vector<vector<bitset<N>>> getProfiles(vector<vector<bitset<N>>> v, vector<int> s
             while populating the breakpoints vector, add for each x first the value x-dbl_min then x
             first implement this, then check the other
         */
+
+        double left = breakpoints[0][i0];       
+        double right = breakpoints[1][i1];
+
+
+        // functions here depend on rightClosed -- might have to concat the first bits of the next segment
+        //int xind = low0 + ((i0 + 1) % 2);
+        int xind = upper_bound(segmentation.begin() + low0 - 1, segmentation.begin() + high1, left) - segmentation.begin() - 1;
+        //int yind = low1 + ((i1 + 1) % 2);
+        int yind = lower_bound(segmentation.begin() + low0 - 1, segmentation.begin() + high1, right) - segmentation.begin();
+
+        if (yind - xind == 0) { // the two ends of the window belong to the same segment
+            if (left == segmentation[xind]) { // the window starts together with the segment
+                /*concat: prefix*/
+            }
+            else { // the window starts after the beginning of the segment
+                /*concat: infix*/
+            }
+        }
+        else { // the two ends of the window fall in different segments
+            if (left == segmentation[xind]) {
+                /*concat: entire segment*/
+            }
+            else {
+                /*concat: suffix*/
+
+            }
+    
+            /*concat: every full segment between two end points*/
+
+            // TODO: fix below
+            if (right == segmentation[yind] && rightClosed) {
+                /*concat: firstBit*/
+            }
+            else if (right != segmentation[yind]) {
+                /*concat: prefix*/
+            }
+        }
+
+        
 
 
         // slide the window
@@ -512,32 +586,6 @@ vector<vector<bitset<N>>> getProfiles(vector<vector<bitset<N>>> v, vector<int> s
             i0++;
             i1++;
         }
-    }
-
-
-
-
-
-
-
-    /*
-    while (flag) {
-        do something
-
-        tie(x, y) = getNextIntervalForProfiles(...);
-    }
-    */
-
-    int x = t1 + a;
-    int y = min(t2 + b, segmentation[segmentation.size() - 1]);
-    int low = lower_bound(segmentation.begin(), segmentation.end(), x) - segmentation.begin();
-    int high = upper_bound(segmentation.begin(), segmentation.end(), y) - segmentation.begin();
-    /*if (segmentation[high - 1] == y) {
-        high--;
-    }*/
-
-    for (int i = low; i < high; i++) {
-        //if (lower_bound(segmentation.begin(), segmentation.end(), x))
     }
 
     return profiles;
@@ -1244,7 +1292,7 @@ int main() {
         }
     }
 
-    vector<int> segmentation;
+    vector<double> segmentation;
     for (const auto &b : segmentation_temp) {
         segmentation.push_back(b);
     }
@@ -1329,6 +1377,8 @@ int main() {
         v.resize(1);
         v[0].resize(2);
     }
+
+    vector<vector<bitset<SIZE>>> prfff = getProfiles(aps[0], segmentation, segmentation[1], segmentation[2], 0, 3, true, false);
 
     /*
     // RANDOM INPUT
