@@ -11,9 +11,10 @@
 #include <algorithm>
 #include <limits>
 #include <cfloat>
+#include <chrono>
 using namespace std;
 
-#define SIZE 100
+#define SIZE 1000
 
 bitset<SIZE> evenMask;
 bitset<SIZE> oddMask;
@@ -1118,6 +1119,7 @@ vector<vector<bitset<N>>> bitsetNegation(vector<vector<bitset<N>>> v) {
     return v;
 }
 
+// this only works for boolean signals
 template<std::size_t N>
 vector<vector<vector<bitset<N>>>> convertIntoBitset(vector<vector<set<string>>> &valExprs) {
     vector<vector<vector<bitset<N>>>> aps(valExprs.size());
@@ -1197,13 +1199,68 @@ set<string> concatWithDestutter(const set<string> &set1, const set<string> &set2
     return result;
 }
 
+pair<int, int> convertIntoBoolWithDestutter(string str, string delimiter) {
+    vector<bool> v;
+
+    if (!str.empty()) {
+        int start = 0;
+        do {
+            // Find the index of occurrence
+            int idx = str.find(delimiter, start);
+            if (idx == string::npos) {
+                break;
+            }
+ 
+
+            int length = idx - start;
+            if (stof(str.substr(start, length)) > 0) {
+                if (v.empty() || v[v.size() - 1] != true){
+                    v.push_back(true);
+                }
+            }
+            else {
+                if (v.empty() || v[v.size() - 1] != false){
+                    v.push_back(false);
+                }
+            }
+            start += (length + delimiter.size());
+        } while (true);
+
+        if (stof(str.substr(start, str.length())) > 0) {
+            if (v.empty() || v[v.size() - 1] != true){
+                v.push_back(true);
+            }
+        }
+        else {
+            if (v.empty() || v[v.size() - 1] != false){
+                v.push_back(false);
+            }
+        }
+    }
+
+    int x = -1;
+    int y = -1;
+
+    if (!v.empty()) {
+        if (v[0] == true) {
+            x = 1;
+        }
+        else {
+            x = 0;
+        }
+
+        y = v.size() - 1;
+    }
+ 
+    return make_pair(x, y);
+}
 
 int main() {
     /* get spec */ 
     // TODO
     int m;
     double eps = 2;
-    double del = 2;
+    double del = 1;
 
     /* generate random signals */ 
     int n = 2;
@@ -1221,20 +1278,21 @@ int main() {
     mt19937 gen(seed);
 
     uniform_int_distribution<> edgeDist(1, maxEdges);
-    uniform_int_distribution<> timeDist(0, d - 1);
+    //uniform_int_distribution<> timeDist(0, d - 1);
     uniform_int_distribution<> valDist(0, 1);
-    //uniform_real_distribution<> timeDist(0, d);
+    uniform_real_distribution<> timeDist(0, d);
     //uniform_real_distribution<> valDist(minVal, maxVal);
 
-    vector<map<int,int>> signalsTemp(n);
+    vector<map<double,double>> signalsTemp(n);
 
     for (auto &sig : signalsTemp) {
-        set<int> timeStamps;
+        set<double> timeStamps;
+        
         timeStamps.insert(0);
 
         int numEdges = edgeDist(gen);
         for (int i = 0; i < numEdges; i++) {
-            int temp = timeDist(gen);
+            double temp = timeDist(gen);
             if  (timeStamps.find(temp) == timeStamps.end()) {
                 timeStamps.insert(temp);
             }
@@ -1249,9 +1307,18 @@ int main() {
             sig[t] = (initVal + ctr) % 2;
             ctr++;
         }
+        
+
+        /*double initVal = valDist(gen);
+        sig[0] = valDist(gen);
+        for (const auto &t : timeStamps) {
+            sig[t] = valDist(gen);
+        }*/
+
+        
     }
 
-    vector<vector<pair<int,int>>> signals(n);
+    vector<vector<pair<double,double>>> signals(n);
 
     for (int i = 0; i < n; i++) {
         for (const auto &edge : signalsTemp[i]) {
@@ -1260,7 +1327,7 @@ int main() {
     }
 
     /* compute the uncertainty intervals */
-    vector<vector<vector<int>>> uncertainties(n);
+    vector<vector<vector<double>>> uncertainties(n);
 
     for (int i = 0; i < n; i++) {
         int gi = signals[i].size();
@@ -1278,6 +1345,12 @@ int main() {
             int tj = signals[i][j].first;
             int high = min(uncertainties[i][j + 1][1] - del, tj + eps);
             uncertainties[i][j].push_back(high);
+
+            // check input validity
+            /*if (uncertainties[i][j][0] >= uncertainties[i][j][1]) {
+                cout << "invalid input" << endl;
+                return -1;
+            }*/
         }
     }
 
@@ -1298,6 +1371,8 @@ int main() {
     }
 
     int numSegments = segmentation.size() - 1;
+
+    cout << numSegments << endl;
 
     /* compute the value expressions */
     // TODO: check and improve
@@ -1360,25 +1435,53 @@ int main() {
     }
 
     /* translate real-valued signals to atomic propositions */
-    // TODO
+    vector<vector<vector<bitset<SIZE>>>> aps(n);
+    for (auto &v : aps) {
+        v.resize(segmentation.size());
+        for (auto &vv : v) {
+            vv.resize(2);
+        }
+    }
 
-    /* translate string value expressions to bit vector representation */
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < numSegments; j++) {
+            for (auto &expr : valExprs[i][j]) {
+                if (expr != "") {
+                    pair<int, int> xy = convertIntoBoolWithDestutter(expr, ";");
+                    if (xy.first >= 0 && xy.second >= 0) {
+                        aps[i][j][xy.first][xy.second] = true;
+                    }
+                }
+                
+            }
+        }
+    }
+
     for (int i = 0; i < SIZE; i++) {
         if (i % 2 == 0) {
-            evenMask.set(i, true);
+            evenMask[i] = true;
         }
         else {
-            oddMask.set(i, true);
+            oddMask[i] = true;
         }
     }
+    
+    std::chrono::time_point<std::chrono::system_clock> start, end;
+ 
+    start = std::chrono::system_clock::now();
+    vector<vector<bitset<SIZE>>> testBitConj = bitsetConjunction(aps[0], aps[1]);
+    end = std::chrono::system_clock::now();
+ 
+    std::chrono::duration<double> elapsed_seconds = end - start;
+    std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+ 
+    std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
 
-    vector<vector<vector<bitset<SIZE>>>> aps(2);
-    for (auto &v : aps) {
-        v.resize(1);
-        v[0].resize(2);
-    }
 
-    vector<vector<bitset<SIZE>>> prfff = getProfiles(aps[0], segmentation, segmentation[1], segmentation[2], 0, 3, true, false);
+    
+    
+
+    //vector<vector<bitset<SIZE>>> prfff = getProfiles(aps[0], segmentation, segmentation[1], segmentation[2], 0, 3, true, false);
 
     /*
     // RANDOM INPUT
@@ -1405,7 +1508,7 @@ int main() {
     }
     */
 
-
+    /*
     // EXHAUSTIVE INPUT
     int numBits = 8;
     int numBitsTwice = 2 * numBits;
@@ -1431,18 +1534,17 @@ int main() {
             }
         }
 
-        /*vector<vector<bitset<SIZE>>> testBit = bitsetNegation(aps[0]);
-        vector<set<string>> testProd = prodNegation(bitset2stringset_withSegments(aps[0]));
-        if (!isEqual(testProd, testBit)) {
-            cout << "check: " << i << endl;
-        }*/
+        //vector<vector<bitset<SIZE>>> testBit = bitsetNegation(aps[0]);
+        //vector<set<string>> testProd = prodNegation(bitset2stringset_withSegments(aps[0]));
+        //if (!isEqual(testProd, testBit)) {
+        //    cout << "check: " << i << endl;
+        //}
         
-        /*vector<vector<bitset<SIZE>>> test1 = bitsetPrefix(aps[0]);
-        vector<vector<bitset<SIZE>>> test2 = bitsetSuffix(aps[0]);
-        vector<vector<bitset<SIZE>>> test3 = bitsetInfix(aps[0]);*/
+        //vector<vector<bitset<SIZE>>> test1 = bitsetPrefix(aps[0]);
+        //vector<vector<bitset<SIZE>>> test2 = bitsetSuffix(aps[0]);
+        //vector<vector<bitset<SIZE>>> test3 = bitsetInfix(aps[0]);
     }
-    
-    int x = 0;
+    */
     
     /*
     // CONTROLLED INPUT
