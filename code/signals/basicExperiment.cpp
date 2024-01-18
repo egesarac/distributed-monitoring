@@ -751,8 +751,8 @@ vector<vector<bitset<N>>> bitsetEventually(const vector<vector<bitset<N>>> &v1) 
 }
 
 template<std::size_t N>
-vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &vv1, const vector<vector<bitset<N>>> &vv2) {
-    vector<vector<bitset<N>>> vv(vv1.size()); 
+vector<vector<bitset<N>>> bitsetUntil(vector<vector<bitset<N>>> v1, vector<vector<bitset<N>>> v2) {
+    vector<vector<bitset<N>>> vv(v1.size()); 
 
     for (auto & v : vv) {
         v.resize(2);
@@ -761,11 +761,16 @@ vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &vv1, cons
     bool firstBit0 = false;
     bool firstBit1 = true;
 
-    for (int i = vv1.size() - 1; i >= 0; i--) {
-        if (firstBit0 == true) {
-            vector<vector<bitset<N>>> v1 = vv1;
-            vector<vector<bitset<N>>> v2 = vv2;
+    for (int i = v1.size() - 1; i >= 0; i--) {
+        // TODO: improve this
+        vector<bool> save(4);
+        save[0] = v1[i][0][0];
+        save[1] = v1[i][1][0];
+        save[2] = v2[i][0][0];
+        save[3] = v2[i][1][0];
 
+
+        if (firstBit0 == true) {
             // handling the corner cases of 0 U x, 1 U x, x U 0, x U 1
             if (v1[i][0][0] == true) {
                 vv[i][0] = vv[i][0] | v2[i][0];
@@ -826,7 +831,7 @@ vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &vv1, cons
             if (ctr > -1) {
                 if (len1[2] == 2 && len1[0] == 0 && len1[1] == 0 && len1[3] == 0) {
                     while (ctr > 0) {
-                        vv[i][0][ctr] = vv2[i][0][ctr];
+                        vv[i][0][ctr] = v2[i][0][ctr];
                         ctr -= 2;
                     }
                 }
@@ -843,7 +848,7 @@ vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &vv1, cons
             if (ctr > -1) {
                 if (len1[2] == 2 && len1[0] == 0 && len1[1] == 0 && len1[3] == 0) {
                     while (ctr > 0) {
-                        vv[i][0][ctr] = vv2[i][0][ctr];
+                        vv[i][0][ctr] = v2[i][0][ctr];
                         ctr -= 2;
                     }
                 }
@@ -871,14 +876,34 @@ vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &vv1, cons
         }
 
         if (firstBit1 == true) {
-            vector<vector<bitset<N>>> v1 = vv1;
-            vector<vector<bitset<N>>> v2 = vv2;
+            v1[i][0][0] = save[0];
+            v1[i][1][0] = save[1];
+            v2[i][0][0] = save[2];
+            v2[i][1][0] = save[3];
 
             // handling the corner cases of 0Ux=x, 1Ux=1, xU0=Ax, xU1=1
+            if (v2[i][0][0] == true) {
+                vector<int> temp(4);
+                temp[0] = msb(v1[i][0] & evenMask) + 1; // 0...0
+                temp[1] = msb(v1[i][0] & oddMask) + 1; // 0...1
+                temp[2] = msb(v1[i][1] & oddMask) + 1; // 1...0
+                temp[3] = msb(v1[i][1] & evenMask) + 1; // 1...1
+                
+                vv[i][0][0] = vv[i][0][0] || (max(temp[0], temp[2]) > 0); 
+                vv[i][0][1] = vv[i][0][1] || (max(temp[1], temp[3]-2) > 0);
+                vv[i][1][0] = vv[i][1][0] || v1[i][1][0];
+
+                v2[i][0][0] = false;
+            }
+
             if (v1[i][0][0] == true) {
-                vv[i][0] = vv[i][0] | vv2[i][0];
-                vv[i][1] = vv[i][1] | vv2[i][1];
+                v2[i][0][0] = save[2];
+
+                vv[i][0] = vv[i][0] | v2[i][0];
+                vv[i][1] = vv[i][1] | v2[i][1];
                 v1[i][0][0] = false;
+
+                v2[i][0][0] = false;
             }
 
             if (v1[i][1][0] == true) {
@@ -886,19 +911,7 @@ vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &vv1, cons
                 v1[i][1][0] = false;
             }
 
-            if (v2[i][0][0] == true) {
-                vector<int> temp(4);
-                temp[0] = msb(vv1[i][0] & evenMask) + 1; // 0...0
-                temp[1] = msb(vv1[i][0] & oddMask) + 1; // 0...1
-                temp[2] = msb(vv1[i][1] & oddMask) + 1; // 1...0
-                temp[3] = msb(vv1[i][1] & evenMask) + 1; // 1...1
-                
-                vv[i][0][0] = vv[i][0][0] || (max(temp[0], temp[2]) > 0); 
-                vv[i][0][1] = vv[i][0][1] || (max(temp[1], temp[3]-2) > 0);
-                vv[i][1][0] = vv[i][1][0] || vv1[i][1][0];
 
-                v2[i][0][0] = false;
-            }
 
             if (v2[i][1][0] == true) {
                 vv[i][1][0] = true;
@@ -975,7 +988,7 @@ vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &vv1, cons
             if (ctr > -1) {
                 if (len1[2] == 2 && len1[0] == 0) {
                     while (ctr > 0) {
-                        vv[i][0][ctr] = vv2[i][0][ctr];
+                        vv[i][0][ctr] = v2[i][0][ctr];
                         ctr -= 2;
                     }
                 }
@@ -992,7 +1005,7 @@ vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &vv1, cons
             if (ctr > -1) {
                 if (len1[2] == 2 && len1[0] == 0 && len1[1] == 0 && len1[3] == 0) {
                    while (ctr > 0) {
-                        vv[i][0][ctr] = vv2[i][0][ctr];
+                        vv[i][0][ctr] = v2[i][0][ctr];
                         ctr -= 2;
                     }
                 }
@@ -1009,7 +1022,7 @@ vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &vv1, cons
             if (ctr > -1) {
                 if (len1[2] == 2 && len1[0] == 0 && len2[2] == 0) {
                     while (ctr > 0) {
-                        vv[i][1][ctr] = vv2[i][1][ctr];
+                        vv[i][1][ctr] = v2[i][1][ctr];
                         ctr -= 2;
                     }
                     int cc = len2[0] - 2;
@@ -1039,16 +1052,14 @@ vector<vector<bitset<N>>> bitsetUntil(const vector<vector<bitset<N>>> &vv1, cons
 }
 
 template<std::size_t N>
-vector<vector<bitset<N>>> bitsetConjunction(const vector<vector<bitset<N>>> &vv1, const vector<vector<bitset<N>>> &vv2) {
-    vector<vector<bitset<N>>> vv(vv1.size());
+vector<vector<bitset<N>>> bitsetConjunction(vector<vector<bitset<N>>> v1, vector<vector<bitset<N>>> v2) {
+    vector<vector<bitset<N>>> vv(v1.size());
 
     for (auto & v : vv) {
         v.resize(2);
     }
 
-    for (int i = 0; i < vv1.size(); i++) {
-        vector<vector<bitset<N>>> v1 = vv1;
-        vector<vector<bitset<N>>> v2 = vv2;
+    for (int i = 0; i < v1.size(); i++) {
         // handling the corner cases of conjunction with 0 or 1
         if (v1[i][0][0] == true) {
             vv[i][0][0] = true;
@@ -1264,21 +1275,22 @@ pair<int, int> convertIntoBoolWithDestutter(string str, string delimiter) {
 int main() {
 
     vector<int> N {1, 2};
-    vector<int> D {32, 64, 128};
+    vector<int> D {256, 512, 1024};
     vector<double> EPS {1, 2, 4, 8};
     vector<double> DEL {1, 2, 4, 8};
 
+    //int n = 1;
     int n = 2;
     
     ofstream results;
-    string filename = "results.txt";
+    string filename = "dummy.txt";
     results.open(filename);
 
     for (const auto &d : D) {
         for (const auto &eps : EPS) {
             for (const auto &del : DEL) {
                 vector<int> NUMEDGES;
-                int num = 1;
+                int num = 1; // FIX
                 while (num <= ceil((d + eps) / del) + 1) {
                     NUMEDGES.push_back(num);
                     num = num * 2;
@@ -1318,7 +1330,7 @@ int main() {
 
                         if(signals[1].empty()) {
                             continue;
-                        }  
+                        }
 
                         
 
@@ -1480,12 +1492,15 @@ int main() {
                         
                     
                         starttime = chrono::system_clock::now();
-                        vector<vector<bitset<SIZE>>> test = bitsetConjunction(aps[0], aps[1]);
+                        vector<vector<bitset<SIZE>>> test = bitsetUntil(aps[0], aps[1]);
+                        //vector<vector<bitset<SIZE>>> test = bitsetEventually(aps[0]);
                         endtime = chrono::system_clock::now();
                         chrono::duration<double, milli> evalTime = endtime - starttime;
                         //cout << evalTime.count() << endl;
 
+                        //results << d << " " << eps << " " << del << " " << numEdges1 << " " << numSegments << " " << intervalsTime.count() << " " << segmentationTime.count() << " " << valExprsTime.count() << " " << apsTime.count() << " " << evalTime.count() << endl;                        
                         results << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << intervalsTime.count() << " " << segmentationTime.count() << " " << valExprsTime.count() << " " << apsTime.count() << " " << evalTime.count() << endl;                        
+                        //cout << d << " " << eps << " " << del << " " << numEdges1 << " " << numSegments << " " << intervalsTime.count() << " " << segmentationTime.count() << " " << valExprsTime.count() << " " << apsTime.count() << " " << evalTime.count() << endl;                              
                         cout << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << intervalsTime.count() << " " << segmentationTime.count() << " " << valExprsTime.count() << " " << apsTime.count() << " " << evalTime.count() << endl;                              
                     }
                 }

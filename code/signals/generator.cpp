@@ -15,7 +15,7 @@ using namespace std;
 int main() {
 
     vector<int> N {1, 2};
-    vector<int> D {32, 64, 128};
+    vector<int> D {256, 512, 1024};
     vector<double> EPS {1, 2, 4, 8};
     vector<double> DEL {1, 2, 4, 8};
 
