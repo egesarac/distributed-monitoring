@@ -24,6 +24,7 @@ bitset<SIZE> oddMask;
 chrono::time_point<chrono::system_clock> starttime;
 chrono::time_point<chrono::system_clock> endtime;
 
+
 template<std::size_t N>
 int msb(const bitset<N> &bs) {
     for (int i = bs.size() - 1; i >= 0; i--) {
@@ -448,66 +449,153 @@ bool isEqual (vector<set<string>> productResult, vector<vector<bitset<N>>> bitse
     return flag;
 }
 
-template<std::size_t N>
-vector<bitset<N>> segmentFirstBit(vector<bitset<N>> v1) {
-    v1[0] = v1[0] & bitset<N>(1);
-    v1[1] = v1[1] & bitset<N>(1);
+pair<int, int> getNextIntervalForProfiles(const vector<int> &segmentation, const int &t1, const int &t2, const bool &leftOpen, const bool &rightOpen) { //TODO: real valued time points
+    int s1, s2;
 
-    return v1;
+    return make_pair(s1, s2);
 }
 
 template<std::size_t N>
-vector<bitset<N>> segmentInfix(vector<bitset<N>> v1) {
-    int maxInd = max(msb(v1[0] & (evenMask | oddMask)), msb(v1[1] & (evenMask | oddMask)));
-
-    for (int j = 0; j < maxInd; j++) {
-        v1[0][j] = true;
-        v1[1][j] = true;
+vector<bitset<N>> bitsetConcat(const vector<bitset<N>> &v1, const vector<bitset<N>> &v2) {
+    vector<bitset<N>> out(2);
+    // TODO: check and fix -- v1 empty? 
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j <= msb(v1[i]); j++) {
+            if (v1[i][j] == true) {
+                for (int x = 0; x < 2; x++) {
+                    for (int y = 0; y <= msb(v2[x]); y++) {
+                        if (v2[x][y] == true) {
+                            if ((i == x && j % 2 == 1) || (i != x && j % 2 == 0)) {
+                                out[i][j + y + 1] = true;
+                            }
+                            else {
+                                out[i][j + y] = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    return v1;
+    return out;
 }
 
 template<std::size_t N>
-vector<bitset<N>> segmentSuffix(vector<bitset<N>> v1) {
-    int maxInd0 = max(msb(v1[0] & evenMask), msb(v1[1] & oddMask));
-    int maxInd1 = max(msb(v1[0] & oddMask), msb(v1[1] & evenMask));
+vector<vector<bitset<N>>> getProfiles(vector<vector<bitset<N>>> v, vector<double> segmentation, const double &t1, const double &t2, const double &a, const double &b, const bool &leftClosed, const bool &rightClosed) { //TODO: real valued time points
+    vector<vector<bitset<N>>> profiles;
 
-    for (int j = maxInd0; j >= 0; j--) {
-        if (j % 2 == 0) {
-            v1[0][j] = true;
+    // to handle the cases where the window falls out of the signal
+    segmentation.push_back(INT32_MAX);
+    vector<bitset<N>> temp(2);
+    temp[0][0] = true;
+    v.push_back(temp);
+
+    vector<vector<double>> breakpoints(2);
+
+
+    // TODO: check and improve
+    breakpoints[0].push_back(t1 + a);
+    int low0 = upper_bound(segmentation.begin(), segmentation.end(), t1 + a) - segmentation.begin();
+    int high0 = lower_bound(segmentation.begin(), segmentation.end(), t2 + a) - segmentation.begin() - 1;
+    for (int i = low0; i <= high0; i++) {
+        breakpoints[0].push_back(segmentation[i] - 0.000001);
+        breakpoints[0].push_back(segmentation[i]);
+    }
+    if (segmentation[high0] < t2 + a) {
+        breakpoints[0].push_back(t2 + a - 0.000001);
+        breakpoints[0].push_back(t2 + a);
+    }
+
+    breakpoints[1].push_back(t1 + b);
+    int low1 = upper_bound(segmentation.begin(), segmentation.end(), t1 + b) - segmentation.begin();
+    int high1 = lower_bound(segmentation.begin(), segmentation.end(), t2 + b) - segmentation.begin() - 1;
+    for (int i = low1; i <= high1; i++) {
+        breakpoints[1].push_back(segmentation[i] - 0.000001);
+        breakpoints[1].push_back(segmentation[i]);
+    }
+    if (segmentation[high1] < t2 + b) {
+        breakpoints[1].push_back(t2 + b - 0.000001);
+        breakpoints[1].push_back(t2 + b);
+    }
+
+    int l0 = breakpoints[0].size() - 1; // to ignore the last interval
+    int l1 = breakpoints[1].size() - 1;
+
+    int i0 = 0;
+    int i1 = 0;
+
+    while (i0 < l0 && i1 < l1) {
+        // find the relation of the current window to the segments, determine which actions to carry for the profile (prefix, suffix, etc)
+    
+
+        // check if we can fit another profile before this one
+
+
+        /*alternative to above: add artificial breakpoints to capture the check step
+            while populating the breakpoints vector, add for each x first the value x-dbl_min then x
+            first implement this, then check the other
+        */
+
+        double left = breakpoints[0][i0];       
+        double right = breakpoints[1][i1];
+
+
+        // functions here depend on rightClosed -- might have to concat the first bits of the next segment
+        //int xind = low0 + ((i0 + 1) % 2);
+        int xind = upper_bound(segmentation.begin() + low0 - 1, segmentation.begin() + high1, left) - segmentation.begin() - 1;
+        //int yind = low1 + ((i1 + 1) % 2);
+        int yind = lower_bound(segmentation.begin() + low0 - 1, segmentation.begin() + high1, right) - segmentation.begin();
+
+        if (yind - xind == 0) { // the two ends of the window belong to the same segment
+            if (left == segmentation[xind]) { // the window starts together with the segment
+                /*concat: prefix*/
+            }
+            else { // the window starts after the beginning of the segment
+                /*concat: infix*/
+            }
+        }
+        else { // the two ends of the window fall in different segments
+            if (left == segmentation[xind]) {
+                /*concat: entire segment*/
+            }
+            else {
+                /*concat: suffix*/
+
+            }
+    
+            /*concat: every full segment between two end points*/
+
+            // TODO: fix below
+            if (right == segmentation[yind] && rightClosed) {
+                /*concat: firstBit*/
+            }
+            else if (right != segmentation[yind]) {
+                /*concat: prefix*/
+            }
+        }
+
+        
+
+
+        // slide the window
+        if (breakpoints[0][i0 + 1] - breakpoints[0][i0] < breakpoints[1][i1 + 1] - breakpoints[1][i1]) {
+            breakpoints[1][i1] += (breakpoints[0][i0 + 1] - breakpoints[0][i0]);
+            i0++;
+        }
+        else if (breakpoints[0][i0 + 1] - breakpoints[0][i0] > breakpoints[1][i1 + 1] - breakpoints[1][i1]) {
+            breakpoints[0][i0] += (breakpoints[1][i1 + 1] - breakpoints[1][i1]);
+            i1++;
+
         }
         else {
-            v1[1][j] = true;
+            breakpoints[1][i1] += (breakpoints[0][i0 + 1] - breakpoints[0][i0]);
+            i0++;
+            i1++;
         }
     }
 
-    for (int j = maxInd1; j >= 0; j--) {
-        if (j % 2 == 0) {
-            v1[1][j] = true;
-        }
-        else {
-            v1[0][j] = true;
-        }
-    }
-
-    return v1;
-}
-
-template<std::size_t N>
-vector<bitset<N>> segmentPrefix(vector<bitset<N>> v1) {
-    int maxInd0 = msb(v1[0] & (evenMask | oddMask));
-    int maxInd1 = msb(v1[1] & (evenMask | oddMask));
-
-    for (int j = 0; j <= maxInd0; j++) {
-        v1[0][j] = true;
-    }
-
-    for (int j = 0; j <= maxInd1; j++) {
-        v1[1][j] = true;
-    }
-
-    return v1;
+    return profiles;
 }
 
 template<std::size_t N>
@@ -568,155 +656,6 @@ vector<vector<bitset<N>>> bitsetPrefix(vector<vector<bitset<N>>> v1) {
     }
 
     return v1;
-}
-
-template<std::size_t N>
-vector<bitset<N>> bitsetConcat(const vector<bitset<N>> &v1, const vector<bitset<N>> &v2) {
-    if (v1[0].none() && v1[1].none()) {
-        return v2;
-    }
-    
-    vector<bitset<N>> out(2);
-    for (int i = 0; i < 2; i++) {
-        for (int j = 0; j <= msb(v1[i]); j++) {
-            if (v1[i][j] == true) {
-                for (int x = 0; x < 2; x++) {
-                    for (int y = 0; y <= msb(v2[x]); y++) {
-                        if (v2[x][y] == true) {
-                            if ((i == x && j % 2 == 1) || (i != x && j % 2 == 0)) {
-                                out[i][j + y + 1] = true;
-                            }
-                            else {
-                                out[i][j + y] = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return out;
-}
-
-template<std::size_t N>
-vector<vector<bitset<N>>> getProfiles(vector<vector<bitset<N>>> v, vector<long long> segmentation, const long long &t1, const long long &t2, const long long &a, const long long &b, const bool &leftClosed, const bool &rightClosed) { //TODO: real valued time points
-    vector<vector<bitset<N>>> profiles;
-
-    // to handle the cases where the window falls out of the signal
-    segmentation.push_back(INT32_MAX);
-    vector<bitset<N>> temp(2);
-    temp[0][0] = true;
-    v.push_back(temp);
-
-    vector<vector<long long>> breakpoints(2);
-
-
-    // TODO: check and improve
-    breakpoints[0].push_back(t1 + a);
-    int low0 = upper_bound(segmentation.begin(), segmentation.end(), t1 + a) - segmentation.begin();
-    int high0 = lower_bound(segmentation.begin(), segmentation.end(), t2 + a) - segmentation.begin() - 1;
-    for (int i = low0; i <= high0; i++) {
-        breakpoints[0].push_back(segmentation[i] - 1);
-        breakpoints[0].push_back(segmentation[i]);
-    }
-    if (segmentation[high0] < t2 + a) {
-        breakpoints[0].push_back(t2 + a - 1);
-        breakpoints[0].push_back(t2 + a);
-    }
-
-    breakpoints[1].push_back(t1 + b);
-    int low1 = upper_bound(segmentation.begin(), segmentation.end(), t1 + b) - segmentation.begin();
-    int high1 = lower_bound(segmentation.begin(), segmentation.end(), t2 + b) - segmentation.begin() - 1;
-    for (int i = low1; i <= high1; i++) {
-        breakpoints[1].push_back(segmentation[i] - 1);
-        breakpoints[1].push_back(segmentation[i]);
-    }
-    if (segmentation[high1] < t2 + b) {
-        breakpoints[1].push_back(t2 + b - 1);
-        breakpoints[1].push_back(t2 + b);
-    }
-
-    // to ignore the last interval which includes the point t2+b
-    int l0 = breakpoints[0].size() - 1; 
-    int l1 = breakpoints[1].size() - 1;
-
-    int i0 = 0;
-    int i1 = 0;
-
-    while (i0 < l0 && i1 < l1) {
-        // find the relation of the current window to the segments, determine which actions to carry for the profile (prefix, suffix, etc)
-
-        long long left = breakpoints[0][i0];       
-        long long right = breakpoints[1][i1];
-
-        // TODO: check -> functions here depend on rightClosed -- might have to concat the first bits of the next segment
-        //int xind = low0 + ((i0 + 1) % 2);
-        int xind = upper_bound(segmentation.begin() + low0 - 1, segmentation.begin() + high1 + 1, left) - segmentation.begin() - 1;
-        //int yind = low1 + ((i1 + 1) % 2);
-        //int yind = lower_bound(segmentation.begin() + low0 - 1, segmentation.begin() + high1, right) - segmentation.begin();
-        int yind = upper_bound(segmentation.begin() + low0 - 1, segmentation.begin() + high1 + 1, right) - segmentation.begin() - 1;
-
-         vector<bitset<N>> pr(2);
-
-        if (yind - xind == 0) { // the two ends of the window belong to the same segment
-            if (left == segmentation[xind]) { // the window starts together with the segment
-                //concat: prefix
-                pr = bitsetConcat(pr, segmentPrefix(v[xind]));
-            }
-            else { // the window starts after the beginning of the segment
-                //concat: infix
-                pr = bitsetConcat(pr, segmentInfix(v[xind]));
-            }
-        }
-        else { // the two ends of the window fall in different segments
-            if (left == segmentation[xind]) {
-                //concat: entire segment
-                pr = bitsetConcat(pr, v[xind]);
-            }
-            else {
-                //concat: suffix
-                pr = bitsetConcat(pr, segmentSuffix(v[xind]));
-            }
-    
-            //concat: every full segment between two end points
-            for (int xx = xind + 1; xx < yind; xx++) {
-                pr = bitsetConcat(pr, v[xx]);
-            }
-
-            // TODO: fix below
-            if (right == segmentation[yind] && rightClosed) {
-                //concat: firstBit
-                pr = bitsetConcat(pr, segmentFirstBit(v[yind]));
-
-            }
-            else if (right != segmentation[yind]) {
-                //concat: prefix
-                pr = bitsetConcat(pr, segmentPrefix(v[yind]));
-            }
-        }
-
-
-        profiles.push_back(pr);
-
-        // slide the window
-        if (breakpoints[0][i0 + 1] - breakpoints[0][i0] < breakpoints[1][i1 + 1] - breakpoints[1][i1]) {
-            breakpoints[1][i1] += (breakpoints[0][i0 + 1] - breakpoints[0][i0]);
-            i0++;
-        }
-        else if (breakpoints[0][i0 + 1] - breakpoints[0][i0] > breakpoints[1][i1 + 1] - breakpoints[1][i1]) {
-            breakpoints[0][i0] += (breakpoints[1][i1 + 1] - breakpoints[1][i1]);
-            i1++;
-
-        }
-        else {
-            breakpoints[1][i1] += (breakpoints[0][i0 + 1] - breakpoints[0][i0]);
-            i0++;
-            i1++;
-        }
-    }
-
-    return profiles;
 }
 
 template<std::size_t N>
@@ -806,50 +745,6 @@ vector<vector<bitset<N>>> bitsetEventually(const vector<vector<bitset<N>>> &v1) 
         else {
             firstBit1 = false;
         }
-    }
-
-    return vv;
-}
-
-template<std::size_t N>
-vector<vector<bitset<N>>> bitsetBoundedAlways(vector<vector<bitset<N>>> &v1, vector<long long> segmentation, const long long &a, const long long &b, const bool &leftClosed, const bool &rightClosed) { //TODO: real valued time points
-    vector<vector<bitset<N>>> vv(v1.size()); 
-
-    for (auto & v : vv) {
-        v.resize(2);
-    }
-    
-    for (int i = 0; i < v1.size(); i++) {
-        vector<vector<bitset<N>>> temp = getProfiles(v1, segmentation, segmentation[i], segmentation[i + 1], a, b, leftClosed, rightClosed);
-
-        temp = bitsetAlways(temp);
-        for (int j = 1; j < temp.size(); j++) {
-            temp[0] = bitsetConcat(temp[0], temp[j]);
-        }
-
-        vv[i] = temp[0];
-    }
-
-    return vv;
-}
-
-template<std::size_t N>
-vector<vector<bitset<N>>> bitsetBoundedEventually(vector<vector<bitset<N>>> &v1, vector<long long> segmentation, const long long &a, const long long &b, const bool &leftClosed, const bool &rightClosed) { //TODO: real valued time points
-    vector<vector<bitset<N>>> vv(v1.size()); 
-
-    for (auto & v : vv) {
-        v.resize(2);
-    }
-    
-    for (int i = 0; i < v1.size(); i++) {
-        vector<vector<bitset<N>>> temp = getProfiles(v1, segmentation, segmentation[i], segmentation[i + 1], a, b, leftClosed, rightClosed);
-
-        temp = bitsetEventually(temp);
-        for (int j = 1; j < temp.size(); j++) {
-            temp[0] = bitsetConcat(temp[0], temp[j]);
-        }
-
-        vv[i] = temp[0];
     }
 
     return vv;
@@ -1377,425 +1272,254 @@ pair<int, int> convertIntoBoolWithDestutter(string str, string delimiter) {
     return make_pair(x, y);
 }
 
+
+
 int main() {
-    /* get spec */ 
-    // TODO
-    int m;
-    long long eps = 2000;
-    long long del = 1000;
 
-    /* generate random signals */ 
+    vector<int> N {1, 2};
+    vector<int> D {4, 8, 16};
+    vector<double> EPS {1, 2, 4};
+    vector<double> DEL {1, 2, 4};
+
+    //int n = 1;
     int n = 2;
-    int d = 10;
-    int maxEdges = ceil((d + eps) / del) + 1; // per signal, including the initial value
-    double minVal = -10;
-    double maxVal = 10;
-
-    // integer time stamps, boolean values
-    // TODO: update to real time stamps and values
     
-    //random_device rd;  // a seed source for the random number engine
-    //mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
-    int seed = 1234;
-    mt19937 gen(seed);
+    ofstream results;
+    string filename = "dummy_fp.txt";
+    results.open(filename);
 
-    uniform_int_distribution<> edgeDist(1, maxEdges);
-    //uniform_int_distribution<> timeDist(0, d - 1);
-    uniform_int_distribution<> valDist(0, 1);
-    uniform_real_distribution<> timeDist(0, d);
-    //uniform_real_distribution<> valDist(minVal, maxVal);
-
-    vector<map<long long,double>> signalsTemp(n);
-
-    for (auto &sig : signalsTemp) {
-        set<long long> timeStamps;
-        
-        timeStamps.insert(0);
-
-        int numEdges = edgeDist(gen);
-        for (int i = 0; i < numEdges; i++) {
-            long long temp = timeDist(gen) * 1000;
-            if  (timeStamps.find(temp) == timeStamps.end()) {
-                timeStamps.insert(temp);
-            }
-            else {
-                i--;
-            }
-        }
-
-        int initVal = valDist(gen);
-        int ctr = 0;
-        for (const auto &t : timeStamps) {
-            sig[t] = (initVal + ctr) % 2;
-            ctr++;
-        }
-        
-
-        /*double initVal = valDist(gen);
-        sig[0] = valDist(gen);
-        for (const auto &t : timeStamps) {
-            sig[t] = valDist(gen);
-        }*/
-
-        
-    }
-
-    vector<vector<pair<long long,double>>> signals(n);
-
-    for (int i = 0; i < n; i++) {
-        for (const auto &edge : signalsTemp[i]) {
-            signals[i].push_back(make_pair(edge.first, edge.second));
-        }
-    }
-
-    /* compute the uncertainty intervals */
-    vector<vector<vector<long long>>> uncertainties(n);
-
-    for (int i = 0; i < n; i++) {
-        int gi = signals[i].size();
-        uncertainties[i].resize(gi);
-
-        uncertainties[i][0].push_back(-del);
-        for (int j = 1; j < gi; j++) {
-            int tj = signals[i][j].first;
-            int low = max(uncertainties[i][j - 1][0] + del, tj - eps);
-            uncertainties[i][j].push_back(low);
-        }
-
-        uncertainties[i][gi - 1].push_back(signals[i][gi - 1].first + eps);
-        for (int j = gi - 2; j > 0; j--) {
-            int tj = signals[i][j].first;
-            int high = min(uncertainties[i][j + 1][1] - del, tj + eps);
-            uncertainties[i][j].push_back(high);
-
-            // check input validity
-            /*if (uncertainties[i][j][0] >= uncertainties[i][j][1]) {
-                cout << "invalid input" << endl;
-                return -1;
-            }*/
-        }
-    }
-
-    /* compute the canonical segmentation */
-    set<long long> segmentation_temp;
-    segmentation_temp.insert(0.0);
-    segmentation_temp.insert(max(signals[0][signals[0].size() - 1].first, (long long)(d * 1000)));
-
-    for (const auto &s : uncertainties) {
-        for (int j = 1; j < s.size(); j++) {
-            for (auto b : s[j]) {
-                segmentation_temp.insert(b);
-            }
-        }
-    }
-
-    vector<long long> segmentation;
-    //segmentation.push_back(0);
-    for (const auto &b : segmentation_temp) {
-        segmentation.push_back(b);
-    }
-    /*if (segmentation[segmentation.size() - 1] < d * 1000) {
-        segmentation.push_back(d * 1000);
-    }*/
-
-    int numSegments = segmentation.size() - 1;
-
-    /* compute the value expressions */
-    // TODO: check and improve
-    vector<vector<set<string>>> valExprs(n);
-    
-    for (int i = 0; i < n; i++) {
-        valExprs[i].resize(numSegments);
-
-        for (int j = 0; j < numSegments; j++) {
-            valExprs[i][j].insert("");
-
-            for (int k = 1; k < uncertainties[i].size(); k++) {
-                if (segmentation[j] == uncertainties[i][k][0] && segmentation[j + 1] == uncertainties[i][k][1]) {
-                    // entire expression
-                    set<string> temp;
-                    string expr = to_string(signals[i][k - 1].second) + ";" + to_string(signals[i][k].second);
-                    temp.insert("");
-                    temp.insert(expr);
-                    valExprs[i][j] = concatWithDestutter(valExprs[i][j], temp);
+    for (const auto &d : D) {
+        for (const auto &eps : EPS) {
+            for (const auto &del : DEL) {
+                vector<int> NUMEDGES;
+                int num = 1; // FIX
+                while (num <= ceil((d + eps) / del) + 1) {
+                    NUMEDGES.push_back(num);
+                    num = num * 2;
                 }
-                else if (segmentation[j] == uncertainties[i][k][0] && segmentation[j + 1] < uncertainties[i][k][1]) {
-                    // prefix
-                    set<string> temp;
-                    string expr = to_string(signals[i][k - 1].second) + ";" + to_string(signals[i][k].second);
-                    temp.insert("");
-                    temp.insert(expr);
-                    temp.insert(expr.substr(0, expr.find(';')));
-                    valExprs[i][j] = concatWithDestutter(valExprs[i][j], temp);
+                    
+                for (const auto &numEdges1 : NUMEDGES) {
+                    vector<vector<pair<double,double>>> signals(n);
+                    string filename1 = "data/" + to_string(d) + "_" + to_string(int(eps)) + "_" + to_string(int(del)) + "_" + to_string(numEdges1) + "_1.txt";
+                    ifstream sigdata1(filename1);
 
-                }
-                else if (segmentation[j] > uncertainties[i][k][0] && segmentation[j + 1] == uncertainties[i][k][1]) {
-                    // suffix
-                    set<string> temp;
-                    string expr = to_string(signals[i][k - 1].second) + ";" + to_string(signals[i][k].second);
-                    temp.insert("");
-                    temp.insert(expr);
-                    temp.insert(expr.substr(expr.find(';') + 1, expr.length()));
-                    valExprs[i][j] = concatWithDestutter(valExprs[i][j], temp);
-                }
-                else if (segmentation[j] > uncertainties[i][k][0] && segmentation[j + 1] < uncertainties[i][k][1]) {
-                    // infix
-                    set<string> temp;
-                    string expr = to_string(signals[i][k - 1].second) + ";" + to_string(signals[i][k].second);
-                    temp.insert("");
-                    temp.insert(expr);
-                    temp.insert(expr.substr(0, expr.find(';')));
-                    temp.insert(expr.substr(expr.find(';') + 1, expr.length()));
-                    valExprs[i][j] = concatWithDestutter(valExprs[i][j], temp);
-                }
-            }
-
-            if (valExprs[i][j].size() == 1) {
-                int kk = 1;
-                while (kk < uncertainties[i].size() && uncertainties[i][kk][1] <= segmentation[j]) {
-                    kk++;
-                }
-                valExprs[i][j].insert(to_string(signals[i][kk - 1].second));
-            }
-        }
-    }
-
-    /* translate real-valued signals to atomic propositions */
-    vector<vector<vector<bitset<SIZE>>>> aps(n);
-    for (auto &v : aps) {
-        v.resize(numSegments);
-        for (auto &vv : v) {
-            vv.resize(2);
-        }
-    }
-
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < numSegments; j++) {
-            for (auto &expr : valExprs[i][j]) {
-                if (expr != "") {
-                    pair<int, int> xy = convertIntoBoolWithDestutter(expr, ";");
-                    if (xy.first >= 0 && xy.second >= 0) {
-                        aps[i][j][xy.first][xy.second] = true;
+                    string line1;
+                    while(getline(sigdata1, line1)) {
+                        stringstream linestream(line1);
+                        double t, v;
+                        linestream >> t >> v;
+                        signals[0].push_back(make_pair(t, v));
                     }
-                }
-                
-            }
-        }
-    }
+                    sigdata1.close();
 
-    for (int i = 0; i < SIZE; i++) {
-        if (i % 2 == 0) {
-            evenMask[i] = true;
-        }
-        else {
-            oddMask[i] = true;
-        }
-    }
-    
-    /*
-    std::chrono::time_point<std::chrono::system_clock> start, end;
- 
-    start = std::chrono::system_clock::now();
-    vector<vector<bitset<SIZE>>> testBitConj = bitsetConjunction(aps[0], aps[1]);
-    end = std::chrono::system_clock::now();
- 
-    std::chrono::duration<double> elapsed_seconds = end - start;
-    std::time_t end_time = std::chrono::system_clock::to_time_t(end);
- 
-    std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
-    */
-
-    
-    
-
-    vector<vector<bitset<SIZE>>> test = bitsetBoundedEventually(aps[0], segmentation, 0, 3000, true, false);
-
-    /*
-    // RANDOM INPUT
-    uniform_int_distribution<> rrr(0, 32);
-    //random_device rd;  // a seed source for the random number engine
-    //mt19937 gn(rd()); // mersenne_twister_engine seeded with rd()
-    for (int i = 0; i < 1000; i++) { //486 bad input
-        int sd = i;
-        cout << "seed " << sd << endl;
-        mt19937 gn(sd);
-        for (int j = 0; j < 4; j++) {
-            aps[j/2][0][j%2] = rrr(gn);
-        }
-        
-        vector<vector<bitset<SIZE>>> testBit = bitsetUntil(aps[0], aps[1]);
-
-        vector<set<pair<string, string>>> pr = asyncProd(aps[0], aps[1]);
-        //cout << i << " " << pr[0].size() << endl;
-        vector<set<string>> testProd = prodUntil1(pr);
-
-        if (!isEqual(testProd, testBit)) {
-            cout << "check: " << i << endl;
-        }    
-    }
-    */
-
-    /*
-    // EXHAUSTIVE INPUT
-    int numBits = 8;
-    int numBitsTwice = 2 * numBits;
-    unsigned long long bound = (1 << numBitsTwice);
-
-    unsigned int mask0 = (1 << numBits) - 1;
-    unsigned int mask1 = ~mask0;
-
-    for (int i = 1; i < bound; i++) {
-        aps[0][0][0] = bitset<SIZE>(i & mask0);
-        aps[0][0][1] = bitset<SIZE>((i & mask1) >> numBits);
-
-        for (int j = 1; j < bound; j++) {
-            aps[1][0][0] = bitset<SIZE>(j & mask0);
-            aps[1][0][1] = bitset<SIZE>((j & mask1) >> numBits);
-
-            vector<vector<bitset<SIZE>>> testBit = bitsetUntil(aps[0], aps[1]);
-            vector<set<pair<string, string>>> pr = asyncProd(aps[0], aps[1]);
-            vector<set<string>> testProd = prodUntil1(pr);
-
-            if (!isEqual(testProd, testBit)) {
-                cout << "check: " << i << " " << j << endl;
-            }
-        }
-
-        //vector<vector<bitset<SIZE>>> testBit = bitsetNegation(aps[0]);
-        //vector<set<string>> testProd = prodNegation(bitset2stringset_withSegments(aps[0]));
-        //if (!isEqual(testProd, testBit)) {
-        //    cout << "check: " << i << endl;
-        //}
-        
-        //vector<vector<bitset<SIZE>>> test1 = bitsetPrefix(aps[0]);
-        //vector<vector<bitset<SIZE>>> test2 = bitsetSuffix(aps[0]);
-        //vector<vector<bitset<SIZE>>> test3 = bitsetInfix(aps[0]);
-    }
-    */
-    
-    /*
-    // CONTROLLED INPUT
-    aps[0][0][0] = bitset<SIZE>("");
-    aps[0][0][1] = bitset<SIZE>("10");
-    aps[1][0][0] = bitset<SIZE>("");
-    aps[1][0][1] = bitset<SIZE>("100000");
-
-    //vector<vector<bitset<SIZE>>> testBit = bitsetUntil(aps[0], aps[1]);
-    vector<set<pair<string, string>>> pr = asyncProd(aps[0], aps[1]);
-    //cout << i << " " << pr[0].size() << endl;
-    vector<set<string>> testProd = prodUntil1(pr);
-
-    if (!isEqual(testProd, testBit)) {
-        cout << "check" << endl;
-    }
-    int asdf = 0;*/
-
-
-    /*
-    // EXHAUSTIVE, CONTROLLED, 1-1 INPUT
-    int NN = 8;
-    for (int a = 0; a < 4; a++) {
-        for (int b = 0; b < 4; b++) {
-            int M0, M1;
-
-            if (a == 0 || a == 3) {
-                M0 = NN - 1;
-            }
-            else {
-                M0 = NN - 2;
-            }
-
-            if (b == 0 || b == 3) {
-                M1 = NN - 1;
-            }
-            else {
-                M1 = NN - 2;
-            }
-
-            
-            for (int i = M0; i >= 0; i -= 2) {
-                string s0(NN, '0');
-                s0[i] = '1';
-
-                for (int j = M1; j >= 0; j -= 2) {
-                    string s1(NN, '0');
-                    s1[j] = '1';
-
-                    if (a < 2) {
-                        aps[0][0][0] = bitset<SIZE>(s0);
-                        aps[0][0][1] = bitset<SIZE>("0");
-                    }
-                    else {
-                        aps[0][0][0] = bitset<SIZE>("0");
-                        aps[0][0][1] = bitset<SIZE>(s0);
+                    if(signals[0].empty()) {
+                        continue;
                     }
 
-                    if (b < 2) {
-                        aps[1][0][0] = bitset<SIZE>(s1);
-                        aps[1][0][1] = bitset<SIZE>("0");
-                    }
-                    else {
-                        aps[1][0][0] = bitset<SIZE>("0");
-                        aps[1][0][1] = bitset<SIZE>(s1);
-                    }
+                    for (const auto &numEdges2 : NUMEDGES) {
+                        signals[1].clear();
+                        string filename2 = "data/" + to_string(d) + "_" + to_string(int(eps)) + "_" + to_string(int(del)) + "_" + to_string(numEdges2) + "_2.txt";
+                        ifstream sigdata2(filename2);
 
-                    vector<vector<bitset<SIZE>>> testBit = bitsetUntil(aps[0], aps[1]);
-                    vector<set<pair<string, string>>> pr = asyncProd(aps[0], aps[1]);
-                    vector<set<string>> testProd = prodUntil0(pr);
+                        string line2;
+                        while(getline(sigdata2, line2)) {
+                            stringstream linestream(line2);
+                            double t, v;
+                            linestream >> t >> v;
+                            signals[1].push_back(make_pair(t, v));
+                        }
+                        sigdata2.close();
 
-                    if (!isEqual(testProd, testBit)) {
-                        cout << "check: " << i  << " " << j << endl;
-                    }             
+                        if(signals[1].empty()) {
+                            continue;
+                        }
+
+                        
+
+                        /* compute the uncertainty intervals */
+                        starttime = chrono::system_clock::now();
+
+                        vector<vector<vector<double>>> uncertainties(n);
+
+                        for (int i = 0; i < n; i++) {
+                            int gi = signals[i].size();
+                            uncertainties[i].resize(gi);
+
+                            uncertainties[i][0].push_back(-del);
+                            for (int j = 1; j < gi; j++) {
+                                double tj = signals[i][j].first;
+                                double low = max(uncertainties[i][j - 1][0] + del, tj - eps);
+                                uncertainties[i][j].push_back(low);
+                            }
+
+                            uncertainties[i][gi - 1].push_back(signals[i][gi - 1].first + eps);
+                            for (int j = gi - 2; j > 0; j--) {
+                                double tj = signals[i][j].first;
+                                double high = min(uncertainties[i][j + 1][1] - del, tj + eps);
+                                uncertainties[i][j].push_back(high);
+                            }
+                        }
+
+                        endtime = chrono::system_clock::now();
+                        chrono::duration<double, milli> intervalsTime = endtime - starttime;
+
+                        /* compute the actual concurrent events */
+                        // TODO
+
+                        /* generate all valid interleavings */
+                        // TODO
+
+                        /* evaluate all valid interleavings and store in bitsets */
+                        // TODO
+
+                        /* compute the canonical segmentation */
+                        starttime = chrono::system_clock::now();
+
+                        set<double> segmentation_temp;
+
+                        segmentation_temp.insert(0.0);
+                        segmentation_temp.insert(max(double(d), signals[0][signals[0].size() - 1].first));
+
+                        for (const auto &s : uncertainties) {
+                            for (int j = 1; j < s.size(); j++) {
+                                for (auto b : s[j]) {
+                                    segmentation_temp.insert(b);
+                                }
+                            }
+                        }
+
+                        vector<double> segmentation;
+                        for (const auto &b : segmentation_temp) {
+                            segmentation.push_back(b);
+                        }
+
+                        int numSegments = segmentation.size() - 1;
+
+                        endtime = chrono::system_clock::now();
+                        chrono::duration<double, milli> segmentationTime = endtime - starttime;
+
+                        /* compute the value expressions */
+                        // TODO: check and improve
+                        starttime = chrono::system_clock::now();
+
+                        vector<vector<set<string>>> valExprs(n);
+                        
+                        for (int i = 0; i < n; i++) {
+                            valExprs[i].resize(numSegments);
+
+                            for (int j = 0; j < numSegments; j++) {
+                                valExprs[i][j].insert("");
+
+                                for (int k = 1; k < uncertainties[i].size(); k++) {
+                                    if (segmentation[j] == uncertainties[i][k][0] && segmentation[j + 1] == uncertainties[i][k][1]) {
+                                        // entire expression
+                                        set<string> temp;
+                                        string expr = to_string(signals[i][k - 1].second) + ";" + to_string(signals[i][k].second);
+                                        temp.insert("");
+                                        temp.insert(expr);
+                                        valExprs[i][j] = concatWithDestutter(valExprs[i][j], temp);
+                                    }
+                                    else if (segmentation[j] == uncertainties[i][k][0] && segmentation[j + 1] < uncertainties[i][k][1]) {
+                                        // prefix
+                                        set<string> temp;
+                                        string expr = to_string(signals[i][k - 1].second) + ";" + to_string(signals[i][k].second);
+                                        temp.insert("");
+                                        temp.insert(expr);
+                                        temp.insert(expr.substr(0, expr.find(';')));
+                                        valExprs[i][j] = concatWithDestutter(valExprs[i][j], temp);
+
+                                    }
+                                    else if (segmentation[j] > uncertainties[i][k][0] && segmentation[j + 1] == uncertainties[i][k][1]) {
+                                        // suffix
+                                        set<string> temp;
+                                        string expr = to_string(signals[i][k - 1].second) + ";" + to_string(signals[i][k].second);
+                                        temp.insert("");
+                                        temp.insert(expr);
+                                        temp.insert(expr.substr(expr.find(';') + 1, expr.length()));
+                                        valExprs[i][j] = concatWithDestutter(valExprs[i][j], temp);
+                                    }
+                                    else if (segmentation[j] > uncertainties[i][k][0] && segmentation[j + 1] < uncertainties[i][k][1]) {
+                                        // infix
+                                        set<string> temp;
+                                        string expr = to_string(signals[i][k - 1].second) + ";" + to_string(signals[i][k].second);
+                                        temp.insert("");
+                                        temp.insert(expr);
+                                        temp.insert(expr.substr(0, expr.find(';')));
+                                        temp.insert(expr.substr(expr.find(';') + 1, expr.length()));
+                                        valExprs[i][j] = concatWithDestutter(valExprs[i][j], temp);
+                                    }
+                                }
+
+                                if (valExprs[i][j].size() == 1) {
+                                    int kk = 1;
+                                    while (kk < uncertainties[i].size() && uncertainties[i][kk][1] <= segmentation[j]) {
+                                        kk++;
+                                    }
+                                    valExprs[i][j].insert(to_string(signals[i][kk - 1].second));
+                                }
+                            }
+                        }
+
+                        endtime = chrono::system_clock::now();
+                        chrono::duration<double, milli> valExprsTime = endtime - starttime;
+
+                        /* translate real-valued signals to atomic propositions */
+                        starttime = chrono::system_clock::now();
+
+                        vector<vector<vector<bitset<SIZE>>>> aps(n);
+                        for (auto &v : aps) {
+                            v.resize(numSegments);
+                            for (auto &vv : v) {
+                                vv.resize(2);
+                            }
+                        }
+
+                        for (int i = 0; i < n; i++) {
+                            for (int j = 0; j < numSegments; j++) {
+                                for (auto &expr : valExprs[i][j]) {
+                                    if (expr != "") {
+                                        pair<int, int> xy = convertIntoBoolWithDestutter(expr, ";");
+                                        if (xy.first >= 0 && xy.second >= 0) {
+                                            aps[i][j][xy.first][xy.second] = true;
+                                        }
+                                    }
+                                    
+                                }
+                            }
+                        }
+
+                        endtime = chrono::system_clock::now();
+                        chrono::duration<double, milli> apsTime = endtime - starttime;
+
+                        for (int i = 0; i < SIZE; i++) {
+                            if (i % 2 == 0) {
+                                evenMask[i] = true;
+                            }
+                            else {
+                                oddMask[i] = true;
+                            }
+                        }
+                        
+                        
+                    
+                        starttime = chrono::system_clock::now();
+                        vector<vector<bitset<SIZE>>> test = bitsetUntil(aps[0], aps[1]);
+                        //vector<vector<bitset<SIZE>>> test = bitsetEventually(aps[0]);
+                        endtime = chrono::system_clock::now();
+                        chrono::duration<double, milli> evalTime = endtime - starttime;
+                        //cout << evalTime.count() << endl;
+
+                        //results << d << " " << eps << " " << del << " " << numEdges1 << " " << numSegments << " " << intervalsTime.count() << " " << segmentationTime.count() << " " << valExprsTime.count() << " " << apsTime.count() << " " << evalTime.count() << endl;                        
+                        results << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << intervalsTime.count() << " " << segmentationTime.count() << " " << valExprsTime.count() << " " << apsTime.count() << " " << evalTime.count() << endl;                        
+                        //cout << d << " " << eps << " " << del << " " << numEdges1 << " " << numSegments << " " << intervalsTime.count() << " " << segmentationTime.count() << " " << valExprsTime.count() << " " << apsTime.count() << " " << evalTime.count() << endl;                              
+                        cout << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << intervalsTime.count() << " " << segmentationTime.count() << " " << valExprsTime.count() << " " << apsTime.count() << " " << evalTime.count() << endl;                              
+                    }
                 }
             }
         }
     }
-    */
 
-
-
-
-
-
-
-    /*
-    // UNTIL
-    vector<vector<vector<bitset<SIZE>>>> aps = convertIntoBitset<SIZE>(valExprs);
-    vector<vector<bitset<SIZE>>> testBitUnt = bitsetUntil(aps[0], aps[1]);
-    vector<set<string>> testProdUnt = prodUntil(pr);
-    bool resUnt = isEqual(testProdUnt, testBitUnt);
-    */
-
-    /*
-    // CONJUNCTION
-    vector<vector<vector<bitset<SIZE>>>> aps = convertIntoBitset<SIZE>(valExprs);
-    vector<vector<bitset<SIZE>>> testBitConj = bitsetConjunction(aps[0], aps[1]);
-    vector<set<pair<string, string>>> pr = asyncProd(aps[0], aps[1]);
-    vector<set<string>> testProdConj = prodConjunction(pr);
-    bool resConj = isEqual(testProdConj, testBitConj);
-    */
-
-    /*
-    // EVENTUALLY
-    vector<vector<vector<bitset<SIZE>>>> aps = convertIntoBitset<SIZE>(valExprs);
-    vector<vector<bitset<SIZE>>> testBitEv0 = bitsetEventually(aps[0]);
-    vector<vector<bitset<SIZE>>> testBitEv1 = bitsetEventually(aps[1]);
-    vector<set<string>> testProdEv0 = prodEventually(bitset2stringset_withSegments(aps[0]));
-    vector<set<string>> testProdEv1 = prodEventually(bitset2stringset_withSegments(aps[1]));
-    bool resEv0 = isEqual(testProdEv0, testBitEv0);
-    bool resEv1 = isEqual(testProdEv1, testBitEv1);
-    */
-
-    /*
-    // ALWAYS
-    vector<vector<vector<bitset<SIZE>>>> aps = convertIntoBitset<SIZE>(valExprs);
-    vector<vector<bitset<SIZE>>> testBitAl0 = bitsetAlways(aps[0]);
-    vector<vector<bitset<SIZE>>> testBitAl1 = bitsetAlways(aps[1]);
-    vector<set<string>> testProdAl0 = prodAlways(bitset2stringset_withSegments(aps[0]));
-    vector<set<string>> testProdAl1 = prodAlways(bitset2stringset_withSegments(aps[1]));
-    bool resAl0 = isEqual(testProdAl0, testBitAl0);
-    bool resAl1 = isEqual(testProdAl1, testBitAl1);
-    */
+    results.close();
 
     return 0;
 }
