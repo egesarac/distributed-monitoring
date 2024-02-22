@@ -1457,15 +1457,15 @@ int main() {
 
         uncertainties[i][0].push_back(-del);
         for (int j = 1; j < gi; j++) {
-            int tj = signals[i][j].first;
-            int low = max(uncertainties[i][j - 1][0] + del, tj - eps);
+            long long tj = signals[i][j].first;
+            long long low = max(uncertainties[i][j - 1][0] + del, tj - eps);
             uncertainties[i][j].push_back(low);
         }
 
         uncertainties[i][gi - 1].push_back(signals[i][gi - 1].first + eps);
         for (int j = gi - 2; j > 0; j--) {
-            int tj = signals[i][j].first;
-            int high = min(uncertainties[i][j + 1][1] - del, tj + eps);
+            long long tj = signals[i][j].first;
+            long long high = min(uncertainties[i][j + 1][1] - del, tj + eps);
             uncertainties[i][j].push_back(high);
 
             // check input validity
@@ -1478,7 +1478,7 @@ int main() {
 
     /* compute the canonical segmentation */
     set<long long> segmentation_temp;
-    segmentation_temp.insert(0.0);
+    segmentation_temp.insert(0);
     segmentation_temp.insert(max(signals[0][signals[0].size() - 1].first, (long long)(d * 1000)));
 
     for (const auto &s : uncertainties) {

@@ -16,14 +16,13 @@
 #include <chrono>
 using namespace std;
 
-#define SIZE 100 // TODO: this should be as tight as possible
+#define SIZE 1000 // TODO: this should be as tight as possible
 
 bitset<SIZE> evenMask;
 bitset<SIZE> oddMask;
 
 chrono::time_point<chrono::system_clock> starttime;
 chrono::time_point<chrono::system_clock> endtime;
-
 
 template<std::size_t N>
 int msb(const bitset<N> &bs) {
@@ -449,153 +448,66 @@ bool isEqual (vector<set<string>> productResult, vector<vector<bitset<N>>> bitse
     return flag;
 }
 
-pair<int, int> getNextIntervalForProfiles(const vector<int> &segmentation, const int &t1, const int &t2, const bool &leftOpen, const bool &rightOpen) { //TODO: real valued time points
-    int s1, s2;
+template<std::size_t N>
+vector<bitset<N>> segmentFirstBit(vector<bitset<N>> v1) {
+    v1[0] = v1[0] & bitset<N>(1);
+    v1[1] = v1[1] & bitset<N>(1);
 
-    return make_pair(s1, s2);
+    return v1;
 }
 
 template<std::size_t N>
-vector<bitset<N>> bitsetConcat(const vector<bitset<N>> &v1, const vector<bitset<N>> &v2) {
-    vector<bitset<N>> out(2);
-    // TODO: check and fix -- v1 empty? 
-    for (int i = 0; i < 2; i++) {
-        for (int j = 0; j <= msb(v1[i]); j++) {
-            if (v1[i][j] == true) {
-                for (int x = 0; x < 2; x++) {
-                    for (int y = 0; y <= msb(v2[x]); y++) {
-                        if (v2[x][y] == true) {
-                            if ((i == x && j % 2 == 1) || (i != x && j % 2 == 0)) {
-                                out[i][j + y + 1] = true;
-                            }
-                            else {
-                                out[i][j + y] = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
+vector<bitset<N>> segmentInfix(vector<bitset<N>> v1) {
+    int maxInd = max(msb(v1[0] & (evenMask | oddMask)), msb(v1[1] & (evenMask | oddMask)));
+
+    for (int j = 0; j < maxInd; j++) {
+        v1[0][j] = true;
+        v1[1][j] = true;
     }
 
-    return out;
+    return v1;
 }
 
 template<std::size_t N>
-vector<vector<bitset<N>>> getProfiles(vector<vector<bitset<N>>> v, vector<double> segmentation, const double &t1, const double &t2, const double &a, const double &b, const bool &leftClosed, const bool &rightClosed) { //TODO: real valued time points
-    vector<vector<bitset<N>>> profiles;
+vector<bitset<N>> segmentSuffix(vector<bitset<N>> v1) {
+    int maxInd0 = max(msb(v1[0] & evenMask), msb(v1[1] & oddMask));
+    int maxInd1 = max(msb(v1[0] & oddMask), msb(v1[1] & evenMask));
 
-    // to handle the cases where the window falls out of the signal
-    segmentation.push_back(INT32_MAX);
-    vector<bitset<N>> temp(2);
-    temp[0][0] = true;
-    v.push_back(temp);
-
-    vector<vector<double>> breakpoints(2);
-
-
-    // TODO: check and improve
-    breakpoints[0].push_back(t1 + a);
-    int low0 = upper_bound(segmentation.begin(), segmentation.end(), t1 + a) - segmentation.begin();
-    int high0 = lower_bound(segmentation.begin(), segmentation.end(), t2 + a) - segmentation.begin() - 1;
-    for (int i = low0; i <= high0; i++) {
-        breakpoints[0].push_back(segmentation[i] - 0.000001);
-        breakpoints[0].push_back(segmentation[i]);
-    }
-    if (segmentation[high0] < t2 + a) {
-        breakpoints[0].push_back(t2 + a - 0.000001);
-        breakpoints[0].push_back(t2 + a);
-    }
-
-    breakpoints[1].push_back(t1 + b);
-    int low1 = upper_bound(segmentation.begin(), segmentation.end(), t1 + b) - segmentation.begin();
-    int high1 = lower_bound(segmentation.begin(), segmentation.end(), t2 + b) - segmentation.begin() - 1;
-    for (int i = low1; i <= high1; i++) {
-        breakpoints[1].push_back(segmentation[i] - 0.000001);
-        breakpoints[1].push_back(segmentation[i]);
-    }
-    if (segmentation[high1] < t2 + b) {
-        breakpoints[1].push_back(t2 + b - 0.000001);
-        breakpoints[1].push_back(t2 + b);
-    }
-
-    int l0 = breakpoints[0].size() - 1; // to ignore the last interval
-    int l1 = breakpoints[1].size() - 1;
-
-    int i0 = 0;
-    int i1 = 0;
-
-    while (i0 < l0 && i1 < l1) {
-        // find the relation of the current window to the segments, determine which actions to carry for the profile (prefix, suffix, etc)
-    
-
-        // check if we can fit another profile before this one
-
-
-        /*alternative to above: add artificial breakpoints to capture the check step
-            while populating the breakpoints vector, add for each x first the value x-dbl_min then x
-            first implement this, then check the other
-        */
-
-        double left = breakpoints[0][i0];       
-        double right = breakpoints[1][i1];
-
-
-        // functions here depend on rightClosed -- might have to concat the first bits of the next segment
-        //int xind = low0 + ((i0 + 1) % 2);
-        int xind = upper_bound(segmentation.begin() + low0 - 1, segmentation.begin() + high1, left) - segmentation.begin() - 1;
-        //int yind = low1 + ((i1 + 1) % 2);
-        int yind = lower_bound(segmentation.begin() + low0 - 1, segmentation.begin() + high1, right) - segmentation.begin();
-
-        if (yind - xind == 0) { // the two ends of the window belong to the same segment
-            if (left == segmentation[xind]) { // the window starts together with the segment
-                /*concat: prefix*/
-            }
-            else { // the window starts after the beginning of the segment
-                /*concat: infix*/
-            }
-        }
-        else { // the two ends of the window fall in different segments
-            if (left == segmentation[xind]) {
-                /*concat: entire segment*/
-            }
-            else {
-                /*concat: suffix*/
-
-            }
-    
-            /*concat: every full segment between two end points*/
-
-            // TODO: fix below
-            if (right == segmentation[yind] && rightClosed) {
-                /*concat: firstBit*/
-            }
-            else if (right != segmentation[yind]) {
-                /*concat: prefix*/
-            }
-        }
-
-        
-
-
-        // slide the window
-        if (breakpoints[0][i0 + 1] - breakpoints[0][i0] < breakpoints[1][i1 + 1] - breakpoints[1][i1]) {
-            breakpoints[1][i1] += (breakpoints[0][i0 + 1] - breakpoints[0][i0]);
-            i0++;
-        }
-        else if (breakpoints[0][i0 + 1] - breakpoints[0][i0] > breakpoints[1][i1 + 1] - breakpoints[1][i1]) {
-            breakpoints[0][i0] += (breakpoints[1][i1 + 1] - breakpoints[1][i1]);
-            i1++;
-
+    for (int j = maxInd0; j >= 0; j--) {
+        if (j % 2 == 0) {
+            v1[0][j] = true;
         }
         else {
-            breakpoints[1][i1] += (breakpoints[0][i0 + 1] - breakpoints[0][i0]);
-            i0++;
-            i1++;
+            v1[1][j] = true;
         }
     }
 
-    return profiles;
+    for (int j = maxInd1; j >= 0; j--) {
+        if (j % 2 == 0) {
+            v1[1][j] = true;
+        }
+        else {
+            v1[0][j] = true;
+        }
+    }
+
+    return v1;
+}
+
+template<std::size_t N>
+vector<bitset<N>> segmentPrefix(vector<bitset<N>> v1) {
+    int maxInd0 = msb(v1[0] & (evenMask | oddMask));
+    int maxInd1 = msb(v1[1] & (evenMask | oddMask));
+
+    for (int j = 0; j <= maxInd0; j++) {
+        v1[0][j] = true;
+    }
+
+    for (int j = 0; j <= maxInd1; j++) {
+        v1[1][j] = true;
+    }
+
+    return v1;
 }
 
 template<std::size_t N>
@@ -656,6 +568,155 @@ vector<vector<bitset<N>>> bitsetPrefix(vector<vector<bitset<N>>> v1) {
     }
 
     return v1;
+}
+
+template<std::size_t N>
+vector<bitset<N>> bitsetConcat(const vector<bitset<N>> &v1, const vector<bitset<N>> &v2) {
+    if (v1[0].none() && v1[1].none()) {
+        return v2;
+    }
+    
+    vector<bitset<N>> out(2);
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j <= msb(v1[i]); j++) {
+            if (v1[i][j] == true) {
+                for (int x = 0; x < 2; x++) {
+                    for (int y = 0; y <= msb(v2[x]); y++) {
+                        if (v2[x][y] == true) {
+                            if ((i == x && j % 2 == 1) || (i != x && j % 2 == 0)) {
+                                out[i][j + y + 1] = true;
+                            }
+                            else {
+                                out[i][j + y] = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return out;
+}
+
+template<std::size_t N>
+vector<vector<bitset<N>>> getProfiles(vector<vector<bitset<N>>> v, vector<long long> segmentation, const long long &t1, const long long &t2, const long long &a, const long long &b, const bool &leftClosed, const bool &rightClosed) { //TODO: real valued time points
+    vector<vector<bitset<N>>> profiles;
+
+    // to handle the cases where the window falls out of the signal
+    segmentation.push_back(INT32_MAX);
+    vector<bitset<N>> temp(2);
+    temp[0][0] = true;
+    v.push_back(temp);
+
+    vector<vector<long long>> breakpoints(2);
+
+
+    // TODO: check and improve
+    breakpoints[0].push_back(t1 + a);
+    int low0 = upper_bound(segmentation.begin(), segmentation.end(), t1 + a) - segmentation.begin();
+    int high0 = lower_bound(segmentation.begin(), segmentation.end(), t2 + a) - segmentation.begin() - 1;
+    for (int i = low0; i <= high0; i++) {
+        breakpoints[0].push_back(segmentation[i] - 1);
+        breakpoints[0].push_back(segmentation[i]);
+    }
+    if (segmentation[high0] < t2 + a) {
+        breakpoints[0].push_back(t2 + a - 1);
+        breakpoints[0].push_back(t2 + a);
+    }
+
+    breakpoints[1].push_back(t1 + b);
+    int low1 = upper_bound(segmentation.begin(), segmentation.end(), t1 + b) - segmentation.begin();
+    int high1 = lower_bound(segmentation.begin(), segmentation.end(), t2 + b) - segmentation.begin() - 1;
+    for (int i = low1; i <= high1; i++) {
+        breakpoints[1].push_back(segmentation[i] - 1);
+        breakpoints[1].push_back(segmentation[i]);
+    }
+    if (segmentation[high1] < t2 + b) {
+        breakpoints[1].push_back(t2 + b - 1);
+        breakpoints[1].push_back(t2 + b);
+    }
+
+    // to ignore the last interval which includes the point t2+b
+    int l0 = breakpoints[0].size() - 1; 
+    int l1 = breakpoints[1].size() - 1;
+
+    int i0 = 0;
+    int i1 = 0;
+
+    while (i0 < l0 && i1 < l1) {
+        // find the relation of the current window to the segments, determine which actions to carry for the profile (prefix, suffix, etc)
+
+        long long left = breakpoints[0][i0];       
+        long long right = breakpoints[1][i1];
+
+        // TODO: check -> functions here depend on rightClosed -- might have to concat the first bits of the next segment
+        //int xind = low0 + ((i0 + 1) % 2);
+        int xind = upper_bound(segmentation.begin() + low0 - 1, segmentation.begin() + high1 + 1, left) - segmentation.begin() - 1;
+        //int yind = low1 + ((i1 + 1) % 2);
+        //int yind = lower_bound(segmentation.begin() + low0 - 1, segmentation.begin() + high1, right) - segmentation.begin();
+        int yind = upper_bound(segmentation.begin() + low0 - 1, segmentation.begin() + high1 + 1, right) - segmentation.begin() - 1;
+
+         vector<bitset<N>> pr(2);
+
+        if (yind - xind == 0) { // the two ends of the window belong to the same segment
+            if (left == segmentation[xind]) { // the window starts together with the segment
+                //concat: prefix
+                pr = bitsetConcat(pr, segmentPrefix(v[xind]));
+            }
+            else { // the window starts after the beginning of the segment
+                //concat: infix
+                pr = bitsetConcat(pr, segmentInfix(v[xind]));
+            }
+        }
+        else { // the two ends of the window fall in different segments
+            if (left == segmentation[xind]) {
+                //concat: entire segment
+                pr = bitsetConcat(pr, v[xind]);
+            }
+            else {
+                //concat: suffix
+                pr = bitsetConcat(pr, segmentSuffix(v[xind]));
+            }
+    
+            //concat: every full segment between two end points
+            for (int xx = xind + 1; xx < yind; xx++) {
+                pr = bitsetConcat(pr, v[xx]);
+            }
+
+            // TODO: fix below
+            if (right == segmentation[yind] && rightClosed) {
+                //concat: firstBit
+                pr = bitsetConcat(pr, segmentFirstBit(v[yind]));
+
+            }
+            else if (right != segmentation[yind]) {
+                //concat: prefix
+                pr = bitsetConcat(pr, segmentPrefix(v[yind]));
+            }
+        }
+
+
+        profiles.push_back(pr);
+
+        // slide the window
+        if (breakpoints[0][i0 + 1] - breakpoints[0][i0] < breakpoints[1][i1 + 1] - breakpoints[1][i1]) {
+            breakpoints[1][i1] += (breakpoints[0][i0 + 1] - breakpoints[0][i0]);
+            i0++;
+        }
+        else if (breakpoints[0][i0 + 1] - breakpoints[0][i0] > breakpoints[1][i1 + 1] - breakpoints[1][i1]) {
+            breakpoints[0][i0] += (breakpoints[1][i1 + 1] - breakpoints[1][i1]);
+            i1++;
+
+        }
+        else {
+            breakpoints[1][i1] += (breakpoints[0][i0 + 1] - breakpoints[0][i0]);
+            i0++;
+            i1++;
+        }
+    }
+
+    return profiles;
 }
 
 template<std::size_t N>
@@ -745,6 +806,50 @@ vector<vector<bitset<N>>> bitsetEventually(const vector<vector<bitset<N>>> &v1) 
         else {
             firstBit1 = false;
         }
+    }
+
+    return vv;
+}
+
+template<std::size_t N>
+vector<vector<bitset<N>>> bitsetBoundedAlways(vector<vector<bitset<N>>> &v1, vector<long long> segmentation, const long long &a, const long long &b, const bool &leftClosed, const bool &rightClosed) { //TODO: real valued time points
+    vector<vector<bitset<N>>> vv(v1.size()); 
+
+    for (auto & v : vv) {
+        v.resize(2);
+    }
+    
+    for (int i = 0; i < v1.size(); i++) {
+        vector<vector<bitset<N>>> temp = getProfiles(v1, segmentation, segmentation[i], segmentation[i + 1], a, b, leftClosed, rightClosed);
+
+        temp = bitsetAlways(temp);
+        for (int j = 1; j < temp.size(); j++) {
+            temp[0] = bitsetConcat(temp[0], temp[j]);
+        }
+
+        vv[i] = temp[0];
+    }
+
+    return vv;
+}
+
+template<std::size_t N>
+vector<vector<bitset<N>>>bitsetBoundedEventually(vector<vector<bitset<N>>> &v1, vector<long long> segmentation, const long long &a, const long long &b, const bool &leftClosed, const bool &rightClosed) { //TODO: real valued time points
+    vector<vector<bitset<N>>> vv(v1.size()); 
+
+    for (auto & v : vv) {
+        v.resize(2);
+    }
+    
+    for (int i = 0; i < v1.size(); i++) {
+        vector<vector<bitset<N>>> temp = getProfiles(v1, segmentation, segmentation[i], segmentation[i + 1], a, b, leftClosed, rightClosed);
+
+        temp = bitsetEventually(temp);
+        for (int j = 1; j < temp.size(); j++) {
+            temp[0] = bitsetConcat(temp[0], temp[j]);
+        }
+
+        vv[i] = temp[0];
     }
 
     return vv;
@@ -1130,7 +1235,7 @@ vector<vector<bitset<N>>> bitsetConjunction(vector<vector<bitset<N>>> v1, vector
 template<std::size_t N>
 vector<vector<bitset<N>>> bitsetNegation(vector<vector<bitset<N>>> v) {
     for (auto &vv : v) {
-        std::reverse(vv.begin(), vv.end()); // swaps the bitvector0 and bitvector1 for each segment
+        swap(vv[0], vv[1]);
     }
 
     return v;
@@ -1275,15 +1380,21 @@ pair<int, int> convertIntoBoolWithDestutter(string str, string delimiter) {
 int main() {
 
     vector<int> N {1, 2};
-    vector<int> D {256, 512, 1024};
-    vector<double> EPS {1, 2, 4, 8};
-    vector<double> DEL {1, 2, 4, 8};
+    vector<long long> D {4000, 8000, 16000, 32000, 64000};
+    vector<long long> EPS {1000, 2000, 4000, 8000};
+    vector<long long> DEL {1000, 2000, 4000, 8000};
 
-    //int n = 1;
-    int n = 2;
+    long long a = 0;
+    long long b = 16000;
+    bool rightClosed = true;
+    bool leftClosed = false;
+
+    // CHANGE THIS
+    int n = 1;
+    //int n = 2;
     
     ofstream results;
-    string filename = "dummy.txt";
+    string filename = "dummy_bddevsmall_16000.txt";
     results.open(filename);
 
     for (const auto &d : D) {
@@ -1297,8 +1408,8 @@ int main() {
                 }
                     
                 for (const auto &numEdges1 : NUMEDGES) {
-                    vector<vector<pair<double,double>>> signals(n);
-                    string filename1 = "data/" + to_string(d) + "_" + to_string(int(eps)) + "_" + to_string(int(del)) + "_" + to_string(numEdges1) + "_1.txt";
+                    vector<vector<pair<long long,double>>> signals(n);
+                    string filename1 = "data/" + to_string(d/1000) + "_" + to_string(int(eps/1000)) + "_" + to_string(int(del/1000)) + "_" + to_string(numEdges1) + "_1.txt";
                     ifstream sigdata1(filename1);
 
                     string line1;
@@ -1306,7 +1417,7 @@ int main() {
                         stringstream linestream(line1);
                         double t, v;
                         linestream >> t >> v;
-                        signals[0].push_back(make_pair(t, v));
+                        signals[0].push_back(make_pair((long long)(t * 1000), v));
                     }
                     sigdata1.close();
 
@@ -1314,9 +1425,9 @@ int main() {
                         continue;
                     }
 
-                    for (const auto &numEdges2 : NUMEDGES) {
+                    /*for (const auto &numEdges2 : NUMEDGES) {
                         signals[1].clear();
-                        string filename2 = "data/" + to_string(d) + "_" + to_string(int(eps)) + "_" + to_string(int(del)) + "_" + to_string(numEdges2) + "_2.txt";
+                        string filename2 = "data/" + to_string(d/1000) + "_" + to_string(int(eps)/1000) + "_" + to_string(int(del)/1000) + "_" + to_string(numEdges2) + "_2.txt";
                         ifstream sigdata2(filename2);
 
                         string line2;
@@ -1330,14 +1441,14 @@ int main() {
 
                         if(signals[1].empty()) {
                             continue;
-                        }
+                        }*/
 
                         
 
                         /* compute the uncertainty intervals */
                         starttime = chrono::system_clock::now();
 
-                        vector<vector<vector<double>>> uncertainties(n);
+                        vector<vector<vector<long long>>> uncertainties(n);
 
                         for (int i = 0; i < n; i++) {
                             int gi = signals[i].size();
@@ -1345,15 +1456,15 @@ int main() {
 
                             uncertainties[i][0].push_back(-del);
                             for (int j = 1; j < gi; j++) {
-                                double tj = signals[i][j].first;
-                                double low = max(uncertainties[i][j - 1][0] + del, tj - eps);
+                                long long tj = signals[i][j].first;
+                                long long low = max(uncertainties[i][j - 1][0] + del, tj - eps);
                                 uncertainties[i][j].push_back(low);
                             }
 
                             uncertainties[i][gi - 1].push_back(signals[i][gi - 1].first + eps);
                             for (int j = gi - 2; j > 0; j--) {
-                                double tj = signals[i][j].first;
-                                double high = min(uncertainties[i][j + 1][1] - del, tj + eps);
+                                long long tj = signals[i][j].first;
+                                long long high = min(uncertainties[i][j + 1][1] - del, tj + eps);
                                 uncertainties[i][j].push_back(high);
                             }
                         }
@@ -1364,10 +1475,10 @@ int main() {
                         /* compute the canonical segmentation */
                         starttime = chrono::system_clock::now();
 
-                        set<double> segmentation_temp;
+                        set<long long> segmentation_temp;
 
-                        segmentation_temp.insert(0.0);
-                        segmentation_temp.insert(max(double(d), signals[0][signals[0].size() - 1].first));
+                        segmentation_temp.insert(0);
+                        segmentation_temp.insert(max(signals[0][signals[0].size() - 1].first, (long long)(d * 1000)));
 
                         for (const auto &s : uncertainties) {
                             for (int j = 1; j < s.size(); j++) {
@@ -1377,7 +1488,7 @@ int main() {
                             }
                         }
 
-                        vector<double> segmentation;
+                        vector<long long> segmentation;
                         for (const auto &b : segmentation_temp) {
                             segmentation.push_back(b);
                         }
@@ -1489,20 +1600,24 @@ int main() {
                             }
                         }
                         
+
                         
                     
                         starttime = chrono::system_clock::now();
-                        vector<vector<bitset<SIZE>>> test = bitsetUntil(aps[0], aps[1]);
-                        //vector<vector<bitset<SIZE>>> test = bitsetEventually(aps[0]);
+                        //vector<vector<bitset<SIZE>>> test1 = bitsetConjunction(aps[0], aps[1]);
+                        //vector<vector<bitset<SIZE>>> test2 = bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1])));
+                        //vector<vector<bitset<SIZE>>> test = bitsetUntil(aps[0], aps[1]);
+                        vector<vector<bitset<SIZE>>> test = bitsetBoundedEventually(aps[0], segmentation, a, b, rightClosed, leftClosed);
                         endtime = chrono::system_clock::now();
                         chrono::duration<double, milli> evalTime = endtime - starttime;
                         //cout << evalTime.count() << endl;
 
-                        //results << d << " " << eps << " " << del << " " << numEdges1 << " " << numSegments << " " << intervalsTime.count() << " " << segmentationTime.count() << " " << valExprsTime.count() << " " << apsTime.count() << " " << evalTime.count() << endl;                        
-                        results << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << intervalsTime.count() << " " << segmentationTime.count() << " " << valExprsTime.count() << " " << apsTime.count() << " " << evalTime.count() << endl;                        
-                        //cout << d << " " << eps << " " << del << " " << numEdges1 << " " << numSegments << " " << intervalsTime.count() << " " << segmentationTime.count() << " " << valExprsTime.count() << " " << apsTime.count() << " " << evalTime.count() << endl;                              
-                        cout << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << intervalsTime.count() << " " << segmentationTime.count() << " " << valExprsTime.count() << " " << apsTime.count() << " " << evalTime.count() << endl;                              
-                    }
+
+                        results << d << " " << eps << " " << del << " " << numEdges1 << " " << numSegments << " " << intervalsTime.count() << " " << segmentationTime.count() << " " << valExprsTime.count() << " " << apsTime.count() << " " << evalTime.count() << endl;                        
+                        //results << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << intervalsTime.count() << " " << segmentationTime.count() << " " << valExprsTime.count() << " " << apsTime.count() << " " << evalTime.count() << endl;                        
+                        cout << d << " " << eps << " " << del << " " << numEdges1 << " " << numSegments << " " << intervalsTime.count() << " " << segmentationTime.count() << " " << valExprsTime.count() << " " << apsTime.count() << " " << evalTime.count() << endl;                             
+                        //cout << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << intervalsTime.count() << " " << segmentationTime.count() << " " << valExprsTime.count() << " " << apsTime.count() << " " << evalTime.count() << endl;                              
+                    //}
                 }
             }
         }
