@@ -17,7 +17,6 @@
 using namespace std;
 
 #define SIZE 1000 // TODO: this should be as tight as possible
-#define REP 10
 
 bitset<SIZE> evenMask;
 bitset<SIZE> oddMask;
@@ -813,7 +812,7 @@ vector<vector<bitset<N>>> bitsetEventually(const vector<vector<bitset<N>>> &v1) 
 }
 
 template<std::size_t N>
-vector<vector<bitset<N>>> bitsetBoundedAlways(vector<vector<bitset<N>>> &v1, vector<long long> segmentation, const long long &a, const long long &b, const bool &leftClosed, const bool &rightClosed) {
+vector<vector<bitset<N>>> bitsetBoundedAlways(vector<vector<bitset<N>>> &v1, vector<long long> segmentation, const long long &a, const long long &b, const bool &leftClosed, const bool &rightClosed) { //TODO: real valued time points
     vector<vector<bitset<N>>> vv(v1.size()); 
 
     for (auto & v : vv) {
@@ -835,7 +834,7 @@ vector<vector<bitset<N>>> bitsetBoundedAlways(vector<vector<bitset<N>>> &v1, vec
 }
 
 template<std::size_t N>
-vector<vector<bitset<N>>>bitsetBoundedEventually(vector<vector<bitset<N>>> &v1, vector<long long> segmentation, const long long &a, const long long &b, const bool &leftClosed, const bool &rightClosed) {
+vector<vector<bitset<N>>>bitsetBoundedEventually(vector<vector<bitset<N>>> &v1, vector<long long> segmentation, const long long &a, const long long &b, const bool &leftClosed, const bool &rightClosed) { //TODO: real valued time points
     vector<vector<bitset<N>>> vv(v1.size()); 
 
     for (auto & v : vv) {
@@ -1381,21 +1380,21 @@ pair<int, int> convertIntoBoolWithDestutter(string str, string delimiter) {
 int main() {
 
     vector<int> N {1, 2};
-    vector<long long> D {64000, 128000, 256000};
+    vector<long long> D {4000, 8000, 16000, 32000, 64000};
     vector<long long> EPS {1000, 2000, 4000, 8000};
     vector<long long> DEL {1000, 2000, 4000, 8000};
 
-    /*long long a = 0;
+    long long a = 0;
     long long b = 16000;
     bool rightClosed = true;
-    bool leftClosed = false;*/
+    bool leftClosed = false;
 
     // CHANGE THIS
-    //int n = 1;
-    int n = 2;
+    int n = 1;
+    //int n = 2;
     
     ofstream results;
-    string filename = "results_alwaysConj.txt";
+    string filename = "dummy_bddevsmall_16000.txt";
     results.open(filename);
 
     for (const auto &d : D) {
@@ -1426,7 +1425,7 @@ int main() {
                         continue;
                     }
 
-                    for (const auto &numEdges2 : NUMEDGES) {
+                    /*for (const auto &numEdges2 : NUMEDGES) {
                         signals[1].clear();
                         string filename2 = "data/" + to_string(d/1000) + "_" + to_string(int(eps)/1000) + "_" + to_string(int(del)/1000) + "_" + to_string(numEdges2) + "_2.txt";
                         ifstream sigdata2(filename2);
@@ -1442,12 +1441,12 @@ int main() {
 
                         if(signals[1].empty()) {
                             continue;
-                        }
+                        }*/
 
-                        int numSegments;
-                        starttime = chrono::system_clock::now();
-                        for (int rep = 0; rep < REP; rep++) {
+                        
+
                         /* compute the uncertainty intervals */
+                        starttime = chrono::system_clock::now();
 
                         vector<vector<vector<long long>>> uncertainties(n);
 
@@ -1470,7 +1469,12 @@ int main() {
                             }
                         }
 
+                        endtime = chrono::system_clock::now();
+                        chrono::duration<double, milli> intervalsTime = endtime - starttime;
+
                         /* compute the canonical segmentation */
+                        starttime = chrono::system_clock::now();
+
                         set<long long> segmentation_temp;
 
                         segmentation_temp.insert(0);
@@ -1489,10 +1493,15 @@ int main() {
                             segmentation.push_back(b);
                         }
 
-                        numSegments = segmentation.size() - 1;
+                        int numSegments = segmentation.size() - 1;
+
+                        endtime = chrono::system_clock::now();
+                        chrono::duration<double, milli> segmentationTime = endtime - starttime;
 
                         /* compute the value expressions */
                         // TODO: check and improve
+                        starttime = chrono::system_clock::now();
+
                         vector<vector<set<string>>> valExprs(n);
                         
                         for (int i = 0; i < n; i++) {
@@ -1551,7 +1560,12 @@ int main() {
                             }
                         }
 
+                        endtime = chrono::system_clock::now();
+                        chrono::duration<double, milli> valExprsTime = endtime - starttime;
+
                         /* translate real-valued signals to atomic propositions */
+                        starttime = chrono::system_clock::now();
+
                         vector<vector<vector<bitset<SIZE>>>> aps(n);
                         for (auto &v : aps) {
                             v.resize(numSegments);
@@ -1574,6 +1588,9 @@ int main() {
                             }
                         }
 
+                        endtime = chrono::system_clock::now();
+                        chrono::duration<double, milli> apsTime = endtime - starttime;
+
                         for (int i = 0; i < SIZE; i++) {
                             if (i % 2 == 0) {
                                 evenMask[i] = true;
@@ -1583,18 +1600,24 @@ int main() {
                             }
                         }
                         
-                        vector<vector<bitset<SIZE>>> test1 = bitsetAlways(bitsetConjunction(aps[0], aps[1]));
-                        //vector<vector<bitset<SIZE>>> test21 = bitsetEventually(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))));
-                        //vector<vector<bitset<SIZE>>> test22 = bitsetNegation(bitsetAlways(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))));
-                        //vector<vector<bitset<SIZE>>> test3 = bitsetUntil(aps[0], aps[1]);
-                        }
+
+                        
+                    
+                        starttime = chrono::system_clock::now();
+                        //vector<vector<bitset<SIZE>>> test1 = bitsetConjunction(aps[0], aps[1]);
+                        //vector<vector<bitset<SIZE>>> test2 = bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1])));
+                        //vector<vector<bitset<SIZE>>> test = bitsetUntil(aps[0], aps[1]);
+                        vector<vector<bitset<SIZE>>> test = bitsetBoundedEventually(aps[0], segmentation, a, b, rightClosed, leftClosed);
                         endtime = chrono::system_clock::now();
+                        chrono::duration<double, milli> evalTime = endtime - starttime;
+                        //cout << evalTime.count() << endl;
 
-                        chrono::duration<double, milli> totalTime = endtime - starttime;
-                        results << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << (totalTime.count() / REP) / 1000 << endl;                        
-                        cout << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << (totalTime.count() / REP) / 1000 << endl;                        
 
-                    }
+                        results << d << " " << eps << " " << del << " " << numEdges1 << " " << numSegments << " " << intervalsTime.count() << " " << segmentationTime.count() << " " << valExprsTime.count() << " " << apsTime.count() << " " << evalTime.count() << endl;                        
+                        //results << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << intervalsTime.count() << " " << segmentationTime.count() << " " << valExprsTime.count() << " " << apsTime.count() << " " << evalTime.count() << endl;                        
+                        cout << d << " " << eps << " " << del << " " << numEdges1 << " " << numSegments << " " << intervalsTime.count() << " " << segmentationTime.count() << " " << valExprsTime.count() << " " << apsTime.count() << " " << evalTime.count() << endl;                             
+                        //cout << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << intervalsTime.count() << " " << segmentationTime.count() << " " << valExprsTime.count() << " " << apsTime.count() << " " << evalTime.count() << endl;                              
+                    //}
                 }
             }
         }
