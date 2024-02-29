@@ -15,9 +15,9 @@ using namespace std;
 int main() {
 
     vector<int> N {1, 2};
-    vector<int> D {4, 8, 16};
-    vector<double> EPS {1, 2, 4};
-    vector<double> DEL {1, 2, 4};
+    vector<int> D {4, 8, 16, 32, 64, 128, 256, 512, 1024};
+    vector<double> EPS {1, 2, 4, 8};
+    vector<double> DEL {1, 2, 4, 8};
 
     for (const auto &n : N) { 
         for (const auto &d : D) {
@@ -41,12 +41,12 @@ int main() {
 
                         random_device rd;
                         mt19937 gen(rd());
-                        uniform_int_distribution<> valDist(0, 1);
+                        uniform_int_distribution<> valDist(-100, 100);
                         int initVal = valDist(gen);
                         int ctr = 0;
                         map<double,double> sig;
                         for (const auto &t : timeStamps) {
-                            sig[t] = (initVal + ctr) % 2;
+                            sig[t] = valDist(gen);
                             ctr++;
                         }
 
@@ -83,7 +83,7 @@ int main() {
 
                         if (!error) {
                             ofstream sigdata;
-                            string filename = "data/" + to_string(d) + "_" + to_string(int(eps)) + "_" + to_string(int(del)) + "_" + to_string(numEdges) + "_" + to_string(n) + ".txt";
+                            string filename = "dataInt/" + to_string(d) + "_" + to_string(int(eps)) + "_" + to_string(int(del)) + "_" + to_string(numEdges) + "_" + to_string(n) + ".txt";
                             sigdata.open(filename);
 
                             for (const auto &p : sig) {
@@ -93,7 +93,7 @@ int main() {
                             sigdata.close();
                         }
                         else {
-                            string filename = "data/" + to_string(d) + "_" + to_string(int(eps)) + "_" + to_string(int(del)) + "_" + to_string(numEdges) + "_" + to_string(n) + ".txt";
+                            string filename = "dataInt/" + to_string(d) + "_" + to_string(int(eps)) + "_" + to_string(int(del)) + "_" + to_string(numEdges) + "_" + to_string(n) + ".txt";
                             cout << "error: " + filename << endl;
                         }
                     }   
