@@ -88,7 +88,8 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
 
         if not entryFound:
 
-            print()
+            ##print()
+            pass
 
         i += 1
 
@@ -190,11 +191,11 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
             m = s.model()
             # out = "%s %s" % (m[test], m[test2])
             # print(m)
-            print("sat in segment", i)
+            ##print("sat in segment", i)
 
         elif i <= segCount:
 
-            print("unsat in segment", i)
+            ##print("unsat in segment", i)
 
             # terminate after unsat
             return
@@ -283,7 +284,8 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
 
         if not entryFound:
 
-            print()
+            ##print()
+            pass
 
         i += 1
 
@@ -382,14 +384,15 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
             m = s.model()
             # out = "%s %s" % (m[test], m[test2])
             # print(m)
-            print("sat in segment", i)
+            ##print("sat in segment", i)
 
             # terminate after sat
             return
 
         elif i <= segCount:
 
-            print("unsat in segment", i)
+            ##print("unsat in segment", i)
+            pass
 
         s.reset()
 
@@ -475,7 +478,8 @@ def prog_until(eps, segCount, data_0, data_1):
 
         if not entryFound:
 
-            print()
+            ##print()
+            pass
 
         i += 1
 
@@ -585,7 +589,7 @@ def prog_until(eps, segCount, data_0, data_1):
             m = s.model()
             # out = "%s %s" % (m[test], m[test2])
             # print(m)
-            print("sat in segment", i)
+            ##print("sat in segment", i)
 
         elif i <= segCount:
 
@@ -593,10 +597,10 @@ def prog_until(eps, segCount, data_0, data_1):
 
                 if j >= 0 and j < len(data_0) and data_0[j][1] == 0:
 
-                    print("unsat in segment", i)
+                    ##print("unsat in segment", i)
                     return
 
-            print("unknown in segment", i)
+            ##print("unknown in segment", i)
 
         s.reset()
 
@@ -625,10 +629,9 @@ def z3SqDist1d(x1, x2):
 
     return z3Abs(x2 - x1)
 
-
 def getData(d, eps, delim, edges, agent_ID):
 
-    file = open("data/{}_{}_{}_{}_{}.txt".format(d, eps, delim, edges, agent_ID))
+    file = open("dataInt/{}_{}_{}_{}_{}.txt".format(d, eps, delim, edges, agent_ID))
     line = file.readline()
 
     data = []
@@ -658,31 +661,120 @@ def getData(d, eps, delim, edges, agent_ID):
 def main():
 
     # set repeat count for confidence interval
-    repeat = 1
+    repeat = 30
 
-    d = 16
-    eps = 1
-    delim = 1
-    edges = 16
+    for d in (16, 32, 64):
+        for eps in (1, 2 ,4, 8):
+            for delt in (1, 2, 4, 8):
+                if eps < delt:
+                    continue
+                num = 1
+                NUMEDGES = []
+                while (num <= math.ceil((d + eps) / delt) + 1):
+                    NUMEDGES.append(num)
+                    num = num * 2
+                for numEdges1 in NUMEDGES:
+                    path = "dataInt/{}_{}_{}_{}_{}.txt".format(d, eps, delt, numEdges1, 1)
+                    if os.path.isfile(path):
+                        data_1 = getData(d, eps, delt, numEdges1, 1)
+                    else:
+                        continue
 
-    # read data from files
-    data_0 = getData(d, eps, delim, edges, 1)
-    data_1 = getData(d, eps, delim, edges, 2)
+                    for numEdges2 in NUMEDGES:
+                        path = "dataInt/{}_{}_{}_{}_{}.txt".format(d, eps, delt, numEdges2, 2)
+                        if os.path.isfile(path) and numEdges1 <= numEdges2:
+                            data_2 = getData(d, eps, delt, numEdges2, 2)
+                        else:
+                            continue
+                        
+                        results = open("results_ac_smt.txt", "a")
+                        total_time = 0
+                        for i in range(repeat):
+                            start = time.time()
+                            prog_always_conjunction(2*eps, d/4, data_1, data_2)
+                            end = time.time()
+                            total_time += end - start
 
-    total_time = 0
-    for i in range(repeat):
+                        line = "C: " + str(d) + " " + str(eps) + " " + str(delt) + " " + str(numEdges1) + " " + str(numEdges2) + " " + str(0) + " " + str(total_time / repeat)
+                        print(line)
+                        results.write(line + "\n")
+                        results.close() 
+    
 
-        start = time.time()
-        prog_always_conjunction(1, 2, data_0, data_1)
-        prog_eventually_disjunction(1, 2, data_0, data_1)
-        prog_until(1, 2, data_0, data_1)
-        end = time.time()
-        # print("\nTime elapsed :", (end - start), "seconds")
-        dur = end - start
-        print(i, "\t:\t", dur)
-        total_time += dur
+    for d in (16, 32, 64):
+        for eps in (1, 2 ,4, 8):
+            for delt in (1, 2, 4, 8):
+                if eps < delt:
+                    continue
+                num = 1
+                NUMEDGES = []
+                while (num <= math.ceil((d + eps) / delt) + 1):
+                    NUMEDGES.append(num)
+                    num = num * 2
+                for numEdges1 in NUMEDGES:
+                    path = "dataInt/{}_{}_{}_{}_{}.txt".format(d, eps, delt, numEdges1, 1)
+                    if os.path.isfile(path):
+                        data_1 = getData(d, eps, delt, numEdges1, 1)
+                    else:
+                        continue
 
-    print("\nAverage :\t", total_time / repeat)
+                    for numEdges2 in NUMEDGES:
+                        path = "dataInt/{}_{}_{}_{}_{}.txt".format(d, eps, delt, numEdges2, 2)
+                        if os.path.isfile(path) and numEdges1 <= numEdges2:
+                            data_2 = getData(d, eps, delt, numEdges2, 2)
+                        else:
+                            continue
+                        
+                        results = open("results_ed_smt.txt", "a")
+                        total_time = 0
+                        for i in range(repeat):
+                            start = time.time()
+                            prog_eventually_disjunction(2*eps, d/4, data_1, data_2)
+                            end = time.time()
+                            total_time += end - start
+
+                        line = "D: " + str(d) + " " + str(eps) + " " + str(delt) + " " + str(numEdges1) + " " + str(numEdges2) + " " + str(0) + " " + str(total_time / repeat)
+                        print(line)
+                        results.write(line + "\n")
+                        results.close()
+
+    for d in (16, 32, 64):
+        for eps in (1, 2 ,4, 8):
+            for delt in (1, 2, 4, 8):
+                if eps < delt:
+                    continue
+                num = 1
+                NUMEDGES = []
+                while (num <= math.ceil((d + eps) / delt) + 1):
+                    NUMEDGES.append(num)
+                    num = num * 2
+                for numEdges1 in NUMEDGES:
+                    path = "dataInt/{}_{}_{}_{}_{}.txt".format(d, eps, delt, numEdges1, 1)
+                    if os.path.isfile(path):
+                        data_1 = getData(d, eps, delt, numEdges1, 1)
+                    else:
+                        continue
+
+                    for numEdges2 in NUMEDGES:
+                        path = "dataInt/{}_{}_{}_{}_{}.txt".format(d, eps, delt, numEdges2, 2)
+                        if os.path.isfile(path) and numEdges1 <= numEdges2:
+                            data_2 = getData(d, eps, delt, numEdges2, 2)
+                        else:
+                            continue
+                        
+                        results = open("results_u_smt.txt", "a")
+                        total_time = 0
+                        for i in range(repeat):
+                            start = time.time()
+                            prog_until(2*eps, d/4, data_1, data_2)
+                            end = time.time()
+                            total_time += end - start
+
+                        line = "U: " + str(d) + " " + str(eps) + " " + str(delt) + " " + str(numEdges1) + " " + str(numEdges2) + " " + str(0) + " " + str(total_time / repeat)
+                        print(line)
+                        results.write(line + "\n")
+                        results.close() 
+
 
 
 if __name__ == "__main__":
