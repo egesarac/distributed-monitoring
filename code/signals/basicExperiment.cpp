@@ -1441,7 +1441,7 @@ int main() {
                         }
                         sigdata2.close();
 
-                        if(signals[1].empty() || numEdges1 > numEdges2) {
+                        if(signals[1].empty() || numEdges1 > numEdges2 || eps < del) {
                             continue;
                         }
 
