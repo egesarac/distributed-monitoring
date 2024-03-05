@@ -17,7 +17,7 @@
 using namespace std;
 
 #define SIZE 1000 // TODO: this should be as tight as possible
-#define REP 30
+#define REP 5
 
 bitset<SIZE> evenMask;
 bitset<SIZE> oddMask;
@@ -1382,7 +1382,7 @@ pair<int, int> convertIntoBoolWithDestutter(string str, string delimiter) {
 int main() {
 
     vector<int> N {1, 2};
-    vector<long long> D {16000, 32000, 64000};
+    vector<long long> D {256000, 512000, 1024000};
     vector<long long> EPS {1000, 2000, 4000, 8000};
     vector<long long> DEL {1000, 2000, 4000, 8000};
 
@@ -1396,7 +1396,7 @@ int main() {
     int n = 2;
     
     ofstream results;
-    string filename = "results_ac_new.txt";
+    string filename = "results_ac_new_large.txt";
     results.open(filename);
 
     for (const auto &d : D) {

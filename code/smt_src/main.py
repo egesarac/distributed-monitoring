@@ -661,9 +661,9 @@ def getData(d, eps, delim, edges, agent_ID):
 def main():
 
     # set repeat count for confidence interval
-    repeat = 30
+    repeat = 1
 
-    for d in (16, 32, 64):
+    for d in (256, 512, 1024):
         for eps in (1, 2 ,4, 8):
             for delt in (1, 2, 4, 8):
                 if eps < delt:
@@ -682,7 +682,7 @@ def main():
 
                     for numEdges2 in NUMEDGES:
                         path = "dataInt/{}_{}_{}_{}_{}.txt".format(d, eps, delt, numEdges2, 2)
-                        if os.path.isfile(path) and numEdges1 <= numEdges2:
+                        if os.path.isfile(path) and numEdges1 <= numEdges2 and (d == numEdges1 and d == numEdges2):
                             data_2 = getData(d, eps, delt, numEdges2, 2)
                         else:
                             continue
@@ -691,7 +691,7 @@ def main():
                         total_time = 0
                         for i in range(repeat):
                             start = time.time()
-                            prog_always_conjunction(2*eps, d/4, data_1, data_2)
+                            prog_always_conjunction(2*eps, d, data_1, data_2)
                             end = time.time()
                             total_time += end - start
 
@@ -729,7 +729,7 @@ def main():
                         total_time = 0
                         for i in range(repeat):
                             start = time.time()
-                            prog_eventually_disjunction(2*eps, d/4, data_1, data_2)
+                            prog_eventually_disjunction(2*eps, d, data_1, data_2)
                             end = time.time()
                             total_time += end - start
 
@@ -766,7 +766,7 @@ def main():
                         total_time = 0
                         for i in range(repeat):
                             start = time.time()
-                            prog_until(2*eps, d/4, data_1, data_2)
+                            prog_until(2*eps, d, data_1, data_2)
                             end = time.time()
                             total_time += end - start
 

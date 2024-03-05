@@ -8,6 +8,7 @@ set_option(rational_to_decimal=True)
 
 
 def prog_always_conjunction(eps, segCount, data_0, data_1):
+    sc = segCount
 
     # initialize z3 solver
     s = Solver()
@@ -197,9 +198,14 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
             print("unsat in segment", i)
 
             # terminate after unsat
-            return
+            return False
 
         s.reset()
+        
+    if i <= sc:
+        return False
+    else:
+        return True
 
 
 def prog_eventually_disjunction(eps, segCount, data_0, data_1):
@@ -663,8 +669,8 @@ def main():
     d = 4
     eps = 1
     delim = 1
-    edges0 = 4
-    edges1 = 4
+    edges0 = 1
+    edges1 = 1
 
     # read data from files
     data_0 = getData(d, eps, delim, edges0, 1)
@@ -674,7 +680,7 @@ def main():
     for i in range(repeat):
 
         start = time.time()
-        prog_always_conjunction(2*eps, d, data_0, data_1)
+        flag = prog_always_conjunction(2*eps, d, data_0, data_1)
         #prog_eventually_disjunction(2*eps, d/4, data_0, data_1)
         #prog_until(2*eps, d, data_0, data_1)
         end = time.time()
@@ -684,7 +690,7 @@ def main():
         total_time += dur
 
     print("\nAverage :\t", total_time / repeat)
-
+    print("\nOutput :\t", flag)
 
 if __name__ == "__main__":
 
