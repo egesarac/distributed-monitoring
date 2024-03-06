@@ -107,6 +107,8 @@ u \mathsf{U}^0 v &= \left( \max_{i \leq j \leq \ell} \left( \min \left( v[j], \m
 u \mathsf{U}^1 v &= \left( \max \left( u[i..] \mathsf{U}^0 v[i..], \mathsf{A} u[i..] \right) \right)_{1 \leq i \leq \ell} \\
 \end{align*}
 Note that the operators $\mathsf{E}$ and $\mathsf{A}$ respectively correspond to the \emph{eventually} and the \emph{always} operators of temporal logics.
+%
+\borzoo{This is pretty much like robustness semantics of STL. Should we go with that?}
 Moreover, $\mathsf{U}^0$ corresponds to the standard (strong) \emph{until} operator while $\mathsf{U}^1$ is the \emph{weak until}.
 As usual, $\mathsf{A} u = u \mathsf{U}^1 0^\ell$ and $\mathsf{E} u = 1^\ell \mathsf{U}^0 u$.
 This distinction will be useful later when we evaluate value expressions segment by segment.
