@@ -17,10 +17,11 @@
 using namespace std;
 
 #define SIZE 1000 // TODO: this should be as tight as possible
-#define REP 10
+#define REP 5
 
 bitset<SIZE> evenMask;
 bitset<SIZE> oddMask;
+vector<vector<bitset<SIZE>>> test;
 
 chrono::time_point<chrono::system_clock> starttime;
 chrono::time_point<chrono::system_clock> endtime;
@@ -1381,7 +1382,7 @@ pair<int, int> convertIntoBoolWithDestutter(string str, string delimiter) {
 int main() {
 
     vector<int> N {1, 2};
-    vector<long long> D {64000, 128000, 256000};
+    vector<long long> D {256000, 512000, 1024000};
     vector<long long> EPS {1000, 2000, 4000, 8000};
     vector<long long> DEL {1000, 2000, 4000, 8000};
 
@@ -1395,7 +1396,7 @@ int main() {
     int n = 2;
     
     ofstream results;
-    string filename = "results_alwaysConj.txt";
+    string filename = "results_ac_new_large.txt";
     results.open(filename);
 
     for (const auto &d : D) {
@@ -1410,7 +1411,7 @@ int main() {
                     
                 for (const auto &numEdges1 : NUMEDGES) {
                     vector<vector<pair<long long,double>>> signals(n);
-                    string filename1 = "data/" + to_string(d/1000) + "_" + to_string(int(eps/1000)) + "_" + to_string(int(del/1000)) + "_" + to_string(numEdges1) + "_1.txt";
+                    string filename1 = "dataInt/" + to_string(d/1000) + "_" + to_string(int(eps/1000)) + "_" + to_string(int(del/1000)) + "_" + to_string(numEdges1) + "_1.txt";
                     ifstream sigdata1(filename1);
 
                     string line1;
@@ -1428,7 +1429,7 @@ int main() {
 
                     for (const auto &numEdges2 : NUMEDGES) {
                         signals[1].clear();
-                        string filename2 = "data/" + to_string(d/1000) + "_" + to_string(int(eps)/1000) + "_" + to_string(int(del)/1000) + "_" + to_string(numEdges2) + "_2.txt";
+                        string filename2 = "dataInt/" + to_string(d/1000) + "_" + to_string(int(eps)/1000) + "_" + to_string(int(del)/1000) + "_" + to_string(numEdges2) + "_2.txt";
                         ifstream sigdata2(filename2);
 
                         string line2;
@@ -1440,7 +1441,7 @@ int main() {
                         }
                         sigdata2.close();
 
-                        if(signals[1].empty()) {
+                        if(signals[1].empty() || numEdges1 > numEdges2 || eps < del) {
                             continue;
                         }
 
@@ -1474,7 +1475,7 @@ int main() {
                         set<long long> segmentation_temp;
 
                         segmentation_temp.insert(0);
-                        segmentation_temp.insert(max(signals[0][signals[0].size() - 1].first, (long long)(d * 1000)));
+                        segmentation_temp.insert(max(signals[0][signals[0].size() - 1].first, (long long)(d)));
 
                         for (const auto &s : uncertainties) {
                             for (int j = 1; j < s.size(); j++) {
@@ -1583,16 +1584,21 @@ int main() {
                             }
                         }
                         
-                        vector<vector<bitset<SIZE>>> test1 = bitsetAlways(bitsetConjunction(aps[0], aps[1]));
-                        //vector<vector<bitset<SIZE>>> test21 = bitsetEventually(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))));
-                        //vector<vector<bitset<SIZE>>> test22 = bitsetNegation(bitsetAlways(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))));
-                        //vector<vector<bitset<SIZE>>> test3 = bitsetUntil(aps[0], aps[1]);
+                        test = bitsetAlways(bitsetConjunction(aps[0], aps[1]));
+                        //test = bitsetEventually(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1])))); // this is faster
+                        ////test = bitsetNegation(bitsetAlways(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))));
+                        //test = bitsetUntil(aps[0], aps[1]);
                         }
                         endtime = chrono::system_clock::now();
-
                         chrono::duration<double, milli> totalTime = endtime - starttime;
-                        results << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << (totalTime.count() / REP) / 1000 << endl;                        
-                        cout << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << (totalTime.count() / REP) / 1000 << endl;                        
+
+                        bool falseAtZero = test[0][0].any();
+                        bool trueAtZero = test[0][1].any();
+
+                        results << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << (totalTime.count() / REP) / 1000 << " " << falseAtZero << " " << trueAtZero << endl;                         
+                        cout << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << (totalTime.count() / REP) / 1000 << " " << falseAtZero << " " << trueAtZero << endl;                        
+                        //results << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << falseAtZero << " " << trueAtZero << endl;                        
+                        //cout << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << falseAtZero << " " << trueAtZero << endl;                        
 
                     }
                 }

@@ -200,7 +200,7 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
             return
 
         s.reset()
-
+        
 
 def prog_eventually_disjunction(eps, segCount, data_0, data_1):
 
@@ -628,7 +628,7 @@ def z3SqDist1d(x1, x2):
 
 def getData(d, eps, delim, edges, agent_ID):
 
-    file = open("data/{}_{}_{}_{}_{}.txt".format(d, eps, delim, edges, agent_ID))
+    file = open("dataInt/{}_{}_{}_{}_{}.txt".format(d, eps, delim, edges, agent_ID))
     line = file.readline()
 
     data = []
@@ -658,24 +658,26 @@ def getData(d, eps, delim, edges, agent_ID):
 def main():
 
     # set repeat count for confidence interval
-    repeat = 1
+    repeat = 5
 
-    d = 16
+    d = 4
     eps = 1
     delim = 1
-    edges = 16
+    #edges0 = 2 #fast
+    edges0 = 4 #slow
+    edges1 = 4
 
     # read data from files
-    data_0 = getData(d, eps, delim, edges, 1)
-    data_1 = getData(d, eps, delim, edges, 2)
+    data_0 = getData(d, eps, delim, edges0, 1)
+    data_1 = getData(d, eps, delim, edges1, 2)
 
     total_time = 0
     for i in range(repeat):
 
         start = time.time()
-        prog_always_conjunction(1, 2, data_0, data_1)
-        prog_eventually_disjunction(1, 2, data_0, data_1)
-        prog_until(1, 2, data_0, data_1)
+        prog_always_conjunction(2*eps, d, data_0, data_1)
+        #prog_eventually_disjunction(2*eps, d, data_0, data_1)
+        #prog_until(2*eps, d, data_0, data_1)
         end = time.time()
         # print("\nTime elapsed :", (end - start), "seconds")
         dur = end - start
@@ -683,7 +685,6 @@ def main():
         total_time += dur
 
     print("\nAverage :\t", total_time / repeat)
-
 
 if __name__ == "__main__":
 
