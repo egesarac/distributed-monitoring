@@ -2053,7 +2053,8 @@ int main()
 
             sumExpr[0][j] = temp;
         }
-
+        
+        /*
         vector<set<pair<string, string>>> prodd = asyncProdStr(sumExpr[0], valExprs[2]);
         sumExpr[1].resize(numSegments);
         for (int j = 0; j < numSegments; j++)
@@ -2075,6 +2076,7 @@ int main()
 
             sumExpr[1][j] = temp;
         }
+        */
 
         /* translate real-valued signals to atomic propositions */
         vector<vector<vector<bitset<SIZE>>>> aps(1);
@@ -2087,7 +2089,8 @@ int main()
             }
         }
 
-        int i = sumExpr.size() - 1;
+        int i = 0;
+        // int i = 1;
         for (int j = 0; j < numSegments; j++)
         {
             for (auto &expr : sumExpr[i][j])
