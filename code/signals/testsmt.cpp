@@ -62,14 +62,33 @@ set<string> stutterOnceStr(const set<string> &S)
 {
     set<string> out;
 
-    for (const auto &s : S)
+    for (auto s : S)
     {
-        for (int i = 0; i < s.length(); i++)
-        {
-            string sl = s.substr(0, i);
-            string sr = s.substr(i, s.length());
+        vector<string> v = split(s, ";");
 
-            out.insert(sl + s[i] + sr);
+        for (int i = 0; i < v.size(); i++) 
+        {
+            if (v[i] != "")
+            {
+                string t = "";
+
+                for (int j = 0; j <= i; j++)
+                {
+                    t += v[j] + ";";
+                }
+
+                for (int j = i; j < v.size(); j++)
+                {
+                    t += v[j] + ";";
+                }
+
+                out.insert(t.substr(0, t.length() - 1));
+            }
+            else
+            {
+                out.insert("");
+            }
+
         }
     }
 
@@ -96,7 +115,7 @@ set<string> stutterOnce(const set<string> &S)
 
 set<string> stutter2kStr(const set<string> &S, const int &k)
 {
-    int len = S.begin()->length();
+    int len = count(S.begin()->begin(), S.begin()->end(), '.');
     int iter = k - len;
 
     set<string> out = S;
@@ -186,6 +205,26 @@ vector<set<string>> bitset2stringset_withSegments(const vector<vector<bitset<N>>
     return out;
 }
 
+pair<string, string> destuttterPairStr(const string &t1, const string &t2)
+{
+    vector<string> v1 = split(t1, ";");
+    vector<string> v2 = split(t2, ";");
+
+    string s1 = (v1.size() > 0) ? v1[0] : "";
+    string s2 = (v2.size() > 0) ? v2[0] : "";
+
+    for (int i = 1; i < v1.size(); i++)
+    {
+        if (v1[i - 1] != v1[i] || v2[i - 1] != v2[i])
+        {
+            s1 += ";" + v1[i];
+            s2 += ";" + v2[i];
+        }
+    }
+
+    return make_pair(s1, s2);
+}
+
 pair<string, string> destuttterPair(const string &t1, const string &t2)
 {
     string s1 = t1.substr(0, 1);
@@ -204,7 +243,18 @@ pair<string, string> destuttterPair(const string &t1, const string &t2)
     return make_pair(s1, s2);
 }
 
-set<vector<string>> strSet2vecSet(set<string>> s1, set<string>)
+set<vector<string>> strSet2vecSet(set<string> S)
+{
+    set<vector<string>> out;
+
+    for (auto s : S)
+    {
+        vector<string> v = split(s, ";");
+        out.insert(v);
+    }
+
+    return out;
+}
 
 vector<set<pair<string, string>>> asyncProdStr(vector<set<string>> v1, vector<set<string>> v2)
 {
@@ -212,26 +262,28 @@ vector<set<pair<string, string>>> asyncProdStr(vector<set<string>> v1, vector<se
 
     for (int i = 0; i < v1.size(); i++)
     {
-        set<vector<string>> S1 = v1[i];
-        set<string> S2 = v2[i];
-        vector<string> S1 = split(v1[i], ";");
-        vector<string> S2 = split(v2[i], ";");
-
-        for (auto ss1 : v1[i])
+        for (auto s1 : v1[i])
         {
-            vector<string> s1 = split(ss1, ";");
-            int len1 = s1.size();
-
-            for (auto ss2 : v2[i])
+            if (s1 == "")
             {
-                vector<string> s2 = split(ss2, ";");
-                int len2 = s2.size();
-                set<string> temp1, temp2;
+                continue;
+            }
 
+            int len1 = count(s1.begin(), s1.end(), '.');
+
+            for (auto s2 : v2[i])
+            {
+                if (s2 == "")
+                {
+                    continue;
+                }
+
+                int len2 = count(s2.begin(), s2.end(), '.');
+
+                set<string> temp1, temp2;
                 temp1.insert(s1);
                 temp2.insert(s2);
 
-                // TODO: 
                 temp1 = stutter2kStr(temp1, len1 + len2 - 1);
                 temp2 = stutter2kStr(temp2, len1 + len2 - 1);
 
@@ -239,7 +291,7 @@ vector<set<pair<string, string>>> asyncProdStr(vector<set<string>> v1, vector<se
                 {
                     for (auto t2 : temp2)
                     {
-                        out[i].insert(destuttterPair(t1, t2));
+                        out[i].insert(destuttterPairStr(t1, t2));
                     }
                 }
             }
@@ -1682,6 +1734,76 @@ set<string> concatWithDestutter(const set<string> &set1, const set<string> &set2
     return result;
 }
 
+pair<int, int> convertIntoBoolWithDestutterStr(string str, string delimiter)
+{
+    vector<bool> v;
+
+    if (!str.empty())
+    {
+        int start = 0;
+        do
+        {
+            // Find the index of occurrence
+            int idx = str.find(delimiter, start);
+            if (idx == string::npos)
+            {
+                break;
+            }
+
+            int length = idx - start;
+            if (stof(str.substr(start, length)) >= 10)
+            {
+                if (v.empty() || v[v.size() - 1] != true)
+                {
+                    v.push_back(true);
+                }
+            }
+            else
+            {
+                if (v.empty() || v[v.size() - 1] != false)
+                {
+                    v.push_back(false);
+                }
+            }
+            start += (length + delimiter.size());
+        } while (true);
+
+        if (stof(str.substr(start, str.length())) >= 10)
+        {
+            if (v.empty() || v[v.size() - 1] != true)
+            {
+                v.push_back(true);
+            }
+        }
+        else
+        {
+            if (v.empty() || v[v.size() - 1] != false)
+            {
+                v.push_back(false);
+            }
+        }
+    }
+
+    int x = -1;
+    int y = -1;
+
+    if (!v.empty())
+    {
+        if (v[0] == true)
+        {
+            x = 1;
+        }
+        else
+        {
+            x = 0;
+        }
+
+        y = v.size() - 1;
+    }
+
+    return make_pair(x, y);
+}
+
 pair<int, int> convertIntoBoolWithDestutter(string str, string delimiter)
 {
     vector<bool> v;
@@ -1911,6 +2033,7 @@ int main()
 
         vector<set<pair<string, string>>> prod = asyncProdStr(valExprs[0], valExprs[1]);
         vector<vector<set<string>>> sumExpr(1);
+        sumExpr[0].resize(numSegments);
 
         for (int j = 0; j < numSegments; j++)
         {
@@ -1943,15 +2066,15 @@ int main()
             }
         }
 
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < 1; i++)
         {
             for (int j = 0; j < numSegments; j++)
             {
-                for (auto &expr : valExprs[i][j])
+                for (auto &expr : sumExpr[i][j])
                 {
                     if (expr != "")
                     {
-                        pair<int, int> xy = convertIntoBoolWithDestutter(expr, ";");
+                        pair<int, int> xy = convertIntoBoolWithDestutterStr(expr, ";");
                         if (xy.first >= 0 && xy.second >= 0)
                         {
                             aps[i][j][xy.first][xy.second] = true;

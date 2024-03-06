@@ -1399,15 +1399,15 @@ int main() {
     //string filename = "results_alwaysConjNEWsmall_fp.txt";
     //results.open(filename);
 
-    int d = 256000;
+    int d = 4000;
     int eps = 1000;
     int del = 1000;
-    int numEdges1 = 256;
-    int numEdges2 = 256;            
+    int numEdges1 = 4;
+    int numEdges2 = 4;            
                     
                 
                     vector<vector<pair<long long,double>>> signals(n);
-                    string filename1 = "data/TEST_" + to_string(d/1000) + "_" + to_string(int(eps/1000)) + "_" + to_string(int(del/1000)) + "_" + to_string(numEdges1) + "_1.txt";
+                    string filename1 = "data/" + to_string(d/1000) + "_" + to_string(int(eps/1000)) + "_" + to_string(int(del/1000)) + "_" + to_string(numEdges1) + "_1.txt";
                     ifstream sigdata1(filename1);
 
                     string line1;
@@ -1572,6 +1572,9 @@ int main() {
                                 oddMask[i] = true;
                             }
                         }
+
+                        vector<set<pair<string, string>>> AP = asyncProd(aps[0], aps[1]);
+
                         
                         test = bitsetAlways(bitsetConjunction(aps[0], aps[1]));
                         //test = bitsetEventually(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1])))); // this is faster
