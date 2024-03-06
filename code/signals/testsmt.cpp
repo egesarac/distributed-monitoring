@@ -66,7 +66,7 @@ set<string> stutterOnceStr(const set<string> &S)
     {
         vector<string> v = split(s, ";");
 
-        for (int i = 0; i < v.size(); i++) 
+        for (int i = 0; i < v.size(); i++)
         {
             if (v[i] != "")
             {
@@ -88,7 +88,6 @@ set<string> stutterOnceStr(const set<string> &S)
             {
                 out.insert("");
             }
-
         }
     }
 
@@ -1877,7 +1876,7 @@ pair<int, int> convertIntoBoolWithDestutter(string str, string delimiter)
 int main()
 {
 
-    int n = 2;
+    int n = 3;
     long long d = 5;
     long long eps = 0.05 * 1000;
     long long del = 0.001 * 1000;
@@ -1897,7 +1896,7 @@ int main()
     for (int i = 0; i < n; i++)
     {
         string filename = "data_re/wt/s" + to_string(d) + "_tank_" + to_string(i);
-        //string filename = "dataInt/" + to_string(int(d)/1000) + "_" + to_string(int(eps)/1000) + "_" + to_string(int(del)/1000)+ "_" + to_string(edges[i]) + "_" + to_string(i+1) + ".txt";
+        // string filename = "dataInt/" + to_string(int(d)/1000) + "_" + to_string(int(eps)/1000) + "_" + to_string(int(del)/1000)+ "_" + to_string(edges[i]) + "_" + to_string(i+1) + ".txt";
         ifstream sigdata(filename);
         string line;
         while (getline(sigdata, line))
@@ -2031,10 +2030,10 @@ int main()
             }
         }
 
-        vector<set<pair<string, string>>> prod = asyncProdStr(valExprs[0], valExprs[1]);
-        vector<vector<set<string>>> sumExpr(1);
-        sumExpr[0].resize(numSegments);
+        vector<vector<set<string>>> sumExpr(2);
 
+        vector<set<pair<string, string>>> prod = asyncProdStr(valExprs[0], valExprs[1]);
+        sumExpr[0].resize(numSegments);
         for (int j = 0; j < numSegments; j++)
         {
             set<string> temp;
@@ -2055,6 +2054,28 @@ int main()
             sumExpr[0][j] = temp;
         }
 
+        vector<set<pair<string, string>>> prodd = asyncProdStr(sumExpr[0], valExprs[2]);
+        sumExpr[1].resize(numSegments);
+        for (int j = 0; j < numSegments; j++)
+        {
+            set<string> temp;
+
+            for (auto s : prodd[j])
+            {
+                vector<string> s1 = split(s.first, ";");
+                vector<string> s2 = split(s.second, ";");
+                string sum = to_string(stod(s1[0]) + stod(s2[0]));
+                for (int k = 1; k < s1.size(); k++)
+                {
+                    sum += ";" + to_string(stod(s1[k]) + stod(s2[k]));
+                }
+
+                temp.insert(sum);
+            }
+
+            sumExpr[1][j] = temp;
+        }
+
         /* translate real-valued signals to atomic propositions */
         vector<vector<vector<bitset<SIZE>>>> aps(1);
         for (auto &v : aps)
@@ -2066,19 +2087,17 @@ int main()
             }
         }
 
-        for (int i = 0; i < 1; i++)
+        int i = sumExpr.size() - 1;
+        for (int j = 0; j < numSegments; j++)
         {
-            for (int j = 0; j < numSegments; j++)
+            for (auto &expr : sumExpr[i][j])
             {
-                for (auto &expr : sumExpr[i][j])
+                if (expr != "")
                 {
-                    if (expr != "")
+                    pair<int, int> xy = convertIntoBoolWithDestutterStr(expr, ";");
+                    if (xy.first >= 0 && xy.second >= 0)
                     {
-                        pair<int, int> xy = convertIntoBoolWithDestutterStr(expr, ";");
-                        if (xy.first >= 0 && xy.second >= 0)
-                        {
-                            aps[i][j][xy.first][xy.second] = true;
-                        }
+                        aps[0][j][xy.first][xy.second] = true;
                     }
                 }
             }
@@ -2095,7 +2114,6 @@ int main()
                 oddMask[i] = true;
             }
         }
-
 
         test = bitsetAlways(aps[0]);
         // test = bitsetEventually(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1])))); // this is faster
