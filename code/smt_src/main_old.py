@@ -88,8 +88,7 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
 
         if not entryFound:
 
-            ##print()
-            pass
+            print()
 
         i += 1
 
@@ -191,17 +190,17 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
             m = s.model()
             # out = "%s %s" % (m[test], m[test2])
             # print(m)
-            ##print("sat in segment", i)
+            print("sat in segment", i)
 
         elif i <= segCount:
 
-            ##print("unsat in segment", i)
+            print("unsat in segment", i)
 
             # terminate after unsat
-            return
+            return False
 
         s.reset()
-        
+    return True
 
 def prog_eventually_disjunction(eps, segCount, data_0, data_1):
 
@@ -659,35 +658,31 @@ def getData(d, eps, delim, edges, agent_ID):
 def main():
 
     # set repeat count for confidence interval
-    repeat = 10
+    repeat = 1
 
-    d = 256
+    d = 1024
     eps = 1
     delim = 1
-    edges0 = int(d/2) #fast
-    #edges0 = d #slow
+    #edges0 = int(d/2) #fast
+    edges0 = d #slow
     edges1 = d
 
     # read data from files
     data_0 = getData(d, eps, delim, edges0, 1)
     data_1 = getData(d, eps, delim, edges1, 2)
     
-    sc = d
-    while sc <= d:
-        total_time = 0
-        for i in range(repeat):
-            start = time.time()
-            prog_always_conjunction(eps, sc, data_0, data_1)
-            #prog_eventually_disjunction(2*eps, d, data_0, data_1)
-            #prog_until(2*eps, d, data_0, data_1)
-            end = time.time()
-            # print("\nTime elapsed :", (end - start), "seconds")
-            dur = end - start
-            #print(i, "\t:\t", dur)
-            total_time += dur
-        print("Segment count:\t", sc)
-        print("Average :\t", total_time / repeat)
-        sc = sc + 1
+    total_time = 0
+    for i in range(repeat):
+        start = time.time()
+        #flag = prog_always_conjunction(eps, 2*d, data_0, data_1)
+        #prog_eventually_disjunction(eps, 2*d, data_0, data_1)
+        flag = prog_until(eps, 2*d, data_0, data_1)
+        end = time.time()
+        # print("\nTime elapsed :", (end - start), "seconds")
+        dur = end - start
+        #print(i, "\t:\t", dur)
+        total_time += dur
+    print("Average :\t", total_time / repeat)
 
 if __name__ == "__main__":
 

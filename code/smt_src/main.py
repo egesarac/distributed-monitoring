@@ -661,7 +661,7 @@ def getData(d, eps, delim, edges, agent_ID):
 def main():
 
     # set repeat count for confidence interval
-    repeat = 1
+    repeat = 30
 
     for d in (256, 512, 1024):
         for eps in (1, 2 ,4, 8):
@@ -674,24 +674,24 @@ def main():
                     NUMEDGES.append(num)
                     num = num * 2
                 for numEdges1 in NUMEDGES:
-                    path = "dataInt/{}_{}_{}_{}_{}.txt".format(d, eps, delt, numEdges1, 1)
+                    path = "data/{}_{}_{}_{}_{}.txt".format(d, eps, delt, numEdges1, 1)
                     if os.path.isfile(path):
                         data_1 = getData(d, eps, delt, numEdges1, 1)
                     else:
                         continue
 
                     for numEdges2 in NUMEDGES:
-                        path = "dataInt/{}_{}_{}_{}_{}.txt".format(d, eps, delt, numEdges2, 2)
+                        path = "data/{}_{}_{}_{}_{}.txt".format(d, eps, delt, numEdges2, 2)
                         if os.path.isfile(path) and numEdges1 <= numEdges2 and (d == numEdges1 and d == numEdges2):
                             data_2 = getData(d, eps, delt, numEdges2, 2)
                         else:
                             continue
                         
-                        results = open("results_ac_smt.txt", "a")
+                        results = open("results_ac_smt_bool.txt", "a")
                         total_time = 0
                         for i in range(repeat):
                             start = time.time()
-                            prog_always_conjunction(2*eps, d, data_1, data_2)
+                            prog_always_conjunction(eps, 2*d, data_1, data_2)
                             end = time.time()
                             total_time += end - start
 
