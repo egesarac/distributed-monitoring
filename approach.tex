@@ -168,7 +168,13 @@ This leads to an overapproximation of the set of possible behaviors since we los
 	This results in the value expression $2 \cdot 5$ being contained in both the set of value expressions of $x_1$ for $[1,3)$ and for $[3,4)$.
 	However, when we reason on possible the behaviors of $x_1$, we simply take the product of the sets of possible behaviors for each segment and neglect the knowledge that $x_1$ has a single rising edge changing its value from 2 to 5.
 	In particular, our method considers the value expression $2 \cdot 5 \cdot 2 \cdot 5$ as a valid potential behavior of $x_1$ in the interval $[1,4)$ although this is not possible.
-	While each of these value expressions are valid in isolation (i.e., $x_1$ can display the behavior $2$ in $[1,3)$ and $2 \cdot 5$ in $[3,4)$, or $2 \cdot 5$ in $[1,3)$ and $5$ in $[3,4)$), allowing this combination (i.e., $2 \cdot 5 \cdot 2 \cdot 5$) results in an overapproximation by encoding a behavior that is not a potential behavior of the given signal.
+	While each of these value expressions are valid in isolation (i.e., $x_1$ 
+	can display the behavior $2$ in $[1,3)$ and $2 \cdot 5$ in $[3,4)$, or $2 
+	\cdot 5$ in $[1,3)$ and $5$ in $[3,4)$), allowing this combination (i.e., 
+	$2 \cdot 5 \cdot 2 \cdot 5$) results in an overapproximation by encoding 
+	a behavior that is not a potential behavior of the given signal.
+	\borzoo{I think the past couple of pages can be summarized just by this 
+	example.}
 \end{example}
 
 \subsubsection{Approximate Evaluation of Real-Valued Signals}
