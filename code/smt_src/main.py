@@ -1001,10 +1001,10 @@ def main():
     # set repeat count for confidence interval
     repeat = 1
 
-    results = open("results_ad_smt.txt", "a")
 
-    for d in (4, 8, 16):
-        for eps in (1, 2, 4, 8, 16):
+    for e in (4, 8, 16):
+        d = 16
+        for eps in (4, 8, 16):
             for c in range(100):
                 data_0 = getData(d, c)
                 data_1 = getData(d, c + 100)
@@ -1026,11 +1026,11 @@ def main():
                     total_time += end - start
 
                 line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " " + "-" + " " + str(total_time / repeat) + " " + str(flag)
-                
                 print(line)
+                results = open("results_ad_smt.txt", "a")
                 results.write(line + "\n")
+                results.close()
 
-    results.close()
 
 if __name__ == "__main__":
     main()

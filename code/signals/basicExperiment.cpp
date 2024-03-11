@@ -1658,11 +1658,9 @@ pair<int, int> convertIntoBoolWithDestutter(string str, string delimiter)
 
 int main()
 {
-
-    vector<int> N{1, 2};
     vector<long long> D{4000, 8000, 16000};
     vector<long long> EPS{1000, 2000, 4000, 8000, 16000};
-    vector<long long> DEL{1000, 2000, 4000, 8000, 16000};
+    vector<long long> DEL{1, 1000, 2000, 4000, 8000, 16000};
 
     /*
     long long a = 0;
