@@ -197,10 +197,9 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
             print("unsat in segment", i)
 
             # terminate after unsat
-            return False
+            return
 
         s.reset()
-    return True
 
 def prog_always_conjunction(eps, segCount, data_0, data_1):
 
@@ -393,11 +392,10 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
             print("unsat in segment", i)
 
             # terminate after unsat
-            return False
+            return
 
         s.reset()
-    return True
-
+        
 def prog_eventually_conjunction(eps, segCount, data_0, data_1):
 
     # initialize z3 solver
@@ -671,8 +669,7 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
 
         if not entryFound:
 
-            ##print()
-            pass
+            print()
 
         i += 1
 
@@ -771,15 +768,14 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
             m = s.model()
             # out = "%s %s" % (m[test], m[test2])
             # print(m)
-            ##print("sat in segment", i)
+            print("sat in segment", i)
 
             # terminate after sat
             return
 
         elif i <= segCount:
 
-            ##print("unsat in segment", i)
-            pass
+            print("unsat in segment", i)
 
         s.reset()
 
@@ -1016,10 +1012,39 @@ def z3SqDist1d(x1, x2):
     return z3Abs(x2 - x1)
 
 
-def getData(d, eps, delim, edges, agent_ID):
+def getDataOld(d, eps, delim, edges, agent_ID):
 
     #file = open("data/{}_{}_{}_{}_{}.txt".format(d, eps, delim, edges, agent_ID))
     file = open("test{}.txt".format(agent_ID))
+    line = file.readline()
+
+    data = []
+
+    while line:
+
+        # param = line.split("\t")
+        param = line.split(" ")
+
+        values = []
+
+        for i in range(2):
+
+            values.append(float(param[i].strip()))
+
+        data.append(values)
+
+        line = file.readline()
+
+    file.close()
+
+    # print(data)
+
+    return data
+
+def getData(d, setID):
+
+    #file = open("data/{}_{}_{}_{}_{}.txt".format(d, eps, delim, edges, agent_ID))
+    file = open("dataNew/{}_{}.txt".format(d, setID))
     line = file.readline()
 
     data = []
@@ -1051,22 +1076,31 @@ def main():
     # set repeat count for confidence interval
     repeat = 1
 
+    # read data from files
     d = 4
+    data_0 = getData(d, 0)
+    data_1 = getData(d, 1)
+    
+    for i in range(d):
+        if data_0[i][1] > 0:
+            data_0[i][1] = 1.0
+        else:
+            data_0[i][1] = 0.0
+        if data_1[i][1] > 0:
+            data_1[i][1] = 1.0
+        else:
+            data_1[i][1] = 0.0
+    
     eps = 1
     delim = 1
-    edges0 = 1
-    edges1 = 1
-
-    # read data from files
-    data_0 = getData(d, eps, delim, edges0, 1)
-    data_1 = getData(d, eps, delim, edges1, 2)
     
     total_time = 0
     for i in range(repeat):
         start = time.time()
-        #flag = prog_always_conjunction(2, 1, data_0, data_1)
-        prog_eventually_disjunction(1, 1, data_0, data_1)
-        #flag = prog_until(eps, 2*d, data_0, data_1)
+        flag = prog_always_conjunction(1, 1, data_0, data_1)
+        #flag = prog_always_disjunction(1, 8, data_0, data_1)
+        #prog_eventually_disjunction(1, 1, data_0, data_1)
+        #flag = prog_until(1, 1, data_0, data_1)
         end = time.time()
         # print("\nTime elapsed :", (end - start), "seconds")
         dur = end - start
