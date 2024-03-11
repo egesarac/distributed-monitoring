@@ -167,8 +167,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
                 v,
                 Implies(
                     And(v >= timestamps0[0], v <= timestamps0[-1]),
-                    ##z3Interpolate(c_flow, v) == 2,
-                    z3Interpolate(c_flow, v) == 1,
+                    z3Interpolate(c_flow, v) >= 1,
                 ),
             )
         )
@@ -352,7 +351,6 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
                 Implies(
                     And(v >= timestamps0[0], v <= timestamps0[-1]),
                     z3Interpolate(c_flow, v) == 2,
-                    ##z3Interpolate(c_flow, v) == 1,
                 ),
             )
         )
@@ -910,17 +908,20 @@ def prog_until(eps, segCount, data_0, data_1):
             m = s.model()
             # out = "%s %s" % (m[test], m[test2])
             # print(m)
-            print("sat in segment", i)
+            ##print("sat in segment", i)
+            return "1"
 
         elif i <= segCount:
             for j in range((segmentLowerBound + 0), (segmentUpperBound + 1)):
                 if j >= 0 and j < len(data_0) and data_0[j][1] == 0:
-                    print("unsat in segment", i)
-                    return
+                    ##print("unsat in segment", i)
+                    return "0"
 
-            print("unknown in segment", i)
+            ##print("unknown in segment", i)
 
         s.reset()
+
+    return "2"
 
 
 def z3Interpolate(f, p):
@@ -999,12 +1000,78 @@ def getData(d, setID):
 
 def main():
     # set repeat count for confidence interval
-    repeat = 1
+    repeat = 10
 
+    """
+    for d in (4, 8, 16):
+        for eps in (1, 2, 4, 8, 16):
+            if d < eps:
+                continue
+            
+            for c in range():
+                data_0 = getData(d, c)
+                data_1 = getData(d, c + 100)
 
-    for e in (4, 8, 16):
-        d = 16
-        for eps in (4, 8, 16):
+                total_time = 0
+                for i in range(repeat):
+                    start = time.time()
+                    for i in range(d):
+                        if data_0[i][1] > 0:
+                            data_0[i][1] = 1.0
+                        else:
+                            data_0[i][1] = 0.0
+                        if data_1[i][1] > 0:
+                            data_1[i][1] = 1.0
+                        else:
+                            data_1[i][1] = 0.0
+                    flag = prog_always_conjunction(eps, d, data_0, data_1)
+                    end = time.time()
+                    total_time += end - start
+
+                line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " " + "-" + " " + str(total_time / repeat) + " " + str(flag)
+                print(line)
+                results = open("results_ac_smt.txt", "a")
+                results.write(line + "\n")
+                results.close()
+    """
+
+    for d in (4, 16, 64):
+        for eps in (1, 4):
+            if d < eps:
+                continue
+            
+            for c in range(3):
+                data_0 = getData(d, c)
+                data_1 = getData(d, c + 100)
+
+                total_time = 0
+                for i in range(repeat):
+                    start = time.time()
+                    for i in range(d):
+                        if data_0[i][1] > 0:
+                            data_0[i][1] = 1.0
+                        else:
+                            data_0[i][1] = 0.0
+                        if data_1[i][1] > 0:
+                            data_1[i][1] = 1.0
+                        else:
+                            data_1[i][1] = 0.0
+                    flag = prog_always_disjunction(eps, d, data_0, data_1)
+                    end = time.time()
+                    total_time += end - start
+
+                line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " " + "-" + " " + str(total_time / repeat) + " " + str(flag)
+                print(line)
+                results = open("results_ad_smt.txt", "a")
+                results.write(line + "\n")
+                results.close()
+
+    """
+    for d in (4, 8, 16):
+        for eps in (1, 2, 4, 8, 16):
+            if d < eps:
+                continue
+            
             for c in range(100):
                 data_0 = getData(d, c)
                 data_1 = getData(d, c + 100)
@@ -1021,16 +1088,78 @@ def main():
                             data_1[i][1] = 1.0
                         else:
                             data_1[i][1] = 0.0
-                    flag = prog_always_disjunction(eps, 1, data_0, data_1)
+                    flag = prog_eventually_conjunction(eps, d, data_0, data_1)
                     end = time.time()
                     total_time += end - start
 
                 line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " " + "-" + " " + str(total_time / repeat) + " " + str(flag)
                 print(line)
-                results = open("results_ad_smt.txt", "a")
+                results = open("results_ec_smt.txt", "a")
                 results.write(line + "\n")
                 results.close()
 
+    for d in (4, 8, 16):
+        for eps in (1, 2, 4, 8, 16):
+            if d < eps:
+                continue
+            
+            for c in range(100):
+                data_0 = getData(d, c)
+                data_1 = getData(d, c + 100)
+
+                total_time = 0
+                for i in range(repeat):
+                    start = time.time()
+                    for i in range(d):
+                        if data_0[i][1] > 0:
+                            data_0[i][1] = 1.0
+                        else:
+                            data_0[i][1] = 0.0
+                        if data_1[i][1] > 0:
+                            data_1[i][1] = 1.0
+                        else:
+                            data_1[i][1] = 0.0
+                    flag = prog_eventually_disjunction(eps, d, data_0, data_1)
+                    end = time.time()
+                    total_time += end - start
+
+                line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " " + "-" + " " + str(total_time / repeat) + " " + str(flag)
+                print(line)
+                results = open("results_ed_smt.txt", "a")
+                results.write(line + "\n")
+                results.close()
+
+    for d in (4, 8, 16):
+        for eps in (1, 2, 4, 8, 16):
+            if d < eps:
+                continue
+            
+            for c in range(100):
+                data_0 = getData(d, c)
+                data_1 = getData(d, c + 100)
+
+                total_time = 0
+                for i in range(repeat):
+                    start = time.time()
+                    for i in range(d):
+                        if data_0[i][1] > 0:
+                            data_0[i][1] = 1.0
+                        else:
+                            data_0[i][1] = 0.0
+                        if data_1[i][1] > 0:
+                            data_1[i][1] = 1.0
+                        else:
+                            data_1[i][1] = 0.0
+                    flag = prog_until(eps, d, data_0, data_1)
+                    end = time.time()
+                    total_time += end - start
+
+                line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " " + "-" + " " + str(total_time / repeat) + " " + str(flag)
+                print(line)
+                results = open("results_u_smt.txt", "a")
+                results.write(line + "\n")
+                results.close()
+    """
 
 if __name__ == "__main__":
     main()

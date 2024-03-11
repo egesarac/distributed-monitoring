@@ -180,7 +180,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
                 Implies(
                     And(v >= timestamps0[0], v <= timestamps0[-1]),
                     ##z3Interpolate(c_flow, v) == 2,
-                    z3Interpolate(c_flow, v) == 1,
+                    z3Interpolate(c_flow, v) >= 1,
                 ),
             )
         )
@@ -1077,9 +1077,9 @@ def main():
     repeat = 1
 
     # read data from files
-    d = 4
-    data_0 = getData(d, 0)
-    data_1 = getData(d, 1)
+    d = 16
+    data_0 = getData(d, 1)
+    data_1 = getData(d, 101)
     
     for i in range(d):
         if data_0[i][1] > 0:
@@ -1097,8 +1097,8 @@ def main():
     total_time = 0
     for i in range(repeat):
         start = time.time()
-        flag = prog_always_conjunction(1, 1, data_0, data_1)
-        #flag = prog_always_disjunction(1, 8, data_0, data_1)
+        flag = prog_always_conjunction(1, d, data_0, data_1)
+        #flag = prog_always_disjunction(1, 1, data_0, data_1)
         #prog_eventually_disjunction(1, 1, data_0, data_1)
         #flag = prog_until(1, 1, data_0, data_1)
         end = time.time()

@@ -1674,13 +1674,18 @@ int main()
     int n = 2;
 
     ofstream results;
-    string filename = "results_ad.txt";
+    string filename = "results_u.txt";
     results.open(filename);
 
     for (const auto &d : D)
     {
         for (const auto &eps : EPS)
         {
+            if (d < eps)
+            {
+                continue;
+            }
+            
             for (const auto &del : DEL)
             {
                 if (eps < del)
@@ -1729,7 +1734,15 @@ int main()
                         signals.resize(n);
                         for (int i = 0; i < n; i++)
                         {
-                            signals[i].push_back(make_pair(0, signalsReal[i][0].second));
+                            if (signalsReal[i][0].second > 0)
+                            {
+                                signals[i].push_back(make_pair(0, 1));
+                            }
+                            else 
+                            {
+                                signals[i].push_back(make_pair(0, 0));
+                            }
+                            
                             for (int j = 1; j < signalsReal[i].size(); j++)
                             {
                                 if (signalsReal[i][j].second > 0 && signalsReal[i][j - 1].second <= 0)
@@ -1925,7 +1938,7 @@ int main()
                         // test = bitsetAlways(bitsetConjunction(aps[0], aps[1]));
 
                         // always(x1 or x2)
-                        test = bitsetAlways(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))));
+                        // test = bitsetAlways(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))));
 
                         // eventually(x1 and x2)
                         // test = bitsetEventually(bitsetConjunction(aps[0], aps[1]));
@@ -1934,7 +1947,7 @@ int main()
                         // test = bitsetEventually(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))));
 
                         // x1 until x2
-                        // test = bitsetUntil(aps[0], aps[1]);
+                        test = bitsetUntil(aps[0], aps[1]);
                     }
 
                     endtime = chrono::system_clock::now();
