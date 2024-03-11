@@ -1386,10 +1386,10 @@ int main() {
     vector<long long> EPS {1000, 2000, 4000, 8000};
     vector<long long> DEL {1000, 2000, 4000, 8000};
 
-    /*long long a = 0;
-    long long b = 16000;
-    bool rightClosed = true;
-    bool leftClosed = false;*/
+    long long a = 0;
+    long long b = 8000;
+    bool leftClosed= true;
+    bool rightClosed = false;
 
     // CHANGE THIS
     //int n = 1;
@@ -1399,15 +1399,16 @@ int main() {
     //string filename = "results_alwaysConjNEWsmall_fp.txt";
     //results.open(filename);
 
-    int d = 4000;
-    int eps = 1000;
-    int del = 1000;
-    int numEdges1 = 4;
-    int numEdges2 = 4;            
+    int d = 3000;
+    int eps = 0;
+    int del = 0;
+    int numEdges1 = 3;
+    int numEdges2 = 3;            
                     
                 
                     vector<vector<pair<long long,double>>> signals(n);
-                    string filename1 = "data/" + to_string(d/1000) + "_" + to_string(int(eps/1000)) + "_" + to_string(int(del/1000)) + "_" + to_string(numEdges1) + "_1.txt";
+                    //string filename1 = "dataInt/" + to_string(d/1000) + "_" + to_string(int(eps/1000)) + "_" + to_string(int(del/1000)) + "_" + to_string(numEdges1) + "_1.txt";
+                    string filename1 = "test1.txt";
                     ifstream sigdata1(filename1);
 
                     string line1;
@@ -1421,7 +1422,8 @@ int main() {
 
                     
                         signals[1].clear();
-                        string filename2 = "data/" + to_string(d/1000) + "_" + to_string(int(eps)/1000) + "_" + to_string(int(del)/1000) + "_" + to_string(numEdges2) + "_2.txt";
+                        //string filename2 = "dataInt/" + to_string(d/1000) + "_" + to_string(int(eps)/1000) + "_" + to_string(int(del)/1000) + "_" + to_string(numEdges2) + "_2.txt";
+                        string filename2 = "test2.txt";
                         ifstream sigdata2(filename2);
 
                         string line2;
@@ -1429,7 +1431,7 @@ int main() {
                             stringstream linestream(line2);
                             double t, v;
                             linestream >> t >> v;
-                            signals[1].push_back(make_pair(t, v));
+                            signals[1].push_back(make_pair((long long)(t * 1000), v));
                         }
                         sigdata2.close();
 
@@ -1573,14 +1575,14 @@ int main() {
                             }
                         }
 
-                        vector<set<pair<string, string>>> AP = asyncProd(aps[0], aps[1]);
-
-                        
-                        test = bitsetAlways(bitsetConjunction(aps[0], aps[1]));
+                        test = bitsetConjunction(aps[0], aps[1]);
+                        test = bitsetEventually(test);
                         //test = bitsetEventually(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1])))); // this is faster
+                        //test = bitsetAlways(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1])))); // this is faster
                         ////test = bitsetNegation(bitsetAlways(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))));
                         //test = bitsetUntil(aps[0], aps[1]);
-                        
+                        //test = bitsetBoundedEventually(aps[0], segmentation, a, b, leftClosed, rightClosed);
+
                         endtime = chrono::system_clock::now();
                         chrono::duration<double, milli> totalTime = endtime - starttime;
 
@@ -1588,7 +1590,7 @@ int main() {
                         bool trueAtZero = test[0][1].any();
 
                         //results << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << (totalTime.count() / REP) / 1000 << endl;                        
-                        cout << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << (totalTime.count() / REP) / 1000 << endl;                        
+                        cout << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << (totalTime.count() / REP) / 1000 << " " << falseAtZero <<  " " << trueAtZero << endl;                        
                         //results << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << falseAtZero << " " << trueAtZero << endl;                        
                         //cout << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << falseAtZero << " " << trueAtZero << endl;                        
 
