@@ -1003,7 +1003,7 @@ def main():
 
     results = open("results_ad_smt.txt", "a")
 
-    for d in (4, 8, 16, 32, 64, 128):
+    for d in (4, 8, 16):
         for eps in (1, 2, 4, 8, 16):
             for c in range(100):
                 data_0 = getData(d, c)
