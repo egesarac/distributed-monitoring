@@ -198,9 +198,10 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
             ##print("unsat in segment", i)
 
             # terminate after unsat
-            return
+            return "0"
 
         s.reset()
+    return "1"
 
 
 def prog_eventually_disjunction(eps, segCount, data_0, data_1):
@@ -387,7 +388,7 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
             ##print("sat in segment", i)
 
             # terminate after sat
-            return
+            return "1"
 
         elif i <= segCount:
 
@@ -395,9 +396,12 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
             pass
 
         s.reset()
+    return "0"
 
 
 def prog_until(eps, segCount, data_0, data_1):
+
+    out = ""
 
     # initialize z3 solver
     s = Solver()
@@ -416,7 +420,7 @@ def prog_until(eps, segCount, data_0, data_1):
 
     if t0 != 0:
 
-        return
+        return "1"
 
     # encoding
     i = 0
@@ -590,6 +594,7 @@ def prog_until(eps, segCount, data_0, data_1):
             # out = "%s %s" % (m[test], m[test2])
             # print(m)
             ##print("sat in segment", i)
+            out = "1"
 
         elif i <= segCount:
 
@@ -598,11 +603,13 @@ def prog_until(eps, segCount, data_0, data_1):
                 if j >= 0 and j < len(data_0) and data_0[j][1] == 0:
 
                     ##print("unsat in segment", i)
-                    return
+                    return "0"
 
             ##print("unknown in segment", i)
+            out = "2"
 
         s.reset()
+    return out
 
 
 def z3Interpolate(f, p):
@@ -661,9 +668,9 @@ def getData(d, eps, delim, edges, agent_ID):
 def main():
 
     # set repeat count for confidence interval
-    repeat = 30
+    repeat = 1
 
-    for d in (256, 512, 1024):
+    for d in (16, 32, 64):
         for eps in (1, 2 ,4, 8):
             for delt in (1, 2, 4, 8):
                 if eps < delt:
@@ -682,7 +689,7 @@ def main():
 
                     for numEdges2 in NUMEDGES:
                         path = "data/{}_{}_{}_{}_{}.txt".format(d, eps, delt, numEdges2, 2)
-                        if os.path.isfile(path) and numEdges1 <= numEdges2 and (d == numEdges1 and d == numEdges2):
+                        if os.path.isfile(path) and numEdges1 <= numEdges2:
                             data_2 = getData(d, eps, delt, numEdges2, 2)
                         else:
                             continue
@@ -691,11 +698,11 @@ def main():
                         total_time = 0
                         for i in range(repeat):
                             start = time.time()
-                            prog_always_conjunction(eps, 2*d, data_1, data_2)
+                            flag = prog_always_conjunction(eps, 2*d, data_1, data_2)
                             end = time.time()
                             total_time += end - start
 
-                        line = "C: " + str(d) + " " + str(eps) + " " + str(delt) + " " + str(numEdges1) + " " + str(numEdges2) + " " + str(0) + " " + str(total_time / repeat)
+                        line = "C: " + str(d) + " " + str(eps) + " " + str(delt) + " " + str(numEdges1) + " " + str(numEdges2) + " " + "-" + " " + str(total_time / repeat) + " " + flag
                         print(line)
                         results.write(line + "\n")
                         results.close() 
@@ -712,28 +719,28 @@ def main():
                     NUMEDGES.append(num)
                     num = num * 2
                 for numEdges1 in NUMEDGES:
-                    path = "dataInt/{}_{}_{}_{}_{}.txt".format(d, eps, delt, numEdges1, 1)
+                    path = "data/{}_{}_{}_{}_{}.txt".format(d, eps, delt, numEdges1, 1)
                     if os.path.isfile(path):
                         data_1 = getData(d, eps, delt, numEdges1, 1)
                     else:
                         continue
 
                     for numEdges2 in NUMEDGES:
-                        path = "dataInt/{}_{}_{}_{}_{}.txt".format(d, eps, delt, numEdges2, 2)
+                        path = "data/{}_{}_{}_{}_{}.txt".format(d, eps, delt, numEdges2, 2)
                         if os.path.isfile(path) and numEdges1 <= numEdges2:
                             data_2 = getData(d, eps, delt, numEdges2, 2)
                         else:
                             continue
                         
-                        results = open("results_ed_smt.txt", "a")
+                        results = open("results_ed_smt_bool.txt", "a")
                         total_time = 0
                         for i in range(repeat):
                             start = time.time()
-                            prog_eventually_disjunction(2*eps, d, data_1, data_2)
+                            flag = prog_eventually_disjunction(eps, 2*d, data_1, data_2)
                             end = time.time()
                             total_time += end - start
 
-                        line = "D: " + str(d) + " " + str(eps) + " " + str(delt) + " " + str(numEdges1) + " " + str(numEdges2) + " " + str(0) + " " + str(total_time / repeat)
+                        line = "D: " + str(d) + " " + str(eps) + " " + str(delt) + " " + str(numEdges1) + " " + str(numEdges2) + " " + "-" + " " + str(total_time / repeat) + " " + flag
                         print(line)
                         results.write(line + "\n")
                         results.close()
@@ -749,28 +756,28 @@ def main():
                     NUMEDGES.append(num)
                     num = num * 2
                 for numEdges1 in NUMEDGES:
-                    path = "dataInt/{}_{}_{}_{}_{}.txt".format(d, eps, delt, numEdges1, 1)
+                    path = "data/{}_{}_{}_{}_{}.txt".format(d, eps, delt, numEdges1, 1)
                     if os.path.isfile(path):
                         data_1 = getData(d, eps, delt, numEdges1, 1)
                     else:
                         continue
 
                     for numEdges2 in NUMEDGES:
-                        path = "dataInt/{}_{}_{}_{}_{}.txt".format(d, eps, delt, numEdges2, 2)
+                        path = "data/{}_{}_{}_{}_{}.txt".format(d, eps, delt, numEdges2, 2)
                         if os.path.isfile(path) and numEdges1 <= numEdges2:
                             data_2 = getData(d, eps, delt, numEdges2, 2)
                         else:
                             continue
                         
-                        results = open("results_u_smt.txt", "a")
+                        results = open("results_u_smt_bool.txt", "a")
                         total_time = 0
                         for i in range(repeat):
                             start = time.time()
-                            prog_until(2*eps, d, data_1, data_2)
+                            flag = prog_until(eps, 2*d, data_1, data_2)
                             end = time.time()
                             total_time += end - start
 
-                        line = "U: " + str(d) + " " + str(eps) + " " + str(delt) + " " + str(numEdges1) + " " + str(numEdges2) + " " + str(0) + " " + str(total_time / repeat)
+                        line = "U: " + str(d) + " " + str(eps) + " " + str(delt) + " " + str(numEdges1) + " " + str(numEdges2) + " " + "-" + " " + str(total_time / repeat) + " " + flag
                         print(line)
                         results.write(line + "\n")
                         results.close() 

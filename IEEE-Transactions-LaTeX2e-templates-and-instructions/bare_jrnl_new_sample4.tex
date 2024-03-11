@@ -1,0 +1,417 @@
+\documentclass[lettersize,journal]{IEEEtran}
+\usepackage{amsmath,amsfonts}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{array}
+\usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\usepackage{textcomp}
+\usepackage{stfloats}
+\usepackage{url}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{cite}
+\hyphenation{op-tical net-works semi-conduc-tor IEEE-Xplore}
+% updated with editorial comments 8/9/2021
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[hidelinks]{hyperref}
+\usepackage{diagbox}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{stmaryrd}
+\usepackage{tikz}
+\usetikzlibrary{backgrounds, positioning, arrows, calc}
+\usepackage{mathtools}
+\usepackage[inline]{enumitem}  
+\usepackage{cleveref}
+\renewcommand{\cref}{\Cref}
+
+% ----- DEBUG
+\newcommand{\anik}[1]{\textcolor{orange}{\bf Anik: #1}}
+\newcommand{\borzoo}[1]{\textcolor{purple}{\bf Borzoo: #1}}
+\newcommand{\dejan}[1]{\textcolor{cyan!70!black}{\bf Dejan: #1}}
+\newcommand{\ege}[1]{\textcolor{green!70!black}{\bf Ege: #1}}
+
+\newcommand{\noteitem}{\ensuremath{\;{\bullet}\;}}
+\setlength{\marginparwidth}{4.2cm}
+\setlength{\marginparsep}{0.3cm}
+\usepackage{todonotes}
+\newcommand{\answer}[1]{{\color{white}#1}}
+\newcommand{\orangenote}[2][]{{\todo[color=orange!80,size=\footnotesize,#1]{\normalcolor\normalfont#2}}}
+\newcommand{\bluenote}[2][]{{\todo[color=cyan!80,size=\footnotesize,#1]{\normalcolor\normalfont#2}}}
+\newcommand{\greennote}[2][]{{\todo[color=green!80!black,size=\footnotesize,#1]{\normalcolor\normalfont#2}}}
+\newcommand{\rednote}[2][]{{\todo[color=magenta!80,size=\footnotesize,#1]{\normalcolor\normalfont#2}}}
+\newcommand\alert[1]{\textcolor{red}{#1}}
+\newcommand\TODO{\textcolor{red}{TODO}}
+
+\newcommand{\pfx}{\textsf{prefix}}
+\newcommand{\first}{\textsf{first}}
+\newcommand{\sfx}{\textsf{suffix}}
+\newcommand{\infx}{\textsf{infix}}
+\newcommand{\conjunction}{\textsf{conj}}
+
+\newcommand{\hb}{\rightsquigarrow}
+\newcommand{\A}{\mathbb{A}}
+\renewcommand{\S}{\mathbb{S}}
+\newcommand{\fr}{\mathsf{front}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\tr}{\mathsf{Tr}}
+\newcommand{\AP}{\mathsf{AP}}
+\newcommand{\true}{\texttt{true}}
+\newcommand{\false}{\texttt{false}}
+\newcommand{\CCF}{\mathsf{CCF}}
+\newcommand{\ccf}{\mathsf{ccf}}
+\newcommand{\destutter}{\mathsf{destutter}}
+\newcommand{\stutter}{\mathsf{stutter}}
+\newcommand*\BitAnd{\mathbin{\&}}
+\newcommand*\BitOr{\mathbin{|}}
+\newcommand*\ShiftLeft{\ll}
+\newcommand*\ShiftRight{\gg}
+\newcommand*\BitNeg{\ensuremath{\mathord{\sim}}}
+
+% ----- FIGURES
+\tikzstyle{state}=[thick,minimum size=18pt, circle,draw]
+\tikzstyle{transition}=[->,thick,>=stealth,shorten >=1pt,shorten <=1pt]
+\tikzstyle{final}=[after node path={ node[state, scale=.8] at (\tikzlastnode) {} }]
+\tikzstyle{initial}=[after node path={
+	[to path={[transition] (\tikztostart) -- (\tikztotarget)}]
+	(\tikzlastnode)++(180:22pt) edge (\tikzlastnode)
+}]
+\tikzset{
+	bg/.default={},
+	bg/.style={execute at end picture={
+			\begin{scope}[on background layer]
+				\node[xshift=-1mm, yshift=-1mm] (sw) at (current bounding box.south west) {};
+				\node[xshift=1mm, yshift=1mm] (ne) at (current bounding box.north east) {};
+				\node[xshift=1mm, yshift=-1mm] (nw) at (current bounding box.north west) {};
+				\fill[fill=black!10,rounded corners] (sw) rectangle (ne);
+				
+				\ifx&#1&\else
+				\node[anchor=north east, xshift=2pt] at (nw) {#1};
+				\fi
+			\end{scope}
+	}},
+}
+
+% ----- NUMERICAL SETS
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\ZZ}{\overline{\ref{ex:minresp}Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\NN}{\overline{\N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\RR}{\R^{\pm \infty}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\D}{\mathbb{D}}
+\newcommand{\B}{\mathbb{B}}
+
+% ------ FUNCTIONS
+\newcommand{\avg}{\text{\normalfont avg}}
+\newcommand{\disc}{\text{\normalfont disc}}
+\newcommand{\fin}{\text{\normalfont fin}} 
+\newcommand{\limavg}{\text{\normalfont limavg}} 
+
+% ----- LTL SYNTAX
+\newcommand{\LTLf}{\ensuremath{\lozenge}}
+\let\LTLfinally\LTLf
+\let\LTLeventualy\LTLf
+\newcommand{\LTLg}{\ensuremath{\square}}
+\let\LTLalways\LTLg
+\let\LTLglobally\LTLg
+\newcommand{\LTLo}{\ensuremath{\bigcirc}}
+\let\LTLnext\LTLo
+\def\until{\kern.1em\mathcal{U}}
+%\newcommand \until      {\mathbin{\mathcal{U}\kern-.1em}}
+\def\since{\,\mathcal{S}\,}
+
+\newcommand{\?}{\text{?}}
+
+\newcommand{\req}{\texttt{rq}}
+\newcommand{\ping}{\texttt{ping}}
+\newcommand{\ack}{\texttt{ack}}
+\newcommand{\gra}{\texttt{gr}}
+\newcommand{\tick}{\texttt{tk}}
+\newcommand{\other}{\texttt{oo}}
+\newcommand{\off}{\texttt{off}}
+%\newcommand{\ready}{\texttt{ready}}
+
+% ----- MONITOR
+\newcommand{\res}{\mathbf{r}}
+\newcommand{\RES}{\mathbf{R}}
+\newcommand{\ggeq}{\mathrel{\underline{\gg}}}
+\newcommand{\lleq}{\mathrel{\underline{\ll}}}
+\newcommand{\calM}{\mathcal{M}}
+\newcommand{\calA}{\mathcal{A}}
+\newcommand{\calB}{\mathcal{B}}
+\newcommand{\prefixeq}{\preceq}
+\newcommand{\prefix}{\prec}
+\newcommand{\infPhi}{\inf\nolimits_\varPhi}
+\newcommand{\supPhi}{\sup\nolimits_\varPhi}
+\newcommand{\spec}{\textit{spec}}
+\newcommand{\trace}{\textit{trace}}
+\newcommand{\pref}{\textit{pref}}
+
+% ----- GENERAL
+\newcommand{\dom}[1]{{\textsf{dom}(#1)}}
+\newcommand{\sem}[1]{{[\!\![#1]\!\!]}}
+\newcommand{\suchthat}{\;\ifnum\currentgrouptype=16 \middle\fi|\;}
+\let\st\suchthat
+\newcommand{\defeq}{\coloneqq}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+\newcommand\Circle[1][1.4]{\tikz[baseline=-3.3]{\draw(0,0)circle[radius=#1mm];}}
+
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+
+\begin{document}
+
+\title{}
+
+\author{Author(s),~\IEEEmembership{Affiliation(s)}}
+
+% The paper headers
+%\markboth{Journal of \LaTeX\ Class Files,~Vol.~14, No.~8, August~2021}%
+%{Shell \MakeLowercase{\textit{et al.}}: A Sample Article Using IEEEtran.cls for IEEE Journals}
+
+%\IEEEpubid{0000--0000/00\$00.00~\copyright~2021 IEEE}
+% Remember, if you use this you must call \IEEEpubidadjcol in the second
+% column for its text to clear the IEEEpubid mark.
+
+\maketitle
+
+\begin{abstract}
+	
+\end{abstract}
+
+\begin{IEEEkeywords}
+
+\end{IEEEkeywords}
+
+%%%%%
+\section*{TODO-LIST}
+\begin{enumerate}
+	\item find better section names
+	\item write intro
+	\item write abstract
+	\item write related work
+	\item write conclusion
+	\item list keywords
+	\item find title
+	\item acknowledgments
+\end{enumerate}
+%%%%%
+
+\section{Introduction}
+
+
+\section{Preliminaries}
+
+We define $\B = \{ \bot, \top \}$ as the set of boolean truth values, where $\bot < \top$ and they 
+complement each other, i.e., $\overline{\bot} = \top$ and $\overline{\top} = \bot$.
+%
+We denote by $\R$ the set of reals, $\R_{\geq 0}$ the set of nonnegative reals, and $\R_{> 0}$ the 
+set of positive reals.
+%
+An interval $I \subseteq \R$ of reals with the end points $a < b$ has length $|b-a|$.
+
+Let $\Sigma$ be a finite {\em alphabet}.
+%
+We denote by $\Sigma^*$ the set of finite words over $\Sigma$ and by $\epsilon$ the empty word.
+%
+For $u \in \Sigma^*$, we respectively write $\pfx(u)$ and $\sfx(u)$ for the sets of nonempty prefixes 
+and suffixes of $u$.
+%
+We also let $\infx(u) = \{v \in \Sigma^* \st \exists x,y \in \Sigma^* : u = xvy \land v \neq \epsilon\}$.
+%
+For a nonempty word $u \in \Sigma^*$ and $1 \leq i \leq |u|$, we denote by $u[i]$ the $i$th letter of 
+$u$, by $u[..i]$ the prefix of $u$ of length $i$, and by $u[i..]$ the suffix of $u$ of length $|u| - i + 1$. 
+%
+Given $u \in \Sigma^*$ and $\ell \geq 1$, we denote by $u^\ell$ the word obtained by concatenating $u$ by itself $\ell - 1$ times.
+Moreover, given $L \subseteq \Sigma^*$, we define $\first(L) = \{ u[0] \st u \in L\}$.
+
+We define the function $\destutter : \Sigma^* \to \Sigma^*$ inductively as follows.
+For all $\sigma \in \Sigma \cup \{\epsilon\}$, let $\destutter(\sigma) = \sigma$.
+%
+For all $u \in \Sigma^*$ such that $u = \sigma_1 \sigma_2 v$ for some $\sigma_1,\sigma_2 \in 
+\Sigma$ and $v \in \Sigma^*$, let (i) $\destutter(u) = \destutter(\sigma_2 v)$ if $\sigma_1 = 
+\sigma_2$, and (ii) $\destutter(u) = \sigma_1 \cdot \destutter(\sigma_2 v)$ otherwise.
+%
+By extension, for a set $L \subseteq \Sigma^*$ of finite words, we write $\destutter(L) = 
+\{\destutter(u) \st u \in L\}$.
+%
+Given a tuple $(u_1, \ldots, u_m)$ of finite words of the same length, we write $\destutter(u_1, \ldots, u_m)$ for the extension of $\destutter$ defined as expected: requiring the equality condition in (i) to hold for all the words in the tuple.
+
+
+Moreover, given an integer $k \geq 0$, we define $\stutter_k : \Sigma^* \to \Sigma^*$ such that $\stutter_k(u) = \{v \in \Sigma^* \st |v| = k \land \destutter(v) = \destutter(u)\}$ if $k \geq |\destutter(u)|$, and $\stutter_k(u) = \emptyset$ otherwise.
+
+\subsection{Sequential Signal Model and Signal Temporal Logic}
+
+Let $A,B \subset \R$.
+%
+A function $f : A \to B$ is
+\emph{right-continuous} iff $\lim_{a \to c^+} f(a) = f(c)$ for all $c \in A$, and
+%\emph{left-limited} iff $\lim_{a \to c^-} f(a) < \infty$ for all $c \in A$;
+\emph{non-Zeno} iff for every bounded interval $I \subseteq A$ there are finitely many $a \in I$ such that $f$ is not continuous at $a$.
+
+\begin{definition}
+	A \emph{signal} is a right-continuous, non-Zeno, piecewise-constant function $x : [0,d) \to \R$ where $d \in \R_{> 0}$ is the duration of $x$ and $[0,d)$ is its temporal domain.
+\end{definition}
+
+\TODO: finite representation of signals
+
+Let $\AP$ be a set of atomic propositions.
+The syntax is of signal temporal logic (STL) given by the following grammar where $p \in \AP$ and $I \subseteq \R_{\geq 0}$ is an interval.
+$$ \varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \land \varphi ~|~ \varphi \until_I \varphi$$
+
+A \emph{trace} is a vector of synchronous signals of finite duration.
+We express atomic propositions as functions of trace values at a time point 
+$t$, i.e., a proposition $p \in \AP$ over a trace $w = (x_1, \ldots, x_n)$ is 
+defined as $f_p(x_1(t), \ldots, x_n(t)) > 0$ where $f_p : \R^n \to \R$ is a 
+function.
+Note that given a trace over a temporal domain $[0,D)$ and intervals $I,J \subseteq \R_{\geq 0}$, we write $I \oplus J = \{i + j \st i \in I \land j \in J\}$.
+We use the shorthand notation $t$ for the singleton set $\{t\}$. 
+
+Below we recall the finite-trace qualitative semantics of STL defined over $\B$.
+Let $d\in \R_{> 0}$ and $w = (x_1, \ldots, x_n)$ with $x_i : [0,d) \to \R$ for all $1 \leq i \leq n$.
+Let $\varphi_1, \varphi_2$ be STL formulas and let $t \in [0,d)$.
+
+\footnotesize
+\begin{align*}
+	[w,t \models p]_{\mathsf{STL}} &\iff & f_p(x_1(t), \ldots, x_n(t)) > 0 \\
+	[w,t \models \lnot \varphi_1]_{\mathsf{STL}} &\iff & \overline{[w,t \models \varphi_1]_{\mathsf{STL}}} \\
+	[w,t \models \varphi_1 \land \varphi_2]_{\mathsf{STL}} &\iff & [w,t \models \varphi_1]_{\mathsf{STL}} \land [w,t \models \varphi_2]_{\mathsf{STL}} \\
+	[w,t \models \varphi_1 \until_I \varphi_2]_{\mathsf{STL}} &\iff & \exists t' \in (t \oplus I) \cap [0,d) : [w,t' \models \varphi_2]_{\mathsf{STL}}  \\
+	& & \land \forall t'' \in (t, t') : [w,t'' \models \varphi_1]_{\mathsf{STL}} \\
+	%	[w,t \models \LTLf_I \varphi_1] &\iff \exists t' \in t \oplus I : [w,t' \models \varphi_1] \\
+	%	[w,t \models \LTLg_I \varphi_1] &\iff \forall t' \in t \oplus I : [w,t' \models \varphi_1] \\
+\end{align*}
+\normalsize
+
+We simply write $[w \models \varphi]$ for $[w,0 \models \varphi]$.
+We additionally use the following standard abbreviations: 
+$\false = p \land \lnot p$,
+$\true = \lnot \false$,
+$ \varphi_1 \lor \varphi_2 = \lnot (\lnot \varphi_1 \land \lnot \varphi_2)$,
+$\LTLf_I \varphi = \true \until_I \varphi$, and
+$\LTLg_I \varphi = \lnot \LTLf_I \lnot \varphi$.
+Moreover, the untimed temporal operators are defined through their timed counterparts on the interval $(0,\infty)$, e.g., $\varphi_1 \until \varphi_2 = \varphi_1 \until_{(0,\infty)} \varphi_2$.
+Note that our interpretation of the untimed until operator is strict.
+The non-strict variant can be defined in terms of the strict one as follows: $\varphi_1 \underline{\until} \varphi_2 = \varphi_2 \lor (\varphi_1 \land (\varphi_1 \until \varphi_2))$.
+
+%The semantics above is defined for infinite traces while a distributed signal has finite length.
+%To bridge this gap, we take the standard extension to a 3-valued semantics.
+%Given a finite-length trace $w$ and an STL formula $\varphi$, 
+%we define $[w \models \varphi]_3 = \top$ iff $[w w' \models \varphi]_{\mathsf{STL}}$ for every infinite-length signal $w'$, define $[w \models \varphi]_3 = \bot$ iff $[w w' \models \lnot \varphi]_{\mathsf{STL}}$ for every infinite-length signal $w'$, and $[w \models \varphi]_3 = \?$ otherwise.
+
+
+\subsection{Distributed Signal Model and Signal Temporal Logic} \label{sec:stl}
+
+We consider an asynchronous and loosely-coupled message-passing system of $N \geq 2$ reliable 
+agents, denoted $A_1, \ldots, A_N$.
+%
+The agents produce a set of $n \geq 2$ signals $x_1, \ldots, x_n$, where for some $d \in \R_{> 0}$ 
+we have $x_i : [0,d) \to \R$ for all $1 \leq i \leq n$.
+%
+The function $\pi : \{x_1, \ldots, x_n\} \to \{A_1, \ldots, A_N\}$ maps each signal to the agent it is 
+produced by. \borzoo{Check later if this is really needed.}
+%
+The agents do not share memory or a global clock.
+%
+Only to formalize statements, we speak of a {\em hypothetical} global clock and denote its value by 
+$T$.
+%
+For local time values, we use the lowercase letters $t$ and $s$.
+
+We represent the local clock of the agent $A_i$ as an increasing and divergent function $c_i : 
+\R_{\geq 0} \to \R_{\geq 0}$ that maps a global time $T$ to a local time $c_i(T)$ of $A_i$.
+%
+We denote by $c_i^{-1}$ the inverse of the local clock function $c_i$.
+%
+We assume that the system is \emph{partially synchronous}: the agents use a clock synchronization algorithm that guarantees a bounded clock skew with respect to the global clock, i.e., $|c_i(T) - T| < \varepsilon$ for all $1 \leq i \leq N$ and $T \in \R_{\geq 0}$, where $\varepsilon \in \R_{> 0}$ is the maximum clock skew.
+\borzoo{Another way is $|c(i) - c(j)| < \epsilon$} \anik{$|c_i(T) - c_j(T)| < \epsilon$ for all $1 \leq i,j \leq N$ and $T \in \R_{\geq 0}$}
+
+
+
+An \emph{event} of a given signal $x_i$ is a pair $(t, x_i(t))$, where $t$ is a local clock value.
+We denote by $V_i$ the set of events of signal $x_i$.
+%
+An \emph{edge} of $x_i$ is an event $(t, x_i(t))$ such that $\lim_{s \to t^-} x_i(s) \neq \lim_{s \to t^+} x_i(s)$.
+In particular, it is a \emph{rising} edge if $\lim_{s \to t^-} x_i(s) < \lim_{s \to t^+} x_i(s)$, and a \emph{falling} edge otherwise.
+We respectively denote by $E_i^\uparrow$ and $E_i^\downarrow$ the sets of rising and falling edges of $x_i$, and we let $E_i = E_i^\uparrow \cup E_i^\downarrow$.
+
+We assume that signals have \emph{bounded variability} with respect to the global clock: for each 
+signal $x_i$ and every pair $(t, x_i(t)), (t', x_i(t')) \in E_i$ of edges, we have $|c_j^{-1}(t) - 
+c_j^{-1}(t')| \geq \delta$  \anik{for all $1 \leq j \leq N$}, where $A_j = \pi(x_i)$ is the agent that produces $x_i$ and $\delta \in 
+\R_{\geq 0}$ is the bounded variability constant. \borzoo{Do we really need the agent here?}
+
+\begin{definition} \label{defn:hb}
+	A \emph{distributed signal} is a pair $(S, {\hb})$, where $S = (x_1, \ldots, x_n)$ is a vector of 
+	signals and ${\hb}$ is the happened-before relation between events in signals extended with the 
+	partial synchrony assumption as follows.
+	\begin{itemize}
+		\item For every agent, the events of its signals are totally ordered, i.e., for all $1 \leq i,j \leq n$ \anik{Use either `n' or `N' consistently} 
+		with $\pi(x_i) = \pi(x_j)$ and all $(t, x_i(t)) \in V_i$ and $(t', x_j(t')) \in V_j$, if $t < t'$ then $(t, 
+		x_i(t)) \hb (t', x_j(t'))$.
+		\borzoo{I do think $\pi$ is unnecessary. We can assume each agent produces a distinct signal.}
+		\item Every pair of events whose timestamps are at least $2 \varepsilon$ apart is totally ordered, i.e., for all $1 \leq i,j \leq n$ and all $(t, x_i(t)) \in V_i$ and $(t', x_j(t')) \in V_j$, if $t + 2\varepsilon \leq t'$ then $(t, x_i(t)) \hb (t', x_j(t'))$.
+	\end{itemize}
+\end{definition}
+
+\begin{example}
+	\TODO: distributed signal, happened-before relation
+\end{example}
+
+\begin{definition}
+	Let $(S, {\hb})$ be a distributed signal of $n$ signals, and $V = \bigcup_{i = 1}^{n} V_i$ be the set of its events.
+	A set $C \subseteq V$ is a \emph{consistent cut} iff for every event in $C$, all events that happened before  it also belong to $C$, i.e., for all $e, e' \in V$, if $e \in C$ and $e' \hb e$, then $e' \in C$.
+\end{definition}
+
+We denote by $\CC(T)$ the (infinite) set of consistent cuts at global time $T$.
+Given a consistent cut $C$, its \emph{frontier} $\fr(C) \subseteq C$ is the set consisting of the last events in $C$ of each signal, i.e., $\fr(C) = \bigcup_{i = 1}^{n} \{ (t, x_i(t)) \in V_i \cap C \st \forall t' > t : (t', x_i(t')) \notin V_i \cap C \}$.
+
+\begin{definition}
+	A \emph{consistent cut flow} is a function $\ccf : \R_{\geq 0} \to 2^V$ that 
+	maps a global clock value $T$ to the frontier of a consistent cut at time 
+	$T$, i.e., $\ccf(T) \in \{\fr(C) \st C \in \CC(T)\}$.
+\end{definition}
+
+
+For all $T,T' \in \R_{\geq 0}$ and $1 \leq i \leq n$ where $A_j = \pi(x_i)$, if 
+$T < T'$, then for every pair of events $(c_j(T), x_i(c_j(T))) \in \ccf(T)$ and 
+$(c_j(T'), x_i(c_j(T'))) \in \ccf(T')$ we have $(c_j(T), x_i(c_j(T))) \hb (c_j(T'), 
+x_i(c_j(T')))$.
+We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distributed signal $(S,{\hb})$.
+
+\begin{example}
+	\TODO: consistent cut, frontier, consistent cut flow
+\end{example}
+
+\TODO: distributed semantics
+
+
+\section{Our Approach}
+
+
+\subsection{}
+
+
+\section{Our Algorithm}
+
+
+\section{Experimental Evaluation}
+
+
+\section{Conclusion}
+
+
+\section*{Acknowledgments}
+
+
+
+%TODO
+%\cite{GangulyMB20}
+%\bibliography{main}
+\vfill
+\end{document}
