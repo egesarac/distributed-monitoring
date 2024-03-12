@@ -997,79 +997,52 @@ def getData(d, setID):
 
     return data
 
+def preprocess(data, d):
+    for i in range(d):
+        if data[i][1] > 0:
+            data[i][1] = 1.0
+        else:
+            data[i][1] = 0.0
+
+    data.append([float(d), data[d-1][1]])
+
+    return data
 
 def main():
     # set repeat count for confidence interval
-    repeat = 5
-
-    for d in (32, 64):
-        for eps in (1, 2, 4, 8, 16):
-            if d < eps:
+    repeat = 10
+    seg = 1
+    while seg <= 32:
+        for d in (4, 8, 16, 32):
+            if d < seg:
                 continue
-            
-            for c in range(1):
-                data_0 = getData(d, c)
-                data_1 = getData(d, c + 100)
+            for eps in (1, 2, 4, 8):
+                if d < eps:
+                    continue
+                
+                for c in range(400,401):
+                    data_0 = getData(d, c)
+                    data_1 = getData(d, c + 100)
 
-                seg = 1
-                while seg <= d:
                     total_time = 0
                     for i in range(repeat):
                         start = time.time()
-                        for i in range(d):
-                            if data_0[i][1] > 0:
-                                data_0[i][1] = 1.0
-                            else:
-                                data_0[i][1] = 0.0
-                            if data_1[i][1] > 0:
-                                data_1[i][1] = 1.0
-                            else:
-                                data_1[i][1] = 0.0
-                        flag = prog_always_conjunction(eps, seg, data_0, data_1)
+                        data0 = preprocess(data_0, d)
+                        data1 = preprocess(data_1, d)
+                        flag = prog_eventually_disjunction(eps, seg, data0, data1)
                         end = time.time()
                         total_time += end - start
 
-                    line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " " + str(seg) + " " + "-" + " " + str(total_time / repeat) + " " + str(flag)
-                    print("AC: " + line)
-                    results = open("results_ac_smt.txt", "a")
+                    line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str(total_time / repeat) + " " + str(flag) + " " + str(seg)
+                    print(line)
+                    results = open("SEG_results_ed_smt.txt", "a")
                     results.write(line + "\n")
                     results.close()
-                    seg = seg * 2
+        seg = seg * 2
+    """
 
-
-    for d in (4, 8, 16):
-        for eps in (1, 2, 4, 8, 16):
-            if d < eps:
-                continue
-            
-            for c in range(3):
-                data_0 = getData(d, c)
-                data_1 = getData(d, c + 100)
-
-                total_time = 0
-                for i in range(repeat):
-                    start = time.time()
-                    for i in range(d):
-                        if data_0[i][1] > 0:
-                            data_0[i][1] = 1.0
-                        else:
-                            data_0[i][1] = 0.0
-                        if data_1[i][1] > 0:
-                            data_1[i][1] = 1.0
-                        else:
-                            data_1[i][1] = 0.0
-                    flag = prog_always_disjunction(eps, d, data_0, data_1)
-                    end = time.time()
-                    total_time += end - start
-
-                line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " " + "-" + " " + str(total_time / repeat) + " " + str(flag)
-                print(line)
-                results = open("results_ad_smt.txt", "a")
-                results.write(line + "\n")
-                results.close()
-
-    for d in (4, 8, 16):
-        for eps in (1, 2, 4, 8, 16):
+    for d in (4, 8, 16, 32):
+        for eps in (1, 2, 4, 8):
             if d < eps:
                 continue
             
@@ -1080,27 +1053,20 @@ def main():
                 total_time = 0
                 for i in range(repeat):
                     start = time.time()
-                    for i in range(d):
-                        if data_0[i][1] > 0:
-                            data_0[i][1] = 1.0
-                        else:
-                            data_0[i][1] = 0.0
-                        if data_1[i][1] > 0:
-                            data_1[i][1] = 1.0
-                        else:
-                            data_1[i][1] = 0.0
-                    flag = prog_eventually_conjunction(eps, d, data_0, data_1)
+                    data0 = preprocess(data_0, d)
+                    data1 = preprocess(data_1, d)
+                    flag = prog_always_disjunction(eps, 1, data0, data1)
                     end = time.time()
                     total_time += end - start
 
                 line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " " + "-" + " " + str(total_time / repeat) + " " + str(flag)
                 print(line)
-                results = open("results_ec_smt.txt", "a")
+                results = open("results_ad_smt2.txt", "a")
                 results.write(line + "\n")
                 results.close()
 
-    for d in (4, 8, 16):
-        for eps in (1, 2, 4, 8, 16):
+    for d in (4, 8, 16, 32):
+        for eps in (1, 2, 4, 8):
             if d < eps:
                 continue
             
@@ -1111,27 +1077,20 @@ def main():
                 total_time = 0
                 for i in range(repeat):
                     start = time.time()
-                    for i in range(d):
-                        if data_0[i][1] > 0:
-                            data_0[i][1] = 1.0
-                        else:
-                            data_0[i][1] = 0.0
-                        if data_1[i][1] > 0:
-                            data_1[i][1] = 1.0
-                        else:
-                            data_1[i][1] = 0.0
-                    flag = prog_eventually_disjunction(eps, d, data_0, data_1)
+                    data0 = preprocess(data_0, d)
+                    data1 = preprocess(data_1, d)
+                    flag = prog_eventually_conjunction(eps, 1, data0, data1)
                     end = time.time()
                     total_time += end - start
 
                 line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " " + "-" + " " + str(total_time / repeat) + " " + str(flag)
                 print(line)
-                results = open("results_ed_smt.txt", "a")
+                results = open("results_ec_smt2.txt", "a")
                 results.write(line + "\n")
                 results.close()
 
-    for d in (4, 8, 16):
-        for eps in (1, 2, 4, 8, 16):
+    for d in (4, 8, 16, 32):
+        for eps in (1, 2, 4, 8):
             if d < eps:
                 continue
             
@@ -1142,24 +1101,42 @@ def main():
                 total_time = 0
                 for i in range(repeat):
                     start = time.time()
-                    for i in range(d):
-                        if data_0[i][1] > 0:
-                            data_0[i][1] = 1.0
-                        else:
-                            data_0[i][1] = 0.0
-                        if data_1[i][1] > 0:
-                            data_1[i][1] = 1.0
-                        else:
-                            data_1[i][1] = 0.0
-                    flag = prog_until(eps, d, data_0, data_1)
+                    data0 = preprocess(data_0, d)
+                    data1 = preprocess(data_1, d)
+                    flag = prog_eventually_disjunction(eps, 1, data0, data1)
                     end = time.time()
                     total_time += end - start
 
                 line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " " + "-" + " " + str(total_time / repeat) + " " + str(flag)
                 print(line)
-                results = open("results_u_smt.txt", "a")
+                results = open("results_ed_smt2.txt", "a")
                 results.write(line + "\n")
                 results.close()
+
+    for d in (4, 8, 16, 32):
+        for eps in (1, 2, 4, 8):
+            if d < eps:
+                continue
+            
+            for c in range(100):
+                data_0 = getData(d, c)
+                data_1 = getData(d, c + 100)
+
+                total_time = 0
+                for i in range(repeat):
+                    start = time.time()
+                    data0 = preprocess(data_0, d)
+                    data1 = preprocess(data_1, d)
+                    flag = prog_until(eps, 1, data0, data1)
+                    end = time.time()
+                    total_time += end - start
+
+                line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " " + "-" + " " + str(total_time / repeat) + " " + str(flag)
+                print(line)
+                results = open("results_u_smt2.txt", "a")
+                results.write(line + "\n")
+                results.close()
+    """
 
 if __name__ == "__main__":
     main()
