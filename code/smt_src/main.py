@@ -1010,35 +1010,36 @@ def preprocess(data, d):
 
 def main():
     # set repeat count for confidence interval
-    repeat = 1
+    repeat = 10
 
-    for d in (4, 8):
+    for d in (4, 8, 16, 32):
         for eps in (1, 2, 4, 8):
             if d < eps:
                 continue
             
-            for c in range(100):
-                data_0 = getData(d, c)
-                data_1 = getData(d, c + 100)
+            for seg in range(1, d+1):
+                for c in range(10):
+                    data_0 = getData(d, c)
+                    data_1 = getData(d, c + 100)
 
-                total_time = 0
-                for i in range(repeat):
-                    start = time.time()
-                    data0 = preprocess(data_0, d)
-                    data1 = preprocess(data_1, d)
-                    flag = prog_always_conjunction(eps, 1, data0, data1)
-                    end = time.time()
-                    total_time += end - start
+                    total_time = 0
+                    for i in range(repeat):
+                        start = time.time()
+                        data0 = preprocess(data_0, d)
+                        data1 = preprocess(data_1, d)
+                        flag = prog_always_conjunction(eps, seg, data0, data1)
+                        end = time.time()
+                        total_time += end - start
 
-                line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " " + "-" + " " + str(total_time / repeat) + " " + str(flag)
-                print(line)
-                results = open("results_ac_smt2.txt", "a")
-                results.write(line + "\n")
-                results.close()
-    
+                    line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str(total_time / repeat) + " " + str(flag) + " " + str(seg)
+                    print(line)
+                    results = open("results_ac_smt2.txt", "a")
+                    results.write(line + "\n")
+                    results.close()
     """
-    for d in (4, 8, 16):
-        for eps in (1, 2, 4, 8, 16):
+
+    for d in (4, 8, 16, 32):
+        for eps in (1, 2, 4, 8):
             if d < eps:
                 continue
             
@@ -1057,12 +1058,12 @@ def main():
 
                 line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " " + "-" + " " + str(total_time / repeat) + " " + str(flag)
                 print(line)
-                results = open("results_ad_smt.txt", "a")
+                results = open("results_ad_smt2.txt", "a")
                 results.write(line + "\n")
                 results.close()
 
-    for d in (4, 8, 16):
-        for eps in (1, 2, 4, 8, 16):
+    for d in (4, 8, 16, 32):
+        for eps in (1, 2, 4, 8):
             if d < eps:
                 continue
             
@@ -1081,12 +1082,12 @@ def main():
 
                 line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " " + "-" + " " + str(total_time / repeat) + " " + str(flag)
                 print(line)
-                results = open("results_ec_smt.txt", "a")
+                results = open("results_ec_smt2.txt", "a")
                 results.write(line + "\n")
                 results.close()
 
-    for d in (4, 8, 16):
-        for eps in (1, 2, 4, 8, 16):
+    for d in (4, 8, 16, 32):
+        for eps in (1, 2, 4, 8):
             if d < eps:
                 continue
             
@@ -1105,12 +1106,12 @@ def main():
 
                 line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " " + "-" + " " + str(total_time / repeat) + " " + str(flag)
                 print(line)
-                results = open("results_ed_smt.txt", "a")
+                results = open("results_ed_smt2.txt", "a")
                 results.write(line + "\n")
                 results.close()
 
-    for d in (4, 8, 16):
-        for eps in (1, 2, 4, 8, 16):
+    for d in (4, 8, 16, 32):
+        for eps in (1, 2, 4, 8):
             if d < eps:
                 continue
             
@@ -1129,7 +1130,7 @@ def main():
 
                 line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " " + "-" + " " + str(total_time / repeat) + " " + str(flag)
                 print(line)
-                results = open("results_u_smt.txt", "a")
+                results = open("results_u_smt2.txt", "a")
                 results.write(line + "\n")
                 results.close()
     """
