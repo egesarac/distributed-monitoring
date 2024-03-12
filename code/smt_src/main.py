@@ -1012,7 +1012,7 @@ def main():
     # set repeat count for confidence interval
     repeat = 1
 
-    for d in (4, 8, 16, 32):
+    for d in (4, 8):
         for eps in (1, 2, 4, 8):
             if d < eps:
                 continue
@@ -1032,7 +1032,7 @@ def main():
 
                 line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " " + "-" + " " + str(total_time / repeat) + " " + str(flag)
                 print(line)
-                results = open("results_ac_smt.txt", "a")
+                results = open("results_ac_smt2.txt", "a")
                 results.write(line + "\n")
                 results.close()
     
