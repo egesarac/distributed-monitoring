@@ -1658,9 +1658,9 @@ pair<int, int> convertIntoBoolWithDestutter(string str, string delimiter)
 
 int main()
 {
-    vector<long long> D{4000, 8000, 16000};
-    vector<long long> EPS{1000, 2000, 4000, 8000, 16000};
-    vector<long long> DEL{1, 1000, 2000, 4000, 8000, 16000};
+    vector<long long> D{4000, 8000, 16000, 32000};
+    vector<long long> EPS{1000, 2000, 4000, 8000};
+    vector<long long> DEL{1, 1000, 2000, 4000, 8000};
 
     /*
     long long a = 0;
@@ -1674,7 +1674,7 @@ int main()
     int n = 2;
 
     ofstream results;
-    string filename = "results_u.txt";
+    string filename = "results_u2.txt";
     results.open(filename);
 
     for (const auto &d : D)
