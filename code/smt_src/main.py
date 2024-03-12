@@ -1036,11 +1036,11 @@ def main():
     """
     
     for d in (16, 32):
-        for eps in (8, 16):
+        for eps in (16, 32):
             if d < eps:
                 continue
             
-            for c in range(100):
+            for c in range(20, 100):
                 data_0 = getData(d, c)
                 data_1 = getData(d, c + 100)
 
