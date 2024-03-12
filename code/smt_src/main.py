@@ -1056,7 +1056,7 @@ def main():
                             data_1[i][1] = 1.0
                         else:
                             data_1[i][1] = 0.0
-                    flag = prog_always_disjunction(eps, 2, data_0, data_1)
+                    flag = prog_always_disjunction(eps, 4, data_0, data_1)
                     end = time.time()
                     total_time += end - start
 
