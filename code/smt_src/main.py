@@ -1000,7 +1000,7 @@ def getData(d, setID):
 
 def main():
     # set repeat count for confidence interval
-    repeat = 10
+    repeat = 1
 
     """
     for d in (4, 8, 16):
@@ -1008,7 +1008,7 @@ def main():
             if d < eps:
                 continue
             
-            for c in range():
+            for c in range(100):
                 data_0 = getData(d, c)
                 data_1 = getData(d, c + 100)
 
@@ -1024,7 +1024,7 @@ def main():
                             data_1[i][1] = 1.0
                         else:
                             data_1[i][1] = 0.0
-                    flag = prog_always_conjunction(eps, d, data_0, data_1)
+                    flag = prog_always_conjunction(eps, 1, data_0, data_1)
                     end = time.time()
                     total_time += end - start
 
@@ -1034,13 +1034,13 @@ def main():
                 results.write(line + "\n")
                 results.close()
     """
-
-    for d in (4, 16, 64):
-        for eps in (1, 4):
+    
+    for d in (16, 32):
+        for eps in (8, 16):
             if d < eps:
                 continue
             
-            for c in range(3):
+            for c in range(100):
                 data_0 = getData(d, c)
                 data_1 = getData(d, c + 100)
 
@@ -1056,7 +1056,7 @@ def main():
                             data_1[i][1] = 1.0
                         else:
                             data_1[i][1] = 0.0
-                    flag = prog_always_disjunction(eps, d, data_0, data_1)
+                    flag = prog_always_disjunction(eps, 2, data_0, data_1)
                     end = time.time()
                     total_time += end - start
 
@@ -1088,7 +1088,7 @@ def main():
                             data_1[i][1] = 1.0
                         else:
                             data_1[i][1] = 0.0
-                    flag = prog_eventually_conjunction(eps, d, data_0, data_1)
+                    flag = prog_eventually_conjunction(eps, 1, data_0, data_1)
                     end = time.time()
                     total_time += end - start
 
@@ -1119,7 +1119,7 @@ def main():
                             data_1[i][1] = 1.0
                         else:
                             data_1[i][1] = 0.0
-                    flag = prog_eventually_disjunction(eps, d, data_0, data_1)
+                    flag = prog_eventually_disjunction(eps, 1, data_0, data_1)
                     end = time.time()
                     total_time += end - start
 
@@ -1150,7 +1150,7 @@ def main():
                             data_1[i][1] = 1.0
                         else:
                             data_1[i][1] = 0.0
-                    flag = prog_until(eps, d, data_0, data_1)
+                    flag = prog_until(eps, 1, data_0, data_1)
                     end = time.time()
                     total_time += end - start
 
