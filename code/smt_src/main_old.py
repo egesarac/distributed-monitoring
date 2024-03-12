@@ -1012,7 +1012,7 @@ def z3SqDist1d(x1, x2):
     return z3Abs(x2 - x1)
 
 
-def getDataOld(d, eps, delim, edges, agent_ID):
+def getDataTest(agent_ID):
 
     #file = open("data/{}_{}_{}_{}_{}.txt".format(d, eps, delim, edges, agent_ID))
     file = open("test{}.txt".format(agent_ID))
@@ -1077,9 +1077,10 @@ def main():
     repeat = 1
 
     # read data from files
-    d = 16
-    data_0 = getData(d, 1)
-    data_1 = getData(d, 101)
+    d = 4
+    c = 6
+    data_0 = getDataTest(1)
+    data_1 = getDataTest(2)
     
     for i in range(d):
         if data_0[i][1] > 0:
@@ -1091,13 +1092,16 @@ def main():
         else:
             data_1[i][1] = 0.0
     
+    data_0.append([float(d), data_0[d-1][1]])
+    data_1.append([float(d), data_1[d-1][1]])
+
     eps = 1
     delim = 1
     
     total_time = 0
     for i in range(repeat):
         start = time.time()
-        flag = prog_always_conjunction(1, d, data_0, data_1)
+        flag = prog_always_conjunction(1, 1, data_0, data_1)
         #flag = prog_always_disjunction(1, 1, data_0, data_1)
         #prog_eventually_disjunction(1, 1, data_0, data_1)
         #flag = prog_until(1, 1, data_0, data_1)

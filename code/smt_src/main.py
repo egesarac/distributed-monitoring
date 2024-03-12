@@ -997,11 +997,45 @@ def getData(d, setID):
 
     return data
 
+def preprocess(data, d):
+    for i in range(d):
+        if data[i][1] > 0:
+            data[i][1] = 1.0
+        else:
+            data[i][1] = 0.0
+
+    data.append([float(d), data[d-1][1]])
+
+    return data
 
 def main():
     # set repeat count for confidence interval
     repeat = 1
 
+    for d in (4, 8, 16, 32):
+        for eps in (1, 2, 4, 8):
+            if d < eps:
+                continue
+            
+            for c in range(100):
+                data_0 = getData(d, c)
+                data_1 = getData(d, c + 100)
+
+                total_time = 0
+                for i in range(repeat):
+                    start = time.time()
+                    data0 = preprocess(data_0, d)
+                    data1 = preprocess(data_1, d)
+                    flag = prog_always_conjunction(eps, 1, data0, data1)
+                    end = time.time()
+                    total_time += end - start
+
+                line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " " + "-" + " " + str(total_time / repeat) + " " + str(flag)
+                print(line)
+                results = open("results_ac_smt.txt", "a")
+                results.write(line + "\n")
+                results.close()
+    
     """
     for d in (4, 8, 16):
         for eps in (1, 2, 4, 8, 16):
@@ -1015,48 +1049,9 @@ def main():
                 total_time = 0
                 for i in range(repeat):
                     start = time.time()
-                    for i in range(d):
-                        if data_0[i][1] > 0:
-                            data_0[i][1] = 1.0
-                        else:
-                            data_0[i][1] = 0.0
-                        if data_1[i][1] > 0:
-                            data_1[i][1] = 1.0
-                        else:
-                            data_1[i][1] = 0.0
-                    flag = prog_always_conjunction(eps, 1, data_0, data_1)
-                    end = time.time()
-                    total_time += end - start
-
-                line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " " + "-" + " " + str(total_time / repeat) + " " + str(flag)
-                print(line)
-                results = open("results_ac_smt.txt", "a")
-                results.write(line + "\n")
-                results.close()
-    """
-    
-    for d in (16, 32):
-        for eps in (16, 32):
-            if d < eps:
-                continue
-            
-            for c in range(20, 100):
-                data_0 = getData(d, c)
-                data_1 = getData(d, c + 100)
-
-                total_time = 0
-                for i in range(repeat):
-                    start = time.time()
-                    for i in range(d):
-                        if data_0[i][1] > 0:
-                            data_0[i][1] = 1.0
-                        else:
-                            data_0[i][1] = 0.0
-                        if data_1[i][1] > 0:
-                            data_1[i][1] = 1.0
-                        else:
-                            data_1[i][1] = 0.0
-                    flag = prog_always_disjunction(eps, 4, data_0, data_1)
+                    data0 = preprocess(data_0, d)
+                    data1 = preprocess(data_1, d)
+                    flag = prog_always_disjunction(eps, 1, data0, data1)
                     end = time.time()
                     total_time += end - start
 
@@ -1066,7 +1061,6 @@ def main():
                 results.write(line + "\n")
                 results.close()
 
-    """
     for d in (4, 8, 16):
         for eps in (1, 2, 4, 8, 16):
             if d < eps:
@@ -1079,16 +1073,9 @@ def main():
                 total_time = 0
                 for i in range(repeat):
                     start = time.time()
-                    for i in range(d):
-                        if data_0[i][1] > 0:
-                            data_0[i][1] = 1.0
-                        else:
-                            data_0[i][1] = 0.0
-                        if data_1[i][1] > 0:
-                            data_1[i][1] = 1.0
-                        else:
-                            data_1[i][1] = 0.0
-                    flag = prog_eventually_conjunction(eps, 1, data_0, data_1)
+                    data0 = preprocess(data_0, d)
+                    data1 = preprocess(data_1, d)
+                    flag = prog_eventually_conjunction(eps, 1, data0, data1)
                     end = time.time()
                     total_time += end - start
 
@@ -1110,16 +1097,9 @@ def main():
                 total_time = 0
                 for i in range(repeat):
                     start = time.time()
-                    for i in range(d):
-                        if data_0[i][1] > 0:
-                            data_0[i][1] = 1.0
-                        else:
-                            data_0[i][1] = 0.0
-                        if data_1[i][1] > 0:
-                            data_1[i][1] = 1.0
-                        else:
-                            data_1[i][1] = 0.0
-                    flag = prog_eventually_disjunction(eps, 1, data_0, data_1)
+                    data0 = preprocess(data_0, d)
+                    data1 = preprocess(data_1, d)
+                    flag = prog_eventually_disjunction(eps, 1, data0, data1)
                     end = time.time()
                     total_time += end - start
 
@@ -1141,16 +1121,9 @@ def main():
                 total_time = 0
                 for i in range(repeat):
                     start = time.time()
-                    for i in range(d):
-                        if data_0[i][1] > 0:
-                            data_0[i][1] = 1.0
-                        else:
-                            data_0[i][1] = 0.0
-                        if data_1[i][1] > 0:
-                            data_1[i][1] = 1.0
-                        else:
-                            data_1[i][1] = 0.0
-                    flag = prog_until(eps, 1, data_0, data_1)
+                    data0 = preprocess(data_0, d)
+                    data1 = preprocess(data_1, d)
+                    flag = prog_until(eps, 1, data0, data1)
                     end = time.time()
                     total_time += end - start
 
