@@ -1010,9 +1010,9 @@ def preprocess(data, d):
 
 def main():
     # set repeat count for confidence interval
-    repeat = 1
+    repeat = 10
 
-    for d in (4, 8):
+    for d in (4, 8, 16, 32):
         for eps in (1, 2, 4, 8):
             if d < eps:
                 continue
