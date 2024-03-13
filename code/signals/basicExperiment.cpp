@@ -878,11 +878,6 @@ vector<vector<bitset<N>>> bitsetAlways(const vector<vector<bitset<N>>> &v1)
 
     for (int i = v1.size() - 1; i >= 0; i--)
     {
-        if (firstBit0 == true)
-        {
-            vv[i][0][0] = true;
-        }
-
         if (firstBit1 == true)
         {
             vector<int> len1(4);
@@ -895,6 +890,12 @@ vector<vector<bitset<N>>> bitsetAlways(const vector<vector<bitset<N>>> &v1)
             vv[i][0][1] = (max(len1[1], len1[3] - 2) > 0);
             vv[i][1][0] = v1[i][1][0];
         }
+
+        if (firstBit0 == true)
+        {
+            vv[i][0][0] = true;
+        }
+
 
         if ((vv[i][0][0] == true) || (vv[i][0][1] == true))
         {
