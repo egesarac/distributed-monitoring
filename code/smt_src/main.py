@@ -306,7 +306,7 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    And(c0(i) - c1(i) < eps, c0(i) - c1(i) > -eps)
+                    And(c0(i) - c1(i) <= eps, c0(i) - c1(i) >= -eps)
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
