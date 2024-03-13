@@ -1012,6 +1012,7 @@ def main():
     # set repeat count for confidence interval
     repeat = 1 
     
+    """
     for d in (4, 8, 16, 32):
         for eps in (1, 2, 4, 8):
             if d < eps:
@@ -1036,14 +1037,13 @@ def main():
                 results.write(line + "\n")
                 results.close()
 
-    """
 
     for d in (4, 8, 16, 32):
-        for eps in (1, 2, 4, 8):
+        for eps in (4, 8):
             if d < eps:
                 continue
             
-            for c in range(100):
+            for c in range(40,100):
                 data_0 = getData(d, c)
                 data_1 = getData(d, c + 100)
 
@@ -1058,7 +1058,7 @@ def main():
 
                 line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " " + "-" + " " + str(total_time / repeat) + " " + str(flag)
                 print(line)
-                results = open("results_ad_smt3.txt", "a")
+                results = open("results_ad_smt33.txt", "a")
                 results.write(line + "\n")
                 results.close()
 
@@ -1087,6 +1087,7 @@ def main():
                 results.write(line + "\n")
                 results.close()
 
+    """
     for d in (4, 8, 16, 32):
         for eps in (1, 2, 4, 8):
             if d < eps:
@@ -1107,10 +1108,11 @@ def main():
 
                 line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " " + "-" + " " + str(total_time / repeat) + " " + str(flag)
                 print(line)
-                results = open("results_ed_smt2.txt", "a")
+                results = open("results_ed_smt3.txt", "a")
                 results.write(line + "\n")
                 results.close()
 
+    """
     for d in (4, 8, 16, 32):
         for eps in (1, 2, 4, 8):
             if d < eps:
