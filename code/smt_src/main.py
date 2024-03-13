@@ -306,7 +306,7 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    And(c0(i) - c1(i) <= eps, c0(i) - c1(i) >= -eps)
+                    And(c0(i) - c1(i) < eps, c0(i) - c1(i) > -eps)
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -1027,13 +1027,13 @@ def main():
                     start = time.time()
                     data0 = preprocess(data_0, d)
                     data1 = preprocess(data_1, d)
-                    flag = prog_always_conjunction(eps, d / min(d, 8), data0, data1)
+                    flag = prog_always_conjunction(eps, 1, data0, data1) # d / min(d, 8)
                     end = time.time()
                     total_time += end - start
 
                 line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str(total_time / repeat) + " " + str(flag)
                 print(line)
-                results = open("results_ac_smt4.txt", "a")
+                results = open("results_ac_smt5.txt", "a")
                 results.write(line + "\n")
                 results.close()
 
