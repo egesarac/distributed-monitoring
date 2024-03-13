@@ -1516,6 +1516,11 @@ vector<vector<vector<bitset<N>>>> convertIntoBitset(vector<vector<set<string>>> 
 
 set<string> concatWithDestutter(const set<string> &set1, const set<string> &set2)
 {
+    if (set1.empty())
+    {
+        return set2;
+    }
+
     set<string> result;
 
     for (const auto &s1 : set1)
@@ -1679,15 +1684,13 @@ int main()
     // string filename = "results_alwaysConjNEWsmall_fp.txt";
     // results.open(filename);
 
-    int d = 3000;
-    int eps = 0;
+    int d = 8000;
+    int eps = 2000;
     int del = 0;
-    int numEdges1 = 3;
-    int numEdges2 = 3;
 
     vector<vector<pair<long long, double>>> signalsReal(n);
     // string filename1 = "dataInt/" + to_string(d/1000) + "_" + to_string(int(eps/1000)) + "_" + to_string(int(del/1000)) + "_" + to_string(numEdges1) + "_1.txt";
-    string filename1 = "test1.txt";
+    string filename1 = "dataNew/8_50.txt";
     ifstream sigdata1(filename1);
 
     string line1;
@@ -1702,7 +1705,7 @@ int main()
 
     signalsReal[1].clear();
     // string filename2 = "dataInt/" + to_string(d/1000) + "_" + to_string(int(eps)/1000) + "_" + to_string(int(del)/1000) + "_" + to_string(numEdges2) + "_2.txt";
-    string filename2 = "test2.txt";
+    string filename2 = "dataNew/8_150.txt";
     ifstream sigdata2(filename2);
 
     string line2;
@@ -1715,24 +1718,38 @@ int main()
     }
     sigdata2.close();
 
-    vector<vector<pair<long long, double>>> signals(n);
-    for (int i = 0; i < n; i++) {
-        signals[i].push_back(make_pair(0, signalsReal[i][0].second));
-        for (int j = 1; j < signalsReal[i].size(); j++) {
-            if (signalsReal[i][j].second > 0 && signalsReal[i][j-1].second <= 0) {
-                signals[i].push_back(make_pair(signalsReal[i][j].first, 1));
-            }
-            else if (signalsReal[i][j].second <= 0 && signalsReal[i][j-1].second > 0) {
-                signals[i].push_back(make_pair(signalsReal[i][j].first, 0));
-            }
-        }
-    }
-
-
     int numSegments;
     starttime = chrono::system_clock::now();
     for (int rep = 0; rep < REP; rep++)
     {
+        /* read the signals as atomic propositions to improve performance */
+        vector<vector<pair<long long, double>>> signals;
+        // signals = signalsReal;
+        signals.resize(n);
+        for (int i = 0; i < n; i++)
+        {
+            if (signalsReal[i][0].second > 0)
+            {
+                signals[i].push_back(make_pair(0, 1));
+            }
+            else
+            {
+                signals[i].push_back(make_pair(0, 0));
+            }
+
+            for (int j = 1; j < signalsReal[i].size(); j++)
+            {
+                if (signalsReal[i][j].second > 0 && signalsReal[i][j - 1].second <= 0)
+                {
+                    signals[i].push_back(make_pair(signalsReal[i][j].first, 1));
+                }
+                else if (signalsReal[i][j].second <= 0 && signalsReal[i][j - 1].second > 0)
+                {
+                    signals[i].push_back(make_pair(signalsReal[i][j].first, 0));
+                }
+            }
+        }
+
         /* compute the uncertainty intervals */
 
         vector<vector<vector<long long>>> uncertainties(n);
@@ -1794,7 +1811,7 @@ int main()
 
             for (int j = 0; j < numSegments; j++)
             {
-                valExprs[i][j].insert("");
+                //valExprs[i][j].insert("");
 
                 for (int k = 1; k < uncertainties[i].size(); k++)
                 {
@@ -1803,7 +1820,8 @@ int main()
                         // entire expression
                         set<string> temp;
                         string expr = to_string(signals[i][k - 1].second) + ";" + to_string(signals[i][k].second);
-                        temp.insert("");
+                        if (!(k < uncertainties[i].size() - 1 && uncertainties[i][k][0] == uncertainties[i][k + 1][0]))
+                            temp.insert("");
                         temp.insert(expr);
                         valExprs[i][j] = concatWithDestutter(valExprs[i][j], temp);
                     }
@@ -1812,7 +1830,8 @@ int main()
                         // prefix
                         set<string> temp;
                         string expr = to_string(signals[i][k - 1].second) + ";" + to_string(signals[i][k].second);
-                        temp.insert("");
+                        if (!(k < uncertainties[i].size() - 1 && uncertainties[i][k][0] == uncertainties[i][k + 1][0]))
+                            temp.insert("");
                         temp.insert(expr);
                         temp.insert(expr.substr(0, expr.find(';')));
                         valExprs[i][j] = concatWithDestutter(valExprs[i][j], temp);
@@ -1822,7 +1841,8 @@ int main()
                         // suffix
                         set<string> temp;
                         string expr = to_string(signals[i][k - 1].second) + ";" + to_string(signals[i][k].second);
-                        temp.insert("");
+                        if (!(k < uncertainties[i].size() - 1 && uncertainties[i][k][0] == uncertainties[i][k + 1][0]))
+                            temp.insert("");
                         temp.insert(expr);
                         temp.insert(expr.substr(expr.find(';') + 1, expr.length()));
                         valExprs[i][j] = concatWithDestutter(valExprs[i][j], temp);
@@ -1832,7 +1852,8 @@ int main()
                         // infix
                         set<string> temp;
                         string expr = to_string(signals[i][k - 1].second) + ";" + to_string(signals[i][k].second);
-                        temp.insert("");
+                        if (!(k < uncertainties[i].size() - 1 && uncertainties[i][k][0] == uncertainties[i][k + 1][0]))
+                            temp.insert("");
                         temp.insert(expr);
                         temp.insert(expr.substr(0, expr.find(';')));
                         temp.insert(expr.substr(expr.find(';') + 1, expr.length()));
@@ -1840,7 +1861,7 @@ int main()
                     }
                 }
 
-                if (valExprs[i][j].size() == 1)
+                if (valExprs[i][j].empty())
                 {
                     int kk = 1;
                     while (kk < uncertainties[i].size() && uncertainties[i][kk][1] <= segmentation[j])
@@ -1893,8 +1914,10 @@ int main()
             }
         }
 
-        test = bitsetConjunction(aps[0], aps[1]);
+        test = bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1])));
         test = bitsetEventually(test);
+        // test = bitsetConjunction(aps[0], aps[1]);
+        // test = bitsetEventually(test);
         // test = bitsetEventually(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1])))); // this is faster
         // test = bitsetAlways(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1])))); // this is faster
         ////test = bitsetNegation(bitsetAlways(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))));
@@ -1907,10 +1930,7 @@ int main()
         bool falseAtZero = test[0][0].any();
         bool trueAtZero = test[0][1].any();
 
-        // results << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << (totalTime.count() / REP) / 1000 << endl;
-        cout << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << (totalTime.count() / REP) / 1000 << " " << falseAtZero << " " << trueAtZero << endl;
-        // results << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << falseAtZero << " " << trueAtZero << endl;
-        // cout << d << " " << eps << " " << del << " " << numEdges1 << " " << numEdges2 << " " << numSegments << " " << falseAtZero << " " << trueAtZero << endl;
+        cout << d << " " << eps << " " << del << " " << numSegments << " " << (totalTime.count() / REP) / 1000 << " " << falseAtZero << " " << trueAtZero << endl;
     }
 
     // results.close();
