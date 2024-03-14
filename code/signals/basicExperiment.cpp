@@ -1679,7 +1679,7 @@ int main()
     int n = 2;
 
     ofstream results;
-    string filename = "results_ed3.txt";
+    string filename = "results_u4.txt";
     results.open(filename);
 
     for (const auto &d : D)
@@ -1953,10 +1953,10 @@ int main()
                         // test = bitsetEventually(bitsetConjunction(aps[0], aps[1]));
 
                         // eventually(x1 or x2)
-                        test = bitsetEventually(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))));
+                        // test = bitsetEventually(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))));
 
                         // x1 until x2
-                        // test = bitsetUntil(aps[0], aps[1]);
+                        test = bitsetUntil(aps[0], aps[1]);
                     }
 
                     endtime = chrono::system_clock::now();

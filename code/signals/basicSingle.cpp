@@ -1684,13 +1684,13 @@ int main()
     // string filename = "results_alwaysConjNEWsmall_fp.txt";
     // results.open(filename);
 
-    int d = 8000;
-    int eps = 2000;
-    int del = 0;
+    int d = 4000;
+    int eps = 4000;
+    int del = 1;
 
     vector<vector<pair<long long, double>>> signalsReal(n);
     // string filename1 = "dataInt/" + to_string(d/1000) + "_" + to_string(int(eps/1000)) + "_" + to_string(int(del/1000)) + "_" + to_string(numEdges1) + "_1.txt";
-    string filename1 = "dataNew/8_50.txt";
+    string filename1 = "dataNew/4_73.txt";
     ifstream sigdata1(filename1);
 
     string line1;
@@ -1705,7 +1705,7 @@ int main()
 
     signalsReal[1].clear();
     // string filename2 = "dataInt/" + to_string(d/1000) + "_" + to_string(int(eps)/1000) + "_" + to_string(int(del)/1000) + "_" + to_string(numEdges2) + "_2.txt";
-    string filename2 = "dataNew/8_150.txt";
+    string filename2 = "dataNew/4_173.txt";
     ifstream sigdata2(filename2);
 
     string line2;
@@ -1914,9 +1914,7 @@ int main()
             }
         }
 
-        test = bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1])));
-        test = bitsetEventually(test);
-        // test = bitsetConjunction(aps[0], aps[1]);
+        test = bitsetConjunction(aps[0], aps[1]);
         // test = bitsetEventually(test);
         // test = bitsetEventually(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1])))); // this is faster
         // test = bitsetAlways(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1])))); // this is faster
