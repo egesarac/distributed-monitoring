@@ -995,7 +995,7 @@ vector<vector<bitset<N>>> bitsetEventually(const vector<vector<bitset<N>>> &v1)
 }
 
 template <std::size_t N>
-vector<vector<bitset<N>>> bitsetBoundedAlways(vector<vector<bitset<N>>> &v1, vector<long long> segmentation, const long long &a, const long long &b, const bool &leftClosed, const bool &rightClosed)
+vector<vector<bitset<N>>> bitsetBoundedAlways(vector<vector<bitset<N>>> v1, vector<long long> segmentation, const long long &a, const long long &b, const bool &leftClosed, const bool &rightClosed)
 {
     vector<vector<bitset<N>>> vv(v1.size());
 
@@ -1021,7 +1021,7 @@ vector<vector<bitset<N>>> bitsetBoundedAlways(vector<vector<bitset<N>>> &v1, vec
 }
 
 template <std::size_t N>
-vector<vector<bitset<N>>> bitsetBoundedEventually(vector<vector<bitset<N>>> &v1, vector<long long> segmentation, const long long &a, const long long &b, const bool &leftClosed, const bool &rightClosed)
+vector<vector<bitset<N>>> bitsetBoundedEventually(vector<vector<bitset<N>>> v1, vector<long long> segmentation, const long long &a, const long long &b, const bool &leftClosed, const bool &rightClosed)
 {
     vector<vector<bitset<N>>> vv(v1.size());
 
