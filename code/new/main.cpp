@@ -34,7 +34,7 @@ int main()
     */
 
     ofstream results;
-    string filename = "results_ae12.txt";
+    string filename = "results_e12d.txt";
     results.open(filename);
 
     for (const auto &d : D)
@@ -125,7 +125,10 @@ int main()
                         // test = bitsetAlways(bitsetNegation(bitsetConjunction(aps[0], bitsetBoundedAlways(bitsetNegation(aps[1]), segmentation, 0, 2000, true, true))));
                         
                         // always(x1 implies eventually_[1,2](x2))
-                        test = bitsetAlways(bitsetNegation(bitsetConjunction(aps[0], bitsetBoundedAlways(bitsetNegation(aps[1]), segmentation, 1000, 2000, true, true))));
+                        // test = bitsetAlways(bitsetNegation(bitsetConjunction(aps[0], bitsetBoundedAlways(bitsetNegation(aps[1]), segmentation, 1000, 2000, true, true))));
+
+                        // eventually_[1,2](x1 or x2)
+                        test = bitsetBoundedEventually(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))), segmentation, 1000, 2000, true, true);
 
                         // vector<set<pair<string, string>>> prod = asyncProd(aps[0], aps[1]);
                         // vector<set<string>> prodTest = prodUntilNonStrict(prod, false); // pass 'false' for strong until, 'true' for weak until
