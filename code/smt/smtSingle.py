@@ -1094,7 +1094,7 @@ def main():
     eps = 2
     # read data from files
     d = 4
-    id = 81
+    id = 43
     data_0 = getData(d, id)
     data_1 = getData(d, id + 100)
     
@@ -1104,8 +1104,8 @@ def main():
         data0 = preprocess(data_0, d)
         data1 = preprocess(data_1, d)
         #prog_always_conjunction(eps, 1, data0, data1)
-        #prog_always_disjunction(eps, 1, data0, data1)
-        prog_eventually_conjunction(eps, 1, negate(data0), negate(data1))
+        prog_always_disjunction(eps, 1, negate(data0), negate(data1))
+        #prog_eventually_conjunction(eps, 1, data0, data1)
         #prog_eventually_disjunction(eps, 1, data0, data1)
         #prog_until(eps, 1, data_0, data_1)
         end = time.time()
