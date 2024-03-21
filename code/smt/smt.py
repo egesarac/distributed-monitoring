@@ -1121,16 +1121,16 @@ def main():
                     data0 = preprocess(data_0, d)
                     data1 = preprocess(data_1, d)
                     #flag = prog_always_conjunction(eps, 1, data0, data1) # d / min(d, 8)
-                    #flag = prog_always_disjunction(eps, 1, data0, data1)
+                    flag = prog_always_disjunction(eps, 1, data0, data1)
                     #flag = prog_eventually_conjunction(eps, 1, data0, data1)
-                    flag = prog_eventually_disjunction(eps, 1, data0, data1)
+                    #flag = prog_eventually_disjunction(eps, 1, data0, data1)
                     #flag = prog_until(eps, 1, data0, data1)
                     end = time.time()
                     total_time += end - start
 
                 line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str(total_time / repeat) + " " + str(flag)
                 print(line)
-                results = open("results_ed_smt.txt", "a")
+                results = open("results_ad_smt.txt", "a")
                 results.write(line + "\n")
                 results.close()
 
