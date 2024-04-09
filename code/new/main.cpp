@@ -22,19 +22,21 @@ using namespace std;
 int main()
 {
     /* set variables */
-    vector<long long> D{4000, 8000, 16000, 32000};
-    vector<long long> EPS{1000, 2000, 4000, 8000};
+    // vector<long long> D{4000, 8000, 16000};
+    vector<long long> D{16000, 1};
+    // vector<long long> EPS{1000, 2000, 4000, 8000};
+    vector<long long> EPS{8000, 1};
     //vector<long long> DEL{1, 1000, 2000, 4000, 8000};
     int n = 2;
-    /*
+    ///*
     long long a = 0;
-    long long b = 8000;
+    long long b = 16000;
     bool leftClosed = true;
     bool rightClosed = false;
-    */
+    //*/
 
     ofstream results;
-    string filename = "results_e12d.txt";
+    string filename = "results_ed_0_16000_1_0.txt";
     results.open(filename);
 
     for (const auto &d : D)
@@ -127,8 +129,8 @@ int main()
                         // always(x1 implies eventually_[1,2](x2))
                         // test = bitsetAlways(bitsetNegation(bitsetConjunction(aps[0], bitsetBoundedAlways(bitsetNegation(aps[1]), segmentation, 1000, 2000, true, true))));
 
-                        // eventually_[1,2](x1 or x2)
-                        test = bitsetBoundedEventually(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))), segmentation, 1000, 2000, true, true);
+                        // eventually_I(x1 or x2)
+                        test = bitsetBoundedEventually(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))), segmentation, a, b, leftClosed, rightClosed);
 
                         // vector<set<pair<string, string>>> prod = asyncProd(aps[0], aps[1]);
                         // vector<set<string>> prodTest = prodUntilNonStrict(prod, false); // pass 'false' for strong until, 'true' for weak until
