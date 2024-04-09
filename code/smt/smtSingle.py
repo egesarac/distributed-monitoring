@@ -1091,12 +1091,14 @@ def main():
 
     # set repeat count for confidence interval
     repeat = 1
-    eps = 2
+    eps = 1
     # read data from files
     d = 4
-    id = 43
-    data_0 = getData(d, id)
-    data_1 = getData(d, id + 100)
+    #id = 11
+    data_0 = getDataTest(1)
+    #data_0 = getData(d, id)
+    data_1 = getDataTest(2)
+    #data_1 = getData(d, id + 100)
     
     total_time = 0
     for i in range(repeat):
@@ -1104,8 +1106,10 @@ def main():
         data0 = preprocess(data_0, d)
         data1 = preprocess(data_1, d)
         #prog_always_conjunction(eps, 1, data0, data1)
-        prog_always_disjunction(eps, 1, negate(data0), negate(data1))
+        prog_always_disjunction(eps, 1, data0, data1)
+        #prog_always_disjunction(eps, 1, negate(data0), negate(data1))
         #prog_eventually_conjunction(eps, 1, data0, data1)
+        #prog_eventually_conjunction(eps, 1, negate(data0), negate(data1))
         #prog_eventually_disjunction(eps, 1, data0, data1)
         #prog_until(eps, 1, data_0, data_1)
         end = time.time()
