@@ -35,6 +35,10 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
 
     while entryFound:
 
+        # Terminate if segment count is reached
+        if i == segCount:
+            return
+
         # flag to be set True if at least one entry is found in the current iteration
         entryFound = False
 
@@ -101,7 +105,7 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c0(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)])
+                    Or([c0(i) == (min(len(data_0), (max(0, ((i - eps) + j))))) for j in range(2 * int(eps) + 1)])
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -119,7 +123,7 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c1(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)])
+                    Or([c1(i) == (min(len(data_1), (max(0, ((i - eps) + j))))) for j in range(2 * int(eps) + 1)])
                     for i in range(timestamps1[0], timestamps1[-1] + 1)
                 ]
             )
@@ -227,6 +231,10 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
 
     while entryFound:
 
+        # Terminate if segment count is reached
+        if i == segCount:
+            return
+
         # flag to be set True if at least one entry is found in the current iteration
         entryFound = False
 
@@ -293,7 +301,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c0(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)])
+                    Or([c0(i) == (min(len(data_0), (max(0, ((i - eps) + j))))) for j in range(2 * int(eps) + 1)])
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -311,7 +319,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c1(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)])
+                    Or([c1(i) == (min(len(data_1), (max(0, ((i - eps) + j))))) for j in range(2 * int(eps) + 1)])
                     for i in range(timestamps1[0], timestamps1[-1] + 1)
                 ]
             )
@@ -419,6 +427,10 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
 
     while entryFound:
 
+        # Terminate if segment count is reached
+        if i == segCount:
+            return
+
         # flag to be set True if at least one entry is found in the current iteration
         entryFound = False
 
@@ -485,7 +497,7 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c0(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)])
+                    Or([c0(i) == (min(len(data_0), (max(0, ((i - eps) + j))))) for j in range(2 * int(eps) + 1)])
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -503,7 +515,7 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c1(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)])
+                    Or([c1(i) == (min(len(data_1), (max(0, ((i - eps) + j))))) for j in range(2 * int(eps) + 1)])
                     for i in range(timestamps1[0], timestamps1[-1] + 1)
                 ]
             )
@@ -610,6 +622,10 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
     entryFound = True
 
     while entryFound:
+        
+        # Terminate if segment count is reached
+        if i == segCount:
+            return
 
         # flag to be set True if at least one entry is found in the current iteration
         entryFound = False
@@ -669,6 +685,11 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
 
         i += 1
 
+        # for a in range(timestamps0[0], timestamps0[-1] + 1):
+        #     print("break")
+        #     for b in range(2 * int(eps) + 1):
+        #         print(a, min(max(0, (a - eps) + b), len(data_1)))
+
         # force terminate after one loop
         # entryFound = False
 
@@ -677,7 +698,7 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c0(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)])
+                    Or([c0(i) == (min(len(data_0), (max(0, ((i - eps) + j))))) for j in range(2 * int(eps) + 1)])
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -695,7 +716,7 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c1(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)])
+                    Or([c1(i) == (min(len(data_1), (max(0, ((i - eps) + j))))) for j in range(2 * int(eps) + 1)])
                     for i in range(timestamps1[0], timestamps1[-1] + 1)
                 ]
             )
@@ -1091,9 +1112,9 @@ def main():
 
     # set repeat count for confidence interval
     repeat = 1
-    eps = 1
+    eps = 2
     # read data from files
-    d = 4
+    d = 3
     #id = 11
     data_0 = getDataTest(1)
     #data_0 = getData(d, id)
@@ -1106,11 +1127,11 @@ def main():
         data0 = preprocess(data_0, d)
         data1 = preprocess(data_1, d)
         #prog_always_conjunction(eps, 1, data0, data1)
-        prog_always_disjunction(eps, 1, data0, data1)
+        #prog_always_disjunction(eps, 1, data0, data1)
         #prog_always_disjunction(eps, 1, negate(data0), negate(data1))
         #prog_eventually_conjunction(eps, 1, data0, data1)
         #prog_eventually_conjunction(eps, 1, negate(data0), negate(data1))
-        #prog_eventually_disjunction(eps, 1, data0, data1)
+        prog_eventually_disjunction(eps, 1, data0, data1)
         #prog_until(eps, 1, data_0, data_1)
         end = time.time()
         # print("\nTime elapsed :", (end - start), "seconds")
