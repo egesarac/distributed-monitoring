@@ -1135,7 +1135,9 @@ def negate(data):
 def main():
     # set repeat count for confidence interval
     repeat = 1 
-    
+    out = ""
+    flag = False
+
     for d in (4, 8, 16, 32):
         for eps in (1, 2, 4, 8):
             if d < eps:
@@ -1150,17 +1152,22 @@ def main():
                     start = time.time()
                     data0 = preprocess(data_0, d)
                     data1 = preprocess(data_1, d)
-                    #flag = prog_always_conjunction(eps, 1, data0, data1) # d / min(d, 8)
+                    flag = prog_always_conjunction(eps, d / min(d, 8), data0, data1) # d / min(d, 8)
                     #flag = prog_always_disjunction(eps, 1, data0, data1)
-                    flag = prog_eventually_conjunction(eps, 1, data0, data1)
+                    #flag = prog_eventually_conjunction(eps, 1, data0, data1)
                     #flag = prog_eventually_disjunction(eps, 1, data0, data1)
                     #flag = prog_until(eps, 1, data0, data1)
                     end = time.time()
                     total_time += end - start
+                
+                if (flag):
+                    out = "1"
+                else:
+                    out = "0"
 
-                line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str(total_time / repeat) + " " + str(flag)
+                line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str(total_time / repeat) + " " + out
                 print(line)
-                results = open("results_ec_smt.txt", "a")
+                results = open("results_ac_smt_seg.txt", "a")
                 results.write(line + "\n")
                 results.close()
 

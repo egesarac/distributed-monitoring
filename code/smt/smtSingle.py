@@ -1114,7 +1114,7 @@ def main():
     repeat = 1
     eps = 2
     # read data from files
-    d = 3
+    d = 4
     #id = 11
     data_0 = getDataTest(1)
     #data_0 = getData(d, id)
