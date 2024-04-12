@@ -31,8 +31,13 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
     # encoding
     i = 0
     entryFound = True
+    flag = True
 
     while entryFound:
+
+        # Terminate if segment count is reached
+        if i == segCount:
+            return flag
 
         # flag to be set True if at least one entry is found in the current iteration
         entryFound = False
@@ -101,7 +106,7 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c0(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)])
+                    Or([c0(i) == (min(len(data_0), (max(0, ((i - eps) + j))))) for j in range(2 * int(eps) + 1)])
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -119,7 +124,7 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c1(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)])
+                    Or([c1(i) == (min(len(data_1), (max(0, ((i - eps) + j))))) for j in range(2 * int(eps) + 1)])
                     for i in range(timestamps1[0], timestamps1[-1] + 1)
                 ]
             )
@@ -189,18 +194,20 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
             # out = "%s %s" % (m[test], m[test2])
             # print(m)
             ##print("unsat in segment", i)
+            flag = False
 
             # terminate after unsat
-            return "0"
+            return flag
 
         elif i <= segCount:
 
             ##print("sat in segment", i)
-            pass
+            flag = True
 
         s.reset()
 
-    return "1"
+    return flag
+
 
 
 def prog_always_disjunction(eps, segCount, data_0, data_1):
@@ -227,8 +234,13 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
     # encoding
     i = 0
     entryFound = True
+    flag = True
 
     while entryFound:
+
+        # Terminate if segment count is reached
+        if i == segCount:
+            return flag
 
         # flag to be set True if at least one entry is found in the current iteration
         entryFound = False
@@ -297,7 +309,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c0(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)])
+                    Or([c0(i) == (min(len(data_0), (max(0, ((i - eps) + j))))) for j in range(2 * int(eps) + 1)])
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -315,7 +327,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c1(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)])
+                    Or([c1(i) == (min(len(data_1), (max(0, ((i - eps) + j))))) for j in range(2 * int(eps) + 1)])
                     for i in range(timestamps1[0], timestamps1[-1] + 1)
                 ]
             )
@@ -385,18 +397,19 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
             # out = "%s %s" % (m[test], m[test2])
             # print(m)
             ##print("unsat in segment", i)
+            flag = False
 
             # terminate after unsat
-            return "0"
+            return flag
 
         elif i <= segCount:
 
             ##print("sat in segment", i)
-            pass
+            flag = True
 
         s.reset()
     
-    return "1"
+    return flag
 
 
 def prog_eventually_conjunction(eps, segCount, data_0, data_1):
@@ -423,8 +436,13 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
     # encoding
     i = 0
     entryFound = True
+    flag = False
 
     while entryFound:
+
+        # Terminate if segment count is reached
+        if i == segCount:
+            return flag
 
         # flag to be set True if at least one entry is found in the current iteration
         entryFound = False
@@ -493,7 +511,7 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c0(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)])
+                    Or([c0(i) == (min(len(data_0), (max(0, ((i - eps) + j))))) for j in range(2 * int(eps) + 1)])
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -511,7 +529,7 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c1(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)])
+                    Or([c1(i) == (min(len(data_1), (max(0, ((i - eps) + j))))) for j in range(2 * int(eps) + 1)])
                     for i in range(timestamps1[0], timestamps1[-1] + 1)
                 ]
             )
@@ -581,18 +599,19 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
             # out = "%s %s" % (m[test], m[test2])
             # print(m)
             ##print("sat in segment", i)
+            flag = True
 
             # terminate after sat
-            return "1"
+            return flag
 
         elif i <= segCount:
 
             ##print("unsat in segment", i)
-            pass
+            flag = False
 
         s.reset()
-    
-    return "0"
+        
+    return flag
 
 
 def prog_eventually_disjunction(eps, segCount, data_0, data_1):
@@ -619,8 +638,13 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
     # encoding
     i = 0
     entryFound = True
+    flag = False
 
     while entryFound:
+        
+        # Terminate if segment count is reached
+        if i == segCount:
+            return flag
 
         # flag to be set True if at least one entry is found in the current iteration
         entryFound = False
@@ -681,6 +705,11 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
 
         i += 1
 
+        # for a in range(timestamps0[0], timestamps0[-1] + 1):
+        #     print("break")
+        #     for b in range(2 * int(eps) + 1):
+        #         print(a, min(max(0, (a - eps) + b), len(data_1)))
+
         # force terminate after one loop
         # entryFound = False
 
@@ -689,7 +718,7 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c0(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)])
+                    Or([c0(i) == (min(len(data_0), (max(0, ((i - eps) + j))))) for j in range(2 * int(eps) + 1)])
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -707,7 +736,7 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c1(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)])
+                    Or([c1(i) == (min(len(data_1), (max(0, ((i - eps) + j))))) for j in range(2 * int(eps) + 1)])
                     for i in range(timestamps1[0], timestamps1[-1] + 1)
                 ]
             )
@@ -777,18 +806,19 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
             # out = "%s %s" % (m[test], m[test2])
             # print(m)
             ##print("sat in segment", i)
+            flag = True
 
             # terminate after sat
-            return "1"
+            return flag
 
         elif i <= segCount:
 
             ##print("unsat in segment", i)
-            pass
+            flag = False
 
         s.reset()
-    
-    return "0"
+
+    return flag
 
 
 def prog_until(eps, segCount, data_0, data_1):
