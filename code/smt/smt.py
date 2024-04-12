@@ -1150,14 +1150,14 @@ def main():
                 total_time = 0
                 for i in range(repeat):
                     start = time.time()
-                    data0 = preprocess(data_0, d)
-                    #data0 = negate(preprocess(data_0, d))
-                    data1 = preprocess(data_1, d)
-                    #data1 = negate(preprocess(data_1, d))
-                    #flag = prog_always_conjunction(eps, d / min(d, 8), data0, data1) # d / min(d, 8)
+                    #data0 = preprocess(data_0, d)
+                    data0 = negate(preprocess(data_0, d))
+                    #data1 = preprocess(data_1, d)
+                    data1 = negate(preprocess(data_1, d))
+                    flag = prog_always_conjunction(eps, d / min(d, 8), data0, data1) # d / min(d, 8)
                     #flag = prog_always_disjunction(eps, d / min(d, 8), data0, data1)
                     #flag = prog_eventually_conjunction(eps, d / min(d, 8), data0, data1)
-                    flag = prog_eventually_disjunction(eps, d / min(d, 8), data0, data1)
+                    #flag = prog_eventually_disjunction(eps, d / min(d, 8), data0, data1)
                     #flag = prog_until(eps, 1, data0, data1)
                     end = time.time()
                     total_time += end - start
@@ -1169,7 +1169,7 @@ def main():
 
                 line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str(total_time / repeat) + " " + out
                 print(line)
-                results = open("results_ed_smt_seg.txt", "a")
+                results = open("results_ed_smt_segNeg.txt", "a")
                 results.write(line + "\n")
                 results.close()
 
