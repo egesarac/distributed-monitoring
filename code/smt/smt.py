@@ -757,7 +757,7 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    And(c0(i) - c1(i) <= eps, c0(i) - c1(i) >= -eps)
+                    And(c0(i) - c1(i) < eps, c0(i) - c1(i) > -eps)
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -809,7 +809,7 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
 
             m = s.model()
             # out = "%s %s" % (m[test], m[test2])
-            # print(m)
+            print(m)
             ##print("sat in segment", i)
             flag = False
 
