@@ -800,7 +800,7 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
             ForAll(v,
             Implies(
                 And(v >= timestamps0[0], v <= timestamps0[-1]),
-                And(z3Interpolate(c_flow, v) >= 1)
+                And(z3Interpolate(c_flow, v) == 0)
             )
             )
         )
