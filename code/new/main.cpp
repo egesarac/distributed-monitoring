@@ -22,10 +22,10 @@ using namespace std;
 int main()
 {
     /* set variables */
-    // vector<long long> D{4000, 8000, 16000};
-    vector<long long> D{16000, 1};
-    // vector<long long> EPS{1000, 2000, 4000, 8000};
-    vector<long long> EPS{8000, 1};
+    vector<long long> D{4000, 8000, 16000};
+    // vector<long long> D{16000, 1};
+    vector<long long> EPS{1000, 2000, 4000, 8000};
+    // vector<long long> EPS{8000, 1};
     //vector<long long> DEL{1, 1000, 2000, 4000, 8000};
     int n = 2;
     ///*

@@ -53,6 +53,34 @@ set<string> stutterOnce(const set<string> &S)
     return out;
 }
 
+set<string> stutterOnceStr(const set<string> &S)
+{
+    set<string> out;
+
+    for (const auto &s : S)
+    {
+        vector<int> ind;
+        ind.push_back(-1);
+        for (int i = 0; i < s.length(); i++)
+        {
+            if (s[i] == ';')
+            {
+                ind.push_back(i);
+            }
+        }
+        ind.push_back(s.length());
+
+        int prev = 0;
+        for (int j = 1; j < ind.size(); j++) {
+            string sl = s.substr(0, ind[j]);
+            string sr = s.substr(ind[j - 1] + 1, s.length());
+            out.insert(sl + ";" + sr);
+        }
+    }
+
+    return out;
+}
+
 set<string> stutter2k(const set<string> &S, const int &k)
 {
     int len = S.begin()->length();
@@ -62,6 +90,21 @@ set<string> stutter2k(const set<string> &S, const int &k)
     for (int i = 0; i < iter; i++)
     {
         set<string> temp = stutterOnce(out);
+        out = temp;
+    }
+
+    return out;
+}
+
+set<string> stutter2kStr(const set<string> &S, const int &k)
+{
+    int len = count(S.begin()->begin(),S.begin()->end(), ';');
+    int iter = k - len;
+
+    set<string> out = S;
+    for (int i = 0; i < iter; i++)
+    {
+        set<string> temp = stutterOnceStr(out);
         out = temp;
     }
 
@@ -130,7 +173,81 @@ vector<set<string>> bitset2stringset_withSegments(const vector<vector<bitset<N>>
     return out;
 }
 
-pair<string, string> destuttterPair(const string &t1, const string &t2)
+string destutterStr(const string &t1)
+{
+    vector<int> ind1;
+    ind1.push_back(-1);
+    for (int i = 0; i < t1.length(); i++)
+    {
+        if (t1[i] == ';')
+        {
+            ind1.push_back(i);
+        }
+    }
+    ind1.push_back(t1.length());
+
+    string s1p = t1.substr(ind1[0] + 1, ind1[1] - ind1[0] - 1);
+    string x = s1p;
+    string s1;
+    for (int i = 1; i < ind1.size() - 1; i++) {
+        s1 = t1.substr(ind1[i] + 1, ind1[i + 1] - ind1[i] - 1);
+
+        if (s1 != s1p) {
+            x += ";" + s1;
+        }
+
+        s1p = s1;
+    }
+
+    return x;
+}
+
+pair<string, string> destutterPairStr(const string &t1, const string &t2)
+{
+    vector<int> ind1;
+    ind1.push_back(-1);
+    for (int i = 0; i < t1.length(); i++)
+    {
+        if (t1[i] == ';')
+        {
+            ind1.push_back(i);
+        }
+    }
+    ind1.push_back(t1.length());
+
+    vector<int> ind2;
+    ind2.push_back(-1);
+    for (int i = 0; i < t2.length(); i++)
+    {
+        if (t2[i] == ';')
+        {
+            ind2.push_back(i);
+        }
+    }
+    ind2.push_back(t2.length());
+
+    string s1p = t1.substr(ind1[0] + 1, ind1[1] - ind1[0] - 1);
+    string s2p = t2.substr(ind2[0] + 1, ind2[1] - ind2[0] - 1);
+    string x = s1p;
+    string y = s2p;
+    string s1, s2;
+    for (int i = 1; i < ind1.size() - 1; i++) {
+        s1 = t1.substr(ind1[i] + 1, ind1[i + 1] - ind1[i] - 1);
+        s2 = t2.substr(ind2[i] + 1, ind2[i + 1] - ind2[i] - 1);
+
+        if (s1 != s1p || s2 != s2p) {
+            x += ";" + s1;
+            y += ";" + s2;
+        }
+
+        s1p = s1;
+        s2p = s2;
+    }
+
+    return make_pair(x, y);
+}
+
+pair<string, string> destutterPair(const string &t1, const string &t2)
 {
     string s1 = t1.substr(0, 1);
     string s2 = t2.substr(0, 1);
@@ -146,6 +263,219 @@ pair<string, string> destuttterPair(const string &t1, const string &t2)
     }
 
     return make_pair(s1, s2);
+}
+
+vector<set<string>> asyncProdStrDiffSqr(const vector<set<string>> &v1, const vector<set<string>> &v2)
+{
+    vector<set<string>> out(v1.size());
+
+    for (int i = 0; i < v1.size(); i++)
+    {
+        for (auto s1 : v1[i])
+        {
+            for (auto s2 : v2[i])
+            {
+                set<string> temp1, temp2;
+
+                temp1.insert(s1);
+                temp2.insert(s2);
+
+                auto n1 = count(s1.begin(), s1.end(), ';') + 1;
+                auto n2 = count(s2.begin(), s2.end(), ';') + 1;
+
+                temp1 = stutter2kStr(temp1, n1 + n2 - 1);
+                temp2 = stutter2kStr(temp2, n1 + n2 - 1);
+
+                for (auto t1 : temp1)
+                {
+                    for (auto t2 : temp2)
+                    {
+                        vector<int> ind1;
+                        ind1.push_back(-1);
+                        for (int i = 0; i < t1.length(); i++)
+                        {
+                            if (t1[i] == ';')
+                            {
+                                ind1.push_back(i);
+                            }
+                        }
+                        ind1.push_back(t1.length());
+
+                        vector<int> ind2;
+                        ind2.push_back(-1);
+                        for (int i = 0; i < t2.length(); i++)
+                        {
+                            if (t2[i] == ';')
+                            {
+                                ind2.push_back(i);
+                            }
+                        }
+                        ind2.push_back(t2.length());
+
+                        
+
+                        string r = "";
+                        for (int i = 0; i < ind1.size() - 1; i++) {
+                            string r1 = t1.substr(ind1[i] + 1, ind1[i + 1] - ind1[i] - 1);
+                            string r2 = t2.substr(ind2[i] + 1, ind2[i + 1] - ind2[i] - 1);
+
+                            if (!r1.empty() && !r2.empty())
+                            {
+                                r += to_string((stod(r1) - stod(r2)) * (stod(r1) - stod(r2))) + ";";
+                            }
+                        }
+
+
+                        out[i].insert(destutterStr(r.substr(0, r.length() - 1)));
+                    }
+                }
+            }
+        }
+    }
+
+    return out;
+}
+
+vector<set<string>> asyncProdStrDiff(const vector<set<string>> &v1, const vector<set<string>> &v2)
+{
+    vector<set<string>> out(v1.size());
+
+    for (int i = 0; i < v1.size(); i++)
+    {
+        for (auto s1 : v1[i])
+        {
+            for (auto s2 : v2[i])
+            {
+                set<string> temp1, temp2;
+
+                temp1.insert(s1);
+                temp2.insert(s2);
+
+                auto n1 = count(s1.begin(), s1.end(), ';') + 1;
+                auto n2 = count(s2.begin(), s2.end(), ';') + 1;
+
+                temp1 = stutter2kStr(temp1, n1 + n2 - 1);
+                temp2 = stutter2kStr(temp2, n1 + n2 - 1);
+
+                for (auto t1 : temp1)
+                {
+                    for (auto t2 : temp2)
+                    {
+                        vector<int> ind1;
+                        ind1.push_back(-1);
+                        for (int i = 0; i < t1.length(); i++)
+                        {
+                            if (t1[i] == ';')
+                            {
+                                ind1.push_back(i);
+                            }
+                        }
+                        ind1.push_back(t1.length());
+
+                        vector<int> ind2;
+                        ind2.push_back(-1);
+                        for (int i = 0; i < t2.length(); i++)
+                        {
+                            if (t2[i] == ';')
+                            {
+                                ind2.push_back(i);
+                            }
+                        }
+                        ind2.push_back(t2.length());
+
+                        
+
+                        string r = "";
+                        for (int i = 0; i < ind1.size() - 1; i++) {
+                            string r1 = t1.substr(ind1[i] + 1, ind1[i + 1] - ind1[i] - 1);
+                            string r2 = t2.substr(ind2[i] + 1, ind2[i + 1] - ind2[i] - 1);
+                            
+                            if (!r1.empty() && !r2.empty())
+                            {
+                                r += to_string(stod(r1) - stod(r2)) + ";";
+                            }
+                        }
+
+
+                        out[i].insert(destutterStr(r.substr(0, r.length() - 1)));
+                    }
+                }
+            }
+        }
+    }
+
+    return out;
+}
+
+vector<set<string>> asyncProdStrSum(const vector<set<string>> &v1, const vector<set<string>> &v2)
+{
+    vector<set<string>> out(v1.size());
+
+    for (int i = 0; i < v1.size(); i++)
+    {
+        for (auto s1 : v1[i])
+        {
+            for (auto s2 : v2[i])
+            {
+                set<string> temp1, temp2;
+
+                temp1.insert(s1);
+                temp2.insert(s2);
+
+                auto n1 = count(s1.begin(), s1.end(), ';') + 1;
+                auto n2 = count(s2.begin(), s2.end(), ';') + 1;
+
+                temp1 = stutter2kStr(temp1, n1 + n2 - 1);
+                temp2 = stutter2kStr(temp2, n1 + n2 - 1);
+
+                for (auto t1 : temp1)
+                {
+                    for (auto t2 : temp2)
+                    {
+                        vector<int> ind1;
+                        ind1.push_back(-1);
+                        for (int i = 0; i < t1.length(); i++)
+                        {
+                            if (t1[i] == ';')
+                            {
+                                ind1.push_back(i);
+                            }
+                        }
+                        ind1.push_back(t1.length());
+
+                        vector<int> ind2;
+                        ind2.push_back(-1);
+                        for (int i = 0; i < t2.length(); i++)
+                        {
+                            if (t2[i] == ';')
+                            {
+                                ind2.push_back(i);
+                            }
+                        }
+                        ind2.push_back(t2.length());
+
+                        
+
+                        string r = "";
+                        for (int i = 0; i < ind1.size() - 1; i++) {
+                            string r1 = t1.substr(ind1[i] + 1, ind1[i + 1] - ind1[i] - 1);
+                            string r2 = t2.substr(ind2[i] + 1, ind2[i + 1] - ind2[i] - 1);
+                            
+                            if (!r1.empty() && !r2.empty())
+                            {
+                                r += to_string(stod(r1) + stod(r2)) + ";";
+                            }
+                        }
+
+
+                        out[i].insert(destutterStr(r.substr(0, r.length() - 1)));
+                    }
+                }
+            }
+        }
+    }
+
+    return out;
 }
 
 template <std::size_t N>
@@ -174,7 +504,7 @@ vector<set<pair<string, string>>> asyncProd(const vector<vector<bitset<N>>> &v1,
                 {
                     for (auto t2 : temp2)
                     {
-                        out[i].insert(destuttterPair(t1, t2));
+                        out[i].insert(destutterPair(t1, t2));
                     }
                 }
             }
@@ -1975,7 +2305,7 @@ set<string> concatWithDestutter(const set<string> &set1, const set<string> &set2
     return result;
 }
 
-pair<int, int> convertIntoBoolWithDestutter(string str, string delimiter)
+pair<int, int> convertIntoBoolWithDestutter(string str, string delimiter, float thr)
 {
     vector<bool> v;
 
@@ -1992,7 +2322,7 @@ pair<int, int> convertIntoBoolWithDestutter(string str, string delimiter)
             }
 
             int length = idx - start;
-            if (stof(str.substr(start, length)) > 0)
+            if (stof(str.substr(start, length)) > thr)
             {
                 if (v.empty() || v[v.size() - 1] != true)
                 {
@@ -2009,7 +2339,7 @@ pair<int, int> convertIntoBoolWithDestutter(string str, string delimiter)
             start += (length + delimiter.size());
         } while (true);
 
-        if (stof(str.substr(start, str.length())) > 0)
+        if (stof(str.substr(start, str.length())) > thr)
         {
             if (v.empty() || v[v.size() - 1] != true)
             {
@@ -2056,6 +2386,24 @@ vector<pair<long long, double>> getData(const string &fileName)
         double t, v;
         linestream >> t >> v;
         signalReal.push_back(make_pair((long long)(t * 1000), v));
+    }
+    sigdata.close();
+
+    return signalReal;
+}
+
+vector<pair<long long, double>> getData3d(const string &fileName, const int &i) 
+{
+    vector<pair<long long, double>> signalReal;
+    ifstream sigdata(fileName);
+    string line;
+    while (getline(sigdata, line))
+    {
+        stringstream linestream(line);
+        vector<double> temp(3);
+        double t;
+        linestream >> t >> temp[0] >> temp[1] >> temp[2];
+        signalReal.push_back(make_pair((long long)(t * 1000), temp[i]));
     }
     sigdata.close();
 
@@ -2239,7 +2587,7 @@ bitset<SIZE> generateBitmask(const int &parity)
     return mask;
 }
 
-vector<vector<vector<bitset<SIZE>>>> convertSignalsToAtomicPropositions(const vector<vector<set<string>>> &valExprs)
+vector<vector<vector<bitset<SIZE>>>> convertSignalsToAtomicPropositions(const vector<vector<set<string>>> &valExprs, const float &thr)
 {
         int n = valExprs.size();
         int numSegments = valExprs[0].size();
@@ -2262,7 +2610,7 @@ vector<vector<vector<bitset<SIZE>>>> convertSignalsToAtomicPropositions(const ve
                 {
                     if (expr != "")
                     {
-                        pair<int, int> xy = convertIntoBoolWithDestutter(expr, ";");
+                        pair<int, int> xy = convertIntoBoolWithDestutter(expr, ";", thr);
                         if (xy.first >= 0 && xy.second >= 0)
                         {
                             aps[i][j][xy.first][xy.second] = true;
