@@ -22,9 +22,9 @@ using namespace std;
 int main()
 {
     /* set variables */
-    int n = 3;
+    int n = 4;
     int d = 5000;
-    int eps = 50 * 2;
+    int eps = 50 * 1;
     int del = 1;
     /*
     long long a = 0;
@@ -68,7 +68,10 @@ int main()
         vector<set<string>> ve = valExprs[0];
         for (int i = 1; i < n; i++)
         {
-            ve = asyncProdStrSum(ve, valExprs[i]);
+            // ve = asyncProdStrSum(ve, valExprs[i]);
+            ve = abstProdCoarseStrSum(ve, valExprs[i]);
+            // ve = abstProdStrSum(ve, valExprs[i]);
+
         }
         valExprs = {ve};
 
