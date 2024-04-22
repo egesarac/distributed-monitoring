@@ -1139,9 +1139,7 @@ def negate(data):
 
 def main():
     # set repeat count for confidence interval
-    repeat = 1 
-    out = ""
-    flag = False
+    repeat = 1    
 
     for d in (4, 8, 16, 32):
         for eps in (1, 2, 4, 8):
@@ -1149,6 +1147,10 @@ def main():
                 continue
             
             for c in range(100):
+                flag = False
+                flagneg = False
+                out = "0"
+                outneg = "0"
                 data_0 = getData(d, c)
                 data_1 = getData(d, c + 100)
 
@@ -1158,17 +1160,17 @@ def main():
                     data0 = preprocess(data_0, d)
                     data1 = preprocess(data_1, d)
                     
-                    #flag = prog_always_conjunction(eps, d / min(d, 8), data0, data1) # d / min(d, 8)
-                    # flag = prog_eventually_disjunction(eps, 1, negate(data0), negate(data1))
+                    # flag = prog_always_conjunction(eps, 1, data0, data1) # d / min(d, 8)
+                    # flagneg = prog_eventually_disjunction(eps, 1, negate(data0), negate(data1))
 
-                    #flag = prog_always_disjunction(eps, d / min(d, 8), data0, data1)
-                    # flag = prog_eventually_conjunction(eps, 1, negate(data0), negate(data1))
+                    # flag = prog_always_disjunction(eps, 1, data0, data1)
+                    # flagneg = prog_eventually_conjunction(eps, 1, negate(data0), negate(data1))
 
-                    #flag = prog_eventually_conjunction(eps, d / min(d, 8), data0, data1)
-                    # flag = prog_always_disjunction(eps, 1, negate(data0), negate(data1))
+                    # flag = prog_eventually_conjunction(eps, 1, data0, data1)
+                    # flagneg = prog_always_disjunction(eps, 1, negate(data0), negate(data1))
 
-                    #flag = prog_eventually_disjunction(eps, d / min(d, 8), data0, data1)
-                    flag = prog_always_conjunction(eps, 1, negate(data0), negate(data1))
+                    flag = prog_eventually_disjunction(eps, 1, data0, data1)
+                    flagneg = prog_always_conjunction(eps, 1, negate(data0), negate(data1))
 
                     #flag = prog_until(eps, 1, data0, data1)
                     end = time.time()
@@ -1176,12 +1178,13 @@ def main():
                 
                 if (flag):
                     out = "1"
-                else:
-                    out = "0"
+                if (flagneg):
+                    outneg = "1"
+            
 
-                line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str(total_time / repeat) + " " + out
+                line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str(total_time / repeat) + " " + out + " " + outneg
                 print(line)
-                results = open("results_ed_smt_segNeg.txt", "a")
+                results = open("results_ed_smt+neg.txt", "a")
                 results.write(line + "\n")
                 results.close()
 
