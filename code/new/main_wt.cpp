@@ -22,9 +22,9 @@ using namespace std;
 int main()
 {
     /* set variables */
-    int n = 4;
+    int n = 3;
     int d = 5000;
-    int eps = 50 * 1;
+    int eps = 50 * 8;
     int del = 1;
     /*
     long long a = 0;
@@ -41,8 +41,8 @@ int main()
     }
     
     /* prepare the bit masks */
-    bitset<SIZE> evenMask = generateBitmask(0);
-    bitset<SIZE> oddMask = generateBitmask(1);
+    evenMask = generateBitmask(0);
+    oddMask = generateBitmask(1);
 
     int numSegments;
     vector<vector<bitset<SIZE>>> test;

@@ -35,6 +35,30 @@ int msb(const bitset<N> &bs)
     return -1;
 }
 
+set<double> splitSet(string str, string delimiter)
+{
+    set<double> v;
+    if (!str.empty()) {
+        int start = 0;
+        do {
+            // Find the index of occurrence
+            int idx = str.find(delimiter, start);
+            if (idx == string::npos) {
+                break;
+            }
+ 
+            // If found add the substring till that
+            // occurrence in the vector
+            int length = idx - start;
+            v.insert(stod(str.substr(start, length)));
+            start += (length + delimiter.size());
+        } while (true);
+        v.insert(stod(str.substr(start)));
+    }
+ 
+    return v;
+}
+
 vector<double> split(string str, string delimiter)
 {
     vector<double> v;
@@ -287,6 +311,40 @@ pair<string, string> destutterPair(const string &t1, const string &t2)
     }
 
     return make_pair(s1, s2);
+}
+
+vector<set<string>> abstProdStrSum(const vector<set<string>> &v1, const vector<set<string>> &v2)
+{
+    vector<set<string>> out(v1.size());
+
+    for (int i = 0; i < v1.size(); i++)
+    {
+        for (auto s1 : v1[i])
+        {
+            if (!s1.empty())
+            {
+                set<double> vals1 = splitSet(s1, ";");
+                
+                for (auto s2 : v2[i])
+                {
+                    if(!s2.empty())
+                    {
+                        set<double> vals2 = splitSet(s2, ";");
+                        
+                        for (auto e1 : vals1) 
+                        {
+                            for (auto e2 : vals2)
+                            {
+                                out[i].insert(to_string(e1 + e2));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return out;
 }
 
 vector<set<string>> abstProdCoarseStrSum(const vector<set<string>> &v1, const vector<set<string>> &v2)
@@ -2729,4 +2787,49 @@ vector<vector<vector<bitset<SIZE>>>> convertSignalsToAtomicPropositions(const ve
         }
 
     return aps;
+}
+
+vector<vector<set<string>>> computeValueExpressionsCoarse(const vector<vector<pair<long long, double>>> &signals, const vector<vector<vector<long long>>> &uncertainties, const vector<long long> &segmentation)
+{
+    vector<vector<set<string>>> valExprs(signals.size());
+    int numSegments = segmentation.size() - 1;
+
+    for (int i = 0; i < signals.size(); i++)
+        {
+            valExprs[i].resize(numSegments);
+
+            for (int j = 0; j < numSegments; j++)
+            {
+                //valExprs[i][j].insert("");
+                double m = DBL_MAX;
+                double M = -DBL_MAX;
+
+                for (int k = 1; k < uncertainties[i].size(); k++)
+                {
+                    if (segmentation[j] < uncertainties[i][k][1] && segmentation[j + 1] > uncertainties[i][k][0])
+                    {
+                        if (m > min(signals[i][k - 1].second, signals[i][k].second))
+                        {
+                            m = min(signals[i][k - 1].second, signals[i][k].second);
+                        }
+
+                        if (M < max(signals[i][k - 1].second, signals[i][k].second))
+                        {
+                            M = max(signals[i][k - 1].second, signals[i][k].second);
+                        }
+                    }
+                }
+
+                if (m == DBL_MAX) 
+                {
+                    m = signals[i][j].second;
+                    M = m;
+                }
+
+                valExprs[i][j].insert(to_string(m));
+                valExprs[i][j].insert(to_string(M));
+            }
+        }
+
+    return valExprs;
 }

@@ -7,6 +7,7 @@ from z3.z3 import ForAll
 # set_param('parallel.enable', True)
 set_option(rational_to_decimal=True)
 
+
 def prog_always_conjunction(eps, segCount, data_0, data_1):
 
     # initialize z3 solver
@@ -31,13 +32,12 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
     # encoding
     i = 0
     entryFound = True
-    flag = True
 
     while entryFound:
 
         # Terminate if segment count is reached
         if i == segCount:
-            return flag
+            return
 
         # flag to be set True if at least one entry is found in the current iteration
         entryFound = False
@@ -93,8 +93,7 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
 
         if not entryFound:
 
-            ##print()
-            pass
+            print()
 
         i += 1
 
@@ -193,21 +192,16 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
             m = s.model()
             # out = "%s %s" % (m[test], m[test2])
             # print(m)
-            ##print("unsat in segment", i)
-            flag = False
+            print("unsat in segment", i)
 
             # terminate after unsat
-            return flag
+            return
 
         elif i <= segCount:
 
-            ##print("sat in segment", i)
-            flag = True
+            print("sat in segment", i)
 
         s.reset()
-
-    return flag
-
 
 
 def prog_always_disjunction(eps, segCount, data_0, data_1):
@@ -234,13 +228,12 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
     # encoding
     i = 0
     entryFound = True
-    flag = True
 
     while entryFound:
 
         # Terminate if segment count is reached
         if i == segCount:
-            return flag
+            return
 
         # flag to be set True if at least one entry is found in the current iteration
         entryFound = False
@@ -296,8 +289,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
 
         if not entryFound:
 
-            ##print()
-            pass
+            print()
 
         i += 1
 
@@ -396,20 +388,16 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
             m = s.model()
             # out = "%s %s" % (m[test], m[test2])
             # print(m)
-            ##print("unsat in segment", i)
-            flag = False
+            print("unsat in segment", i)
 
             # terminate after unsat
-            return flag
+            return
 
         elif i <= segCount:
 
-            ##print("sat in segment", i)
-            flag = True
+            print("sat in segment", i)
 
         s.reset()
-    
-    return flag
 
 
 def prog_eventually_conjunction(eps, segCount, data_0, data_1):
@@ -436,13 +424,12 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
     # encoding
     i = 0
     entryFound = True
-    flag = True
 
     while entryFound:
 
         # Terminate if segment count is reached
         if i == segCount:
-            return flag
+            return
 
         # flag to be set True if at least one entry is found in the current iteration
         entryFound = False
@@ -498,8 +485,7 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
 
         if not entryFound:
 
-            ##print()
-            pass
+            print()
 
         i += 1
 
@@ -600,21 +586,16 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
             m = s.model()
             # out = "%s %s" % (m[test], m[test2])
             # print(m)
-            ##print("unsat in segment", i)
-            flag = False
+            print("unsat in segment", i)
 
             # terminate after unsat
-            return flag
+            return
 
         elif i <= segCount:
 
-            ##print("sat in segment", i)
-            flag = True
-
+            print("sat in segment", i)
 
         s.reset()
-        
-    return flag
 
 
 def prog_eventually_disjunction(eps, segCount, data_0, data_1):
@@ -641,13 +622,12 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
     # encoding
     i = 0
     entryFound = True
-    flag = True
 
     while entryFound:
         
         # Terminate if segment count is reached
         if i == segCount:
-            return flag
+            return
 
         # flag to be set True if at least one entry is found in the current iteration
         entryFound = False
@@ -703,8 +683,7 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
 
         if not entryFound:
 
-            ##print()
-            pass
+            print()
 
         i += 1
 
@@ -752,7 +731,7 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
                 )
             )
         )
-        
+
         # local clocks are bound by epsilon
         s.add(
             And(
@@ -800,7 +779,7 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
             ForAll(v,
                 Implies(
                     And(v >= timestamps0[0], v <= timestamps0[-1]),
-                    z3Interpolate(c_flow, v) == 0
+                    z3Interpolate(c_flow, v) < 1
                 )
             )
         )
@@ -809,21 +788,17 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
 
             m = s.model()
             # out = "%s %s" % (m[test], m[test2])
-            # print(m)
-            ##print("unsat in segment", i)
-            flag = False
+            print(m)
+            print("unsat in segment", i)
 
             # terminate after unsat
-            return flag
+            return
 
         elif i <= segCount:
 
-            ##print("sat in segment", i)
-            flag = True
+            print("sat in segment", i)
 
         s.reset()
-
-    return flag
 
 
 def prog_until(eps, segCount, data_0, data_1):
@@ -1138,53 +1113,40 @@ def negate(data):
     return data
 
 def main():
+
     # set repeat count for confidence interval
-    repeat = 1 
-    out = ""
-    flag = False
-
-    for d in (4, 8, 16, 32):
-        for eps in (1, 2, 4, 8):
-            if d < eps:
-                continue
-            
-            for c in range(100):
-                data_0 = getData(d, c)
-                data_1 = getData(d, c + 100)
-
-                total_time = 0
-                for i in range(repeat):
-                    start = time.time()
-                    data0 = preprocess(data_0, d)
-                    data1 = preprocess(data_1, d)
-                    
-                    #flag = prog_always_conjunction(eps, d / min(d, 8), data0, data1) # d / min(d, 8)
-                    flag = prog_eventually_disjunction(eps, d / min(d, 8), negate(data0), negate(data1))
-
-                    #flag = prog_always_disjunction(eps, d / min(d, 8), data0, data1)
-                    #flag = prog_eventually_conjunction(eps, d / min(d, 8), negate(data0), negate(data1))
-
-                    #flag = prog_eventually_conjunction(eps, d / min(d, 8), data0, data1)
-                    #flag = prog_always_disjunction(eps, d / min(d, 8), negate(data0), negate(data1))
-
-                    #flag = prog_eventually_disjunction(eps, d / min(d, 8), data0, data1)
-                    #flag = prog_always_conjunction(eps, d / min(d, 8), negate(data0), negate(data1))
-
-                    #flag = prog_until(eps, 1, data0, data1)
-                    end = time.time()
-                    total_time += end - start
-                
-                if (flag):
-                    out = "1"
-                else:
-                    out = "0"
-
-                line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str(total_time / repeat) + " " + out
-                print(line)
-                results = open("results_ac_smt_segNeg.txt", "a")
-                results.write(line + "\n")
-                results.close()
+    repeat = 1
+    eps = 1
+    # read data from files
+    d = 4
+    id = 76
+    # data_0 = getDataTest(1)
+    data_0 = getData(d, id)
+    # data_1 = getDataTest(2)
+    data_1 = getData(d, id + 100)
+    
+    total_time = 0
+    for i in range(repeat):
+        start = time.time()
+        data0 = preprocess(data_0, d)
+        data1 = preprocess(data_1, d)
+        prog_always_conjunction(eps, 1, data0, data1)
+        # prog_always_conjunction(eps, 1, negate(data0), negate(data1))
+        # prog_always_disjunction(eps, 1, data0, data1)
+        # prog_always_disjunction(eps, 1, negate(data0), negate(data1))
+        # prog_eventually_conjunction(eps, 1, data0, data1)
+        # prog_eventually_conjunction(eps, 1, negate(data0), negate(data1))
+        # prog_eventually_disjunction(eps, 1, data0, data1)
+        prog_eventually_disjunction(eps, 1, negate(data0), negate(data1))
+        #prog_until(eps, 1, data_0, data_1)
+        end = time.time()
+        # print("\nTime elapsed :", (end - start), "seconds")
+        dur = end - start
+        #print(i, "\t:\t", dur)
+        total_time += dur
+    print("Average :\t", total_time / repeat)
 
 if __name__ == "__main__":
+
     main()
     pass
