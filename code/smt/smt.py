@@ -1159,10 +1159,10 @@ def main():
                     data1 = preprocess(data_1, d)
                     
                     #flag = prog_always_conjunction(eps, d / min(d, 8), data0, data1) # d / min(d, 8)
-                    flag = prog_eventually_disjunction(eps, d / min(d, 8), negate(data0), negate(data1))
+                    # flag = prog_eventually_disjunction(eps, 1, negate(data0), negate(data1))
 
                     #flag = prog_always_disjunction(eps, d / min(d, 8), data0, data1)
-                    #flag = prog_eventually_conjunction(eps, d / min(d, 8), negate(data0), negate(data1))
+                    flag = prog_eventually_conjunction(eps, 1, negate(data0), negate(data1))
 
                     #flag = prog_eventually_conjunction(eps, d / min(d, 8), data0, data1)
                     #flag = prog_always_disjunction(eps, d / min(d, 8), negate(data0), negate(data1))
@@ -1181,7 +1181,7 @@ def main():
 
                 line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str(total_time / repeat) + " " + out
                 print(line)
-                results = open("results_ac_smt_segNeg.txt", "a")
+                results = open("results_ad_smt_segNeg.txt", "a")
                 results.write(line + "\n")
                 results.close()
 

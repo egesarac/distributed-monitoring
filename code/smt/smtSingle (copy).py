@@ -1116,10 +1116,10 @@ def main():
 
     # set repeat count for confidence interval
     repeat = 1
-    eps = 1
+    eps = 4
     # read data from files
-    d = 4
-    id = 76
+    d = 16
+    id = 1
     # data_0 = getDataTest(1)
     data_0 = getData(d, id)
     # data_1 = getDataTest(2)
@@ -1137,7 +1137,7 @@ def main():
         # prog_eventually_conjunction(eps, 1, data0, data1)
         # prog_eventually_conjunction(eps, 1, negate(data0), negate(data1))
         # prog_eventually_disjunction(eps, 1, data0, data1)
-        prog_eventually_disjunction(eps, 1, negate(data0), negate(data1))
+        prog_eventually_disjunction(eps, 1 / min(d, 8), negate(data0), negate(data1))
         #prog_until(eps, 1, data_0, data_1)
         end = time.time()
         # print("\nTime elapsed :", (end - start), "seconds")
