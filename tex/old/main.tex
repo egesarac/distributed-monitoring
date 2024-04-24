@@ -154,29 +154,29 @@
 % ----- THEOREMS
 \newtheorem{observation}[theorem]{Fact}
 
-\title{\alert{TODO}} 
-\author{Author(s)} %
-\institute{Affiliation(s)} %
-\authorrunning{Author(s)} %
-\date{}
 
 %\renewcommand{\baselinestretch}{.98}
 
 \begin{document}
+	\title{\alert{TODO}} 
+	\author{Author(s)}
+	\institute{Affiliation(s)}
+	\authorrunning{Author(s)}
+	\date{}
 	\maketitle
 	
 	\begin{abstract}
 		\alert{TODO}
 	\end{abstract}
+
+	\rednote[inline]{You can leave notes using the command \textbackslash firstName\{note\}.}
 	
-	\rednote[inline]{You can leave notes using the command \textbackslash firstName\{note\}. \\ Page limit: 16 + 4 (appendix)}
-	
-	\input introduction
-	\input preliminaries
+	\input intro
+	\input prelim
 	\input approach
-	\input algorithm
+	\input algo
 	\input experiments
-	\input conclusion
+	\input concl
 	
 	\bibliographystyle{splncs04}
 	\bibliography{main}
