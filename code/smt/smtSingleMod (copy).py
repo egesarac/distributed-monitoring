@@ -7,6 +7,7 @@ from z3.z3 import ForAll
 # set_param('parallel.enable', True)
 set_option(rational_to_decimal=True)
 
+
 def prog_always_conjunction(eps, segCount, data_0, data_1):
 
     # initialize z3 solver
@@ -31,13 +32,12 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
     # encoding
     i = 0
     entryFound = True
-    flag = True
 
     while entryFound:
 
         # Terminate if segment count is reached
         if i == segCount:
-            return flag
+            return
 
         # flag to be set True if at least one entry is found in the current iteration
         entryFound = False
@@ -93,8 +93,7 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
 
         if not entryFound:
 
-            ##print()
-            pass
+            print()
 
         i += 1
 
@@ -142,7 +141,7 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    And(c0(i) - c1(i) <= eps, c0(i) - c1(i) >= -eps)
+                    And(c0(i) - c1(i) < eps, c0(i) - c1(i) > -eps)
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -154,7 +153,7 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
                 [
                     And(
                         [
-                            Implies(i <= j, And(c0(i) <= c0(j), c1(i) <= c1(j)))
+                            Implies(i < j, And(c0(i) < c0(j), c1(i) < c1(j)))
                             for j in range(timestamps0[0], timestamps0[-1] + 1)
                         ]
                     )
@@ -193,21 +192,16 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
             m = s.model()
             # out = "%s %s" % (m[test], m[test2])
             # print(m)
-            ##print("unsat in segment", i)
-            flag = False
+            print("unsat in segment", i)
 
             # terminate after unsat
-            return flag
+            return
 
         elif i <= segCount:
 
-            ##print("sat in segment", i)
-            flag = True
+            print("sat in segment", i)
 
         s.reset()
-
-    return flag
-
 
 
 def prog_always_disjunction(eps, segCount, data_0, data_1):
@@ -234,13 +228,12 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
     # encoding
     i = 0
     entryFound = True
-    flag = True
 
     while entryFound:
 
         # Terminate if segment count is reached
         if i == segCount:
-            return flag
+            return
 
         # flag to be set True if at least one entry is found in the current iteration
         entryFound = False
@@ -296,8 +289,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
 
         if not entryFound:
 
-            ##print()
-            pass
+            print()
 
         i += 1
 
@@ -305,83 +297,55 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
         # entryFound = False
 
         # global clock to local clock mappings
-        c0 = Function("c0", IntSort(), IntSort())
+        c0 = Function("c0", RealSort(), RealSort())
+        
+        T0 = Real("T0")
         s.add(
-            And(
-                [
-                    Or([c0(i) == (min(len(data_0), (max(0, ((i - eps) + j))))) for j in range(2 * int(eps) + 1)])
-                    for i in range(timestamps0[0], timestamps0[-1] + 1)
-                ]
-            )
-        )
-        s.add(
-            Not(
-                Or(
-                    c0(timestamps0[0]) == timestamps0[0] - 1,
-                    c0(timestamps0[-1]) == timestamps0[-1] + 1,
-                )
-            )
+            ForAll(T0,
+                   Implies(And(T0 >= timestamps0[0], T0 <= timestamps0[-1]),
+                           And(c0(T0) < T0 + eps, c0(T0) > T0 - eps)
+                           )
+                   )
         )
 
-        c1 = Function("c1", IntSort(), IntSort())
+
+        c1 = Function("c1", RealSort(), RealSort())
         s.add(
-            And(
-                [
-                    Or([c1(i) == (min(len(data_1), (max(0, ((i - eps) + j))))) for j in range(2 * int(eps) + 1)])
-                    for i in range(timestamps1[0], timestamps1[-1] + 1)
-                ]
-            )
-        )
-        s.add(
-            Not(
-                Or(
-                    c1(timestamps1[0]) == timestamps1[0] - 1,
-                    c1(timestamps1[-1]) == timestamps1[-1] + 1,
-                )
-            )
+            ForAll(T0,
+                   Implies(And(T0 >= timestamps0[0], T0 <= timestamps0[-1]),
+                           And(c1(T0) < T0 + eps, c1(T0) > T0 - eps)
+                           )
+                   )
         )
 
         # local clocks are bound by epsilon
         s.add(
-            And(
-                [
-                    And(c0(i) - c1(i) <= eps, c0(i) - c1(i) >= -eps)
-                    for i in range(timestamps0[0], timestamps0[-1] + 1)
-                ]
-            )
+            ForAll(T0,
+                   Implies(And(T0 >= timestamps0[0], T0 <= timestamps0[-1]),
+                           And(c0(T0) - c1(T0) < eps, c0(T0) - c1(T0) > -eps)
+                           )
+                   )
         )
 
         # global clock to local clock mappings are ordered
-        s.add(
-            And(
-                [
-                    And(
-                        [
-                            Implies(i <= j, And(c0(i) <= c0(j), c1(i) <= c1(j)))
-                            for j in range(timestamps0[0], timestamps0[-1] + 1)
-                        ]
-                    )
-                    for i in range(timestamps0[0], timestamps0[-1] + 1)
-                ]
-            )
-        )
+        T1 = Real("T1")
+        s.add(ForAll(T0, ForAll(T1, Implies(T0 <= T1, And(c0(T0) < c0(T1), c1(T0) < c1(T1))))))
 
         # consistent cut flow
         # _flow = Function("c_flow", IntSort(), RealSort())
-        c_flow = Function("c_flow", IntSort(), IntSort())
+        c_flow = Function("c_flow", RealSort(), IntSort())
 
         # addition
         s.add(
-            And(
-                [
-                    c_flow(i) == (sig0(c0(i)) + sig1(c1(i)))
-                    for i in range(timestamps0[0], timestamps0[-1] + 1)
-                ]
-            )
+            ForAll(T0,
+                   Implies(And(T0 >= timestamps0[0], T0 <= timestamps0[-1]),
+                           c_flow(T0) == (sig0(ToInt(c0(T0))) + sig1(ToInt(c1(T0))))
+                           )
+                   )
         )
 
         # violation check
-        v = Int("v")
+        v = Real("v")
         s.add(And(v >= timestamps0[0], v <= timestamps0[-1]))
 
         s.add(
@@ -391,25 +355,23 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
             )
         )
 
+        print(s.assertions())
+
         if s.check() == sat:
 
             m = s.model()
             # out = "%s %s" % (m[test], m[test2])
             # print(m)
-            ##print("unsat in segment", i)
-            flag = False
+            print("unsat in segment", i)
 
             # terminate after unsat
-            return flag
+            return
 
         elif i <= segCount:
 
-            ##print("sat in segment", i)
-            flag = True
+            print("sat in segment", i)
 
         s.reset()
-    
-    return flag
 
 
 def prog_eventually_conjunction(eps, segCount, data_0, data_1):
@@ -436,13 +398,12 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
     # encoding
     i = 0
     entryFound = True
-    flag = True
 
     while entryFound:
 
         # Terminate if segment count is reached
         if i == segCount:
-            return flag
+            return
 
         # flag to be set True if at least one entry is found in the current iteration
         entryFound = False
@@ -498,8 +459,7 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
 
         if not entryFound:
 
-            ##print()
-            pass
+            print()
 
         i += 1
 
@@ -547,7 +507,7 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    And(c0(i) - c1(i) <= eps, c0(i) - c1(i) >= -eps)
+                    And(c0(i) - c1(i) < eps, c0(i) - c1(i) > -eps)
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -559,7 +519,7 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
                 [
                     And(
                         [
-                            Implies(i <= j, And(c0(i) <= c0(j), c1(i) <= c1(j)))
+                            Implies(i < j, And(c0(i) < c0(j), c1(i) < c1(j)))
                             for j in range(timestamps0[0], timestamps0[-1] + 1)
                         ]
                     )
@@ -584,7 +544,7 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
 
         # violation check
         v = Int("v")
-        s.add(And(v >= timestamps0[0], v <= timestamps0[-1]))
+        s.add(And(v >= timestamps0[0], v < timestamps0[-1]))
 
         s.add(
             ForAll(v,
@@ -599,22 +559,17 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
 
             m = s.model()
             # out = "%s %s" % (m[test], m[test2])
-            # print(m)
-            ##print("unsat in segment", i)
-            flag = False
+            print(m)
+            print("unsat in segment", i)
 
             # terminate after unsat
-            return flag
+            return
 
         elif i <= segCount:
 
-            ##print("sat in segment", i)
-            flag = True
-
+            print("sat in segment", i)
 
         s.reset()
-        
-    return flag
 
 
 def prog_eventually_disjunction(eps, segCount, data_0, data_1):
@@ -641,13 +596,12 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
     # encoding
     i = 0
     entryFound = True
-    flag = True
 
     while entryFound:
         
         # Terminate if segment count is reached
         if i == segCount:
-            return flag
+            return
 
         # flag to be set True if at least one entry is found in the current iteration
         entryFound = False
@@ -703,8 +657,7 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
 
         if not entryFound:
 
-            ##print()
-            pass
+            print()
 
         i += 1
 
@@ -752,12 +705,12 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
                 )
             )
         )
-        
+
         # local clocks are bound by epsilon
         s.add(
             And(
                 [
-                    And(c0(i) - c1(i) <= eps, c0(i) - c1(i) >= -eps)
+                    And(c0(i) - c1(i) < eps, c0(i) - c1(i) > -eps)
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -769,7 +722,7 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
                 [
                     And(
                         [
-                            Implies(i <= j, And(c0(i) <= c0(j), c1(i) <= c1(j)))
+                            Implies(i < j, And(c0(i) < c0(j), c1(i) < c1(j)))
                             for j in range(timestamps0[0], timestamps0[-1] + 1)
                         ]
                     )
@@ -800,7 +753,7 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
             ForAll(v,
                 Implies(
                     And(v >= timestamps0[0], v <= timestamps0[-1]),
-                    z3Interpolate(c_flow, v) == 0
+                    z3Interpolate(c_flow, v) < 1
                 )
             )
         )
@@ -809,21 +762,17 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
 
             m = s.model()
             # out = "%s %s" % (m[test], m[test2])
-            # print(m)
-            ##print("unsat in segment", i)
-            flag = False
+            print(m)
+            print("unsat in segment", i)
 
             # terminate after unsat
-            return flag
+            return
 
         elif i <= segCount:
 
-            ##print("sat in segment", i)
-            flag = True
+            print("sat in segment", i)
 
         s.reset()
-
-    return flag
 
 
 def prog_until(eps, segCount, data_0, data_1):
@@ -1121,15 +1070,18 @@ def getData(d, setID):
     return data
 
 def preprocess(data, d):
+    dataNew = []
+    x = 0.0
     for i in range(d):
+        x = 0.0
         if data[i][1] > 0:
-            data[i][1] = 1.0
-        else:
-            data[i][1] = 0.0
+            x = 1.0
+        dataNew.append([float(data[i][0] * 1), x])
+        # dataNew.append([float(data[i][0] * 2 + 1), x])
 
-    data.append([float(d), data[d-1][1]])
+    dataNew.append([float(d), x])
 
-    return data
+    return dataNew
 
 def negate(data):
     for i in range(len(data)):
@@ -1138,56 +1090,46 @@ def negate(data):
     return data
 
 def main():
+
     # set repeat count for confidence interval
-    repeat = 1    
+    repeat = 1
+    eps = 1
+    # read data from files
+    d = 4
+    # id = 9
+    data_0 = getDataTest(1)
+    # data_0 = getData(d, id)
+    data_1 = getDataTest(2)
+    # data_1 = getData(d, id + 100)
+    
+    total_time = 0
+    for i in range(repeat):
+        start = time.time()
+        data0 = preprocess(data_0, d)
+        data1 = preprocess(data_1, d)
 
-    for d in (4, 8, 16, 32):
-        for eps in (1, 2, 4, 8):
-            if d < eps:
-                continue
-            
-            for c in range(100):
-                flag = False
-                flagneg = False
-                out = "0"
-                outneg = "0"
-                data_0 = getData(d, c)
-                data_1 = getData(d, c + 100)
+        # prog_always_conjunction(eps, 1, data0, data1)
+        # prog_eventually_disjunction(eps, 1, negate(data0), negate(data1))
 
-                total_time = 0
-                for i in range(repeat):
-                    start = time.time()
-                    data0 = preprocess(data_0, d)
-                    data1 = preprocess(data_1, d)
-                    
-                    flag = prog_always_conjunction(eps, 1, data0, data1) # d / min(d, 8)
-                    flagneg = prog_eventually_disjunction(eps, 1, negate(data0), negate(data1))
+        # prog_always_disjunction(eps, 1, data0, data1)
+        # prog_eventually_conjunction(eps, 1, negate(data0), negate(data1))
 
-                    # flag = prog_always_disjunction(eps, 1, data0, data1)
-                    # flagneg = prog_eventually_conjunction(eps, 1, negate(data0), negate(data1))
+        # prog_eventually_conjunction(eps, 1, data0, data1)
+        prog_always_disjunction(eps, 1, negate(data0), negate(data1))
 
-                    # flag = prog_eventually_conjunction(eps, 1, data0, data1)
-                    # flagneg = prog_always_disjunction(eps, 1, negate(data0), negate(data1))
+        # prog_eventually_disjunction(eps, 1, data0, data1)
+        # prog_always_conjunction(eps, 1, negate(data0), negate(data1))
 
-                    # flag = prog_eventually_disjunction(eps, 1, data0, data1)
-                    # flagneg = prog_always_conjunction(eps, 1, negate(data0), negate(data1))
+        #prog_until(eps, 1, data_0, data_1)
 
-                    #flag = prog_until(eps, 1, data0, data1)
-                    end = time.time()
-                    total_time += end - start
-                
-                if (flag):
-                    out = "1"
-                if (flagneg):
-                    outneg = "1"
-            
-
-                line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str(total_time / repeat) + " " + out + " " + outneg
-                print(line)
-                results = open("results_ac_smt+neg.txt", "a")
-                results.write(line + "\n")
-                results.close()
+        end = time.time()
+        # print("\nTime elapsed :", (end - start), "seconds")
+        dur = end - start
+        #print(i, "\t:\t", dur)
+        total_time += dur
+    print("Average :\t", total_time / repeat)
 
 if __name__ == "__main__":
+
     main()
     pass

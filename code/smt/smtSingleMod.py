@@ -141,7 +141,7 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    And(c0(i) - c1(i) < eps, c0(i) - c1(i) > -eps)
+                    And(c0(i) - c1(i) <= eps, c0(i) - c1(i) >= -eps)
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -153,7 +153,7 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
                 [
                     And(
                         [
-                            Implies(i < j, And(c0(i) < c0(j), c1(i) < c1(j)))
+                            Implies(i <= j, And(c0(i) <= c0(j), c1(i) <= c1(j)))
                             for j in range(timestamps0[0], timestamps0[-1] + 1)
                         ]
                     )
@@ -337,7 +337,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    And(c0(i) - c1(i) < eps, c0(i) - c1(i) > -eps)
+                    And(c0(i) - c1(i) <= eps, c0(i) - c1(i) >= -eps)
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -349,7 +349,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
                 [
                     And(
                         [
-                            Implies(i < j, And(c0(i) < c0(j), c1(i) < c1(j)))
+                            Implies(i <= j, And(c0(i) <= c0(j), c1(i) <= c1(j)))
                             for j in range(timestamps0[0], timestamps0[-1] + 1)
                         ]
                     )
@@ -533,7 +533,7 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    And(c0(i) - c1(i) < eps, c0(i) - c1(i) > -eps)
+                    And(c0(i) - c1(i) <= eps, c0(i) - c1(i) >= -eps)
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -545,7 +545,7 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
                 [
                     And(
                         [
-                            Implies(i < j, And(c0(i) < c0(j), c1(i) < c1(j)))
+                            Implies(i <= j, And(c0(i) <= c0(j), c1(i) <= c1(j)))
                             for j in range(timestamps0[0], timestamps0[-1] + 1)
                         ]
                     )
@@ -570,7 +570,7 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
 
         # violation check
         v = Int("v")
-        s.add(And(v >= timestamps0[0], v <= timestamps0[-1]))
+        s.add(And(v >= timestamps0[0], v < timestamps0[-1]))
 
         s.add(
             ForAll(v,
@@ -585,7 +585,7 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
 
             m = s.model()
             # out = "%s %s" % (m[test], m[test2])
-            # print(m)
+            print(m)
             print("unsat in segment", i)
 
             # terminate after unsat
@@ -736,7 +736,7 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    And(c0(i) - c1(i) < eps, c0(i) - c1(i) > -eps)
+                    And(c0(i) - c1(i) <= eps, c0(i) - c1(i) >= -eps)
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -748,7 +748,7 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
                 [
                     And(
                         [
-                            Implies(i < j, And(c0(i) < c0(j), c1(i) < c1(j)))
+                            Implies(i < j, And(c0(i) <= c0(j), c1(i) <= c1(j)))
                             for j in range(timestamps0[0], timestamps0[-1] + 1)
                         ]
                     )
@@ -1096,15 +1096,19 @@ def getData(d, setID):
     return data
 
 def preprocess(data, d):
+    dataNew = []
+    x = 0.0
     for i in range(d):
+        x = 0.0
         if data[i][1] > 0:
-            data[i][1] = 1.0
-        else:
-            data[i][1] = 0.0
+            x = 1.0
+        dataNew.append([float(data[i][0]), x])
+        # for j in range(10):
+            # dataNew.append([float(data[i][0] * 10 + j), x])
 
-    data.append([float(d), data[d-1][1]])
+    # dataNew.append([float(d * 10), data[d-1][1]])
 
-    return data
+    return dataNew
 
 def negate(data):
     for i in range(len(data)):
@@ -1119,11 +1123,11 @@ def main():
     eps = 1
     # read data from files
     d = 4
-    id = 9
-    # data_0 = getDataTest(1)
-    data_0 = getData(d, id)
-    # data_1 = getDataTest(2)
-    data_1 = getData(d, id + 100)
+    # id = 9
+    data_0 = getDataTest(1)
+    # data_0 = getData(d, id)
+    data_1 = getDataTest(2)
+    # data_1 = getData(d, id + 100)
     
     total_time = 0
     for i in range(repeat):

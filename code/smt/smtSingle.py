@@ -1115,11 +1115,11 @@ def main():
     eps = 1
     # read data from files
     d = 4
-    id = 9
-    # data_0 = getDataTest(1)
-    data_0 = getData(d, id)
-    # data_1 = getDataTest(2)
-    data_1 = getData(d, id + 100)
+    # id = 9
+    data_0 = getDataTest(1)
+    # data_0 = getData(d, id)
+    data_1 = getDataTest(2)
+    # data_1 = getData(d, id + 100)
     
     total_time = 0
     for i in range(repeat):
