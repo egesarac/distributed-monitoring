@@ -55,7 +55,7 @@ int main()
                     continue;
                 }
 
-                for (int c = 6; c < 100; c++)
+                for (int c = 12; c < 100; c++)
                 {
                     /* read signal data */
                     vector<vector<pair<long long, double>>> signalsReal(n);
@@ -98,7 +98,7 @@ int main()
                         numSegments = segmentation.size() - 1;
 
                         /* compute the value expressions */
-                        vector<vector<set<string>>> valExprs1 = computeValueExpressions(signals, uncertainties, segmentation);
+                        vector<vector<set<string>>> valExprs = computeValueExpressions(signals, uncertainties, segmentation);
 
                         /* translate signals to atomic propositions */
                         vector<vector<vector<bitset<SIZE>>>> aps = convertSignalsToAtomicPropositions(valExprs, 0.0);

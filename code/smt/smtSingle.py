@@ -183,7 +183,7 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
         s.add(
             Implies(
                 And(v >= timestamps0[0], v <= timestamps0[-1]),
-                And(z3Interpolate(c_flow, v) < 2),
+                z3Interpolate(c_flow, v) < 2
             )
         )
 
@@ -191,7 +191,7 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
 
             m = s.model()
             # out = "%s %s" % (m[test], m[test2])
-            # print(m)
+            print(m)
             print("unsat in segment", i)
 
             # terminate after unsat
@@ -379,7 +379,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
         s.add(
             Implies(
                 And(v >= timestamps0[0], v <= timestamps0[-1]),
-                And(z3Interpolate(c_flow, v) == 0),
+                z3Interpolate(c_flow, v) == 0
             )
         )
 
@@ -387,7 +387,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
 
             m = s.model()
             # out = "%s %s" % (m[test], m[test2])
-            # print(m)
+            print(m)
             print("unsat in segment", i)
 
             # terminate after unsat
@@ -573,9 +573,11 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
         s.add(And(v >= timestamps0[0], v <= timestamps0[-1]))
 
         s.add(
-            Implies(
-                And(v >= timestamps0[0], v <= timestamps0[-1]),
-                And(z3Interpolate(c_flow, v) >= 2),
+            ForAll(v,
+                Implies(
+                    And(v >= timestamps0[0], v <= timestamps0[-1]),
+                    z3Interpolate(c_flow, v) < 2
+                )
             )
         )
 
@@ -583,15 +585,15 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
 
             m = s.model()
             # out = "%s %s" % (m[test], m[test2])
-            # print(m)
-            print("sat in segment", i)
+            print(m)
+            print("unsat in segment", i)
 
-            # terminate after sat
+            # terminate after unsat
             return
 
         elif i <= segCount:
 
-            print("unsat in segment", i)
+            print("sat in segment", i)
 
         s.reset()
 
@@ -774,9 +776,11 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
         s.add(And(v >= timestamps0[0], v <= timestamps0[-1]))
 
         s.add(
-            Implies(
-                And(v >= timestamps0[0], v <= timestamps0[-1]),
-                And(z3Interpolate(c_flow, v) >= 1),
+            ForAll(v,
+                Implies(
+                    And(v >= timestamps0[0], v <= timestamps0[-1]),
+                    z3Interpolate(c_flow, v) == 0
+                )
             )
         )
 
@@ -784,15 +788,15 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
 
             m = s.model()
             # out = "%s %s" % (m[test], m[test2])
-            # print(m)
-            print("sat in segment", i)
+            print(m)
+            print("unsat in segment", i)
 
-            # terminate after sat
+            # terminate after unsat
             return
 
         elif i <= segCount:
 
-            print("unsat in segment", i)
+            print("sat in segment", i)
 
         s.reset()
 
@@ -1115,11 +1119,11 @@ def main():
     eps = 1
     # read data from files
     d = 4
-    # id = 9
-    data_0 = getDataTest(1)
-    # data_0 = getData(d, id)
-    data_1 = getDataTest(2)
-    # data_1 = getData(d, id + 100)
+    id = 12
+    # data_0 = getDataTest(1)
+    data_0 = getData(d, id)
+    # data_1 = getDataTest(2)
+    data_1 = getData(d, id + 100)
     
     total_time = 0
     for i in range(repeat):
@@ -1127,14 +1131,14 @@ def main():
         data0 = preprocess(data_0, d)
         data1 = preprocess(data_1, d)
 
-        # prog_always_conjunction(eps, 1, data0, data1)
-        # prog_eventually_disjunction(eps, 1, negate(data0), negate(data1))
+        prog_always_conjunction(eps, 1, data0, data1)
+        prog_eventually_disjunction(eps, 1, negate(data0), negate(data1))
 
         # prog_always_disjunction(eps, 1, data0, data1)
         # prog_eventually_conjunction(eps, 1, negate(data0), negate(data1))
 
-        prog_eventually_conjunction(eps, 1, data0, data1)
-        prog_always_disjunction(eps, 1, negate(data0), negate(data1))
+        # prog_eventually_conjunction(eps, 1, data0, data1)
+        # prog_always_disjunction(eps, 1, negate(data0), negate(data1))
 
         # prog_eventually_disjunction(eps, 1, data0, data1)
         # prog_always_conjunction(eps, 1, negate(data0), negate(data1))
