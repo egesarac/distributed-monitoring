@@ -248,7 +248,8 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
         timestamps0 = []
 
         # sig0 = Function("sig0", IntSort(), RealSort())
-        sig0 = Function("sig0", IntSort(), IntSort())
+        t = Real("t")
+        sig0 = Function("sig0", RealSort(), IntSort())
 
         for j in range((segmentLowerBound + 0), (segmentUpperBound + 1)):
 
@@ -256,7 +257,8 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
 
                 timestamps0.append(j)
 
-                s.add(sig0(j) == data_0[j][1])
+                # s.add(sig0(j) == data_0[j][1])
+                s.add(ForAll(t, Implies(And(t >= j, t < j + 1), sig0(t) == data_0[j][1])))
 
                 if j > (i * segDur):
 
@@ -269,7 +271,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
         timestamps1 = []
 
         # sig1 = Function("sig1", IntSort(), RealSort())
-        sig1 = Function("sig1", IntSort(), IntSort())
+        sig1 = Function("sig1", RealSort(), IntSort())
 
         for j in range((segmentLowerBound + 0), (segmentUpperBound + 1)):
 
@@ -277,7 +279,8 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
 
                 timestamps1.append(j)
 
-                s.add(sig1(j) == data_1[j][1])
+                # s.add(sig1(j) == data_1[j][1])
+                s.add(ForAll(t, Implies(And(t >= j, t < j + 1), sig1(t) == data_1[j][1])))
 
                 if j > (i * segDur):
 
@@ -302,7 +305,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
         T0 = Real("T0")
         s.add(
             ForAll(T0,
-                   Implies(And(T0 >= timestamps0[0], T0 <= timestamps0[-1]),
+                   Implies(And(T0 >= timestamps0[0], T0 < timestamps0[-1]),
                            And(c0(T0) < T0 + eps, c0(T0) > T0 - eps)
                            )
                    )
@@ -312,7 +315,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
         c1 = Function("c1", RealSort(), RealSort())
         s.add(
             ForAll(T0,
-                   Implies(And(T0 >= timestamps0[0], T0 <= timestamps0[-1]),
+                   Implies(And(T0 >= timestamps0[0], T0 < timestamps0[-1]),
                            And(c1(T0) < T0 + eps, c1(T0) > T0 - eps)
                            )
                    )
@@ -321,7 +324,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
         # local clocks are bound by epsilon
         s.add(
             ForAll(T0,
-                   Implies(And(T0 >= timestamps0[0], T0 <= timestamps0[-1]),
+                   Implies(And(T0 >= timestamps0[0], T0 < timestamps0[-1]),
                            And(c0(T0) - c1(T0) < eps, c0(T0) - c1(T0) > -eps)
                            )
                    )
@@ -329,7 +332,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
 
         # global clock to local clock mappings are ordered
         T1 = Real("T1")
-        s.add(ForAll(T0, ForAll(T1, Implies(T0 <= T1, And(c0(T0) < c0(T1), c1(T0) < c1(T1))))))
+        s.add(ForAll(T0, ForAll(T1, Implies(T0 < T1, And(c0(T0) < c0(T1), c1(T0) < c1(T1))))))
 
         # consistent cut flow
         # _flow = Function("c_flow", IntSort(), RealSort())
@@ -338,7 +341,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
         # addition
         s.add(
             ForAll(T0,
-                   Implies(And(T0 >= timestamps0[0], T0 <= timestamps0[-1]),
+                   Implies(And(T0 >= timestamps0[0], T0 < timestamps0[-1]),
                            c_flow(T0) == (sig0(ToInt(c0(T0))) + sig1(ToInt(c1(T0))))
                            )
                    )
@@ -346,11 +349,11 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
 
         # violation check
         v = Real("v")
-        s.add(And(v >= timestamps0[0], v <= timestamps0[-1]))
+        s.add(And(v >= timestamps0[0], v < timestamps0[-1]))
 
         s.add(
             Implies(
-                And(v >= timestamps0[0], v <= timestamps0[-1]),
+                And(v >= timestamps0[0], v < timestamps0[-1]),
                 z3Interpolate(c_flow, v) == 0
             )
         )
