@@ -254,7 +254,10 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
 
             if j >= 0 and j < len(data_0):
 
-                timestamps0.append(j)
+                # timestamps0.append(j)
+                for k in range(10):
+                    timestamps0.append(j + k)
+
 
                 s.add(sig0(j) == data_0[j][1])
 
@@ -275,7 +278,9 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
 
             if j >= 0 and j < len(data_1):
 
-                timestamps1.append(j)
+                # timestamps1.append(j)
+                for k in range(10):
+                    timestamps1.append(j + k)
 
                 s.add(sig1(j) == data_1[j][1])
 
@@ -301,43 +306,43 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c0(i) == (min(len(data_0), (max(0, ((i - eps) + j))))) for j in range(2 * int(eps) + 1)])
+                    Or([c0(i) == (min(len(data_0), (max(0, ((i - eps*10) + j))))) for j in range(2 * int(eps)*10 + 1)])
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
         )
-        s.add(
-            Not(
-                Or(
-                    c0(timestamps0[0]) == timestamps0[0] - 1,
-                    c0(timestamps0[-1]) == timestamps0[-1] + 1,
-                )
-            )
-        )
+        # s.add(
+        #     Not(
+        #         Or(
+        #             c0(timestamps0[0]) == timestamps0[0] - 1,
+        #             c0(timestamps0[-1]) == timestamps0[-1] + 1,
+        #         )
+        #     )
+        # )
 
         c1 = Function("c1", IntSort(), IntSort())
         s.add(
             And(
                 [
-                    Or([c1(i) == (min(len(data_1), (max(0, ((i - eps) + j))))) for j in range(2 * int(eps) + 1)])
+                    Or([c1(i) == (min(len(data_1), (max(0, ((i - eps*10) + j))))) for j in range(2 * int(eps)*10 + 1)])
                     for i in range(timestamps1[0], timestamps1[-1] + 1)
                 ]
             )
         )
-        s.add(
-            Not(
-                Or(
-                    c1(timestamps1[0]) == timestamps1[0] - 1,
-                    c1(timestamps1[-1]) == timestamps1[-1] + 1,
-                )
-            )
-        )
+        # s.add(
+        #     Not(
+        #         Or(
+        #             c1(timestamps1[0]) == timestamps1[0] - 1,
+        #             c1(timestamps1[-1]) == timestamps1[-1] + 1,
+        #         )
+        #     )
+        # )
 
         # local clocks are bound by epsilon
         s.add(
             And(
                 [
-                    And(c0(i) - c1(i) <= eps, c0(i) - c1(i) >= -eps)
+                    And(c0(i) - c1(i) < eps, c0(i) - c1(i) > -eps)
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -450,7 +455,9 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
 
             if j >= 0 and j < len(data_0):
 
-                timestamps0.append(j)
+                # timestamps0.append(j)
+                for k in range(10):
+                    timestamps0.append(j + k)
 
                 s.add(sig0(j) == data_0[j][1])
 
@@ -471,7 +478,9 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
 
             if j >= 0 and j < len(data_1):
 
-                timestamps1.append(j)
+                # timestamps1.append(j)
+                for k in range(10):
+                    timestamps1.append(j + k)
 
                 s.add(sig1(j) == data_1[j][1])
 
@@ -497,43 +506,43 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c0(i) == (min(len(data_0), (max(0, ((i - eps) + j))))) for j in range(2 * int(eps) + 1)])
+                    Or([c0(i) == (min(len(data_0), (max(0, ((i - eps*10) + j))))) for j in range(2 * int(eps)*10 + 1)])
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
         )
-        s.add(
-            Not(
-                Or(
-                    c0(timestamps0[0]) == timestamps0[0] - 1,
-                    c0(timestamps0[-1]) == timestamps0[-1] + 1,
-                )
-            )
-        )
+        # s.add(
+        #     Not(
+        #         Or(
+        #             c0(timestamps0[0]) == timestamps0[0] - 1,
+        #             c0(timestamps0[-1]) == timestamps0[-1] + 1,
+        #         )
+        #     )
+        # )
 
         c1 = Function("c1", IntSort(), IntSort())
         s.add(
             And(
                 [
-                    Or([c1(i) == (min(len(data_1), (max(0, ((i - eps) + j))))) for j in range(2 * int(eps) + 1)])
+                    Or([c1(i) == (min(len(data_1), (max(0, ((i - eps*10) + j))))) for j in range(2 * int(eps)*10 + 1)])
                     for i in range(timestamps1[0], timestamps1[-1] + 1)
                 ]
             )
         )
-        s.add(
-            Not(
-                Or(
-                    c1(timestamps1[0]) == timestamps1[0] - 1,
-                    c1(timestamps1[-1]) == timestamps1[-1] + 1,
-                )
-            )
-        )
+        # s.add(
+        #     Not(
+        #         Or(
+        #             c1(timestamps1[0]) == timestamps1[0] - 1,
+        #             c1(timestamps1[-1]) == timestamps1[-1] + 1,
+        #         )
+        #     )
+        # )
 
         # local clocks are bound by epsilon
         s.add(
             And(
                 [
-                    And(c0(i) - c1(i) <= eps, c0(i) - c1(i) >= -eps)
+                    And(c0(i) - c1(i) < eps, c0(i) - c1(i) > -eps)
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -570,7 +579,7 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
 
         # violation check
         v = Int("v")
-        s.add(And(v >= timestamps0[0], v < timestamps0[-1]))
+        s.add(And(v >= timestamps0[0], v <= timestamps0[-1]))
 
         s.add(
             ForAll(v,
@@ -585,7 +594,7 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
 
             m = s.model()
             # out = "%s %s" % (m[test], m[test2])
-            print(m)
+            # print(m)
             print("unsat in segment", i)
 
             # terminate after unsat
