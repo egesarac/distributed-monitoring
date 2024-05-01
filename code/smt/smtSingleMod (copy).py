@@ -258,7 +258,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
                 timestamps0.append(j)
 
                 # s.add(sig0(j) == data_0[j][1])
-                s.add(ForAll(t, Implies(And(t >= j, t < j + 1), sig0(t) == data_0[j][1])))
+                # s.add(ForAll(t, Implies(And(t >= j, t < j + 1), sig0(t) == data_0[j][1])))
 
                 if j > (i * segDur):
 
@@ -267,6 +267,19 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
                 if j == sigDur:
 
                     entryFound = False
+
+        s.add(
+            ForAll(
+                t,
+                And(
+                    [
+                        Implies(And(t >= j, t < j + 1), sig0(t) == data_0[j][1])
+                        for j in range(0, len(data_0) - 1)
+                    ]
+                )
+            )
+        )
+
 
         timestamps1 = []
 
@@ -280,7 +293,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
                 timestamps1.append(j)
 
                 # s.add(sig1(j) == data_1[j][1])
-                s.add(ForAll(t, Implies(And(t >= j, t < j + 1), sig1(t) == data_1[j][1])))
+                # s.add(ForAll(t, Implies(And(t >= j, t < j + 1), sig1(t) == data_1[j][1])))
 
                 if j > (i * segDur):
 
@@ -289,6 +302,18 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
                 if j == sigDur:
 
                     entryFound = False
+
+        s.add(
+            ForAll(
+                t,
+                And(
+                    [
+                        Implies(And(t >= j, t < j + 1), sig1(t) == data_1[j][1])
+                        for j in range(0, len(data_0) - 1)
+                    ]
+                )
+            )
+        )
 
         if not entryFound:
 
@@ -301,48 +326,34 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
 
         # global clock to local clock mappings
         c0 = Function("c0", RealSort(), RealSort())
-        
-        T0 = Real("T0")
-        s.add(
-            ForAll(T0,
-                   Implies(And(T0 >= timestamps0[0], T0 < timestamps0[-1]),
-                           And(c0(T0) < T0 + eps, c0(T0) > T0 - eps)
-                           )
-                   )
-        )
-
-
         c1 = Function("c1", RealSort(), RealSort())
+        
+        T = Real("T")
         s.add(
-            ForAll(T0,
-                   Implies(And(T0 >= timestamps0[0], T0 < timestamps0[-1]),
-                           And(c1(T0) < T0 + eps, c1(T0) > T0 - eps)
-                           )
+            ForAll(T,
+                   Implies(And(T >= timestamps0[0], T < timestamps0[-1]),
+                           And(c0(T) < T + eps, c0(T) > T - eps, c1(T) < T + eps, c1(T) > T - eps, c0(T) - c1(T) < eps, c0(T) - c1(T) > -eps)
                    )
+            )
         )
 
-        # local clocks are bound by epsilon
-        s.add(
-            ForAll(T0,
-                   Implies(And(T0 >= timestamps0[0], T0 < timestamps0[-1]),
-                           And(c0(T0) - c1(T0) < eps, c0(T0) - c1(T0) > -eps)
-                           )
-                   )
-        )
+
 
         # global clock to local clock mappings are ordered
+        T0 = Real("T0")
         T1 = Real("T1")
-        s.add(ForAll(T0, ForAll(T1, Implies(T0 < T1, And(c0(T0) < c0(T1), c1(T0) < c1(T1))))))
+        s.add(ForAll(T0, ForAll(T1, Implies(And(T0 >= timestamps0[0], T0 < timestamps0[-1], T1 >= timestamps0[0], T1 < timestamps0[-1], T0 < T1), And(c0(T0) < c0(T1), c1(T0) < c1(T1))))))
 
         # consistent cut flow
         # _flow = Function("c_flow", IntSort(), RealSort())
         c_flow = Function("c_flow", RealSort(), IntSort())
 
         # addition
+        TT = Real("TT")
         s.add(
-            ForAll(T0,
-                   Implies(And(T0 >= timestamps0[0], T0 < timestamps0[-1]),
-                           c_flow(T0) == (sig0(ToInt(c0(T0))) + sig1(ToInt(c1(T0))))
+            ForAll(TT,
+                   Implies(And(TT >= timestamps0[0], TT < timestamps0[-1]),
+                           c_flow(TT) == (sig0(ToInt(c0(TT))) + sig1(ToInt(c1(TT))))
                            )
                    )
         )
@@ -1098,7 +1109,7 @@ def main():
     repeat = 1
     eps = 1
     # read data from files
-    d = 4
+    d = 2
     # id = 9
     data_0 = getDataTest(1)
     # data_0 = getData(d, id)
