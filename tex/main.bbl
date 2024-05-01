@@ -1,0 +1,11 @@
+\begin{thebibliography}{1}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\providecommand{\doi}[1]{https://doi.org/#1}
+
+\bibitem{MalerN13}
+Maler, O., Nickovic, D.: Monitoring properties of analog and mixed-signal
+  circuits. Int. J. Softw. Tools Technol. Transf.  \textbf{15}(3),  247--268
+  (2013). \doi{10.1007/s10009-012-0247-9}
+
+\end{thebibliography}

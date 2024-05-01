@@ -13,10 +13,10 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
     s = Solver
 
     pad = min(2 * eps, len(data_0) - 1)
-    global_eps = pad * eps
+    peps = pad * eps
 
     # initialize signal duration and segment duration
-    sigDur = len(data_0)
+    sigDur = len(data_0) - 1
     segDur = sigDur / segCount
 
     # check for edge cases
@@ -59,12 +59,11 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
 
         for j in range((segmentLowerBound + 0), (segmentUpperBound + 1)):
 
-            if j >= 0 and j < len(data_0):
+            if j >= 0 and j < len(data_0) - 1:
 
                 for k in range(pad):
-                    timestamps0.append(j + k)
-
-                s.add(sig0(j) == data_0[j][1])
+                    timestamps0.append(j * pad + k)
+                    s.add(sig0(j * pad + k) == data_0[j][1])
 
                 if j > (i * segDur):
 
@@ -81,12 +80,11 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
 
         for j in range((segmentLowerBound + 0), (segmentUpperBound + 1)):
 
-            if j >= 0 and j < len(data_1):
+            if j >= 0 and j < len(data_1) - 1:
 
                 for k in range(pad):
-                    timestamps1.append(j + k)
-
-                s.add(sig1(j) == data_1[j][1])
+                    timestamps1.append(j * pad + k)
+                    s.add(sig1(j * pad + k) == data_1[j][1])
 
                 if j > (i * segDur):
 
@@ -111,7 +109,7 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c0(i) == (min(len(data_0), (max(0, ((i - global_eps) + j))))) for j in range(2 * int(global_eps) + 1)])
+                    Or([c0(i) == (min(len(data_0), (max(0, ((i - peps) + j))))) for j in range(2 * int(peps) + 1)])
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -121,7 +119,7 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c1(i) == (min(len(data_1), (max(0, ((i - global_eps) + j))))) for j in range(2 * int(global_eps) + 1)])
+                    Or([c1(i) == (min(len(data_1), (max(0, ((i - peps) + j))))) for j in range(2 * int(peps) + 1)])
                     for i in range(timestamps1[0], timestamps1[-1] + 1)
                 ]
             )
@@ -131,7 +129,7 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    And(c0(i) - c1(i) < eps, c0(i) - c1(i) > -eps)
+                    And(c0(i) - c1(i) < peps, c0(i) - c1(i) > -peps)
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -143,7 +141,7 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
                 [
                     And(
                         [
-                            Implies(i <= j, And(c0(i) <= c0(j), c1(i) <= c1(j)))
+                            Implies(i < j, And(c0(i) < c0(j), c1(i) < c1(j)))
                             for j in range(timestamps0[0], timestamps0[-1] + 1)
                         ]
                     )
@@ -205,10 +203,10 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
     s = Solver
 
     pad = min(2 * eps, len(data_0) - 1)
-    global_eps = pad * eps
+    peps = pad * eps
 
     # initialize signal duration and segment duration
-    sigDur = len(data_0)
+    sigDur = len(data_0) - 1
     segDur = sigDur / segCount
 
     # check for edge cases
@@ -251,12 +249,11 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
 
         for j in range((segmentLowerBound + 0), (segmentUpperBound + 1)):
 
-            if j >= 0 and j < len(data_0):
+            if j >= 0 and j < len(data_0) - 1:
 
                 for k in range(pad):
-                    timestamps0.append(j + k)
-
-                s.add(sig0(j) == data_0[j][1])
+                    timestamps0.append(j * pad + k)
+                    s.add(sig0(j * pad + k) == data_0[j][1])
 
                 if j > (i * segDur):
 
@@ -273,12 +270,11 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
 
         for j in range((segmentLowerBound + 0), (segmentUpperBound + 1)):
 
-            if j >= 0 and j < len(data_1):
+            if j >= 0 and j < len(data_1) - 1:
 
                 for k in range(pad):
-                    timestamps1.append(j + k)
-
-                s.add(sig1(j) == data_1[j][1])
+                    timestamps1.append(j * pad + k)
+                    s.add(sig1(j * pad + k) == data_1[j][1])
 
                 if j > (i * segDur):
 
@@ -303,7 +299,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c0(i) == (min(len(data_0), (max(0, ((i - global_eps) + j))))) for j in range(2 * int(global_eps) + 1)])
+                    Or([c0(i) == (min(len(data_0), (max(0, ((i - peps) + j))))) for j in range(2 * int(peps) + 1)])
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -313,7 +309,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c1(i) == (min(len(data_1), (max(0, ((i - global_eps) + j))))) for j in range(2 * int(global_eps) + 1)])
+                    Or([c1(i) == (min(len(data_1), (max(0, ((i - peps) + j))))) for j in range(2 * int(peps) + 1)])
                     for i in range(timestamps1[0], timestamps1[-1] + 1)
                 ]
             )
@@ -323,7 +319,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    And(c0(i) - c1(i) < eps, c0(i) - c1(i) > -eps)
+                    And(c0(i) - c1(i) < peps, c0(i) - c1(i) > -peps)
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -335,7 +331,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
                 [
                     And(
                         [
-                            Implies(i <= j, And(c0(i) <= c0(j), c1(i) <= c1(j)))
+                            Implies(i < j, And(c0(i) < c0(j), c1(i) < c1(j)))
                             for j in range(timestamps0[0], timestamps0[-1] + 1)
                         ]
                     )
@@ -396,7 +392,7 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
     s = Solver
 
     pad = min(2 * eps, len(data_0) - 1)
-    global_eps = pad * eps
+    peps = pad * eps
 
     # initialize signal duration and segment duration
     sigDur = len(data_0) - 1
@@ -442,12 +438,11 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
 
         for j in range((segmentLowerBound + 0), (segmentUpperBound + 1)):
 
-            if j >= 0 and j < len(data_0):
+            if j >= 0 and j < len(data_0) - 1:
 
                 for k in range(pad):
-                    timestamps0.append(j + k)
-
-                s.add(sig0(j) == data_0[j][1])
+                    timestamps0.append(j * pad + k)
+                    s.add(sig0(j * pad + k) == data_0[j][1])
 
                 if j > (i * segDur):
 
@@ -464,12 +459,11 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
 
         for j in range((segmentLowerBound + 0), (segmentUpperBound + 1)):
 
-            if j >= 0 and j < len(data_1):
+            if j >= 0 and j < len(data_1) - 1:
 
                 for k in range(pad):
-                    timestamps1.append(j + k)
-
-                s.add(sig1(j) == data_1[j][1])
+                    timestamps1.append(j * pad + k)
+                    s.add(sig1(j * pad + k) == data_1[j][1])
 
                 if j > (i * segDur):
 
@@ -494,7 +488,7 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c0(i) == (min(len(data_0), (max(0, ((i - global_eps) + j))))) for j in range(2 * int(global_eps) + 1)])
+                    Or([c0(i) == (min(len(data_0), (max(0, ((i - peps) + j))))) for j in range(2 * int(peps) + 1)])
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -504,7 +498,7 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c1(i) == (min(len(data_1), (max(0, ((i - global_eps) + j))))) for j in range(2 * int(global_eps) + 1)])
+                    Or([c1(i) == (min(len(data_1), (max(0, ((i - peps) + j))))) for j in range(2 * int(peps) + 1)])
                     for i in range(timestamps1[0], timestamps1[-1] + 1)
                 ]
             )
@@ -514,7 +508,7 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    And(c0(i) - c1(i) < eps, c0(i) - c1(i) > -eps)
+                    And(c0(i) - c1(i) < peps, c0(i) - c1(i) > -peps)
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -526,7 +520,7 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
                 [
                     And(
                         [
-                            Implies(i <= j, And(c0(i) <= c0(j), c1(i) <= c1(j)))
+                            Implies(i < j, And(c0(i) < c0(j), c1(i) < c1(j)))
                             for j in range(timestamps0[0], timestamps0[-1] + 1)
                         ]
                     )

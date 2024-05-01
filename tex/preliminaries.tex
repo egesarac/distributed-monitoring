@@ -122,7 +122,7 @@ We assume that the system is \emph{partially synchronous}: the agents use a cloc
 \alert{
 We assume that signals have \emph{bounded variability} with respect to the global clock: for each signal $x_i$ and every pair $(t, x_i(t)), (t', x_i(t')) \in E_i$ of edges, we have $|c_j^{-1}(t) - c_j^{-1}(t')| \geq \delta$ where $\delta \in \R_{\geq 0}$ is the variability bound.
 }
-\ege{This definition made sense when we defined partial synchrony with respect to the global clock. It seems off with the pairwise definition of partial synchrony. Do we even use this assumption now? Maybe we can assume equally spaced edges for the theoretical analysis?}
+\ege{This definition made sense when we defined partial synchrony with respect to the global clock. It seems off with the pairwise definition of partial synchrony. Do we even use this assumption now? Maybe we can assume equally spaced edges for the theoretical analysis and epsilon in relation to sampling frequency?}
 
 \begin{definition} \label{defn:hb}
 	A \emph{distributed signal} is a pair $(S, {\hb})$, where $S = (x_1, \ldots, x_n)$ is a vector of 
