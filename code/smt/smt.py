@@ -15,6 +15,30 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
     pad = min(2 * eps, len(data_0) - 1)
     peps = pad * eps
 
+    var_0 = [0]
+    for i in range(1, len(data_0) - 1):
+        if (data_0[i][1] != data_0[i - 1][1]):
+            var_0.append(i * pad)
+    var_0.append((len(data_0) - 1) * pad)
+    
+    
+    var_1 = [0]
+    for i in range(1, len(data_1) - 1):
+        if (data_1[i][1] != data_1[i - 1][1]):
+            var_1.append(i * pad)
+    var_1.append((len(data_1) - 1) * pad)
+
+
+    # var_0 = 0
+    # for i in range(1, len(data_0)):
+    #     if (data_0[i][1] != data_0[i - 1][1]):
+    #         var_0 += 1
+
+    # var_1 = 0
+    # for i in range(1, len(data_1)):
+    #     if (data_1[i][1] != data_1[i - 1][1]):
+    #         var_1 += 1
+
     # initialize signal duration and segment duration
     sigDur = len(data_0) - 1
     segDur = sigDur / segCount
@@ -117,19 +141,6 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
                 ]
             )
         )
-        s.add(
-            And(
-                [
-                    Or(
-                        [
-                            And(i * pad <= c0(j), c0(j) < (i + 1) * pad)
-                            for j in range(timestamps0[0], timestamps0[-1] + 1)
-                        ]
-                    )
-                    for i in range(len(data_0) - 1)
-                ]
-            )
-        )
 
         c1 = Function("c1", IntSort(), IntSort())
         s.add(
@@ -140,19 +151,59 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
                 ]
             )
         )
+        
+        # retiming preserves signal variability
         s.add(
             And(
                 [
                     Or(
                         [
-                            And(i * pad <= c1(j), c1(j) < (i + 1) * pad)
+                            And(var_0[i] <= c0(j), c0(j) < var_0[i + 1])
                             for j in range(timestamps0[0], timestamps0[-1] + 1)
                         ]
                     )
-                    for i in range(len(data_1) - 1)
+                    for i in range(len(var_0) - 1)
                 ]
             )
         )
+
+        s.add(
+            And(
+                [
+                    Or(
+                        [
+                            And(var_1[i] <= c1(j), c1(j) < var_1[i + 1])
+                            for j in range(timestamps0[0], timestamps0[-1] + 1)
+                        ]
+                    )
+                    for i in range(len(var_1) - 1)
+                ]
+            )
+        )
+
+        # x0 = Function("x0", IntSort(), IntSort())
+        # s.add(x0(0) == 0)
+        # s.add(
+        #     And(
+        #         [
+        #             x0(i) == x0(i - 1) + ((sig0(c0(i - 1)) + sig0(c0(i))) % 2)
+        #             for i in range(timestamps0[0] + 1, timestamps0[-1] + 1)
+        #         ]
+        #     )
+        # )
+        # s.add(x0(timestamps0[-1]) == var_0)
+
+        # x1 = Function("x1", IntSort(), IntSort())
+        # s.add(x1(0) == 0)
+        # s.add(
+        #     And(
+        #         [
+        #             x1(i) == x1(i - 1) + ((sig1(c1(i - 1)) + sig1(c1(i))) % 2)
+        #             for i in range(timestamps1[0] + 1, timestamps1[-1] + 1)
+        #         ]
+        #     )
+        # )
+        # s.add(x1(timestamps1[-1]) == var_1)
 
         # local clocks are bound by epsilon
         s.add(
@@ -235,6 +286,16 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
     pad = min(2 * eps, len(data_0) - 1)
     peps = pad * eps
 
+    var_0 = 0
+    for i in range(1, len(data_0)):
+        if (data_0[i][1] != data_0[i - 1][1]):
+            var_0 += 1
+
+    var_1 = 0
+    for i in range(1, len(data_1)):
+        if (data_1[i][1] != data_1[i - 1][1]):
+            var_1 += 1
+
     # initialize signal duration and segment duration
     sigDur = len(data_0) - 1
     segDur = sigDur / segCount
@@ -332,21 +393,8 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c0(i) == (min(len(data_0), (max(0, ((i - peps) + j))))) for j in range(1, 2 * int(peps))])
+                    Or([c0(i) == (min(timestamps0[-1], (max(0, ((i - peps) + j))))) for j in range(1, 2 * int(peps))])
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
-                ]
-            )
-        )
-        s.add(
-            And(
-                [
-                    Or(
-                        [
-                            And(i * pad <= c0(j), c0(j) < (i + 1) * pad)
-                            for j in range(timestamps0[0], timestamps0[-1] + 1)
-                        ]
-                    )
-                    for i in range(len(data_0) - 1)
                 ]
             )
         )
@@ -355,24 +403,36 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c1(i) == (min(len(data_1), (max(0, ((i - peps) + j))))) for j in range(1, 2 * int(peps))])
+                    Or([c1(i) == (min(timestamps1[-1], (max(0, ((i - peps) + j))))) for j in range(1, 2 * int(peps))])
                     for i in range(timestamps1[0], timestamps1[-1] + 1)
                 ]
             )
         )
+        
+        # retiming preserves signal variability
+        x0 = Function("x0", IntSort(), IntSort())
+        s.add(x0(0) == 0)
         s.add(
             And(
                 [
-                    Or(
-                        [
-                            And(i * pad <= c1(j), c1(j) < (i + 1) * pad)
-                            for j in range(timestamps0[0], timestamps0[-1] + 1)
-                        ]
-                    )
-                    for i in range(len(data_1) - 1)
+                    x0(i) == x0(i - 1) + ((sig0(c0(i - 1)) + sig0(c0(i))) % 2)
+                    for i in range(timestamps0[0] + 1, timestamps0[-1] + 1)
                 ]
             )
         )
+        s.add(x0(timestamps0[-1]) == var_0)
+
+        x1 = Function("x1", IntSort(), IntSort())
+        s.add(x1(0) == 0)
+        s.add(
+            And(
+                [
+                    x1(i) == x1(i - 1) + ((sig1(c1(i - 1)) + sig1(c1(i))) % 2)
+                    for i in range(timestamps1[0] + 1, timestamps1[-1] + 1)
+                ]
+            )
+        )
+        s.add(x1(timestamps1[-1]) == var_1)
 
         # local clocks are bound by epsilon
         s.add(
@@ -453,6 +513,16 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
     pad = min(2 * eps, len(data_0) - 1)
     peps = pad * eps
 
+    var_0 = 0
+    for i in range(1, len(data_0)):
+        if (data_0[i][1] != data_0[i - 1][1]):
+            var_0 += 1
+
+    var_1 = 0
+    for i in range(1, len(data_1)):
+        if (data_1[i][1] != data_1[i - 1][1]):
+            var_1 += 1
+
     # initialize signal duration and segment duration
     sigDur = len(data_0) - 1
     segDur = sigDur / segCount
@@ -550,21 +620,8 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c0(i) == (min(len(data_0), (max(0, ((i - peps) + j))))) for j in range(1, 2 * int(peps))])
+                    Or([c0(i) == (min(timestamps0[-1], (max(0, ((i - peps) + j))))) for j in range(1, 2 * int(peps))])
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
-                ]
-            )
-        )
-        s.add(
-            And(
-                [
-                    Or(
-                        [
-                            And(i * pad <= c0(j), c0(j) < (i + 1) * pad)
-                            for j in range(timestamps0[0], timestamps0[-1] + 1)
-                        ]
-                    )
-                    for i in range(len(data_0) - 1)
                 ]
             )
         )
@@ -573,30 +630,42 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c1(i) == (min(len(data_1), (max(0, ((i - peps) + j))))) for j in range(1, 2 * int(peps))])
+                    Or([c1(i) == (min(timestamps1[-1], (max(0, ((i - peps) + j))))) for j in range(1, 2 * int(peps))])
                     for i in range(timestamps1[0], timestamps1[-1] + 1)
                 ]
             )
         )
+        
+        # retiming preserves signal variability
+        x0 = Function("x0", IntSort(), IntSort())
+        s.add(x0(0) == 0)
         s.add(
             And(
                 [
-                    Or(
-                        [
-                            And(i * pad <= c1(j), c1(j) < (i + 1) * pad)
-                            for j in range(timestamps0[0], timestamps0[-1] + 1)
-                        ]
-                    )
-                    for i in range(len(data_1) - 1)
+                    x0(i) == x0(i - 1) + ((sig0(c0(i - 1)) + sig0(c0(i))) % 2)
+                    for i in range(timestamps0[0] + 1, timestamps0[-1] + 1)
                 ]
             )
         )
+        s.add(x0(timestamps0[-1]) == var_0)
+
+        x1 = Function("x1", IntSort(), IntSort())
+        s.add(x1(0) == 0)
+        s.add(
+            And(
+                [
+                    x1(i) == x1(i - 1) + ((sig1(c1(i - 1)) + sig1(c1(i))) % 2)
+                    for i in range(timestamps1[0] + 1, timestamps1[-1] + 1)
+                ]
+            )
+        )
+        s.add(x1(timestamps1[-1]) == var_1)
 
         # local clocks are bound by epsilon
         s.add(
             And(
                 [
-                    And(c0(i) - c1(i) < peps, c0(i) - c1(i) > -peps)
+                    And(c0(i) - c1(i) <= peps, c0(i) - c1(i) >= -peps)
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -674,6 +743,16 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
     pad = min(2 * eps, len(data_0) - 1)
     peps = pad * eps
 
+    var_0 = 0
+    for i in range(1, len(data_0)):
+        if (data_0[i][1] != data_0[i - 1][1]):
+            var_0 += 1
+
+    var_1 = 0
+    for i in range(1, len(data_1)):
+        if (data_1[i][1] != data_1[i - 1][1]):
+            var_1 += 1
+
     # initialize signal duration and segment duration
     sigDur = len(data_0) - 1
     segDur = sigDur / segCount
@@ -771,21 +850,8 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c0(i) == (min(len(data_0), (max(0, ((i - peps) + j))))) for j in range(1, 2 * int(peps))])
+                    Or([c0(i) == (min(timestamps0[-1], (max(0, ((i - peps) + j))))) for j in range(1, 2 * int(peps))])
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
-                ]
-            )
-        )
-        s.add(
-            And(
-                [
-                    Or(
-                        [
-                            And(i * pad <= c0(j), c0(j) < (i + 1) * pad)
-                            for j in range(timestamps0[0], timestamps0[-1] + 1)
-                        ]
-                    )
-                    for i in range(len(data_0) - 1)
                 ]
             )
         )
@@ -794,30 +860,42 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    Or([c1(i) == (min(len(data_1), (max(0, ((i - peps) + j))))) for j in range(1, 2 * int(peps))])
+                    Or([c1(i) == (min(timestamps1[-1], (max(0, ((i - peps) + j))))) for j in range(1, 2 * int(peps))])
                     for i in range(timestamps1[0], timestamps1[-1] + 1)
                 ]
             )
         )
+        
+        # retiming preserves signal variability
+        x0 = Function("x0", IntSort(), IntSort())
+        s.add(x0(0) == 0)
         s.add(
             And(
                 [
-                    Or(
-                        [
-                            And(i * pad <= c1(j), c1(j) < (i + 1) * pad)
-                            for j in range(timestamps0[0], timestamps0[-1] + 1)
-                        ]
-                    )
-                    for i in range(len(data_1) - 1)
+                    x0(i) == x0(i - 1) + ((sig0(c0(i - 1)) + sig0(c0(i))) % 2)
+                    for i in range(timestamps0[0] + 1, timestamps0[-1] + 1)
                 ]
             )
         )
+        s.add(x0(timestamps0[-1]) == var_0)
+
+        x1 = Function("x1", IntSort(), IntSort())
+        s.add(x1(0) == 0)
+        s.add(
+            And(
+                [
+                    x1(i) == x1(i - 1) + ((sig1(c1(i - 1)) + sig1(c1(i))) % 2)
+                    for i in range(timestamps1[0] + 1, timestamps1[-1] + 1)
+                ]
+            )
+        )
+        s.add(x1(timestamps1[-1]) == var_1)
 
         # local clocks are bound by epsilon
         s.add(
             And(
                 [
-                    And(c0(i) - c1(i) < peps, c0(i) - c1(i) > -peps)
+                    And(c0(i) - c1(i) <= peps, c0(i) - c1(i) >= -peps)
                     for i in range(timestamps0[0], timestamps0[-1] + 1)
                 ]
             )
@@ -1202,7 +1280,7 @@ def main():
     repeat = 1
 
     for d in (4, 8, 16, 32):
-        for eps in (1, 2, 4, 8):
+        for eps in (4, 8):
             if d < eps:
                 continue
             
@@ -1211,10 +1289,10 @@ def main():
                 flagneg = False
                 out = "0"
                 outneg = "0"
-                data_0 = getDataTest(1)
-                data_1 = getDataTest(2)
-                # data_0 = getData(d, c)
-                # data_1 = getData(d, c + 100)
+                # data_0 = getDataTest(1)
+                # data_1 = getDataTest(2)
+                data_0 = getData(d, c)
+                data_1 = getData(d, c + 100)
 
                 prep_time = 0
                 eval_time = 0
@@ -1224,13 +1302,13 @@ def main():
                     data0 = preprocess(data_0, d)
                     data1 = preprocess(data_1, d)
                     t1 = time.time()
-                    # flag = prog_always_conjunction(eps, 1, data0, data1) # d / min(d, 8)
-                    flag = prog_always_disjunction(eps, 1, data0, data1)
+                    flag = prog_always_conjunction(eps, 1, data0, data1) # d / min(d, 8)
+                    # flag = prog_always_disjunction(eps, 1, data0, data1)
                     # flag = prog_eventually_conjunction(eps, 1, data0, data1)
                     # flag = prog_eventually_disjunction(eps, 1, data0, data1)
                     t2 = time.time()
-                    # flagneg = prog_eventually_disjunction(eps, 1, negate(data0), negate(data1))
-                    flagneg = prog_eventually_conjunction(eps, 1, negate(data0), negate(data1))
+                    flagneg = prog_eventually_disjunction(eps, 1, negate(data0), negate(data1))
+                    # flagneg = prog_eventually_conjunction(eps, 1, negate(data0), negate(data1))
                     # flagneg = prog_always_disjunction(eps, 1, negate(data0), negate(data1))
                     # flagneg = prog_always_conjunction(eps, 1, negate(data0), negate(data1))
                     t3 = time.time()

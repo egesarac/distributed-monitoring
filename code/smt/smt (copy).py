@@ -188,6 +188,7 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
             )
         )
 
+        print(s.assertions())
         if s.check() == sat:
 
             m = s.model()
@@ -1139,7 +1140,7 @@ def negate(data):
 
 def main():
     # set repeat count for confidence interval
-    repeat = 1    
+    repeat = 1
 
     for d in (4, 8, 16, 32):
         for eps in (1, 2, 4, 8):
@@ -1151,30 +1152,34 @@ def main():
                 flagneg = False
                 out = "0"
                 outneg = "0"
+                # data_0 = getDataTest(1)
+                # data_1 = getDataTest(2)
                 data_0 = getData(d, c)
                 data_1 = getData(d, c + 100)
 
-                total_time = 0
+                prep_time = 0
+                eval_time = 0
+                neg_time = 0
                 for i in range(repeat):
-                    start = time.time()
+                    t0 = time.time()
                     data0 = preprocess(data_0, d)
                     data1 = preprocess(data_1, d)
-                    
+                    t1 = time.time()
                     flag = prog_always_conjunction(eps, 1, data0, data1) # d / min(d, 8)
-                    flagneg = prog_eventually_disjunction(eps, 1, negate(data0), negate(data1))
-
                     # flag = prog_always_disjunction(eps, 1, data0, data1)
-                    # flagneg = prog_eventually_conjunction(eps, 1, negate(data0), negate(data1))
-
                     # flag = prog_eventually_conjunction(eps, 1, data0, data1)
-                    # flagneg = prog_always_disjunction(eps, 1, negate(data0), negate(data1))
-
                     # flag = prog_eventually_disjunction(eps, 1, data0, data1)
+                    t2 = time.time()
+                    flagneg = prog_eventually_disjunction(eps, 1, negate(data0), negate(data1))
+                    # flagneg = prog_eventually_conjunction(eps, 1, negate(data0), negate(data1))
+                    # flagneg = prog_always_disjunction(eps, 1, negate(data0), negate(data1))
                     # flagneg = prog_always_conjunction(eps, 1, negate(data0), negate(data1))
+                    t3 = time.time()
 
-                    #flag = prog_until(eps, 1, data0, data1)
-                    end = time.time()
-                    total_time += end - start
+                    prep_time += t1 - t0 
+                    eval_time += t2 - t1 
+                    neg_time += t3 - t2
+
                 
                 if (flag):
                     out = "1"
@@ -1182,7 +1187,7 @@ def main():
                     outneg = "1"
             
 
-                line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str(total_time / repeat) + " " + out + " " + outneg
+                line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str((prep_time + eval_time) / repeat) + " " + str((prep_time + neg_time) / repeat) + " " + out + " " + outneg
                 print(line)
                 results = open("results_ac_smt+neg.txt", "a")
                 results.write(line + "\n")
