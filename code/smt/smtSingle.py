@@ -382,7 +382,8 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
                 z3Interpolate(c_flow, v) == 0
             )
         )
-
+        
+        print(s.assertions())
         if s.check() == sat:
 
             m = s.model()
@@ -1119,7 +1120,7 @@ def main():
     eps = 1
     # read data from files
     d = 4
-    id = 12
+    id = 1
     # data_0 = getDataTest(1)
     data_0 = getData(d, id)
     # data_1 = getDataTest(2)
@@ -1131,10 +1132,10 @@ def main():
         data0 = preprocess(data_0, d)
         data1 = preprocess(data_1, d)
 
-        prog_always_conjunction(eps, 1, data0, data1)
-        prog_eventually_disjunction(eps, 1, negate(data0), negate(data1))
+        # prog_always_conjunction(eps, 1, data0, data1)
+        # prog_eventually_disjunction(eps, 1, negate(data0), negate(data1))
 
-        # prog_always_disjunction(eps, 1, data0, data1)
+        prog_always_disjunction(eps, 1, data0, data1)
         # prog_eventually_conjunction(eps, 1, negate(data0), negate(data1))
 
         # prog_eventually_conjunction(eps, 1, data0, data1)
