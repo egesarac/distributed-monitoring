@@ -754,14 +754,15 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
             )
         )
 
-        s.add(
-            And(
-                [
-                    Or(c0(i + 1) == c0(i), c0(i + 1) == c0(i) + 1)
-                    for i in range(timestamps_0[0], timestamps_0[-1])
-                ]
-            )
-        )
+        # CHECK
+        # s.add(
+        #     And(
+        #         [
+        #             Or(c0(i + 1) == c0(i), c0(i + 1) == c0(i) + 1)
+        #             for i in range(timestamps_0[0], timestamps_0[-1])
+        #         ]
+        #     )
+        # )
 
         # s.add(c0(timestamps_0[0]) >= segmentLowerBound)
 
@@ -788,14 +789,15 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
             )
         )
 
-        s.add(
-            And(
-                [
-                    Or(c1(i + 1) == c1(i), c1(i + 1) == c1(i) + 1)
-                    for i in range(timestamps_1[0], timestamps_1[-1])
-                ]
-            )
-        )
+        # CHECK
+        # s.add(
+        #     And(
+        #         [
+        #             Or(c1(i + 1) == c1(i), c1(i + 1) == c1(i) + 1)
+        #             for i in range(timestamps_1[0], timestamps_1[-1])
+        #         ]
+        #     )
+        # )
 
         
         # s.add(c1(timestamps_1[0]) >= segmentLowerBound)
@@ -1538,15 +1540,20 @@ def getData(d, setID):
     return data
 
 def preprocess(data, d):
+    temp = []
     for i in range(d):
         if data[i][1] > 0:
-            data[i][1] = 1.0
+            temp.append([i, 1.0])
+            # data[i][1] = 1.0
         else:
-            data[i][1] = 0.0
+            temp.append([i, 0.0])
+            # data[i][1] = 0.0
 
-    data.append([float(d), data[d-1][1]])
+    temp.append([float(d), data[d-1][1]])
+    # data.append([float(d), data[d-1][1]])
 
-    return data
+    return temp
+    # return data
 
 def negate(data):
     temp = []
@@ -1554,8 +1561,8 @@ def negate(data):
         temp.append([i, 1.0 - data[i][1]])
         # data[i][1] = 1.0 - data[i][1]
 
-    # return data
     return temp
+    # return data
 
 def main():
     # set repeat count for confidence interval
