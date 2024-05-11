@@ -24,7 +24,7 @@ int main()
     /* set variables */
     int n = 2;
     int d = 1000;
-    int eps = 50 * 2;
+    int eps = 50 * 4;
     int del = 1;
     /*
     long long a = 0;
@@ -68,17 +68,18 @@ int main()
         set<int> leaders = {0, 1, 2};
         vector<vector<set<string>>> valExprs = computeRelativeValueExpressions(leaders, signalsReal, uncertainties, segmentation);
         // vector<vector<set<string>>> valExprs = computeValueExpressions(signalsReal, uncertainties, segmentation);
-        cout << valExprs[0][10].size() << endl;
+        // cout << valExprs[0][10].size() << endl;
         vector<set<string>> vex = asyncProdStrDiffSqr(valExprs[0], valExprs[3]);
-        cout << vex[10].size() << endl;
+        // cout << vex[10].size() << endl;
         vector<set<string>> vey = asyncProdStrDiffSqr(valExprs[1], valExprs[4]);
-        cout << vey[10].size() << endl;
+        // cout << vey[10].size() << endl;
         vector<set<string>> vez = asyncProdStrDiffSqr(valExprs[2], valExprs[5]);
-        cout << vez[10].size() << endl;
+        // cout << vez[10].size() << endl;
         vector<set<string>> vexy = asyncProdStrSum(vex, vey);
-        cout << vexy[10].size() << endl;
+        // cout << vexy[10].size() << endl;
         vector<set<string>> vexyz = asyncProdStrSum(vexy, vez);
-        cout << vexyz[10].size() << endl;
+        // cout << vexyz[10].size() << endl;
+
         // skip the square root since the distance parameter is 0
         valExprs = {vexyz};
 

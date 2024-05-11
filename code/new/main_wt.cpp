@@ -17,14 +17,15 @@
 #include "functions.cpp"
 using namespace std;
 
-#define REP 5
+#define REP 30
 
 int main()
 {
     /* set variables */
-    int n = 3;
+    vector<long long> N{2, 3, 4};
+    vector<long long> EPS{1, 2, 4};
+    int k = 50;
     int d = 5000;
-    int eps = 50 * 8;
     int del = 0;
     /*
     long long a = 0;
@@ -32,6 +33,9 @@ int main()
     bool leftClosed = true;
     bool rightClosed = false;
     */
+   for (auto n : N) {
+    for (auto eps : EPS) {
+        eps = eps * k;
 
     /* read signal data */
     vector<vector<pair<long long, double>>> signalsReal(n);
@@ -89,13 +93,13 @@ int main()
         ////test = bitsetNegation(bitsetAlways(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))));
         // test = bitsetUntilStrict(aps[0], aps[1]);
         // test = bitsetBoundedEventually(aps[0], segmentation, a, b, leftClosed, rightClosed);
-
     }
     
     endtime = chrono::system_clock::now();
     totalTime += endtime - starttime;
 
     cout << d << " " << eps << " " << del << " " << numSegments << " " << (totalTime.count() / REP) / 1000 << " " << test[0][0].any() << " " << test[0][1].any() << endl;
-
+     }
+   }
     return 0;
 }

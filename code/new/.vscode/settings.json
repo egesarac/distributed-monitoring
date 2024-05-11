@@ -11,5 +11,6 @@
         "xstring": "cpp",
         "xutility": "cpp",
         "string": "cpp"
-    }
+    },
+    "cmake.configureOnOpen": true
 }
