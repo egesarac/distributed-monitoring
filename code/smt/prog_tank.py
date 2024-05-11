@@ -12,10 +12,7 @@ from z3.z3 import ForAll
 # set_param('parallel.enable', True)
 set_option(rational_to_decimal = True)
 
-def prog_tp2(eps, segCount):
-
-    data_0 = getDataTank(0)
-    data_1 = getDataTank(1)
+def prog_tp2(eps, segCount, data_0, data_1):
 
     # initialize z3 solver
     s = Solver()
@@ -297,11 +294,7 @@ def prog_tp2(eps, segCount):
 
     return flag
 
-def prog_tp3(eps, segCount):
-
-    data_0 = getDataTank(0)
-    data_1 = getDataTank(1)
-    data_2 = getDataTank(2)
+def prog_tp3(eps, segCount, data_0, data_1, data_2):
 
     # initialize z3 solver
     s = Solver()
@@ -698,12 +691,7 @@ def prog_tp3(eps, segCount):
 
     return flag
 
-def prog_tp4(eps, segCount):
-
-    data_0 = getDataTank(0)
-    data_1 = getDataTank(1)
-    data_2 = getDataTank(2)
-    data_3 = getDataTank(3)
+def prog_tp4(eps, segCount, data_0, data_1, data_2, data_3):
 
     # initialize z3 solver
     s = Solver()
@@ -1280,46 +1268,58 @@ def main():
             eps = eps * 0.05
 
             if (n == 2):
+                out = "0"
+                flag = False
+                data_0 = getDataTank(0)
+                data_1 = getDataTank(1)
+                t0 = time.time()
                 for i in range(repeat):
-                    out = "0"
-                    t0 = time.time()
-                    flag = prog_tp2(eps, 1)
-                    t1 = time.time()
-                    if (flag):
-                        out = "1"
-                    line = str(d) + " " + str(eps) + " " + str((t1 - t0) / repeat) + " " + out
-                    print(line)
-                    results = open("results_wt2.txt", "a")
-                    results.write(line + "\n")
-                    results.close()
+                    flag = prog_tp2(eps, 1, data_0, data_1)
+                t1 = time.time()
+                if (flag):
+                    out = "1"
+                line = str(d) + " " + str(eps) + " " + str((t1 - t0) / repeat) + " " + out
+                print(line)
+                results = open("results_wt2.txt", "a")
+                results.write(line + "\n")
+                results.close()
 
             elif (n == 3):
+                out = "0"
+                flag = False
+                data_0 = getDataTank(0)
+                data_1 = getDataTank(1)
+                data_2 = getDataTank(2)
+                t0 = time.time()
                 for i in range(repeat):
-                    out = "0"
-                    t0 = time.time()
-                    flag = prog_tp3(eps, 1)
-                    t1 = time.time()
-                    if (flag):
-                        out = "1"
-                    line = str(d) + " " + str(eps) + " " + str((t1 - t0) / repeat) + " " + out
-                    print(line)
-                    results = open("results_wt3.txt", "a")
-                    results.write(line + "\n")
-                    results.close()
+                    flag = prog_tp3(eps, 1, data_0, data_1, data_2)
+                t1 = time.time()
+                if (flag):
+                    out = "1"
+                line = str(d) + " " + str(eps) + " " + str((t1 - t0) / repeat) + " " + out
+                print(line)
+                results = open("results_wt3.txt", "a")
+                results.write(line + "\n")
+                results.close()
 
             elif (n == 4):
+                out = "0"
+                flag = False
+                data_0 = getDataTank(0)
+                data_1 = getDataTank(1)
+                data_2 = getDataTank(2)
+                data_3 = getDataTank(3)
+                t0 = time.time()
                 for i in range(repeat):
-                    out = "0"
-                    t0 = time.time()
-                    flag = prog_tp4(eps, 1)
-                    t1 = time.time()
-                    if (flag):
-                        out = "1"
-                    line = str(d) + " " + str(eps) + " " + str((t1 - t0) / repeat) + " " + out
-                    print(line)
-                    results = open("results_wt4.txt", "a")
-                    results.write(line + "\n")
-                    results.close()           
+                    flag = prog_tp4(eps, 1, data_0, data_1, data_2, data_3)
+                t1 = time.time()
+                if (flag):
+                    out = "1"
+                line = str(d) + " " + str(eps) + " " + str((t1 - t0) / repeat) + " " + out
+                print(line)
+                results = open("results_wt4.txt", "a")
+                results.write(line + "\n")
+                results.close()          
 
 if __name__ == "__main__":
     main()

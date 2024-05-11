@@ -17,7 +17,7 @@
 #include "functions.cpp"
 using namespace std;
 
-#define REP 30
+#define REP 50
 
 int main()
 {
@@ -41,7 +41,7 @@ int main()
     vector<vector<pair<long long, double>>> signalsReal(n);
     for (int i = 0; i < n; i++)
     {
-        signalsReal[i] = getData("data_re/wt/s5_tank_" + to_string(i));
+        signalsReal[i] = getData("data/wt/s5_tank_" + to_string(i));
     }
     
     /* prepare the bit masks */
