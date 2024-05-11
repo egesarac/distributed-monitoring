@@ -2636,6 +2636,146 @@ vector<long long> computeCanonicalSegmentation(const vector<vector<pair<long lon
     return segmentation;
 }
 
+vector<vector<set<string>>> computeRelativeValueExpressions(const set<int> &leaders, const vector<vector<pair<long long, double>>> &signals, const vector<vector<vector<long long>>> &uncertainties, const vector<long long> &segmentation)
+{
+    vector<vector<set<string>>> valExprs(signals.size());
+    int numSegments = segmentation.size() - 1;
+
+    for (auto leader : leaders) {
+        valExprs[leader].resize(numSegments);
+
+        for (int j = 0; j < numSegments; j++) 
+        {
+            set<string> temp;
+            temp.insert(""); // ??
+
+            string expr = "";
+
+            for (auto p : signals[leader])
+            {
+                if (segmentation[j] <= p.first) {
+                    if (p.first < segmentation[j + 1]) {
+                        expr += to_string(p.second) + ";";
+                    }
+                    else {
+                        break;
+                    }
+                }
+            }
+
+            if (expr == "") {
+                expr = to_string(signals[leader][signals[leader].size() - 1].second) + ";";
+            }
+
+            temp.insert(destutterStr(expr.substr(0, expr.length() - 1)));
+            valExprs[leader][j] = temp;
+        }
+    }
+
+
+    for (int i = 0; i < signals.size(); i++)
+        {
+            if (leaders.find(i) == leaders.end()) {
+                valExprs[i].resize(numSegments);
+
+                for (int j = 0; j < numSegments; j++)
+                {
+                    //valExprs[i][j].insert("");
+
+                    for (int k = 1; k < uncertainties[i].size(); k++)
+                    {
+                        if (segmentation[j] == uncertainties[i][k][0] && segmentation[j + 1] == uncertainties[i][k][1])
+                        {
+                            // entire expression
+                            set<string> temp;
+                            string expr;
+                            if (signals[i][k - 1].second == signals[i][k].second) {
+                                expr = to_string(signals[i][k - 1].second);
+                            }
+                            else
+                            {
+                                expr = to_string(signals[i][k - 1].second) + ";" + to_string(signals[i][k].second);
+                            }
+                            if (!(k < uncertainties[i].size() - 1 && uncertainties[i][k][0] == uncertainties[i][k + 1][0]))
+                                temp.insert("");
+                            temp.insert(expr);
+                            valExprs[i][j] = concatWithDestutter(valExprs[i][j], temp);
+                        }
+                        else if (segmentation[j] == uncertainties[i][k][0] && segmentation[j + 1] < uncertainties[i][k][1])
+                        {
+                            // prefix
+                            set<string> temp;
+                            string expr;
+                            if (signals[i][k - 1].second == signals[i][k].second) {
+                                expr = to_string(signals[i][k - 1].second);
+                            }
+                            else
+                            {
+                                expr = to_string(signals[i][k - 1].second) + ";" + to_string(signals[i][k].second);
+                            }
+                            if (!(k < uncertainties[i].size() - 1 && uncertainties[i][k][0] == uncertainties[i][k + 1][0]))
+                                temp.insert("");
+                            temp.insert(expr);
+                            temp.insert(expr.substr(0, expr.find(';')));
+                            valExprs[i][j] = concatWithDestutter(valExprs[i][j], temp);
+                        }
+                        else if (segmentation[j] > uncertainties[i][k][0] && segmentation[j + 1] == uncertainties[i][k][1])
+                        {
+                            // suffix
+                            set<string> temp;
+                            string expr;
+                            if (signals[i][k - 1].second == signals[i][k].second) {
+                                expr = to_string(signals[i][k - 1].second);
+                            }
+                            else
+                            {
+                                expr = to_string(signals[i][k - 1].second) + ";" + to_string(signals[i][k].second);
+                            }
+                            if (!(k < uncertainties[i].size() - 1 && uncertainties[i][k][0] == uncertainties[i][k + 1][0]))
+                                temp.insert("");
+                            temp.insert(expr);
+                            temp.insert(expr.substr(expr.find(';') + 1, expr.length()));
+                            valExprs[i][j] = concatWithDestutter(valExprs[i][j], temp);
+                        }
+                        else if (segmentation[j] > uncertainties[i][k][0] && segmentation[j + 1] < uncertainties[i][k][1])
+                        {
+                            // infix
+                            set<string> temp;
+                            string expr;
+                            if (signals[i][k - 1].second == signals[i][k].second) {
+                                expr = to_string(signals[i][k - 1].second);
+                            }
+                            else
+                            {
+                                expr = to_string(signals[i][k - 1].second) + ";" + to_string(signals[i][k].second);
+                            }
+                            if (!(k < uncertainties[i].size() - 1 && uncertainties[i][k][0] == uncertainties[i][k + 1][0]))
+                                temp.insert("");
+                            temp.insert(expr);
+                            temp.insert(expr.substr(0, expr.find(';')));
+                            temp.insert(expr.substr(expr.find(';') + 1, expr.length()));
+                            valExprs[i][j] = concatWithDestutter(valExprs[i][j], temp);
+                        }
+                    }
+
+                    if (valExprs[i][j].empty())
+                    {
+                        int kk = 1;
+                        while (kk < uncertainties[i].size() && uncertainties[i][kk][1] <= segmentation[j])
+                        {
+                            kk++;
+                        }
+                        valExprs[i][j].insert(to_string(signals[i][kk - 1].second));
+                    }
+                }
+
+            }
+        }
+
+    return valExprs;
+}
+
+
 // TODO: check and improve
 vector<vector<set<string>>> computeValueExpressions(const vector<vector<pair<long long, double>>> &signals, const vector<vector<vector<long long>>> &uncertainties, const vector<long long> &segmentation)
 {
@@ -2772,7 +2912,7 @@ vector<vector<vector<bitset<SIZE>>>> convertSignalsToAtomicPropositions(const ve
         {
             for (int j = 0; j < numSegments; j++)
             {
-                for (auto &expr : valExprs[i][j])
+                for (auto expr : valExprs[i][j])
                 {
                     if (expr != "")
                     {

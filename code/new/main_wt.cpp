@@ -17,7 +17,7 @@
 #include "functions.cpp"
 using namespace std;
 
-#define REP 1
+#define REP 5
 
 int main()
 {
@@ -25,7 +25,7 @@ int main()
     int n = 3;
     int d = 5000;
     int eps = 50 * 8;
-    int del = 1;
+    int del = 0;
     /*
     long long a = 0;
     long long b = 8000;
@@ -64,7 +64,9 @@ int main()
         numSegments = segmentation.size() - 1;
 
         /* compute the value expressions */
-        vector<vector<set<string>>> valExprs = computeValueExpressions(signalsReal, uncertainties, segmentation);
+        set<int> leaders = {0};
+        vector<vector<set<string>>> valExprs = computeRelativeValueExpressions(leaders, signalsReal, uncertainties, segmentation);
+        // vector<vector<set<string>>> valExprs = computeValueExpressions(signalsReal, uncertainties, segmentation);
         vector<set<string>> ve = valExprs[0];
         for (int i = 1; i < n; i++)
         {

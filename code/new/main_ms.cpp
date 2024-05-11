@@ -24,7 +24,7 @@ int main()
     /* set variables */
     int n = 2;
     int d = 1000;
-    int eps = 50;
+    int eps = 50 * 2;
     int del = 1;
     /*
     long long a = 0;
@@ -42,8 +42,6 @@ int main()
     signalsReal[4] = getData3d("data_re/uav/s1_uav_1", 1);
     signalsReal[5] = getData3d("data_re/uav/s1_uav_1", 2);
 
-    
-    
     /* prepare the bit masks */
     bitset<SIZE> evenMask = generateBitmask(0);
     bitset<SIZE> oddMask = generateBitmask(1);
@@ -67,7 +65,9 @@ int main()
         numSegments = segmentation.size() - 1;
 
         /* compute the value expressions */
-        vector<vector<set<string>>> valExprs = computeValueExpressions(signalsReal, uncertainties, segmentation);
+        set<int> leaders = {0, 1, 2};
+        vector<vector<set<string>>> valExprs = computeRelativeValueExpressions(leaders, signalsReal, uncertainties, segmentation);
+        // vector<vector<set<string>>> valExprs = computeValueExpressions(signalsReal, uncertainties, segmentation);
         cout << valExprs[0][10].size() << endl;
         vector<set<string>> vex = asyncProdStrDiffSqr(valExprs[0], valExprs[3]);
         cout << vex[10].size() << endl;
@@ -78,13 +78,15 @@ int main()
         vector<set<string>> vexy = asyncProdStrSum(vex, vey);
         cout << vexy[10].size() << endl;
         vector<set<string>> vexyz = asyncProdStrSum(vexy, vez);
+        cout << vexyz[10].size() << endl;
         // skip the square root since the distance parameter is 0
         valExprs = {vexyz};
 
         /* translate signals to atomic propositions */
-        //vector<vector<vector<bitset<SIZE>>>> aps = convertSignalsToAtomicPropositions(valExprs);
+        vector<vector<vector<bitset<SIZE>>>> aps = convertSignalsToAtomicPropositions(valExprs, 0.0);
 
         /* evaluate the formula */
+        test = bitsetAlways(aps[0]);
         // test = bitsetConjunction(aps[0], aps[1]);
         // test = bitsetEventually(test);
         // test = bitsetEventually(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1])))); // this is faster

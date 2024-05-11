@@ -139,8 +139,8 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    # And(c0(i) >= 0, c0(i) < data_0[-1][0])
-                    Or([c0(i) == (min(timestamps_0[-1]//pad, (max(0, ((i - peps) + j)//pad)))) for j in range(1, 2 * int(peps))])
+                    And(c0(i) >= 0, c0(i) < data_0[-1][0])
+                    # Or([c0(i) == (min(timestamps_0[-1]//pad, (max(0, ((i - peps) + j)//pad)))) for j in range(1, 2 * int(peps))])
                     for i in range(timestamps_0[0], timestamps_0[-1] + 1)
                 ]
             )
@@ -156,14 +156,12 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
             )
         )
 
-        s.add(c0(timestamps_0[0]) >= segmentLowerBound)
-
         c1 = Function("c1", IntSort(), IntSort())
         s.add(
             And(
                 [
-                    # And(c1(i) >= 0, c1(i) < data_1[-1][0])
-                    Or([c1(i) == (min(timestamps_1[-1]//pad, (max(0, ((i - peps) + j)//pad)))) for j in range(1, 2 * int(peps))])
+                    And(c1(i) >= 0, c1(i) < data_1[-1][0])
+                    # Or([c1(i) == (min(timestamps_1[-1]//pad, (max(0, ((i - peps) + j)//pad)))) for j in range(1, 2 * int(peps))])
                     for i in range(timestamps_1[0], timestamps_1[-1] + 1)
                 ]
             )
@@ -179,8 +177,6 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
             )
         )
         
-        s.add(c1(timestamps_1[0]) >= segmentLowerBound)
-
         # retiming preserves signal variability
         s.add(
             And(
@@ -427,8 +423,8 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    # And(c0(i) >= 0, c0(i) < data_0[-1][0])
-                    Or([c0(i) == (min(timestamps_0[-1]//pad, (max(0, ((i - peps) + j)//pad)))) for j in range(1, 2 * int(peps))])
+                    And(c0(i) >= 0, c0(i) < data_0[-1][0])
+                    # Or([c0(i) == (min(timestamps_0[-1]//pad, (max(0, ((i - peps) + j)//pad)))) for j in range(1, 2 * int(peps))])
                     for i in range(timestamps_0[0], timestamps_0[-1] + 1)
                 ]
             )
@@ -444,14 +440,12 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
             )
         )
 
-        s.add(c0(timestamps_0[0]) >= segmentLowerBound)
-
         c1 = Function("c1", IntSort(), IntSort())
         s.add(
             And(
                 [
-                    # And(c1(i) >= 0, c1(i) < data_1[-1][0])
-                    Or([c1(i) == (min(timestamps_1[-1]//pad, (max(0, ((i - peps) + j)//pad)))) for j in range(1, 2 * int(peps))])
+                    And(c1(i) >= 0, c1(i) < data_1[-1][0])
+                    # Or([c1(i) == (min(timestamps_1[-1]//pad, (max(0, ((i - peps) + j)//pad)))) for j in range(1, 2 * int(peps))])
                     for i in range(timestamps_1[0], timestamps_1[-1] + 1)
                 ]
             )
@@ -467,8 +461,6 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
             )
         )
         
-        s.add(c1(timestamps_1[0]) >= segmentLowerBound)
-
         # retiming preserves signal variability
         s.add(
             And(
@@ -714,8 +706,8 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    # And(c0(i) >= 0, c0(i) < data_0[-1][0])
-                    Or([c0(i) == (min(timestamps_0[-1]//pad, (max(0, ((i - peps) + j)//pad)))) for j in range(1, 2 * int(peps))])
+                    And(c0(i) >= 0, c0(i) < data_0[-1][0])
+                    # Or([c0(i) == (min(timestamps_0[-1]//pad, (max(0, ((i - peps) + j)//pad)))) for j in range(1, 2 * int(peps))])
                     for i in range(timestamps_0[0], timestamps_0[-1] + 1)
                 ]
             )
@@ -731,14 +723,12 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
             )
         )
 
-        s.add(c0(timestamps_0[0]) >= segmentLowerBound)
-
         c1 = Function("c1", IntSort(), IntSort())
         s.add(
             And(
                 [
-                    # And(c1(i) >= 0, c1(i) < data_1[-1][0])
-                    Or([c1(i) == (min(timestamps_1[-1]//pad, (max(0, ((i - peps) + j)//pad)))) for j in range(1, 2 * int(peps))])
+                    And(c1(i) >= 0, c1(i) < data_1[-1][0])
+                    # Or([c1(i) == (min(timestamps_1[-1]//pad, (max(0, ((i - peps) + j)//pad)))) for j in range(1, 2 * int(peps))])
                     for i in range(timestamps_1[0], timestamps_1[-1] + 1)
                 ]
             )
@@ -754,8 +744,6 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
             )
         )
         
-        s.add(c1(timestamps_1[0]) >= segmentLowerBound)
-
         # retiming preserves signal variability
         s.add(
             And(
@@ -1003,8 +991,8 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
         s.add(
             And(
                 [
-                    # And(c0(i) >= 0, c0(i) < data_0[-1][0])
-                    Or([c0(i) == (min(timestamps_0[-1]//pad, (max(0, ((i - peps) + j)//pad)))) for j in range(1, 2 * int(peps))])
+                    And(c0(i) >= 0, c0(i) < data_0[-1][0])
+                    # Or([c0(i) == (min(timestamps_0[-1]//pad, (max(0, ((i - peps) + j)//pad)))) for j in range(1, 2 * int(peps))])
                     for i in range(timestamps_0[0], timestamps_0[-1] + 1)
                 ]
             )
@@ -1020,14 +1008,12 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
             )
         )
 
-        s.add(c0(timestamps_0[0]) >= segmentLowerBound)
-
         c1 = Function("c1", IntSort(), IntSort())
         s.add(
             And(
                 [
-                    # And(c1(i) >= 0, c1(i) < data_1[-1][0])
-                    Or([c1(i) == (min(timestamps_1[-1]//pad, (max(0, ((i - peps) + j)//pad)))) for j in range(1, 2 * int(peps))])
+                    And(c1(i) >= 0, c1(i) < data_1[-1][0])
+                    # Or([c1(i) == (min(timestamps_1[-1]//pad, (max(0, ((i - peps) + j)//pad)))) for j in range(1, 2 * int(peps))])
                     for i in range(timestamps_1[0], timestamps_1[-1] + 1)
                 ]
             )
@@ -1043,8 +1029,6 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
             )
         )
         
-        s.add(c1(timestamps_1[0]) >= segmentLowerBound)
-
         # retiming preserves signal variability
         s.add(
             And(
@@ -1523,7 +1507,7 @@ def main():
 
                 line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str((prep_time + eval_time) / repeat) + " " + str((prep_time + neg_time) / repeat) + " " + out + " " + outneg
                 print(line)
-                results = open("results_ad_smt+neg8.txt", "a")
+                results = open("results_ad_smt+negT.txt", "a")
                 results.write(line + "\n")
                 results.close()
 
