@@ -1260,7 +1260,7 @@ def getDataTank(agent_ID):
 
 def main():
     # set repeat count for confidence interval
-    repeat = 1
+    repeat = 5
     d = 1000
 
     for n in (2, 3, 4):
