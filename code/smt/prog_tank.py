@@ -12,544 +12,1216 @@ from z3.z3 import ForAll
 # set_param('parallel.enable', True)
 set_option(rational_to_decimal = True)
 
-
-def prog_tanks_pressure(eps, sigDur, segCount):
-
-    # initialize z3 solver
-    s = Solver()
-
-    # ===== VAR INIT START ===== #
-
-    t0 = 0.00  # First time-stamp on agent that is to be re-timed
-    t1 = 0.05  # Second time-stamp on agent that is to be re-timed
-
-    if sigDur / segCount < t1:
-
-        segCount = sigDur / t1
-
-    if t0 != 0:
-
-        return
-
-    segmentDuration = sigDur / segCount
-    delta = 0
-    nSAT = 1  # Number of SAT assignments the solver will display per segment; set to -1 for allSAT
-
-    # multiplier adjustments
-    multiplier = 1 / t1
-    eps *= multiplier
-    segmentDuration *= multiplier
-    sigDur *= multiplier
-
-    # ===== VAR INIT END ===== #
-
-    # ===== READ DATA START ===== #
+def prog_tp2(eps, segCount):
 
     data_0 = getDataTank(0)
     data_1 = getDataTank(1)
 
-    i = 0
-    solvers = []
-    entryFound = True
-
-    while(entryFound):
-
-        # Flag to be set True if at least one entry is found in the current iteration
-        entryFound = False
-
-        # Initialize solver
-        s = Solver()
-
-        # Calculate upper and lower time bound for current segment
-        segmentLowerBound = int((i * segmentDuration) - eps)
-        segmentUpperBound = int((i + 1) * segmentDuration)
-
-        timestamps0 = []
-
-        tank0 = Function('tank0', IntSort(), RealSort())
-
-        for j in range ((segmentLowerBound + 0), (segmentUpperBound + 1)):
-
-            if(j >= 0 and j < len(data_0)):
-
-                timestamps0.append(int(data_0[j][0] * multiplier))
-
-                s.add(tank0(int(data_0[j][0] * multiplier)) == data_0[j][1])
-
-                if(int(data_0[j][0] * multiplier) > (i * segmentDuration)):
-
-                    entryFound = True
-
-                if data_0[j][0] * multiplier == sigDur:
-
-                    entryFound = False
-
-        timestamps1 = []
-
-        tank1 = Function('tank1', IntSort(), RealSort())
-
-        for j in range ((segmentLowerBound + 0), (segmentUpperBound + 1)):
-
-            if(j >= 0 and j < len(data_1)):
-
-                timestamps1.append(int(data_1[j][0] * multiplier))
-
-                s.add(tank1(int(data_1[j][0] * multiplier)) == data_1[j][1])
-
-                if(int(data_1[j][0] * multiplier) > (i * segmentDuration)):
-
-                    entryFound = True
-
-                if data_1[j][0] * multiplier == sigDur:
-
-                    entryFound = False
-
-        i += 1
-
-        # force terminate after one loop
-        entryFound = False
-
-        # ===== READ DATA END ===== #
-
-        # ===== CONCUT FLOW START ===== #
-
-        # global clock to local clock mappings
-        c0 = Function('c0', IntSort(), IntSort())
-        s.add(And([Or([c0(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)]) for i in range(timestamps0[0], timestamps0[-1] + 1)]))
-        s.add(Not(Or(c0(timestamps0[0]) == timestamps0[0] - 1, c0(timestamps0[-1]) == timestamps0[-1] + 1)))
-
-        c1 = Function('c1', IntSort(), IntSort())
-        s.add(And([Or([c1(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)]) for i in range(timestamps1[0], timestamps1[-1] + 1)]))
-        s.add(Not(Or(c1(timestamps1[0]) == timestamps1[0] - 1, c1(timestamps1[-1]) == timestamps1[-1] + 1)))
-
-        # local clocks are bound by epsilon
-        s.add(And([And(c0(i) - c1(i) <= eps, c0(i) - c1(i) >= -eps) for i in range(timestamps0[0], timestamps0[-1] + 1)]))
-
-        # global clock to local clock mappings are ordered
-        s.add(And([And([Implies(i <= j, And(c0(i) <= c0(j), c1(i) <= c1(j))) for j in range(timestamps0[0], timestamps0[-1] + 1)]) for i in range(timestamps0[0], timestamps0[-1] + 1)]))
-
-        # consistent cut flow
-        c_flow = Function('c_flow', IntSort(), RealSort())
-        # c_flow = Function('c_flow', IntSort(), IntSort())
-
-        # addition
-        s.add(And([c_flow(i) == (tank0(c0(i)) + tank1(c1(i))) for i in range(timestamps0[0], timestamps0[-1] + 1)]))
-
-        # violation check
-        v = Real('v')
-        s.add(And(v >= timestamps0[0], v <= timestamps0[-1]))
-
-        s.add(ForAll(v, Implies(And(v >= timestamps0[0], v <= timestamps0[-1]), z3Interpolate(c_flow, v) >= 10)))
-        # s.add(z3Interpolate(c_flow, v) == 15)
-        # s.add(v == 10)
-
-        start = time.time()
-
-        if s.check() == sat:
-
-            m = s.model()
-            # out = "%s %s" % (m[test], m[test2])
-            # print(m)
-
-        end = time.time()
-
-        # else:
-        #
-        #     print("unsat")
-
-        s.reset()
-
-        dur = end - start
-        return dur
-
-
-def prog_tanks_pressure_3(eps, sigDur, segCount):
-
     # initialize z3 solver
     s = Solver()
 
-    # ===== VAR INIT START ===== #
+    # pad = min(2 * eps, len(data_0) - 1)
+    pad = 2
+    peps = pad * eps
 
-    t0 = 0.00  # First time-stamp on agent that is to be re-timed
-    t1 = 0.05  # Second time-stamp on agent that is to be re-timed
+    # initialize signal duration and segment duration
+    sigDur = len(data_0) - 1
+    segDur = sigDur / segCount
+
+    # check for edge cases
+    t0 = data_0[0][0]
+    t1 = data_0[1][0]
 
     if sigDur / segCount < t1:
 
         segCount = sigDur / t1
 
     if t0 != 0:
-
         return
 
-    segmentDuration = sigDur / segCount
-    delta = 0
-    nSAT = 1  # Number of SAT assignments the solver will display per segment; set to -1 for allSAT
+    var_0 = {0 : True}
+    for i in range(1, len(data_0)):
+        if (data_0[i][1] != data_0[i - 1][1]):
+            var_0[int(data_0[i][0])] = True
+    var_0[int(data_0[-1][0])] = True
 
-    # multiplier adjustments
-    multiplier = 1 / t1
-    eps *= multiplier
-    segmentDuration *= multiplier
-    sigDur *= multiplier
+    var_1 = {0 : True}
+    for i in range(1, len(data_1)):
+        if (data_1[i][1] != data_1[i - 1][1]):
+            var_1[int(data_1[i][0])] = True
+    var_1[int(data_1[-1][0])] = True
 
-    # ===== VAR INIT END ===== #
+    # encoding
+    i = 0
+    entryFound = True
+    flag = True
 
-    # ===== READ DATA START ===== #
+    while entryFound:
+
+        # Terminate if segment count is reached
+        if i == segCount:
+            return flag
+
+        # flag to be set True if at least one entry is found in the current iteration
+        entryFound = False
+
+        # initialize solver
+        s = Solver()
+
+        # calculate upper and lower time bound for current segment
+        segmentLowerBound = max(0, int((i * segDur) - eps))
+        # segmentUpperBound = int((i + 1) * segDur)
+        segmentUpperBound = min(sigDur, int((i + 1) * segDur + eps))
+
+        timestamps_0 = []
+        segvar_0 = []
+        sig0 = Function("sig0", IntSort(), IntSort())
+
+        for j in range(segmentLowerBound, segmentUpperBound + 1):
+
+            if j >= 0 and j < len(data_0) - 1:
+
+                s.add(sig0(j) == data_0[j][1])
+                for k in range(pad):
+                    timestamps_0.append(j * pad + k)
+
+                # if (j > 0 and data_0[j][1] != data_0[j - 1][1]):
+                #     var_0.append(j)
+
+                if (j == segmentLowerBound or (data_0[j][0] in var_0 and data_0[j][0] > segmentLowerBound)):
+                    segvar_0.append(int(data_0[j][0]))
+
+                if j > (i * segDur):
+
+                    entryFound = True
+
+                if j == sigDur:
+
+                    entryFound = False
+
+        if (len(segvar_0) > 0 and segvar_0[-1] < segmentUpperBound):
+            segvar_0.append(segmentUpperBound)
+
+        timestamps_1 = []
+        segvar_1 = []
+        sig1 = Function("sig1", IntSort(), IntSort())
+
+        for j in range(segmentLowerBound, segmentUpperBound + 1):
+
+            if j >= 0 and j < len(data_1) - 1:
+
+                s.add(sig1(j) == data_1[j][1])
+                for k in range(pad):
+                    timestamps_1.append(j * pad + k)
+
+                # if (j > 0 and data_1[j][1] != data_1[j - 1][1]):
+                #     var_1.append(j)
+
+                if (j == segmentLowerBound or (data_1[j][0] in var_1 and data_1[j][0] > segmentLowerBound)):
+                    segvar_1.append(int(data_1[j][0]))
+
+                if j > (i * segDur):
+
+                    entryFound = True
+
+                if j == sigDur:
+
+                    entryFound = False
+
+        if (len(segvar_1) > 0 and segvar_1[-1] < segmentUpperBound):
+            segvar_1.append(segmentUpperBound)              
+
+        if not entryFound:
+
+            ##print()
+            pass
+
+        i += 1
+
+        # force terminate after one loop
+        # entryFound = False
+
+        # global clock to local clock mappings (implicit piece-wise constant interpolation w.r.t. local clock values)
+        c0 = Function("c0", IntSort(), IntSort())
+        s.add(
+            And(
+                [
+                    And(c0(i) >= 0, c0(i) < data_0[-1][0])
+                    # Or([c0(i) == (min(timestamps_0[-1]//pad, (max(0, ((i - peps) + j)//pad)))) for j in range(1, 2 * int(peps))])
+                    for i in range(timestamps_0[0], timestamps_0[-1] + 1)
+                ]
+            )
+        )
+
+        s.add(
+            And(
+                [
+                    Or([c0(min(timestamps_0[-1], max(0, i * pad - peps + j))) == i for j in range(1, 2 * int(peps) + pad)])
+                    for i in range(segmentLowerBound, segmentUpperBound)
+                    # for i in range(int(data_0[-1][0]))
+                ]
+            )
+        )
+
+        c1 = Function("c1", IntSort(), IntSort())
+        s.add(
+            And(
+                [
+                    And(c1(i) >= 0, c1(i) < data_1[-1][0])
+                    # Or([c1(i) == (min(timestamps_1[-1]//pad, (max(0, ((i - peps) + j)//pad)))) for j in range(1, 2 * int(peps))])
+                    for i in range(timestamps_1[0], timestamps_1[-1] + 1)
+                ]
+            )
+        )
+
+        s.add(
+            And(
+                [
+                    Or([c1(min(timestamps_1[-1], max(0, i * pad - peps + j))) == i for j in range(2 * int(peps) + pad)])
+                    for i in range(segmentLowerBound, segmentUpperBound)
+                    # for i in range(int(data_1[-1][0]))
+                ]
+            )
+        )
+        
+        # retiming preserves signal variability
+        s.add(
+            And(
+                [
+                    Or(
+                        [
+                            And(segvar_0[i] <= c0(j), c0(j) < segvar_0[i + 1])
+                            for j in range(timestamps_0[0], timestamps_0[-1] + 1)
+                        ]
+                    )
+                    for i in range(len(segvar_0) - 1)
+                ]
+            )
+        )
+
+        s.add(
+            And(
+                [
+                    Or(
+                        [
+                            And(segvar_1[i] <= c1(j), c1(j) < segvar_1[i + 1])
+                            for j in range(timestamps_1[0], timestamps_1[-1] + 1)
+                        ]
+                    )
+                    for i in range(len(segvar_1) - 1)
+                ]
+            )
+        )
+
+        # local clocks are bound by epsilon
+        s.add(
+            And(
+                [
+                    And(c0(i) - c1(i) <= eps, c0(i) - c1(i) >= -eps)
+                    for i in range(timestamps_0[0], timestamps_0[-1] + 1)
+                ]
+            )
+        )
+
+        # non-concurrent edges stay non-concurrent ???
+        s.add(
+            And(
+                [
+                    Implies(
+                        And(
+                            Or([And(c0(i) == segvar_0[j], c0(i) != c0(i - 1)) for j in range(1, len(segvar_0) - 1)]),
+                            Or([And(c1(i) == segvar_1[j], c1(i) != c1(i - 1)) for j in range(1, len(segvar_1) - 1)])
+                        ),
+                        And(c0(i) - c1(i) < eps, c0(i) - c1(i) > -eps)
+                    )
+                    for i in range(timestamps_1[0], timestamps_1[-1] + 1)
+                ]
+            )
+        )
+
+        # global clock to local clock mappings are ordered
+        s.add(
+            And(
+                [
+                    And(
+                        [
+                            Implies(i <= j, And(c0(i) <= c0(j), c1(i) <= c1(j)))
+                            for j in range(timestamps_0[0], timestamps_0[-1] + 1)
+                        ]
+                    )
+                    for i in range(timestamps_0[0], timestamps_0[-1] + 1)
+                ]
+            )
+        )
+
+        # consistent cut flow
+        # _flow = Function("c_flow", IntSort(), RealSort())
+        c_flow = Function("c_flow", IntSort(), IntSort())
+
+        # addition
+        s.add(
+            And(
+                [
+                    c_flow(i) == (sig0(c0(i)) + sig1(c1(i)))
+                    for i in range(timestamps_0[0], timestamps_0[-1] + 1)
+                ]
+            )
+        )
+
+        # violation check
+        v = Int("v")
+        s.add(And(v >= timestamps_0[0], v <= timestamps_0[-1]))
+
+        s.add(
+            Implies(
+                And(v >= timestamps_0[0], v <= timestamps_0[-1]),
+                z3Interpolate(c_flow, v) >= 10
+            )
+        )
+
+        # print(s.assertions())
+        if s.check() == sat:
+            m = s.model()
+            # out = "%s %s" % (m[test], m[test2])
+            # print(m)
+            ##print("unsat in segment", i)
+            flag = False
+            # terminate after unsat
+            return flag
+
+        elif i <= segCount:
+            ##print("sat in segment", i)
+            flag = True
+
+        s.reset()
+
+    return flag
+
+def prog_tp3(eps, segCount):
 
     data_0 = getDataTank(0)
     data_1 = getDataTank(1)
     data_2 = getDataTank(2)
 
-    i = 0
-    solvers = []
-    entryFound = True
-
-    while(entryFound):
-
-        # Flag to be set True if at least one entry is found in the current iteration
-        entryFound = False
-
-        # Initialize solver
-        s = Solver()
-
-        # Calculate upper and lower time bound for current segment
-        segmentLowerBound = int((i * segmentDuration) - eps)
-        segmentUpperBound = int((i + 1) * segmentDuration)
-
-        timestamps0 = []
-
-        tank0 = Function('tank0', IntSort(), RealSort())
-
-        for j in range ((segmentLowerBound + 0), (segmentUpperBound + 1)):
-
-            if(j >= 0 and j < len(data_0)):
-
-                timestamps0.append(int(data_0[j][0] * multiplier))
-
-                s.add(tank0(int(data_0[j][0] * multiplier)) == data_0[j][1])
-
-                if(int(data_0[j][0] * multiplier) > (i * segmentDuration)):
-
-                    entryFound = True
-
-                if data_0[j][0] * multiplier == sigDur:
-
-                    entryFound = False
-
-        timestamps1 = []
-
-        tank1 = Function('tank1', IntSort(), RealSort())
-
-        for j in range ((segmentLowerBound + 0), (segmentUpperBound + 1)):
-
-            if(j >= 0 and j < len(data_1)):
-
-                timestamps1.append(int(data_1[j][0] * multiplier))
-
-                s.add(tank1(int(data_1[j][0] * multiplier)) == data_1[j][1])
-
-                if(int(data_1[j][0] * multiplier) > (i * segmentDuration)):
-
-                    entryFound = True
-
-                if data_1[j][0] * multiplier == sigDur:
-
-                    entryFound = False
-
-        timestamps2 = []
-
-        tank2 = Function('tank2', IntSort(), RealSort())
-
-        for j in range ((segmentLowerBound + 0), (segmentUpperBound + 1)):
-
-            if(j >= 0 and j < len(data_2)):
-
-                timestamps2.append(int(data_2[j][0] * multiplier))
-
-                s.add(tank2(int(data_2[j][0] * multiplier)) == data_2[j][1])
-
-                if(int(data_2[j][0] * multiplier) > (i * segmentDuration)):
-
-                    entryFound = True
-
-                if data_2[j][0] * multiplier == sigDur:
-
-                    entryFound = False
-
-        i += 1
-
-        # force terminate after one loop
-        entryFound = False
-
-        # ===== READ DATA END ===== #
-
-        # ===== CONCUT FLOW START ===== #
-
-        # global clock to local clock mappings
-        c0 = Function('c0', IntSort(), IntSort())
-        s.add(And([Or([c0(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)]) for i in range(timestamps0[0], timestamps0[-1] + 1)]))
-        s.add(Not(Or(c0(timestamps0[0]) == timestamps0[0] - 1, c0(timestamps0[-1]) == timestamps0[-1] + 1)))
-
-        c1 = Function('c1', IntSort(), IntSort())
-        s.add(And([Or([c1(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)]) for i in range(timestamps1[0], timestamps1[-1] + 1)]))
-        s.add(Not(Or(c1(timestamps1[0]) == timestamps1[0] - 1, c1(timestamps1[-1]) == timestamps1[-1] + 1)))
-
-        c2 = Function('c2', IntSort(), IntSort())
-        s.add(And([Or([c2(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)]) for i in range(timestamps2[0], timestamps2[-1] + 1)]))
-        s.add(Not(Or(c2(timestamps2[0]) == timestamps2[0] - 1, c2(timestamps2[-1]) == timestamps2[-1] + 1)))
-
-        # local clocks are bound by epsilon
-        s.add(And([And(c0(i) - c1(i) <= eps, c0(i) - c1(i) >= -eps) for i in range(timestamps0[0], timestamps0[-1] + 1)]))
-        s.add(And([And(c1(i) - c2(i) <= eps, c1(i) - c2(i) >= -eps) for i in range(timestamps1[0], timestamps1[-1] + 1)]))
-        s.add(And([And(c2(i) - c0(i) <= eps, c2(i) - c0(i) >= -eps) for i in range(timestamps2[0], timestamps2[-1] + 1)]))
-
-        # global clock to local clock mappings are ordered
-        s.add(And([And([Implies(i <= j, And(c0(i) <= c0(j), c1(i) <= c1(j), c2(i) <= c2(j))) for j in range(timestamps0[0], timestamps0[-1] + 1)]) for i in range(timestamps0[0], timestamps0[-1] + 1)]))
-
-        # consistent cut flow
-        c_flow = Function('c_flow', IntSort(), RealSort())
-        # c_flow = Function('c_flow', IntSort(), IntSort())
-
-        # addition
-        s.add(And([c_flow(i) == (tank0(c0(i)) + tank1(c1(i)) + tank2(c2(i))) for i in range(timestamps0[0], timestamps0[-1] + 1)]))
-
-        # violation check
-        v = Real('v')
-        s.add(And(v >= timestamps0[0], v <= timestamps0[-1]))
-
-        s.add(ForAll(v, Implies(And(v >= timestamps0[0], v <= timestamps0[-1]), z3Interpolate(c_flow, v) >= 15)))
-        # s.add(z3Interpolate(c_flow, v) == 15)
-        # s.add(v == 10)
-
-        start = time.time()
-
-        if s.check() == sat:
-
-            m = s.model()
-            # out = "%s %s" % (m[test], m[test2])
-            # print(m)
-
-        end = time.time()
-
-        # else:
-        #
-        #     print("unsat")
-
-        s.reset()
-
-        dur = end - start
-        return dur
-
-
-def prog_tanks_pressure_4(eps, sigDur, segCount):
-
     # initialize z3 solver
     s = Solver()
 
-    # ===== VAR INIT START ===== #
+    # pad = min(2 * eps, len(data_0) - 1)
+    pad = 2
+    peps = pad * eps
 
-    t0 = 0.00  # First time-stamp on agent that is to be re-timed
-    t1 = 0.05  # Second time-stamp on agent that is to be re-timed
+    # initialize signal duration and segment duration
+    sigDur = len(data_0) - 1
+    segDur = sigDur / segCount
+
+    # check for edge cases
+    t0 = data_0[0][0]
+    t1 = data_0[1][0]
 
     if sigDur / segCount < t1:
 
         segCount = sigDur / t1
 
     if t0 != 0:
-
         return
 
-    segmentDuration = sigDur / segCount
-    delta = 0
-    nSAT = 1  # Number of SAT assignments the solver will display per segment; set to -1 for allSAT
+    var_0 = {0 : True}
+    for i in range(1, len(data_0)):
+        if (data_0[i][1] != data_0[i - 1][1]):
+            var_0[int(data_0[i][0])] = True
+    var_0[int(data_0[-1][0])] = True
 
-    # multiplier adjustments
-    multiplier = 1 / t1
-    eps *= multiplier
-    segmentDuration *= multiplier
-    sigDur *= multiplier
+    var_1 = {0 : True}
+    for i in range(1, len(data_1)):
+        if (data_1[i][1] != data_1[i - 1][1]):
+            var_1[int(data_1[i][0])] = True
+    var_1[int(data_1[-1][0])] = True
 
-    # ===== VAR INIT END ===== #
+    var_2 = {0 : True}
+    for i in range(1, len(data_2)):
+        if (data_2[i][1] != data_2[i - 1][1]):
+            var_2[int(data_2[i][0])] = True
+    var_2[int(data_2[-1][0])] = True
 
-    # ===== READ DATA START ===== #
+    # encoding
+    i = 0
+    entryFound = True
+    flag = True
+
+    while entryFound:
+
+        # Terminate if segment count is reached
+        if i == segCount:
+            return flag
+
+        # flag to be set True if at least one entry is found in the current iteration
+        entryFound = False
+
+        # initialize solver
+        s = Solver()
+
+        # calculate upper and lower time bound for current segment
+        segmentLowerBound = max(0, int((i * segDur) - eps))
+        # segmentUpperBound = int((i + 1) * segDur)
+        segmentUpperBound = min(sigDur, int((i + 1) * segDur + eps))
+
+        timestamps_0 = []
+        segvar_0 = []
+        sig0 = Function("sig0", IntSort(), IntSort())
+
+        for j in range(segmentLowerBound, segmentUpperBound + 1):
+
+            if j >= 0 and j < len(data_0) - 1:
+
+                s.add(sig0(j) == data_0[j][1])
+                for k in range(pad):
+                    timestamps_0.append(j * pad + k)
+
+                # if (j > 0 and data_0[j][1] != data_0[j - 1][1]):
+                #     var_0.append(j)
+
+                if (j == segmentLowerBound or (data_0[j][0] in var_0 and data_0[j][0] > segmentLowerBound)):
+                    segvar_0.append(int(data_0[j][0]))
+
+                if j > (i * segDur):
+
+                    entryFound = True
+
+                if j == sigDur:
+
+                    entryFound = False
+
+        if (len(segvar_0) > 0 and segvar_0[-1] < segmentUpperBound):
+            segvar_0.append(segmentUpperBound)
+
+        timestamps_1 = []
+        segvar_1 = []
+        sig1 = Function("sig1", IntSort(), IntSort())
+
+        for j in range(segmentLowerBound, segmentUpperBound + 1):
+
+            if j >= 0 and j < len(data_1) - 1:
+
+                s.add(sig1(j) == data_1[j][1])
+                for k in range(pad):
+                    timestamps_1.append(j * pad + k)
+
+                # if (j > 0 and data_1[j][1] != data_1[j - 1][1]):
+                #     var_1.append(j)
+
+                if (j == segmentLowerBound or (data_1[j][0] in var_1 and data_1[j][0] > segmentLowerBound)):
+                    segvar_1.append(int(data_1[j][0]))
+
+                if j > (i * segDur):
+
+                    entryFound = True
+
+                if j == sigDur:
+
+                    entryFound = False
+
+        if (len(segvar_1) > 0 and segvar_1[-1] < segmentUpperBound):
+            segvar_1.append(segmentUpperBound)              
+
+
+        timestamps_2 = []
+        segvar_2 = []
+        sig2 = Function("sig2", IntSort(), IntSort())
+
+        for j in range(segmentLowerBound, segmentUpperBound + 1):
+
+            if j >= 0 and j < len(data_2) - 1:
+
+                s.add(sig2(j) == data_2[j][1])
+                for k in range(pad):
+                    timestamps_2.append(j * pad + k)
+
+                # if (j > 0 and data_0[j][1] != data_0[j - 1][1]):
+                #     var_0.append(j)
+
+                if (j == segmentLowerBound or (data_2[j][0] in var_2 and data_2[j][0] > segmentLowerBound)):
+                    segvar_2.append(int(data_2[j][0]))
+
+                if j > (i * segDur):
+
+                    entryFound = True
+
+                if j == sigDur:
+
+                    entryFound = False
+
+        if (len(segvar_2) > 0 and segvar_2[-1] < segmentUpperBound):
+            segvar_2.append(segmentUpperBound)
+
+        if not entryFound:
+
+            ##print()
+            pass
+
+        i += 1
+
+        # force terminate after one loop
+        # entryFound = False
+
+        # global clock to local clock mappings (implicit piece-wise constant interpolation w.r.t. local clock values)
+        c0 = Function("c0", IntSort(), IntSort())
+        s.add(
+            And(
+                [
+                    And(c0(i) >= 0, c0(i) < data_0[-1][0])
+                    # Or([c0(i) == (min(timestamps_0[-1]//pad, (max(0, ((i - peps) + j)//pad)))) for j in range(1, 2 * int(peps))])
+                    for i in range(timestamps_0[0], timestamps_0[-1] + 1)
+                ]
+            )
+        )
+
+        s.add(
+            And(
+                [
+                    Or([c0(min(timestamps_0[-1], max(0, i * pad - peps + j))) == i for j in range(1, 2 * int(peps) + pad)])
+                    for i in range(segmentLowerBound, segmentUpperBound)
+                    # for i in range(int(data_0[-1][0]))
+                ]
+            )
+        )
+
+        c1 = Function("c1", IntSort(), IntSort())
+        s.add(
+            And(
+                [
+                    And(c1(i) >= 0, c1(i) < data_1[-1][0])
+                    for i in range(timestamps_1[0], timestamps_1[-1] + 1)
+                ]
+            )
+        )
+
+        s.add(
+            And(
+                [
+                    Or([c1(min(timestamps_1[-1], max(0, i * pad - peps + j))) == i for j in range(2 * int(peps) + pad)])
+                    for i in range(segmentLowerBound, segmentUpperBound)
+                ]
+            )
+        )
+
+        c2 = Function("c2", IntSort(), IntSort())
+        s.add(
+            And(
+                [
+                    And(c2(i) >= 0, c2(i) < data_2[-1][0])
+                    for i in range(timestamps_2[0], timestamps_2[-1] + 1)
+                ]
+            )
+        )
+
+        s.add(
+            And(
+                [
+                    Or([c2(min(timestamps_2[-1], max(0, i * pad - peps + j))) == i for j in range(2 * int(peps) + pad)])
+                    for i in range(segmentLowerBound, segmentUpperBound)
+                ]
+            )
+        )
+        
+        # retiming preserves signal variability
+        s.add(
+            And(
+                [
+                    Or(
+                        [
+                            And(segvar_0[i] <= c0(j), c0(j) < segvar_0[i + 1])
+                            for j in range(timestamps_0[0], timestamps_0[-1] + 1)
+                        ]
+                    )
+                    for i in range(len(segvar_0) - 1)
+                ]
+            )
+        )
+
+        s.add(
+            And(
+                [
+                    Or(
+                        [
+                            And(segvar_1[i] <= c1(j), c1(j) < segvar_1[i + 1])
+                            for j in range(timestamps_1[0], timestamps_1[-1] + 1)
+                        ]
+                    )
+                    for i in range(len(segvar_1) - 1)
+                ]
+            )
+        )
+
+        s.add(
+            And(
+                [
+                    Or(
+                        [
+                            And(segvar_2[i] <= c2(j), c2(j) < segvar_2[i + 1])
+                            for j in range(timestamps_2[0], timestamps_2[-1] + 1)
+                        ]
+                    )
+                    for i in range(len(segvar_2) - 1)
+                ]
+            )
+        )
+
+        # local clocks are bound by epsilon
+        s.add(
+            And(
+                [
+                    And(c0(i) - c1(i) <= eps, c0(i) - c1(i) >= -eps)
+                    for i in range(timestamps_0[0], timestamps_0[-1] + 1)
+                ]
+            )
+        )
+
+        s.add(
+            And(
+                [
+                    And(c0(i) - c2(i) <= eps, c0(i) - c2(i) >= -eps)
+                    for i in range(timestamps_0[0], timestamps_0[-1] + 1)
+                ]
+            )
+        )
+
+        s.add(
+            And(
+                [
+                    And(c1(i) - c2(i) <= eps, c1(i) - c2(i) >= -eps)
+                    for i in range(timestamps_0[0], timestamps_0[-1] + 1)
+                ]
+            )
+        )
+
+        # non-concurrent edges stay non-concurrent ???
+        s.add(
+            And(
+                [
+                    Implies(
+                        And(
+                            Or([And(c0(i) == segvar_0[j], c0(i) != c0(i - 1)) for j in range(1, len(segvar_0) - 1)]),
+                            Or([And(c1(i) == segvar_1[j], c1(i) != c1(i - 1)) for j in range(1, len(segvar_1) - 1)])
+                        ),
+                        And(c0(i) - c1(i) < eps, c0(i) - c1(i) > -eps)
+                    )
+                    for i in range(timestamps_1[0], timestamps_1[-1] + 1)
+                ]
+            )
+        )
+
+        s.add(
+            And(
+                [
+                    Implies(
+                        And(
+                            Or([And(c0(i) == segvar_0[j], c0(i) != c0(i - 1)) for j in range(1, len(segvar_0) - 1)]),
+                            Or([And(c2(i) == segvar_2[j], c2(i) != c2(i - 1)) for j in range(1, len(segvar_2) - 1)])
+                        ),
+                        And(c0(i) - c2(i) < eps, c0(i) - c2(i) > -eps)
+                    )
+                    for i in range(timestamps_1[0], timestamps_1[-1] + 1)
+                ]
+            )
+        )
+
+        s.add(
+            And(
+                [
+                    Implies(
+                        And(
+                            Or([And(c1(i) == segvar_1[j], c1(i) != c1(i - 1)) for j in range(1, len(segvar_1) - 1)]),
+                            Or([And(c2(i) == segvar_2[j], c2(i) != c2(i - 1)) for j in range(1, len(segvar_2) - 1)])
+                        ),
+                        And(c1(i) - c2(i) < eps, c1(i) - c2(i) > -eps)
+                    )
+                    for i in range(timestamps_1[0], timestamps_1[-1] + 1)
+                ]
+            )
+        )
+
+        # global clock to local clock mappings are ordered
+        s.add(
+            And(
+                [
+                    And(
+                        [
+                            Implies(i <= j, And(c0(i) <= c0(j), c1(i) <= c1(j), c2(i) <= c2(j)))
+                            for j in range(timestamps_0[0], timestamps_0[-1] + 1)
+                        ]
+                    )
+                    for i in range(timestamps_0[0], timestamps_0[-1] + 1)
+                ]
+            )
+        )
+
+        # consistent cut flow
+        # _flow = Function("c_flow", IntSort(), RealSort())
+        c_flow = Function("c_flow", IntSort(), IntSort())
+
+        # addition
+        s.add(
+            And(
+                [
+                    c_flow(i) == (sig0(c0(i)) + sig1(c1(i)) + sig2(c2(i)))
+                    for i in range(timestamps_0[0], timestamps_0[-1] + 1)
+                ]
+            )
+        )
+
+        # violation check
+        v = Int("v")
+        s.add(And(v >= timestamps_0[0], v <= timestamps_0[-1]))
+
+        s.add(
+            Implies(
+                And(v >= timestamps_0[0], v <= timestamps_0[-1]),
+                z3Interpolate(c_flow, v) >= 10
+            )
+        )
+
+        # print(s.assertions())
+        if s.check() == sat:
+            m = s.model()
+            # out = "%s %s" % (m[test], m[test2])
+            # print(m)
+            ##print("unsat in segment", i)
+            flag = False
+            # terminate after unsat
+            return flag
+
+        elif i <= segCount:
+            ##print("sat in segment", i)
+            flag = True
+
+        s.reset()
+
+    return flag
+
+def prog_tp4(eps, segCount):
 
     data_0 = getDataTank(0)
     data_1 = getDataTank(1)
     data_2 = getDataTank(2)
     data_3 = getDataTank(3)
 
+    # initialize z3 solver
+    s = Solver()
+
+    # pad = min(2 * eps, len(data_0) - 1)
+    pad = 2
+    peps = pad * eps
+
+    # initialize signal duration and segment duration
+    sigDur = len(data_0) - 1
+    segDur = sigDur / segCount
+
+    # check for edge cases
+    t0 = data_0[0][0]
+    t1 = data_0[1][0]
+
+    if sigDur / segCount < t1:
+
+        segCount = sigDur / t1
+
+    if t0 != 0:
+        return
+
+    var_0 = {0 : True}
+    for i in range(1, len(data_0)):
+        if (data_0[i][1] != data_0[i - 1][1]):
+            var_0[int(data_0[i][0])] = True
+    var_0[int(data_0[-1][0])] = True
+
+    var_1 = {0 : True}
+    for i in range(1, len(data_1)):
+        if (data_1[i][1] != data_1[i - 1][1]):
+            var_1[int(data_1[i][0])] = True
+    var_1[int(data_1[-1][0])] = True
+
+    var_2 = {0 : True}
+    for i in range(1, len(data_2)):
+        if (data_2[i][1] != data_2[i - 1][1]):
+            var_2[int(data_2[i][0])] = True
+    var_2[int(data_2[-1][0])] = True
+
+    var_3 = {0 : True}
+    for i in range(1, len(data_3)):
+        if (data_3[i][1] != data_3[i - 1][1]):
+            var_2[int(data_3[i][0])] = True
+    var_3[int(data_3[-1][0])] = True
+
+    # encoding
     i = 0
-    solvers = []
     entryFound = True
+    flag = True
 
-    while(entryFound):
+    while entryFound:
 
-        # Flag to be set True if at least one entry is found in the current iteration
+        # Terminate if segment count is reached
+        if i == segCount:
+            return flag
+
+        # flag to be set True if at least one entry is found in the current iteration
         entryFound = False
 
-        # Initialize solver
+        # initialize solver
         s = Solver()
 
-        # Calculate upper and lower time bound for current segment
-        segmentLowerBound = int((i * segmentDuration) - eps)
-        segmentUpperBound = int((i + 1) * segmentDuration)
+        # calculate upper and lower time bound for current segment
+        segmentLowerBound = max(0, int((i * segDur) - eps))
+        # segmentUpperBound = int((i + 1) * segDur)
+        segmentUpperBound = min(sigDur, int((i + 1) * segDur + eps))
 
-        timestamps0 = []
+        timestamps_0 = []
+        segvar_0 = []
+        sig0 = Function("sig0", IntSort(), IntSort())
 
-        tank0 = Function('tank0', IntSort(), RealSort())
+        for j in range(segmentLowerBound, segmentUpperBound + 1):
 
-        for j in range ((segmentLowerBound + 0), (segmentUpperBound + 1)):
+            if j >= 0 and j < len(data_0) - 1:
 
-            if(j >= 0 and j < len(data_0)):
+                s.add(sig0(j) == data_0[j][1])
+                for k in range(pad):
+                    timestamps_0.append(j * pad + k)
 
-                timestamps0.append(int(data_0[j][0] * multiplier))
+                # if (j > 0 and data_0[j][1] != data_0[j - 1][1]):
+                #     var_0.append(j)
 
-                s.add(tank0(int(data_0[j][0] * multiplier)) == data_0[j][1])
+                if (j == segmentLowerBound or (data_0[j][0] in var_0 and data_0[j][0] > segmentLowerBound)):
+                    segvar_0.append(int(data_0[j][0]))
 
-                if(int(data_0[j][0] * multiplier) > (i * segmentDuration)):
-
-                    entryFound = True
-
-                if data_0[j][0] * multiplier == sigDur:
-
-                    entryFound = False
-
-        timestamps1 = []
-
-        tank1 = Function('tank1', IntSort(), RealSort())
-
-        for j in range ((segmentLowerBound + 0), (segmentUpperBound + 1)):
-
-            if(j >= 0 and j < len(data_1)):
-
-                timestamps1.append(int(data_1[j][0] * multiplier))
-
-                s.add(tank1(int(data_1[j][0] * multiplier)) == data_1[j][1])
-
-                if(int(data_1[j][0] * multiplier) > (i * segmentDuration)):
+                if j > (i * segDur):
 
                     entryFound = True
 
-                if data_1[j][0] * multiplier == sigDur:
+                if j == sigDur:
 
                     entryFound = False
 
-        timestamps2 = []
+        if (len(segvar_0) > 0 and segvar_0[-1] < segmentUpperBound):
+            segvar_0.append(segmentUpperBound)
 
-        tank2 = Function('tank2', IntSort(), RealSort())
+        timestamps_1 = []
+        segvar_1 = []
+        sig1 = Function("sig1", IntSort(), IntSort())
 
-        for j in range ((segmentLowerBound + 0), (segmentUpperBound + 1)):
+        for j in range(segmentLowerBound, segmentUpperBound + 1):
 
-            if(j >= 0 and j < len(data_2)):
+            if j >= 0 and j < len(data_1) - 1:
 
-                timestamps2.append(int(data_2[j][0] * multiplier))
+                s.add(sig1(j) == data_1[j][1])
+                for k in range(pad):
+                    timestamps_1.append(j * pad + k)
 
-                s.add(tank2(int(data_2[j][0] * multiplier)) == data_2[j][1])
+                # if (j > 0 and data_1[j][1] != data_1[j - 1][1]):
+                #     var_1.append(j)
 
-                if(int(data_2[j][0] * multiplier) > (i * segmentDuration)):
+                if (j == segmentLowerBound or (data_1[j][0] in var_1 and data_1[j][0] > segmentLowerBound)):
+                    segvar_1.append(int(data_1[j][0]))
+
+                if j > (i * segDur):
 
                     entryFound = True
 
-                if data_2[j][0] * multiplier == sigDur:
+                if j == sigDur:
 
                     entryFound = False
 
-        timestamps3 = []
+        if (len(segvar_1) > 0 and segvar_1[-1] < segmentUpperBound):
+            segvar_1.append(segmentUpperBound)              
 
-        tank3 = Function('tank3', IntSort(), RealSort())
 
-        for j in range ((segmentLowerBound + 0), (segmentUpperBound + 1)):
+        timestamps_2 = []
+        segvar_2 = []
+        sig2 = Function("sig2", IntSort(), IntSort())
 
-            if(j >= 0 and j < len(data_3)):
+        for j in range(segmentLowerBound, segmentUpperBound + 1):
 
-                timestamps3.append(int(data_3[j][0] * multiplier))
+            if j >= 0 and j < len(data_2) - 1:
 
-                s.add(tank3(int(data_3[j][0] * multiplier)) == data_3[j][1])
+                s.add(sig2(j) == data_2[j][1])
+                for k in range(pad):
+                    timestamps_2.append(j * pad + k)
 
-                if(int(data_3[j][0] * multiplier) > (i * segmentDuration)):
+                # if (j > 0 and data_0[j][1] != data_0[j - 1][1]):
+                #     var_0.append(j)
+
+                if (j == segmentLowerBound or (data_2[j][0] in var_2 and data_2[j][0] > segmentLowerBound)):
+                    segvar_2.append(int(data_2[j][0]))
+
+                if j > (i * segDur):
 
                     entryFound = True
 
-                if data_3[j][0] * multiplier == sigDur:
+                if j == sigDur:
 
                     entryFound = False
+
+        if (len(segvar_2) > 0 and segvar_2[-1] < segmentUpperBound):
+            segvar_2.append(segmentUpperBound)
+
+
+        timestamps_3 = []
+        segvar_3 = []
+        sig3 = Function("sig3", IntSort(), IntSort())
+
+        for j in range(segmentLowerBound, segmentUpperBound + 1):
+
+            if j >= 0 and j < len(data_3) - 1:
+
+                s.add(sig3(j) == data_3[j][1])
+                for k in range(pad):
+                    timestamps_3.append(j * pad + k)
+
+                # if (j > 0 and data_0[j][1] != data_0[j - 1][1]):
+                #     var_0.append(j)
+
+                if (j == segmentLowerBound or (data_3[j][0] in var_3 and data_3[j][0] > segmentLowerBound)):
+                    segvar_3.append(int(data_3[j][0]))
+
+                if j > (i * segDur):
+
+                    entryFound = True
+
+                if j == sigDur:
+
+                    entryFound = False
+
+        if (len(segvar_3) > 0 and segvar_3[-1] < segmentUpperBound):
+            segvar_3.append(segmentUpperBound)
+
+        if not entryFound:
+
+            ##print()
+            pass
 
         i += 1
 
         # force terminate after one loop
-        entryFound = False
+        # entryFound = False
 
-        # ===== READ DATA END ===== #
+        # global clock to local clock mappings (implicit piece-wise constant interpolation w.r.t. local clock values)
+        c0 = Function("c0", IntSort(), IntSort())
+        s.add(
+            And(
+                [
+                    And(c0(i) >= 0, c0(i) < data_0[-1][0])
+                    # Or([c0(i) == (min(timestamps_0[-1]//pad, (max(0, ((i - peps) + j)//pad)))) for j in range(1, 2 * int(peps))])
+                    for i in range(timestamps_0[0], timestamps_0[-1] + 1)
+                ]
+            )
+        )
 
-        # ===== CONCUT FLOW START ===== #
+        s.add(
+            And(
+                [
+                    Or([c0(min(timestamps_0[-1], max(0, i * pad - peps + j))) == i for j in range(1, 2 * int(peps) + pad)])
+                    for i in range(segmentLowerBound, segmentUpperBound)
+                    # for i in range(int(data_0[-1][0]))
+                ]
+            )
+        )
 
-        # global clock to local clock mappings
-        c0 = Function('c0', IntSort(), IntSort())
-        s.add(And([Or([c0(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)]) for i in range(timestamps0[0], timestamps0[-1] + 1)]))
-        s.add(Not(Or(c0(timestamps0[0]) == timestamps0[0] - 1, c0(timestamps0[-1]) == timestamps0[-1] + 1)))
+        c1 = Function("c1", IntSort(), IntSort())
+        s.add(
+            And(
+                [
+                    And(c1(i) >= 0, c1(i) < data_1[-1][0])
+                    for i in range(timestamps_1[0], timestamps_1[-1] + 1)
+                ]
+            )
+        )
 
-        c1 = Function('c1', IntSort(), IntSort())
-        s.add(And([Or([c1(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)]) for i in range(timestamps1[0], timestamps1[-1] + 1)]))
-        s.add(Not(Or(c1(timestamps1[0]) == timestamps1[0] - 1, c1(timestamps1[-1]) == timestamps1[-1] + 1)))
+        s.add(
+            And(
+                [
+                    Or([c1(min(timestamps_1[-1], max(0, i * pad - peps + j))) == i for j in range(2 * int(peps) + pad)])
+                    for i in range(segmentLowerBound, segmentUpperBound)
+                ]
+            )
+        )
 
-        c2 = Function('c2', IntSort(), IntSort())
-        s.add(And([Or([c2(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)]) for i in range(timestamps2[0], timestamps2[-1] + 1)]))
-        s.add(Not(Or(c2(timestamps2[0]) == timestamps2[0] - 1, c2(timestamps2[-1]) == timestamps2[-1] + 1)))
+        c2 = Function("c2", IntSort(), IntSort())
+        s.add(
+            And(
+                [
+                    And(c2(i) >= 0, c2(i) < data_2[-1][0])
+                    for i in range(timestamps_2[0], timestamps_2[-1] + 1)
+                ]
+            )
+        )
 
-        c3 = Function('c3', IntSort(), IntSort())
-        s.add(And([Or([c3(i) == ((i - eps) + j) for j in range(2 * int(eps) + 1)]) for i in range(timestamps3[0], timestamps3[-1] + 1)]))
-        s.add(Not(Or(c3(timestamps3[0]) == timestamps3[0] - 1, c3(timestamps3[-1]) == timestamps3[-1] + 1)))
+        s.add(
+            And(
+                [
+                    Or([c2(min(timestamps_2[-1], max(0, i * pad - peps + j))) == i for j in range(2 * int(peps) + pad)])
+                    for i in range(segmentLowerBound, segmentUpperBound)
+                ]
+            )
+        )
+
+        c3 = Function("c3", IntSort(), IntSort())
+        s.add(
+            And(
+                [
+                    And(c3(i) >= 0, c3(i) < data_3[-1][0])
+                    for i in range(timestamps_3[0], timestamps_3[-1] + 1)
+                ]
+            )
+        )
+
+        s.add(
+            And(
+                [
+                    Or([c3(min(timestamps_3[-1], max(0, i * pad - peps + j))) == i for j in range(2 * int(peps) + pad)])
+                    for i in range(segmentLowerBound, segmentUpperBound)
+                ]
+            )
+        )
+        
+        # retiming preserves signal variability
+        s.add(
+            And(
+                [
+                    Or(
+                        [
+                            And(segvar_0[i] <= c0(j), c0(j) < segvar_0[i + 1])
+                            for j in range(timestamps_0[0], timestamps_0[-1] + 1)
+                        ]
+                    )
+                    for i in range(len(segvar_0) - 1)
+                ]
+            )
+        )
+
+        s.add(
+            And(
+                [
+                    Or(
+                        [
+                            And(segvar_1[i] <= c1(j), c1(j) < segvar_1[i + 1])
+                            for j in range(timestamps_1[0], timestamps_1[-1] + 1)
+                        ]
+                    )
+                    for i in range(len(segvar_1) - 1)
+                ]
+            )
+        )
+
+        s.add(
+            And(
+                [
+                    Or(
+                        [
+                            And(segvar_2[i] <= c2(j), c2(j) < segvar_2[i + 1])
+                            for j in range(timestamps_2[0], timestamps_2[-1] + 1)
+                        ]
+                    )
+                    for i in range(len(segvar_2) - 1)
+                ]
+            )
+        )
+
+        s.add(
+            And(
+                [
+                    Or(
+                        [
+                            And(segvar_3[i] <= c3(j), c3(j) < segvar_3[i + 1])
+                            for j in range(timestamps_3[0], timestamps_3[-1] + 1)
+                        ]
+                    )
+                    for i in range(len(segvar_3) - 1)
+                ]
+            )
+        )
 
         # local clocks are bound by epsilon
-        s.add(And([And(c0(i) - c1(i) <= eps, c0(i) - c1(i) >= -eps) for i in range(timestamps0[0], timestamps0[-1] + 1)]))
-        s.add(And([And(c1(i) - c2(i) <= eps, c1(i) - c2(i) >= -eps) for i in range(timestamps1[0], timestamps1[-1] + 1)]))
-        s.add(And([And(c2(i) - c0(i) <= eps, c2(i) - c0(i) >= -eps) for i in range(timestamps2[0], timestamps2[-1] + 1)]))
+        s.add(
+            And(
+                [
+                    And(c0(i) - c1(i) <= eps, c0(i) - c1(i) >= -eps)
+                    for i in range(timestamps_0[0], timestamps_0[-1] + 1)
+                ]
+            )
+        )
+        
+        s.add(
+            And(
+                [
+                    And(c0(i) - c2(i) <= eps, c0(i) - c2(i) >= -eps)
+                    for i in range(timestamps_0[0], timestamps_0[-1] + 1)
+                ]
+            )
+        )
 
-        s.add(And([And(c0(i) - c3(i) <= eps, c0(i) - c3(i) >= -eps) for i in range(timestamps3[0], timestamps3[-1] + 1)]))
-        s.add(And([And(c1(i) - c3(i) <= eps, c1(i) - c3(i) >= -eps) for i in range(timestamps3[0], timestamps3[-1] + 1)]))
-        s.add(And([And(c2(i) - c3(i) <= eps, c2(i) - c3(i) >= -eps) for i in range(timestamps3[0], timestamps3[-1] + 1)]))
+        s.add(
+            And(
+                [
+                    And(c1(i) - c2(i) <= eps, c1(i) - c2(i) >= -eps)
+                    for i in range(timestamps_0[0], timestamps_0[-1] + 1)
+                ]
+            )
+        )
+
+        s.add(And([And(c0(i) - c3(i) <= eps, c0(i) - c3(i) >= -eps) for i in range(timestamps_3[0], timestamps_3[-1] + 1)]))
+        s.add(And([And(c1(i) - c3(i) <= eps, c1(i) - c3(i) >= -eps) for i in range(timestamps_3[0], timestamps_3[-1] + 1)]))
+        s.add(And([And(c2(i) - c3(i) <= eps, c2(i) - c3(i) >= -eps) for i in range(timestamps_3[0], timestamps_3[-1] + 1)]))
+
+        # non-concurrent edges stay non-concurrent ???
+        s.add(
+            And(
+                [
+                    Implies(
+                        And(
+                            Or([And(c0(i) == segvar_0[j], c0(i) != c0(i - 1)) for j in range(1, len(segvar_0) - 1)]),
+                            Or([And(c1(i) == segvar_1[j], c1(i) != c1(i - 1)) for j in range(1, len(segvar_1) - 1)])
+                        ),
+                        And(c0(i) - c1(i) < eps, c0(i) - c1(i) > -eps)
+                    )
+                    for i in range(timestamps_1[0], timestamps_1[-1] + 1)
+                ]
+            )
+        )
+
+        s.add(
+            And(
+                [
+                    Implies(
+                        And(
+                            Or([And(c0(i) == segvar_0[j], c0(i) != c0(i - 1)) for j in range(1, len(segvar_0) - 1)]),
+                            Or([And(c2(i) == segvar_2[j], c2(i) != c2(i - 1)) for j in range(1, len(segvar_2) - 1)])
+                        ),
+                        And(c0(i) - c2(i) < eps, c0(i) - c2(i) > -eps)
+                    )
+                    for i in range(timestamps_1[0], timestamps_1[-1] + 1)
+                ]
+            )
+        )
+
+        s.add(
+            And(
+                [
+                    Implies(
+                        And(
+                            Or([And(c1(i) == segvar_1[j], c1(i) != c1(i - 1)) for j in range(1, len(segvar_1) - 1)]),
+                            Or([And(c2(i) == segvar_2[j], c2(i) != c2(i - 1)) for j in range(1, len(segvar_2) - 1)])
+                        ),
+                        And(c1(i) - c2(i) < eps, c1(i) - c2(i) > -eps)
+                    )
+                    for i in range(timestamps_1[0], timestamps_1[-1] + 1)
+                ]
+            )
+        )
+
+        s.add(
+            And(
+                [
+                    Implies(
+                        And(
+                            Or([And(c0(i) == segvar_0[j], c0(i) != c0(i - 1)) for j in range(1, len(segvar_0) - 1)]),
+                            Or([And(c3(i) == segvar_3[j], c3(i) != c3(i - 1)) for j in range(1, len(segvar_3) - 1)])
+                        ),
+                        And(c0(i) - c3(i) < eps, c0(i) - c3(i) > -eps)
+                    )
+                    for i in range(timestamps_3[0], timestamps_3[-1] + 1)
+                ]
+            )
+        )
+
+        s.add(
+            And(
+                [
+                    Implies(
+                        And(
+                            Or([And(c1(i) == segvar_1[j], c1(i) != c1(i - 1)) for j in range(1, len(segvar_1) - 1)]),
+                            Or([And(c3(i) == segvar_3[j], c3(i) != c3(i - 1)) for j in range(1, len(segvar_3) - 1)])
+                        ),
+                        And(c1(i) - c3(i) < eps, c1(i) - c3(i) > -eps)
+                    )
+                    for i in range(timestamps_3[0], timestamps_3[-1] + 1)
+                ]
+            )
+        )
+
+        s.add(
+            And(
+                [
+                    Implies(
+                        And(
+                            Or([And(c2(i) == segvar_2[j], c2(i) != c2(i - 1)) for j in range(1, len(segvar_2) - 1)]),
+                            Or([And(c3(i) == segvar_3[j], c3(i) != c3(i - 1)) for j in range(1, len(segvar_3) - 1)])
+                        ),
+                        And(c2(i) - c3(i) < eps, c2(i) - c3(i) > -eps)
+                    )
+                    for i in range(timestamps_3[0], timestamps_3[-1] + 1)
+                ]
+            )
+        )
 
         # global clock to local clock mappings are ordered
-        s.add(And([And([Implies(i <= j, And(c0(i) <= c0(j), c1(i) <= c1(j), c2(i) <= c2(j), c3(i) <= c3(j))) for j in range(timestamps0[0], timestamps0[-1] + 1)]) for i in range(timestamps0[0], timestamps0[-1] + 1)]))
+        s.add(
+            And(
+                [
+                    And(
+                        [
+                            Implies(i <= j, And(c0(i) <= c0(j), c1(i) <= c1(j), c2(i) <= c2(j), c3(i) <= c3(j)))
+                            for j in range(timestamps_0[0], timestamps_0[-1] + 1)
+                        ]
+                    )
+                    for i in range(timestamps_0[0], timestamps_0[-1] + 1)
+                ]
+            )
+        )
 
         # consistent cut flow
-        c_flow = Function('c_flow', IntSort(), RealSort())
-        # c_flow = Function('c_flow', IntSort(), IntSort())
+        # _flow = Function("c_flow", IntSort(), RealSort())
+        c_flow = Function("c_flow", IntSort(), IntSort())
 
         # addition
-        s.add(And([c_flow(i) == (tank0(c0(i)) + tank1(c1(i)) + tank2(c2(i)) + tank3(c3(i))) for i in range(timestamps0[0], timestamps0[-1] + 1)]))
+        s.add(
+            And(
+                [
+                    c_flow(i) == (sig0(c0(i)) + sig1(c1(i)) + sig2(c2(i)) + sig3(c3(i)))
+                    for i in range(timestamps_0[0], timestamps_0[-1] + 1)
+                ]
+            )
+        )
 
         # violation check
-        v = Real('v')
-        s.add(And(v >= timestamps0[0], v <= timestamps0[-1]))
+        v = Int("v")
+        s.add(And(v >= timestamps_0[0], v <= timestamps_0[-1]))
 
-        s.add(ForAll(v, Implies(And(v >= timestamps0[0], v <= timestamps0[-1]), z3Interpolate(c_flow, v) >= 20)))
-        # s.add(z3Interpolate(c_flow, v) == 15)
-        # s.add(v == 10)
+        s.add(
+            Implies(
+                And(v >= timestamps_0[0], v <= timestamps_0[-1]),
+                z3Interpolate(c_flow, v) >= 10
+            )
+        )
 
-        start = time.time()
-
+        # print(s.assertions())
         if s.check() == sat:
-
             m = s.model()
             # out = "%s %s" % (m[test], m[test2])
             # print(m)
+            ##print("unsat in segment", i)
+            flag = False
+            # terminate after unsat
+            return flag
 
-        end = time.time()
-
-        # else:
-        #
-        #     print("unsat")
+        elif i <= segCount:
+            ##print("sat in segment", i)
+            flag = True
 
         s.reset()
 
-        dur = end - start
-        return dur
-
+    return flag
 
 def z3Interpolate(f, p):
 
-    return (f(ToInt(p)) + ((f(ToInt(p) + 1) - f(ToInt(p))) * (p - ToInt(p))))
-
+    # return (f(ToInt(p)) + ((f(ToInt(p) + 1) - f(ToInt(p))) * (p - ToInt(p))))
+    return f(p)
 
 def z3Abs(x):
 
@@ -598,140 +1270,57 @@ def getDataTank(agent_ID):
 
     return data
 
-
 def main():
+    # set repeat count for confidence interval
+    repeat = 1
+    d = 1000
 
-    eps = 0.05
+    for n in (2, 3, 4):
+        for eps in (1, 2, 4, 8):
+            eps = eps * 0.05
 
-    agents2 = True
-    agents3 = True
-    agents4 = True
+            if (n == 2):
+                for i in range(repeat):
+                    out = "0"
+                    t0 = time.time()
+                    flag = prog_tp2(eps, 1)
+                    t1 = time.time()
+                    if (flag):
+                        out = "1"
+                    line = str(d) + " " + str(eps) + " " + str((t1 - t0) / repeat) + " " + out
+                    print(line)
+                    results = open("results_wt2.txt", "a")
+                    results.write(line + "\n")
+                    results.close()
 
-    if len(sys.argv) == 3:
+            elif (n == 3):
+                for i in range(repeat):
+                    out = "0"
+                    t0 = time.time()
+                    flag = prog_tp3(eps, 1)
+                    t1 = time.time()
+                    if (flag):
+                        out = "1"
+                    line = str(d) + " " + str(eps) + " " + str((t1 - t0) / repeat) + " " + out
+                    print(line)
+                    results = open("results_wt3.txt", "a")
+                    results.write(line + "\n")
+                    results.close()
 
-        epsTemp = max(float(sys.argv[1]), 0.01)
-        eps = max(epsTemp, 0.05)
-        agentsTemp = max(int(sys.argv[2]), 2)
-        agents = min(agentsTemp, 4)
+            elif (n == 4):
+                for i in range(repeat):
+                    out = "0"
+                    t0 = time.time()
+                    flag = prog_tp4(eps, 1)
+                    t1 = time.time()
+                    if (flag):
+                        out = "1"
+                    line = str(d) + " " + str(eps) + " " + str((t1 - t0) / repeat) + " " + out
+                    print(line)
+                    results = open("results_wt4.txt", "a")
+                    results.write(line + "\n")
+                    results.close()           
 
-        if agents == 2:
-
-            agents3 = False
-            agents4 = False
-
-        if agents == 3:
-
-            agents2 = False
-            agents4 = False
-
-        if agents == 4:
-
-            agents2 = False
-            agents3 = False
-
-    print("Reproducing experiments...\n")
-
-    print("Pressure level safety property:\n")
-
-    repeat = 50
-    multiproc = False
-
-    print("\tDuration 1s\t\tDuration 2s\t\tDuration 3s\t\tDuration 4s\t\tDuration 5s", end = "")
-
-    if agents2:
-
-        print("\n\n2 Tanks\t", end = "")
-
-        for i in range(5):
-
-            total_time = 0
-
-            if multiproc:
-
-                pool = multiprocessing.Pool()
-
-                inputs = [(eps, i + 1, 1) for j in range(repeat)]
-                outputs = pool.starmap(prog_tanks_pressure, inputs)
-
-                total_time = sum(outputs)
-
-            else:
-
-                for j in range(repeat):
-                    if i < 4:
-                        continue
-                    start = time.time()
-                    # prog_tanks_pressure(eps, i + 1, 1)
-                    end = time.time()
-                    dur = end - start
-                    total_time += prog_tanks_pressure(eps, i + 1, 100)
-
-            print("{}\t".format(total_time / repeat), end = "")
-
-    if agents3:
-
-        print("\n\n3 Tanks\t", end = "")
-
-        for i in range(5):
-
-            total_time = 0
-
-            if multiproc:
-
-                pool = multiprocessing.Pool()
-
-                inputs = [(eps, i + 1, 1) for j in range(repeat)]
-                outputs = pool.starmap(prog_tanks_pressure_3, inputs)
-
-                total_time = sum(outputs)
-
-            else:
-
-                for j in range(repeat):
-                    if i < 4:
-                        continue
-                    start = time.time()
-                    # prog_tanks_pressure_3(eps, i + 1, 1)
-                    end = time.time()
-                    dur = end - start
-                    total_time += prog_tanks_pressure_3(eps, i + 1, 100)
-
-            print("{}\t".format(total_time / repeat), end = "")
-
-    if agents4:
-
-        print("\n\n4 Tanks\t", end = "")
-
-        for i in range(5):
-
-            total_time = 0
-
-            if multiproc:
-
-                pool = multiprocessing.Pool()
-
-                inputs = [(eps, i + 1, 1) for j in range(repeat)]
-                outputs = pool.starmap(prog_tanks_pressure_4, inputs)
-
-                total_time = sum(outputs)
-
-            else:
-
-                for j in range(repeat):
-                    if i < 4:
-                        continue
-                    start = time.time()
-                    # prog_tanks_pressure_4(eps, i + 1, 1)
-                    end = time.time()
-                    dur = end - start
-                    total_time += prog_tanks_pressure_4(eps, i + 1, 100)
-
-            print("{}\t".format(total_time / repeat), end = "")
-
-    print()
-
-
-if __name__ == '__main__':
-
+if __name__ == "__main__":
     main()
     pass
