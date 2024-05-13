@@ -1232,8 +1232,8 @@ def z3SqDist1d(x1, x2):
 
 
 def getDataTank(agent_ID):
-
-    file = open('data/wt/s5_tank_{}'.format(agent_ID))
+    file = open('/home/ege/Desktop/repos/distributed-monitoring/code/smt/data/wt/s5_tank_{}'.format(agent_ID))
+    # file = open('data/wt/s5_tank_{}'.format(agent_ID))
     line = file.readline()
 
     data = []

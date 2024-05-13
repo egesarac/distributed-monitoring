@@ -17,7 +17,7 @@
 #include "functions.cpp"
 using namespace std;
 
-#define REP 1
+#define REP 10
 
 int main()
 {
@@ -26,34 +26,35 @@ int main()
     vector<long long> EPS{1000, 2000, 4000, 8000};
     //vector<long long> DEL{1, 1000, 2000, 4000, 8000};
     int n = 2;
-    
+    int del = 0;
+
     long long a = 0;
     long long b = 15000;
+    vector<long long> B{15000,16000};
     bool leftClosed = true;
     bool rightClosed = false;
 
 
     ofstream results;
-    // string filename = "results_ac_coarse.txt";
-    string filename = "results_ed_0_15000_1_0.txt";
+    string filename = "results_edI_new1516rep10.txt";
+    // string filename = "results_ed_0_15000_1_0.txt";
     results.open(filename);
 
+    for (auto bb : B)
+    {
+    b = bb;
     for (const auto &d : D)
     {
+        if (d < b)
+        {
+            continue;
+        }
         for (const auto &eps : EPS)
         {
-            if (d < eps || d < b)
+            if (d < eps)
             {
                 continue;
             }
-
-            //for (const auto &del : DEL)
-            //{
-                int del = 1;
-                if (eps < del)
-                {
-                    continue;
-                }
 
                 for (int c = 0; c < 100; c++)
                 {
@@ -124,6 +125,9 @@ int main()
                        
                         // always(x1 implies eventually_[0,2](x2))
                         // test = bitsetAlways(bitsetNegation(bitsetConjunction(aps[0], bitsetBoundedAlways(bitsetNegation(aps[1]), segmentation, 0, 2000, true, true))));
+                       
+                        // always(x1 implies eventually_[0,1](x2))
+                        // test = bitsetAlways(bitsetNegation(bitsetConjunction(aps[0], bitsetBoundedAlways(bitsetNegation(aps[1]), segmentation, 0, 1000, true, true))));
                         
                         // always(x1 implies eventually_[1,2](x2))
                         // test = bitsetAlways(bitsetNegation(bitsetConjunction(aps[0], bitsetBoundedAlways(bitsetNegation(aps[1]), segmentation, 1000, 2000, true, true))));
@@ -169,7 +173,7 @@ int main()
                     results << w << endl;
                     cout << w << endl;
                 }
-            //}
+            }
         }
     }
 

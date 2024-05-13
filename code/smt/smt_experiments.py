@@ -1407,8 +1407,8 @@ def getDataTest(agent_ID):
     return data
 
 def getData(d, setID):
-
-    file = open("dataNew/{}_{}.txt".format(d, setID))
+    file = open('/home/ege/Desktop/repos/distributed-monitoring/code/smt/dataNew/{}_{}.txt'.format(d, setID))
+    # file = open("dataNew/{}_{}.txt".format(d, setID))
     # file = open(
     #     "{}\\dataNew\\{}_{}.txt".format(
     #         os.path.dirname(os.path.abspath(__file__)), d, setID
@@ -1460,7 +1460,7 @@ def main():
     # set repeat count for confidence interval
     repeat = 1
 
-    for d in (4, 8, 16, 32):
+    for d in (4, 8, 16):
         for eps in (1, 2, 4, 8):
             if d < eps:
                 continue
@@ -1501,7 +1501,7 @@ def main():
                 results.write(line + "\n")
                 results.close()
 
-    for d in (4, 8, 16, 32):
+    for d in (4, 8, 16):
         for eps in (1, 2, 4, 8):
             if d < eps:
                 continue
@@ -1542,7 +1542,7 @@ def main():
                 results.write(line + "\n")
                 results.close()
 
-    for d in (4, 8, 16, 32):
+    for d in (4, 8, 16):
         for eps in (1, 2, 4, 8):
             if d < eps:
                 continue
@@ -1583,7 +1583,7 @@ def main():
                 results.write(line + "\n")
                 results.close()
 
-    for d in (4, 8, 16, 32):
+    for d in (4, 8, 16):
         for eps in (1, 2, 4, 8):
             if d < eps:
                 continue

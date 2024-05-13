@@ -17,15 +17,15 @@
 #include "functions.cpp"
 using namespace std;
 
-#define REP 50
+#define REP 10
 
 int main()
 {
     /* set variables */
     vector<long long> N{2, 3, 4};
-    vector<long long> EPS{1, 2, 4};
+    vector<long long> EPS{1, 2, 4, 8};
     int k = 50;
-    int d = 5000;
+    int d = 1000;
     int del = 0;
     /*
     long long a = 0;
