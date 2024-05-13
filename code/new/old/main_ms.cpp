@@ -17,38 +17,34 @@
 #include "functions.cpp"
 using namespace std;
 
-#define REP 3
+#define REP 1
 
 int main()
 {
     /* set variables */
-    vector<long long> N{2,3,4};
-    vector<long long> EPS{8};
-    int k = 50;
+    int n = 3;
     int d = 1000;
+    int eps = 50 * 4;
     int del = 1;
-    
     /*
     long long a = 0;
     long long b = 8000;
     bool leftClosed = true;
     bool rightClosed = false;
     */
-   for (auto n : N) {
-    for (auto eps : EPS) {
-        eps = eps * k;
-        // int n = 3;
-        // int eps = 1 * k;
 
     /* read signal data */
-    vector<vector<pair<long long, double>>> signalsReal(3 * n);
-    for (int i = 0; i < 3 * n; i = i + 3)
-    {
-        signalsReal[i] = getData3d("data/uav/s1_uav_" + to_string(i / 3), 0);
-        signalsReal[i + 1] = getData3d("data/uav/s1_uav_" + to_string(i / 3), 1);
-        signalsReal[i + 2] = getData3d("data/uav/s1_uav_" + to_string(i / 3), 2);
-    }
-    
+    vector<vector<pair<long long, double>>> signalsReal(3*n);
+    signalsReal[0] = getData3d("data/uav/s1_uav_0", 0);
+    signalsReal[1] = getData3d("data/uav/s1_uav_0", 1);
+    signalsReal[2] = getData3d("data/uav/s1_uav_0", 2);
+    signalsReal[3] = getData3d("data/uav/s1_uav_1", 0);
+    signalsReal[4] = getData3d("data/uav/s1_uav_1", 1);
+    signalsReal[5] = getData3d("data/uav/s1_uav_1", 2);
+    signalsReal[6] = getData3d("data/uav/s1_uav_2", 0);
+    signalsReal[7] = getData3d("data/uav/s1_uav_2", 1);
+    signalsReal[8] = getData3d("data/uav/s1_uav_2", 2);
+
     /* prepare the bit masks */
     evenMask = generateBitmask(0);
     oddMask = generateBitmask(1);
@@ -57,7 +53,6 @@ int main()
     vector<vector<bitset<SIZE>>> test;
     chrono::time_point<chrono::system_clock> starttime;
     chrono::time_point<chrono::system_clock> endtime; 
-    chrono::duration<double, milli> totalTime;
     
     starttime = chrono::system_clock::now();
     for (int rep = 0; rep < REP; rep++)
@@ -76,49 +71,58 @@ int main()
         set<int> leaders = {0, 1, 2};
         vector<vector<set<string>>> valExprs = computeRelativeValueExpressions(leaders, signalsReal, uncertainties, segmentation);
         // vector<vector<set<string>>> valExprs = computeValueExpressions(signalsReal, uncertainties, segmentation);
-        vector<vector<set<string>>> valExprsFinal;
+        // cout << valExprs[0][10].size() << endl;
 
-        vector<set<string>> ve = valExprs[0];
-        for (int i = 1; i < n; i++)
-        {
-            vector<set<string>> vex = abstProdStrDiffSqr(valExprs[0], valExprs[3 * i]);
-            vector<set<string>> vey = abstProdStrDiffSqr(valExprs[1], valExprs[3 * i + 1]);
-            vector<set<string>> vez = abstProdStrDiffSqr(valExprs[2], valExprs[3 * i + 2]);
-            vector<set<string>> vexy = abstProdStrSum(vex, vey);
-            vector<set<string>> vexyz = abstProdStrSum(vexy, vez);
-            valExprsFinal.push_back(vexyz);
+        // vector<set<string>> vex = asyncProdStrDiffSqr(valExprs[0], valExprs[3]);
+        vector<set<string>> vex = abstProdStrDiffSqr(valExprs[0], valExprs[3]);
+        // cout << vex[10].size() << endl;
 
-        }
+        // vector<set<string>> vey = asyncProdStrDiffSqr(valExprs[1], valExprs[4]);
+        vector<set<string>> vey = abstProdStrDiffSqr(valExprs[1], valExprs[4]);
+        // cout << vey[10].size() << endl;
+
+        // vector<set<string>> vez = asyncProdStrDiffSqr(valExprs[2], valExprs[5]);
+        vector<set<string>> vez = abstProdStrDiffSqr(valExprs[2], valExprs[5]);
+        // cout << vez[10].size() << endl;
+
+        // vector<set<string>> vexy = asyncProdStrSum(vex, vey);
+        vector<set<string>> vexy = abstProdStrSum(vex, vey);
+        // cout << vexy[10].size() << endl;
+
+        // vector<set<string>> vexyz = asyncProdStrSum(vexy, vez);
+        vector<set<string>> vexyz = abstProdStrSum(vexy, vez);
+        // cout << vexyz[10].size() << endl;
+
+
+        vector<set<string>> vvex = abstProdStrDiffSqr(valExprs[0], valExprs[6]);
+        vector<set<string>> vvey = abstProdStrDiffSqr(valExprs[1], valExprs[7]);
+        vector<set<string>> vvez = abstProdStrDiffSqr(valExprs[2], valExprs[8]);
+        vector<set<string>> vvexy = abstProdStrSum(vvex, vvey);
+        vector<set<string>> vvexyz = abstProdStrSum(vvexy, vvez);
+
+        // skip the square root since the distance parameter is 0
+        // valExprs = {vexyz};
+        valExprs = {vexyz, vvexyz};
 
         /* translate signals to atomic propositions */
-        vector<vector<vector<bitset<SIZE>>>> aps = convertSignalsToAtomicPropositions(valExprsFinal, 0.0);
+        vector<vector<vector<bitset<SIZE>>>> aps = convertSignalsToAtomicPropositions(valExprs, 0.0);
 
         /* evaluate the formula */
-        vector<vector<vector<bitset<SIZE>>>> testVec;
-        for (int i = 0; i < n - 1; i++) 
-        {
-            testVec.push_back(bitsetAlways(aps[i]));
-        }
-        for (int i = 1; i < n - 1; i++) 
-        {
-            testVec[0] = bitsetConjunction(testVec[0], testVec[i]);
-        }
-
-        test = testVec[0];
+        // test = bitsetAlways(aps[0]);
+        test = bitsetAlways(bitsetConjunction(aps[0], aps[1]));
         // test = bitsetConjunction(aps[0], aps[1]);
         // test = bitsetEventually(test);
         // test = bitsetEventually(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1])))); // this is faster
         // test = bitsetAlways(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1])))); // this is faster
         ////test = bitsetNegation(bitsetAlways(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))));
-        // test = bitsetUntilStrict(aps[0], aps[1]);
+        //test = bitsetUntilStrict(aps[0], aps[1]);
         // test = bitsetBoundedEventually(aps[0], segmentation, a, b, leftClosed, rightClosed);
-    }
-    
-    endtime = chrono::system_clock::now();
-    totalTime += endtime - starttime;
 
+
+    }
+    endtime = chrono::system_clock::now();
+    chrono::duration<double, milli> totalTime = endtime - starttime;
     cout << d << " " << eps << " " << del << " " << numSegments << " " << (totalTime.count() / REP) / 1000 << " " << test[0][0].any() << " " << test[0][1].any() << endl;
-     }
-   }
+
     return 0;
 }

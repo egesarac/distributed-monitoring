@@ -403,6 +403,41 @@ vector<set<string>> abstProdCoarseStrSum(const vector<set<string>> &v1, const ve
     return out;
 }
 
+vector<set<string>> abstProdStrDiffSqr(const vector<set<string>> &v1, const vector<set<string>> &v2)
+{
+    vector<set<string>> out(v1.size());
+
+    for (int i = 0; i < v1.size(); i++)
+    {
+        for (auto s1 : v1[i])
+        {
+            if (!s1.empty())
+            {
+                set<double> vals1 = splitSet(s1, ";");
+                
+                for (auto s2 : v2[i])
+                {
+                    if(!s2.empty())
+                    {
+                        set<double> vals2 = splitSet(s2, ";");
+                        
+                        for (auto e1 : vals1) 
+                        {
+                            for (auto e2 : vals2)
+                            {
+                                out[i].insert(to_string((e1 - e2) * (e1 - e2)));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return out;
+}
+
+
 vector<set<string>> asyncProdStrDiffSqr(const vector<set<string>> &v1, const vector<set<string>> &v2)
 {
     vector<set<string>> out(v1.size());

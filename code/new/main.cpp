@@ -24,32 +24,28 @@ int main()
     /* set variables */
     vector<long long> D{4000, 8000, 16000};
     vector<long long> EPS{1000, 2000, 4000, 8000};
-    //vector<long long> DEL{1, 1000, 2000, 4000, 8000};
     int n = 2;
-    int del = 0;
+    int del = 1;
 
     long long a = 0;
-    long long b = 15000;
-    vector<long long> B{15000,16000};
     bool leftClosed = true;
     bool rightClosed = false;
 
 
     ofstream results;
-    string filename = "results_edI_new1516rep10.txt";
-    // string filename = "results_ed_0_15000_1_0.txt";
+    // string filename = "results_aie12_new.txt";
+    string filename = "results_edIrep10_newXXXXXXXX.txt";
     results.open(filename);
 
-    for (auto bb : B)
+    for (long long b = 1000; b <= 16000; b += 1000)
     {
-    b = bb;
-    for (const auto &d : D)
+    for (auto d : D)
     {
         if (d < b)
         {
             continue;
         }
-        for (const auto &eps : EPS)
+        for (auto eps : EPS)
         {
             if (d < eps)
             {
@@ -161,7 +157,7 @@ int main()
                         out = "0";
                     }
 
-                    string w = to_string(d / 1000) + " " + to_string(eps / 1000) + " " + to_string(del / 1000) + " " + to_string(c) + " ";
+                    string w = to_string(b) + " " + to_string(d / 1000) + " " + to_string(eps / 1000) + " " + to_string(del / 1000) + " " + to_string(c) + " ";
                     if (invalidSignal)
                     {
                          w = w + "-" + " " + "-" + " " + "-";

@@ -26,7 +26,8 @@ int main()
     vector<long long> EPS{1, 2, 4, 8};
     int k = 50;
     int d = 1000;
-    int del = 0;
+    int del = 1;
+    
     /*
     long long a = 0;
     long long b = 8000;
@@ -36,6 +37,8 @@ int main()
    for (auto n : N) {
     for (auto eps : EPS) {
         eps = eps * k;
+        // int n = 3;
+        // int eps = 1 * k;
 
     /* read signal data */
     vector<vector<pair<long long, double>>> signalsReal(n);
@@ -75,8 +78,8 @@ int main()
         for (int i = 1; i < n; i++)
         {
             // ve = asyncProdStrSum(ve, valExprs[i]);
-            ve = abstProdCoarseStrSum(ve, valExprs[i]);
             // ve = abstProdStrSum(ve, valExprs[i]);
+            ve = abstProdCoarseStrSum(ve, valExprs[i]);
 
         }
         valExprs = {ve};
