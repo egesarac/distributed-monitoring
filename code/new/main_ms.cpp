@@ -17,13 +17,13 @@
 #include "functions.cpp"
 using namespace std;
 
-#define REP 3
+#define REP 1
 
 int main()
 {
     /* set variables */
     vector<long long> N{2,3,4};
-    vector<long long> EPS{8};
+    vector<long long> EPS{1,2,4,8};
     int k = 50;
     int d = 1000;
     int del = 1;
@@ -73,19 +73,24 @@ int main()
         numSegments = segmentation.size() - 1;
 
         /* compute the value expressions */
-        set<int> leaders = {0, 1, 2};
-        vector<vector<set<string>>> valExprs = computeRelativeValueExpressions(leaders, signalsReal, uncertainties, segmentation);
-        // vector<vector<set<string>>> valExprs = computeValueExpressions(signalsReal, uncertainties, segmentation);
+        // set<int> leaders = {0, 1, 2};
+        // vector<vector<set<string>>> valExprs = computeRelativeValueExpressions(leaders, signalsReal, uncertainties, segmentation);
+        vector<vector<set<string>>> valExprs = computeValueExpressions(signalsReal, uncertainties, segmentation);
         vector<vector<set<string>>> valExprsFinal;
 
         vector<set<string>> ve = valExprs[0];
         for (int i = 1; i < n; i++)
         {
-            vector<set<string>> vex = abstProdStrDiffSqr(valExprs[0], valExprs[3 * i]);
-            vector<set<string>> vey = abstProdStrDiffSqr(valExprs[1], valExprs[3 * i + 1]);
-            vector<set<string>> vez = abstProdStrDiffSqr(valExprs[2], valExprs[3 * i + 2]);
-            vector<set<string>> vexy = abstProdStrSum(vex, vey);
-            vector<set<string>> vexyz = abstProdStrSum(vexy, vez);
+            vector<set<string>> vex = asyncProdStrDiffSqr(valExprs[0], valExprs[3 * i]);
+            vector<set<string>> vey = asyncProdStrDiffSqr(valExprs[1], valExprs[3 * i + 1]);
+            vector<set<string>> vez = asyncProdStrDiffSqr(valExprs[2], valExprs[3 * i + 2]);
+            vector<set<string>> vexy = asyncProdStrSum(vex, vey);
+            vector<set<string>> vexyz = asyncProdStrSum(vexy, vez);
+            // vector<set<string>> vex = abstProdStrDiffSqr(valExprs[0], valExprs[3 * i]);
+            // vector<set<string>> vey = abstProdStrDiffSqr(valExprs[1], valExprs[3 * i + 1]);
+            // vector<set<string>> vez = abstProdStrDiffSqr(valExprs[2], valExprs[3 * i + 2]);
+            // vector<set<string>> vexy = abstProdStrSum(vex, vey);
+            // vector<set<string>> vexyz = abstProdStrSum(vexy, vez);
             valExprsFinal.push_back(vexyz);
 
         }

@@ -71,15 +71,15 @@ int main()
         numSegments = segmentation.size() - 1;
 
         /* compute the value expressions */
-        set<int> leaders = {0};
-        vector<vector<set<string>>> valExprs = computeRelativeValueExpressions(leaders, signalsReal, uncertainties, segmentation);
-        // vector<vector<set<string>>> valExprs = computeValueExpressions(signalsReal, uncertainties, segmentation);
+        // set<int> leaders = {0};
+        // vector<vector<set<string>>> valExprs = computeRelativeValueExpressions(leaders, signalsReal, uncertainties, segmentation);
+        vector<vector<set<string>>> valExprs = computeValueExpressions(signalsReal, uncertainties, segmentation);
         vector<set<string>> ve = valExprs[0];
         for (int i = 1; i < n; i++)
         {
-            // ve = asyncProdStrSum(ve, valExprs[i]);
+            ve = asyncProdStrSum(ve, valExprs[i]);
             // ve = abstProdStrSum(ve, valExprs[i]);
-            ve = abstProdCoarseStrSum(ve, valExprs[i]);
+            // ve = abstProdCoarseStrSum(ve, valExprs[i]);
 
         }
         valExprs = {ve};
