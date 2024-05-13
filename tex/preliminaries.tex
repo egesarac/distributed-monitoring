@@ -119,11 +119,6 @@ We denote by $c_i^{-1}$ the inverse of the local clock function $c_i$.
 
 We assume that the system is \emph{partially synchronous}: the agents use a clock synchronization algorithm that guarantees a bounded clock skew with respect to the global clock, i.e., $|c_i(T) - c_j(T)| < \varepsilon$ for all $1 \leq i,j \leq N$ and $T \in \R_{\geq 0}$, where $\varepsilon \in \R_{> 0}$ is the maximum clock skew.
 
-\alert{
-We assume that signals have \emph{bounded variability} with respect to the global clock: for each signal $x_i$ and every pair $(t, x_i(t)), (t', x_i(t')) \in E_i$ of edges, we have $|c_j^{-1}(t) - c_j^{-1}(t')| \geq \delta$ where $\delta \in \R_{\geq 0}$ is the variability bound.
-}
-\ege{This definition made sense when we defined partial synchrony with respect to the global clock. It seems off with the pairwise definition of partial synchrony. Do we even use this assumption now? Maybe we can assume equally spaced edges for the theoretical analysis and epsilon in relation to sampling frequency?}
-
 \begin{definition} \label{defn:hb}
 	A \emph{distributed signal} is a pair $(S, {\hb})$, where $S = (x_1, \ldots, x_n)$ is a vector of 
 	signals and ${\hb}$ is the happened-before relation between events in signals extended with the 
@@ -161,7 +156,6 @@ Observe that a consistent cut flow of a distributed signal induces a vector of s
 Let $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots, x_n$.
 A consistent cut flow $\ccf \in \CCF(S,{\hb})$ yields a trace $w_{\ccf} = (x'_1, \ldots x'_n)$ on a temporal domain $[0,D)$ where $D \in \R_{> 0}$ such that $(c_i(T), x_i(c_i(T))) \in \ccf(T)$ implies $x_i'(T) = x_i(c_i(T))$ for all $1 \leq i \leq n$ and $T \in [0, D)$.
 The set of traces of $(S,{\hb})$ is given by $\tr(S,{\hb}) = \{ w_{\ccf} \st \ccf \in \CCF(S,{\hb})\}$.
-\alert{Moreover, we write $\tr(S,{\hb},\delta)$ for the largest subset of $\tr(S,{\hb})$ where all signals of all traces satisfy the bounded variability assumption with respect to the constant $\delta$.}
 
 We define the satisfaction of an STL formula $\varphi$ by a distributed signal $(S,{\hb})$ over a three-valued domain $\{\top, \bot, {?}\}$.
 \small
