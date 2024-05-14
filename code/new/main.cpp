@@ -17,34 +17,34 @@
 #include "functions.cpp"
 using namespace std;
 
-#define REP 10
+#define REP 1
 
 int main()
 {
     /* set variables */
-    vector<long long> D{4000, 8000, 16000};
+    vector<long long> D{4000, 8000, 16000, 32000};
     vector<long long> EPS{1000, 2000, 4000, 8000};
     int n = 2;
     int del = 1;
 
-    long long a = 0;
-    bool leftClosed = true;
-    bool rightClosed = false;
+    // long long a = 0;
+    // bool leftClosed = true;
+    // bool rightClosed = false;
 
 
     ofstream results;
     // string filename = "results_aie12_new.txt";
-    string filename = "results_edIrep10_newXXXXXXXX.txt";
+    string filename = "results_TEST.txt";
     results.open(filename);
 
-    for (long long b = 1000; b <= 16000; b += 1000)
-    {
+    // for (long long b = 1000; b <= 16000; b += 1000)
+    // {
     for (auto d : D)
     {
-        if (d < b)
-        {
-            continue;
-        }
+        // if (d < b)
+        // {
+        //     continue;
+        // }
         for (auto eps : EPS)
         {
             if (d < eps)
@@ -63,7 +63,7 @@ int main()
                     evenMask = generateBitmask(0);
                     oddMask = generateBitmask(1);
 
-                    bool invalidSignal = false;
+                    // bool invalidSignal = false;
                     int numSegments;
                     vector<vector<bitset<SIZE>>> test;
                     chrono::time_point<chrono::system_clock> starttime;
@@ -105,7 +105,7 @@ int main()
                         // test = bitsetAlways(bitsetConjunction(aps[0], aps[1]));
 
                         // always(x1 or x2)
-                        // test = bitsetAlways(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))));
+                        test = bitsetAlways(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))));
 
                         // eventually(x1 and x2)
                         // test = bitsetEventually(bitsetConjunction(aps[0], aps[1]));
@@ -129,7 +129,7 @@ int main()
                         // test = bitsetAlways(bitsetNegation(bitsetConjunction(aps[0], bitsetBoundedAlways(bitsetNegation(aps[1]), segmentation, 1000, 2000, true, true))));
 
                         // eventually_I(x1 or x2)
-                        test = bitsetBoundedEventually(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))), segmentation, a, b, leftClosed, rightClosed);
+                        // test = bitsetBoundedEventually(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))), segmentation, a, b, leftClosed, rightClosed);
 
                         // vector<set<pair<string, string>>> prod = asyncProd(aps[0], aps[1]);
                         // vector<set<string>> prodTest = prodUntilNonStrict(prod, false); // pass 'false' for strong until, 'true' for weak until
@@ -157,21 +157,23 @@ int main()
                         out = "0";
                     }
 
-                    string w = to_string(b) + " " + to_string(d / 1000) + " " + to_string(eps / 1000) + " " + to_string(del / 1000) + " " + to_string(c) + " ";
-                    if (invalidSignal)
-                    {
-                         w = w + "-" + " " + "-" + " " + "-";
-                    }
-                    else
-                    {
+                    string w = to_string(d / 1000) + " " + to_string(eps / 1000) + " " + to_string(del / 1000) + " " + to_string(c) + " ";
+                    // string w = to_string(b) + " " + to_string(d / 1000) + " " + to_string(eps / 1000) + " " + to_string(del / 1000) + " " + to_string(c) + " ";
+                    
+                    // if (invalidSignal)
+                    // {
+                    //      w = w + "-" + " " + "-" + " " + "-";
+                    // }
+                    // else
+                    // {
                         w = w + to_string(numSegments) + " " + to_string((totalTime.count() / REP) / 1000) + " " + out;
-                    }
+                    // }
                     results << w << endl;
                     cout << w << endl;
                 }
             }
         }
-    }
+    // }
 
     results.close();
 

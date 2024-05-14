@@ -22,9 +22,9 @@ using namespace std;
 int main()
 {
     /* set variables */
-    int n = 2;
+    int n = 1;
     int d = 4000;
-    int eps = 1000;
+    int eps = 2000;
     int del = 1;
     /*
     long long a = 0;
@@ -36,7 +36,7 @@ int main()
     /* read signal data */
     vector<vector<pair<long long, double>>> signalsReal(n);
     signalsReal[0] = getData("test1.txt");
-    signalsReal[1] = getData("test2.txt");
+    // signalsReal[1] = getData("test2.txt");
     
     /* prepare the bit masks */
     evenMask = generateBitmask(0);
@@ -63,20 +63,20 @@ int main()
 
         /* compute the value expressions */
         vector<vector<set<string>>> valExprs = computeValueExpressions(signals, uncertainties, segmentation);
-        vector<set<string>> asdf = asyncProdStrSum(valExprs[0], valExprs[1]);
-        vector<vector<set<string>>> asdff = {asdf};
+        // vector<set<string>> asdf = asyncProdStrSum(valExprs[0], valExprs[1]);
+        // vector<vector<set<string>>> asdff = {asdf};
 
         /* translate signals to atomic propositions */
-        vector<vector<vector<bitset<SIZE>>>> aps = convertSignalsToAtomicPropositions(asdff, 3);
-        vector<vector<vector<bitset<SIZE>>>> apss = convertSignalsToAtomicPropositions(asdff, 2);
+        vector<vector<vector<bitset<SIZE>>>> aps = convertSignalsToAtomicPropositions(valExprs, 0);
+        // vector<vector<vector<bitset<SIZE>>>> apss = convertSignalsToAtomicPropositions(asdff, 2);
 
         /* evaluate the formula */
         // test = bitsetConjunction(aps[0], aps[1]);
-        // test = bitsetAlways(aps[0]);
+        test = bitsetAlways(aps[0]);
         // test = bitsetEventually(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1])))); // this is faster
         // test = bitsetAlways(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1])))); // this is faster
         ////test = bitsetNegation(bitsetAlways(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))));
-        test = bitsetUntilStrict(aps[0], apss[0]);
+        // test = bitsetUntilStrict(aps[0], apss[0]);
         // test = bitsetBoundedEventually(aps[0], segmentation, a, b, leftClosed, rightClosed);
 
         endtime = chrono::system_clock::now();

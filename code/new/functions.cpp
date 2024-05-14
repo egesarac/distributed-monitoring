@@ -2548,17 +2548,19 @@ pair<int, int> convertIntoBoolWithDestutter(string str, string delimiter, float 
     return make_pair(x, y);
 }
 
-vector<pair<long long, double>> getData(const string &fileName) 
+vector<pair<long long, double>> getData(const string &fileName, const int &len) 
 {
     vector<pair<long long, double>> signalReal;
     ifstream sigdata(fileName);
     string line;
-    while (getline(sigdata, line))
+    int ctr = 0;
+    while (getline(sigdata, line) && ctr < len)
     {
         stringstream linestream(line);
         double t, v;
         linestream >> t >> v;
         signalReal.push_back(make_pair((long long)(t * 1000), v));
+        ctr++;
     }
     sigdata.close();
 
@@ -2627,17 +2629,24 @@ vector<vector<vector<long long>>> computeUncertaintyIntervals(const vector<vecto
             uncertainties[i][0].push_back(-del);
             for (int j = 1; j < gi; j++)
             {
-                long long tj = signals[i][j].first;
-                long long low = max(uncertainties[i][j - 1][0] + del, tj - eps);
-                uncertainties[i][j].push_back(low);
+                // if (signals[i][j].second != signals[i][j - 1].second)
+                // {
+                    long long tj = signals[i][j].first;
+                    long long low = max(uncertainties[i][j - 1][0] + del, tj - eps);
+                    uncertainties[i][j].push_back(low);                   
+                // }
+
             }
 
             uncertainties[i][gi - 1].push_back(signals[i][gi - 1].first + eps);
             for (int j = gi - 2; j > 0; j--)
             {
-                long long tj = signals[i][j].first;
-                long long high = min(uncertainties[i][j + 1][1] - del, tj + eps);
-                uncertainties[i][j].push_back(high);
+                // if (signals[i][j].second != signals[i][j + 1].second)
+                // {
+                    long long tj = signals[i][j].first;
+                    long long high = min(uncertainties[i][j + 1][1] - del, tj + eps);
+                    uncertainties[i][j].push_back(high);
+                // }
             }
         }
     
