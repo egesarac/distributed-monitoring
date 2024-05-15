@@ -1,23 +1,13 @@
 \section{Overapproximation of Synchronous Traces} \label{sec:approach}
-\alert{TODO: summary. main idea is to reduce bookkeeping as much as possible to improve scalability. note we use bool signals for convenience of demonstration, but the methods are general unless otherwise stated. finite signals obviously yield a finite alphabet. we use the values 0 and 1 for boolean signals. first describe a way of partitioning the temporal domain, then a way of encoding signals' behaviors as observed by the monitor and assigning them to these parts.}
+In this section, given a distributed signal $(S,{\hb})$, we describe an overapproximation $\tr^+(S,{\hb})$ of its set $\tr(S,{\hb})$ of synchronous traces.
+First, we present the notion of \emph{canonical segmentation}, a systematic way of partitioning the temporal domain of a given distributed signal to keep track of the partial asynchrony.
+Second, we introduce the notion of \emph{value expressions}, sets of finite words representing how a signal behaves in a time interval.
+Finally, we define $\tr^+$ based on these notions, and show that it soundly approximates $\tr$.
 
-STL$^+$ has the same syntax as STL and the below semantics.
-$\tr^+(S,{\hb})$ is the overapproximation we compute.
-
-\small
-\begin{equation*}
-	[(S,{\hb}) \models \varphi]_{\mathsf{STL}^+} = 
-	\begin{cases}
-		\top & \text{ if } \forall w \in \tr^+(S,{\hb}) : [w \models \varphi]_{\mathsf{STL}} \\
-		\bot & \text{ if } \forall w \in \tr^+(S,{\hb}) : [w \models \lnot\varphi]_{\mathsf{STL}} \\
-		\,? & \text{ otherwise}
-	\end{cases}
-\end{equation*}
-\normalsize
-
-\begin{theorem}
-	For every STL formula $\varphi$ and every distributed signal $(S,{\hb})$, if $[(S,{\hb}) \models \varphi]_{\mathsf{STL}^+} = \top$ (resp. $\bot$) then $[(S,{\hb}) \models \varphi]_{\mathsf{STL}} = \top$ (resp. $\bot$).
-\end{theorem}
+\begin{remark}
+	We assume boolean signals in this section for convenience.
+	The definitions and results presented here extend to real-valued signals.
+\end{remark}
 
 \subsubsection{Canonical Segmentation}
 Consider a boolean signal $x$ with a rising edge at time $t > \varepsilon$.
@@ -39,33 +29,26 @@ By extension, a segmentation of a collection of signals with the same temporal d
 %We use these to describe a canonical segmentation of a distributed signal.
 
 Let $(S,{\hb})$ be a distributed signal of $n$ signals.
-The \emph{canonical segmentation} $G_S$ of $(S,{\hb})$ is the segmentation of $S$ where the end points of the segments coincide with the end points of its edges' uncertainty regions.
+The \emph{canonical segmentation} $G_S$ of $(S,{\hb})$ is the segmentation of $S$ where the end points of the segments coincide with the end points of its temporal domain and uncertainty regions.
 Formally, we define $G_S$ as follows.
 For each signal $x_i$, let $F_i$ be the set of end points of its uncertainty regions.
 Let $d' = \max(d, \max (\bigcup_{i = 1}^{n} F_i))$, which corresponds to the duration of the distributed signal with respect to the monitor's clock.
 %
-Let $F = \{0, d'\} \cup \bigcup_{i = 1}^{n} F_i$ and let $(a_j)_{1 \leq j \leq |F|}$ be a nondecreasing sequence of clock values corresponding to the elements of $F$.
-Then, the canonical segmentation of $(S,{\hb})$ is $G_S = \{I_1, \ldots, I_{|F| - 1}\}$ where $I_j = [a_j, a_{j+1})$ for all $1 \leq j < |F|$.
+Let $F = \{0, d'\} \cup \bigcup_{i = 1}^{n} F_i$ and let $(s_j)_{1 \leq j \leq |F|}$ be a nondecreasing sequence of clock values corresponding to the elements of $F$.
+Then, the canonical segmentation of $(S,{\hb})$ is $G_S = \{I_1, \ldots, I_{|F| - 1}\}$ where $I_j = [s_j, s_{j+1})$ for all $1 \leq j < |F|$.
 
 \begin{example} \label{ex:canonseg}
-	\alert{TODO: canonical segmentation}
-%	Let $(S, {\hb})$ be a distributed signal with $S = (x_1, x_2)$ over the temporal domain $[0,8)$ such that $\pi(x_1) \neq \pi(x_2)$.\borzoo{$\pi$ is unnecessary.}
-%	Suppose $x_1(0) = 2$ and $x_2(0) = 3$, and let $\varepsilon = 2$ and $\delta = 3$.	
-%	Consider the case where $x_1$ has a rising edge $(3,5)$ and a falling edge $(5,3)$ while $x_2$ has a rising edge $(2,7)$ and a falling edge $(5,2)$.
-%	For $x_1$, taking into account only the clock skew would give us the uncertainty regions $(1,5)$ and $(3,7)$.\borzoo{We should this by a figure.}
-%	However, the computation of uncertainty regions take into account also the bounded variability.
-%	Intuitively, if the rising edge of $x_1$ occurs at global time 1, considering bounded variability, its falling edge occurs at the earliest at global time 4 instead of 3.
-%	Conversely, if the falling edge occurs at global time 7 then its rising edge occurs at the latest at global time 4 instead of 5.
-%	Then, we obtain $F_1 = \{1, 4, 7\}$.
-%	For $x_2$, the uncertainty regions are $(0,4)$ and $(3,7)$, which gives us $F_2 = \{0, 3, 4, 7\}$; and therefore, $F_S = \{0, 1, 3, 4, 7, 8\}$.
-%	This leads to the canonical segmentation $G_S = \{[0,1), [1,3) ,[3,4) ,[4,7) ,[7,8)\}$.		
+	Let $(S, {\hb})$ be a distributed boolean signal with $S = (x_1, x_2)$ and $\varepsilon = 2$ over the temporal domain $[0,8)$ as given in \cref{fig:canonseg}.
+	Both signals are initially 0.
+	The signal $x_1$ has a rising edge at time 2 and a falling edge at time 5, while $x_2$ has a rising edge at time 3 and a falling edge at time 6.
+	The uncertainty regions of $x_1$ are $(0,4)$ and $(3,7)$, while those of $x_2$ are $(1,5)$ and $(4,8)$.
+	Then, we have $F = \{0, 8\} \cup \{0, 1, 3, 4, 5, 7, 8\}$, and thus the canonical segmentation is $G_S = \{ [0,1), [1,3), [3,4), [4,5), [5,7), [7,8) \}$.
 \end{example}
 
 \begin{figure} 
 	\centering
-	\caption{\alert{TODO}}
-%	\includegraphics[scale=0.45]{canonseg.png}
-%	\caption{The values of $x_1$ (solid) and $x_2$ (dashed) over time. The edges are marked with black balls and their uncertainty regions are given as light gray boxes around the edges. The resulting canonical segmentation $G_S$ is shown below the graphical representation of the signals.\label{fig:canonseg}}
+	\includegraphics[scale=0.5]{canonseg.png}
+	\caption{The signals $x_1$ (top, red, dashed) and $x_2$ (bottom, blue, solid) from \cref{ex:canonseg}. The edges are marked with solid balls and their uncertainty regions are given as semi-transparent boxes around the edges. The resulting canonical segmentation $G_S$ is shown below the graphical representation of the signals.}
 	\label{fig:canonseg}
 \end{figure}
 
@@ -78,14 +61,13 @@ This representation is called a \emph{value expression} and it encodes the uncer
 Formally, a value expression is an element of $\Sigma^*$ where $\Sigma$ is the finite alphabet of values the signal takes.
 Given a signal $x$ and an edge $(t, x(t))$, the value expression corresponding to the uncertainty region $(\theta_{\text{lo}}(x,t), \theta_{\text{hi}}(x,t))$ is given by $v_{x,t} = v_- \cdot v_+$ where $v_- = \lim_{s \to t^-} x(s)$ and $v_+ = \lim_{s \to t^+} x(s)$.
 
-Now, consider a distributed signal of two boolean signals $x_1$ and $x_2$ respectively with a rising edge in $(2,6)$ and a falling edge in $(4,8)$.
+Notice that (i) uncertainty regions may overlap, and (ii) the canonical segmentation may split an uncertainty region into multiple segments.
+Consider a signal $x$ with a rising edge in $(1,5)$ and a falling edge in $(4,8)$.
 The corresponding value expressions are respectively $v_1 = 0 \cdot 1$ and $v_2 = 1 \cdot 0$.
-Observe that, because the uncertainty regions intersect, the canonical segmentation of this distributed signal includes the segments $[2,4)$, $[4,6)$, and $[6,8)$.
-The value expressions for these segments are obtained by prefixing and suffixing the original value expressions.
-For example, since $[2,4)$ overlaps with $(2,6)$ from the left, the value expression for $[2,4)$ is given by $\pfx(v_1)$.
+Notice that the behavior of $x$ in the interval $[1,4)$ can be expressed as $\pfx(v_1)$, encoding whether the rising edge has happened yet or not.
+Similarly, the behavior in $[4,5)$ is given by $\sfx(v_1) \cdot \pfx(v_2)$, which captures whether the edges occur in this interval (thanks to prefixing and suffixing) and the fact that the rising edge happens before the falling edge (thanks to concatenation).
 
-
-Formally, given a distributed signal $(S,{\hb})$, we define a function $\gamma : S \times G_S \to 2^{\Sigma^*}$ that maps each signal and segment of the canonical segmentation to a set of value expressions.
+Formally, given a distributed signal $(S,{\hb})$, we define a function $\gamma : S \times G_S \to 2^{\Sigma^*}$ that maps each signal and segment of the canonical segmentation to a set of value expressions, capturing the signal's potential behaviors in the given segment.
 Let $x$ be a signal in $S$, and let $R_1, \ldots, R_m$ be its uncertainty regions where $R_i = (t_i, t_i')$ and the corresponding value expression is $v_i$ for all $1 \leq i \leq m$.
 Now, let $I \in G_S$ be a segment with $I = [s, s')$ and for each $1 \leq i \leq m$ define the set $V_i$ of value expressions capturing how $I$ relates with $R_i$ as follows:
 
@@ -103,45 +85,74 @@ Now, let $I \in G_S$ be a segment with $I = [s, s')$ and for each $1 \leq i \leq
 \normalsize
 Note that the last case happens only when $I \cap R_i$ is empty.
 We finally define $\gamma(x,I) = \destutter(V_1 \cdot V_2 \cdot \ldots \cdot V_m) \setminus \{\epsilon\}$.
-First, observe that $\gamma(x,I)$ contains all the potential behaviors of $x$ in segment $I$ by construction.
+Observe that $\gamma(x,I)$ contains all the potential behaviors of $x$ in segment $I$ by construction.
 However, it is potentially overapproximate.
-This is mainly because the sets $V_1, \ldots, V_m$ contain redundancy by definition and the concatenation may lead to taking some edges multiple times or never.
+This is mainly because the sets $V_1, \ldots, V_m$ contain redundancy by definition and the concatenation does not guarantee that an edge is considered exactly once.
 %We demonstrate an example in \cref{fig:valexpr}.
 
 \begin{example} \label{ex:valexpr}
-	\alert{TODO: value expressions and $\gamma$}
+	Recall the distributed signal $(S, {\hb})$ in \cref{ex:canonseg} and \cref{fig:canonseg}.
+	In \cref{fig:valexpr}a, we show the value expressions corresponding to its uncertainty regions.
+	For example, the falling edge of $x_1$ has an uncertainty region of $(3,7)$, represented by the value expression $1 \cdot 0$.
+	In \cref{fig:valexpr}b, we give the function $\gamma$ for $(S, {\hb})$.
+	For example, $\gamma(x_1, [3,4))$ is obtained from $\sfx(0 \cdot 1) \cdot \pfx(1 \cdot 0)$ and $\gamma(x_2, [0,1)) = \{0\}$.
 \end{example}
 
 \begin{figure} 
 	\centering
-	\caption{\alert{TODO}}
-	%	\includegraphics[scale=0.45]{canonseg.png}
-	%	\caption{The values of $x_1$ (solid) and $x_2$ (dashed) over time. The edges are marked with black balls and their uncertainty regions are given as light gray boxes around the edges. The resulting canonical segmentation $G_S$ is shown below the graphical representation of the signals.\label{fig:canonseg}}
+	\includegraphics[scale=0.45]{valexpr.png}
+	\caption{(a) The uncertainty regions of the distributed signal in \cref{ex:canonseg} and the corresponding value expressions. (b) The tabular representation of the function $\gamma$ for the given distributed signal.}
 	\label{fig:valexpr}
 \end{figure}
 
-
-
-\subsubsection{Canonical Overapproximation of Traces}
+\subsubsection{Overapproximation of $\tr$}
 Consider a distributed signal $(S,{\hb})$ of $n$ signals, and let $G_S$ be its canonical segmentation.
 We describe how the function $\gamma$ defines a set $\tr^+(S,{\hb})$ of synchronous traces that overapproximates the set $\tr(S,{\hb})$.
 
-Let $x \in S$ and $x'$ be two signals, and let $I = [s, s')$ be a segment in $G_S$.
-Let $(t_1, x'(t_1)), \ldots, (t_\ell, x'(t_\ell))$ be the edges of $x'$ in segment $I$ such that $t_i < t_{i+1}$ for all $1 \leq i < \ell$.
-The signals $x$ and $x'$ are \emph{consistent in $I$} iff $x(s) = x'(s)$ and the value expression $x'(t_1) \cdot \ldots \cdot x'(t_\ell)$ belongs to $\gamma(x,I)$.
+%Let $x : [0,d) \to \B$ be a signal.
+%Consider the set $N_x$ of signals such that each $x' \in X$ is obtained from $x$ by shifting its edges within their uncertainty regions while preserving their relative order.
+%Formally, we let $E = \{ (t_1, x(t_1)), \ldots, (t_m, x(t_m)) \}$ be the set of edges of $x$ with $t_i < t_{i+1}$ for all $1 \leq i < m$, let $R_1, \ldots, R_m$ be the corresponding uncertainty regions, and define $N_x$ as follows: 
+%$$ N_x = \{x' : [0,d) \to \B \st x'(0) = x(0) \land \forall 1 \leq i \leq m : t_i' \in R_i \land x'(t_i') = x(t_i) \} $$ where $E' = \{ (t_1', x'(t_1')), \ldots, (t_m', x'(t_m')) \}$ is the set of edges of $x'$ with $t_i' < t_{i+1}'$ for all $1 \leq i < m$.
+%For example, ...
+
+%Now, 
+%Let $x \in S$ and $x'$ be two signals with the same temporal domain, and let $I = [s, s')$ be a segment in $G_S$.
+%Let $(t_1, x'(t_1)), \ldots, (t_\ell, x'(t_\ell))$ be the edges of $x'$ in segment $I$ with $t_i < t_{i+1}$ for all $1 \leq i < \ell$.
+%The signals $x$ and $x'$ are \emph{consistent in $I$} iff $x(s) = x'(s)$ and the value expression $x'(s) \cdot x'(t_1) \cdot \ldots \cdot x'(t_\ell)$ belongs to $\gamma(x,I)$.
+%Moreover, $x$ and $x'$ are \emph{consistent} iff they are consistent in $I$ for all $I \in G_S$.
+%Now, let $S = (x_1, \ldots, x_n)$ and define the \emph{canonical overapproximation} of $(S,{\hb})$ as follows:
+%$$ \tr^+(S,{\hb}) = \{ (x_1', \ldots, x_n') \st \text{$x_i$ and $x_i'$ are consistent for all $1 \leq i \leq n$}\} $$
+
+Let $x \in S$ and $x'$ be two signals with the same temporal domain, and let $I = [s, s')$ be a segment in $G_S$.
+Let $(t_1, x'(t_1)), \ldots, (t_\ell, x'(t_\ell))$ be the edges of $x'$ in segment $I$ with $t_i < t_{i+1}$ for all $1 \leq i < \ell$.
+The signals $x$ and $x'$ are \emph{consistent in $I$} iff the value expression $x'(s) \cdot x'(t_1) \cdot \ldots \cdot x'(t_\ell)$ belongs to $\gamma(x,I)$.
 Moreover, $x$ and $x'$ are \emph{consistent} iff they are consistent in $I$ for all $I \in G_S$.
-Now, let $S = \{x_1, \ldots, x_n\}$ and define the \emph{canonical overapproximation} of $(S,{\hb})$ as follows:
+Now, let $S = (x_1, \ldots, x_n)$ and define $\tr^+(S,{\hb})$ as follows:
 $$ \tr^+(S,{\hb}) = \{ (x_1', \ldots, x_n') \st \text{$x_i$ and $x_i'$ are consistent for all $1 \leq i \leq n$}\} $$
+
+
+
+\begin{example} \label{ex:overapx}
+	Recall the distributed signal $(S, {\hb})$ in \cref{ex:canonseg} whose $\gamma$ function is given in \cref{fig:valexpr}b.
+	Consider the synchronous trace $w \in \tr(S, {\hb})$ where the rising edges of both signals occur at time 3 and the falling edges at time 5.
+	One can verify that $w \in \tr^+(S,{\hb})$ since for each $i \in \{1,2\}$ the value expression 1 is contained in $\gamma(x_i, [3,4))$ and $\gamma(x_i, [4,5))$ while 0 is contained in the remaining sets $\gamma$ maps $x_i$ to.
+	
+	Now, consider a synchronous trace $(x_1', x_2')$ where both signals are initially 0, have rising edges at time 2 and 3.5, and falling edges at time 3 and 5.
+	Evidently, this trace does not belong to $\tr(S, {\hb})$ since $x_1'$ and $x_2'$ have more edges than $x_1$ and $x_2$.
+	Nonetheless, it belongs to $\tr^+(S,{\hb})$ since $x_1'$ and $x_2'$ are respectively consistent with $x_1$ and $x_2$.
+	To witness, notice that for each $i \in \{1,2\}$ the value expression $0 \cdot 1$ is contained in $\gamma(x_i, [1,3))$ and $\gamma(x_i, [3,4))$, the expression $1$ is contained in $\gamma(x_i, [4,5))$, and 0 is contained in the remaining sets $\gamma$ maps $x_i$ to.
+\end{example}
+
+Finally, we show the correctness of the canonical overapproximation.
 
 \begin{lemma}
 	For every distributed signal $(S,{\hb})$, we have $\tr(S,{\hb}) \subseteq \tr^+(S,{\hb})$.
 \end{lemma}
 
-
-\alert{
-\begin{conjecture}
-	Let $(S,{\hb})$ be a distributed signal with $|S| = 2$ and the maximum clock skew $\varepsilon$.
-	Let ${\hb}'$ be happens-before relation obtained from ${\hb}$ by taking the maximum clock skew as $\varepsilon / 2$.
-	Then, $\tr(S,{\hb}) \subseteq \tr^+(S,{\hb}')$.
-\end{conjecture}
-}
+%\alert{
+%\begin{conjecture}
+%	Let $(S,{\hb})$ be a distributed signal with $|S| = 2$ and the maximum clock skew $\varepsilon$.
+%	Let ${\hb}'$ be happens-before relation obtained from ${\hb}$ by taking the maximum clock skew as $\varepsilon / 2$.
+%	Then, $\tr(S,{\hb}) \subseteq \tr^+(S,{\hb}')$.
+%\end{conjecture}
+%}
