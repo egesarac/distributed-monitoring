@@ -1081,12 +1081,12 @@ def getDataTest(agent_ID):
 
 def getData(d, setID):
 
-    file = open("dataNew/{}_{}.txt".format(d, setID))
-    # file = open(
-    #     "{}\\dataNew\\{}_{}.txt".format(
-    #         os.path.dirname(os.path.abspath(__file__)), d, setID
-    #     )
-    # )
+    # file = open("dataNew/{}_{}.txt".format(d, setID))
+    file = open(
+        "{}/dataNew/{}_{}.txt".format(
+            os.path.dirname(os.path.abspath(__file__)), d, setID
+        )
+    )
     line = file.readline()
 
     data = []
@@ -1134,11 +1134,11 @@ def main():
     repeat = 1
 
     for d in (4, 8, 16, 32):
-        for eps in (1, 2, 4, 8):
+        for eps in (2, 4, 8):
             if d < eps:
                 continue
             
-            for c in range(2,100):
+            for c in range(100):
                 flag = False
                 flagneg = False
                 out = "0"
@@ -1157,15 +1157,19 @@ def main():
                     data1 = preprocess(data_1, d)
                     t1 = time.time()
                     # flag = prog_always_conjunction(eps, 1, data0, data1) # d / min(d, 8)
-                    flag = prog_always_disjunction(eps, 1, data0, data1)
+                    # flag = prog_always_disjunction(eps, 1, data0, data1)
                     # flag = prog_eventually_conjunction(eps, 1, data0, data1)
                     # flag = prog_eventually_disjunction(eps, 1, data0, data1)
                     t2 = time.time()
                     # flagneg = prog_eventually_disjunction(eps, 1, negate(data0), negate(data1))
                     flagneg = prog_eventually_conjunction(eps, 1, negate(data0), negate(data1))
+                    flagnegtest = prog_eventually_conjunction(eps, 2, negate(data0), negate(data1))
                     # flagneg = prog_always_disjunction(eps, 1, negate(data0), negate(data1))
                     # flagneg = prog_always_conjunction(eps, 1, negate(data0), negate(data1))
                     t3 = time.time()
+
+                    if (flagneg != flagnegtest):
+                        x = 0
 
                     prep_time += t1 - t0 
                     eval_time += t2 - t1 
