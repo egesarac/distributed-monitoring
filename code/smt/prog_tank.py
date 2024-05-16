@@ -11,11 +11,9 @@ from z3.z3 import ForAll
 
 # set_param('parallel.enable', True)
 set_option(rational_to_decimal = True)
+mult = 20
 
 def prog_tp2(eps, segCount, data_0, data_1):
-
-    # initialize z3 solver
-    s = Solver()
 
     # pad = min(2 * eps, len(data_0) - 1)
     pad = 2
@@ -72,7 +70,7 @@ def prog_tp2(eps, segCount, data_0, data_1):
 
         timestamps_0 = []
         segvar_0 = []
-        sig0 = Function("sig0", IntSort(), IntSort())
+        sig0 = Function("sig0", IntSort(), RealSort())
 
         for j in range(segmentLowerBound, segmentUpperBound + 1):
 
@@ -101,7 +99,7 @@ def prog_tp2(eps, segCount, data_0, data_1):
 
         timestamps_1 = []
         segvar_1 = []
-        sig1 = Function("sig1", IntSort(), IntSort())
+        sig1 = Function("sig1", IntSort(), RealSort())
 
         for j in range(segmentLowerBound, segmentUpperBound + 1):
 
@@ -253,7 +251,7 @@ def prog_tp2(eps, segCount, data_0, data_1):
 
         # consistent cut flow
         # _flow = Function("c_flow", IntSort(), RealSort())
-        c_flow = Function("c_flow", IntSort(), IntSort())
+        c_flow = Function("c_flow", IntSort(), RealSort())
 
         # addition
         s.add(
@@ -272,7 +270,7 @@ def prog_tp2(eps, segCount, data_0, data_1):
         s.add(
             Implies(
                 And(v >= timestamps_0[0], v <= timestamps_0[-1]),
-                z3Interpolate(c_flow, v) >= 10
+                z3Interpolate(c_flow, v) < 10
             )
         )
 
@@ -295,9 +293,6 @@ def prog_tp2(eps, segCount, data_0, data_1):
     return flag
 
 def prog_tp3(eps, segCount, data_0, data_1, data_2):
-
-    # initialize z3 solver
-    s = Solver()
 
     # pad = min(2 * eps, len(data_0) - 1)
     pad = 2
@@ -360,7 +355,7 @@ def prog_tp3(eps, segCount, data_0, data_1, data_2):
 
         timestamps_0 = []
         segvar_0 = []
-        sig0 = Function("sig0", IntSort(), IntSort())
+        sig0 = Function("sig0", IntSort(), RealSort())
 
         for j in range(segmentLowerBound, segmentUpperBound + 1):
 
@@ -389,7 +384,7 @@ def prog_tp3(eps, segCount, data_0, data_1, data_2):
 
         timestamps_1 = []
         segvar_1 = []
-        sig1 = Function("sig1", IntSort(), IntSort())
+        sig1 = Function("sig1", IntSort(), RealSort())
 
         for j in range(segmentLowerBound, segmentUpperBound + 1):
 
@@ -419,7 +414,7 @@ def prog_tp3(eps, segCount, data_0, data_1, data_2):
 
         timestamps_2 = []
         segvar_2 = []
-        sig2 = Function("sig2", IntSort(), IntSort())
+        sig2 = Function("sig2", IntSort(), RealSort())
 
         for j in range(segmentLowerBound, segmentUpperBound + 1):
 
@@ -650,7 +645,7 @@ def prog_tp3(eps, segCount, data_0, data_1, data_2):
 
         # consistent cut flow
         # _flow = Function("c_flow", IntSort(), RealSort())
-        c_flow = Function("c_flow", IntSort(), IntSort())
+        c_flow = Function("c_flow", IntSort(), RealSort())
 
         # addition
         s.add(
@@ -669,7 +664,7 @@ def prog_tp3(eps, segCount, data_0, data_1, data_2):
         s.add(
             Implies(
                 And(v >= timestamps_0[0], v <= timestamps_0[-1]),
-                z3Interpolate(c_flow, v) >= 10
+                z3Interpolate(c_flow, v) < 10
             )
         )
 
@@ -692,9 +687,6 @@ def prog_tp3(eps, segCount, data_0, data_1, data_2):
     return flag
 
 def prog_tp4(eps, segCount, data_0, data_1, data_2, data_3):
-
-    # initialize z3 solver
-    s = Solver()
 
     # pad = min(2 * eps, len(data_0) - 1)
     pad = 2
@@ -763,7 +755,7 @@ def prog_tp4(eps, segCount, data_0, data_1, data_2, data_3):
 
         timestamps_0 = []
         segvar_0 = []
-        sig0 = Function("sig0", IntSort(), IntSort())
+        sig0 = Function("sig0", IntSort(), RealSort())
 
         for j in range(segmentLowerBound, segmentUpperBound + 1):
 
@@ -792,7 +784,7 @@ def prog_tp4(eps, segCount, data_0, data_1, data_2, data_3):
 
         timestamps_1 = []
         segvar_1 = []
-        sig1 = Function("sig1", IntSort(), IntSort())
+        sig1 = Function("sig1", IntSort(), RealSort())
 
         for j in range(segmentLowerBound, segmentUpperBound + 1):
 
@@ -822,7 +814,7 @@ def prog_tp4(eps, segCount, data_0, data_1, data_2, data_3):
 
         timestamps_2 = []
         segvar_2 = []
-        sig2 = Function("sig2", IntSort(), IntSort())
+        sig2 = Function("sig2", IntSort(), RealSort())
 
         for j in range(segmentLowerBound, segmentUpperBound + 1):
 
@@ -852,7 +844,7 @@ def prog_tp4(eps, segCount, data_0, data_1, data_2, data_3):
 
         timestamps_3 = []
         segvar_3 = []
-        sig3 = Function("sig3", IntSort(), IntSort())
+        sig3 = Function("sig3", IntSort(), RealSort())
 
         for j in range(segmentLowerBound, segmentUpperBound + 1):
 
@@ -1165,7 +1157,7 @@ def prog_tp4(eps, segCount, data_0, data_1, data_2, data_3):
 
         # consistent cut flow
         # _flow = Function("c_flow", IntSort(), RealSort())
-        c_flow = Function("c_flow", IntSort(), IntSort())
+        c_flow = Function("c_flow", IntSort(), RealSort())
 
         # addition
         s.add(
@@ -1184,7 +1176,7 @@ def prog_tp4(eps, segCount, data_0, data_1, data_2, data_3):
         s.add(
             Implies(
                 And(v >= timestamps_0[0], v <= timestamps_0[-1]),
-                z3Interpolate(c_flow, v) >= 10
+                z3Interpolate(c_flow, v) < 10
             )
         )
 
@@ -1248,7 +1240,8 @@ def getDataTank(agent_ID):
 
             values.append(float(param[i].strip()))
 
-        data.append(values)
+        # data.append(values)
+        data.append([values[0] * mult, values[1]])
 
         line = file.readline()
 
@@ -1260,12 +1253,12 @@ def getDataTank(agent_ID):
 
 def main():
     # set repeat count for confidence interval
-    repeat = 5
-    d = 1000
+    repeat = 1
+    d = 1
 
     for n in (2, 3, 4):
         for eps in (1, 2, 4, 8):
-            eps = eps * 0.05
+            # eps = eps * 0.05
 
             if (n == 2):
                 out = "0"

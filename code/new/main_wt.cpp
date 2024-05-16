@@ -26,7 +26,8 @@ int main()
     vector<long long> EPS{1, 2, 4, 8};
     int k = 50;
     int d = 1000;
-    int del = 0;
+    int del = 1;
+    
     /*
     long long a = 0;
     long long b = 8000;
@@ -36,6 +37,8 @@ int main()
    for (auto n : N) {
     for (auto eps : EPS) {
         eps = eps * k;
+        // int n = 3;
+        // int eps = 1 * k;
 
     /* read signal data */
     vector<vector<pair<long long, double>>> signalsReal(n);
@@ -68,15 +71,15 @@ int main()
         numSegments = segmentation.size() - 1;
 
         /* compute the value expressions */
-        set<int> leaders = {0};
-        vector<vector<set<string>>> valExprs = computeRelativeValueExpressions(leaders, signalsReal, uncertainties, segmentation);
-        // vector<vector<set<string>>> valExprs = computeValueExpressions(signalsReal, uncertainties, segmentation);
+        // set<int> leaders = {0};
+        // vector<vector<set<string>>> valExprs = computeRelativeValueExpressions(leaders, signalsReal, uncertainties, segmentation);
+        vector<vector<set<string>>> valExprs = computeValueExpressions(signalsReal, uncertainties, segmentation);
         vector<set<string>> ve = valExprs[0];
         for (int i = 1; i < n; i++)
         {
-            // ve = asyncProdStrSum(ve, valExprs[i]);
-            ve = abstProdCoarseStrSum(ve, valExprs[i]);
+            ve = asyncProdStrSum(ve, valExprs[i]);
             // ve = abstProdStrSum(ve, valExprs[i]);
+            // ve = abstProdCoarseStrSum(ve, valExprs[i]);
 
         }
         valExprs = {ve};

@@ -1,7 +1,5 @@
 \section{Preliminaries} \label{sec:preliminaries}
 
-\alert{TODO: Check and simplify.}
-
 We define boolean domain $\B = \{ \bot, \top \}$ as the set of boolean truth values, where $\bot < \top$ and they 
 complement each other, i.e., $\overline{\bot} = \top$ and $\overline{\top} = \bot$.
 %
@@ -14,16 +12,18 @@ Let $\Sigma$ be a finite {\em alphabet}.
 %
 We denote by $\Sigma^*$ the set of finite words over $\Sigma$ and by $\epsilon$ the empty word.
 %
-For $u \in \Sigma^*$, we respectively write $\pfx(u)$ and $\sfx(u)$ for the sets of nonempty prefixes 
+For $u \in \Sigma^*$, we respectively write $\pfx(u)$ and $\sfx(u)$ for the sets of prefixes 
 and suffixes of $u$.
 %
-We also let $\infx(u) = \{v \in \Sigma^* \st \exists x,y \in \Sigma^* : u = xvy \land v \neq \epsilon\}$.
+We also let $\infx(u) = \{v \in \Sigma^* \st \exists x,y \in \Sigma^* : u = xvy\}$.
 %
 For a nonempty word $u \in \Sigma^*$ and $1 \leq i \leq |u|$, we denote by $u[i]$ the $i$th letter of 
 $u$, by $u[..i]$ the prefix of $u$ of length $i$, and by $u[i..]$ the suffix of $u$ of length $|u| - i + 1$. 
 %
 Given $u \in \Sigma^*$ and $\ell \geq 1$, we denote by $u^\ell$ the word obtained by concatenating $u$ by itself $\ell - 1$ times.
 Moreover, given $L \subseteq \Sigma^*$, we define $\first(L) = \{ u[0] \st u \in L\}$.
+For sets $L_1, L_2 \in \Sigma^*$ of words, we let $L_1 \cdot L_2 = \{u \cdot v \st u \in L_1, v \in L_2\}$.
+For tuples $(u_1, \ldots, u_m)$ and $(v_1, \ldots, v_m)$ of words, we let $(u_1, \ldots, u_m) \cdot (v_1, \ldots, v_m) = (u_1 v_1, \ldots, u_m v_m)$.
 
 We define the function $\destutter : \Sigma^* \to \Sigma^*$ inductively as follows.
 For all $\sigma \in \Sigma \cup \{\epsilon\}$, let $\destutter(\sigma) = \sigma$.
@@ -35,12 +35,13 @@ For all $u \in \Sigma^*$ such that $u = \sigma_1 \sigma_2 v$ for some $\sigma_1,
 By extension, for a set $L \subseteq \Sigma^*$ of finite words, we write $\destutter(L) = 
 \{\destutter(u) \st u \in L\}$.
 %
-Given a tuple $(u_1, \ldots, u_m)$ of finite words of the same length, we write $\destutter(u_1, \ldots, u_m)$ for the extension of $\destutter$ defined as expected: requiring the equality condition in (i) to hold for all the words in the tuple.
+Given a tuple $(u_1, \ldots, u_m) = (\sigma_{1,1} \sigma_{1,2} v_1, \ldots, \sigma_{m,1} \sigma_{m,2} v_m)$ of finite words of the same length, we define $\destutter(u_1, \ldots, u_m)$ as expected: (i) $\destutter(u_1, \ldots, u_m) = \destutter(\sigma_{1,2} v_1, \ldots, \sigma_{m,2} v_m)$ if $\sigma_{i,1} = 
+\sigma_{i,2}$ for all $1 \leq i \leq m$, and (ii) $\destutter(u_1, \ldots, u_m) = (\sigma_{1,1}, \ldots, \sigma_{m,1}) \cdot \destutter(\sigma_{1,2} v_1, \ldots, \sigma_{m,2} v_m)$ otherwise.
 
 
 Moreover, given an integer $k \geq 0$, we define $\stutter_k : \Sigma^* \to \Sigma^*$ such that $\stutter_k(u) = \{v \in \Sigma^* \st |v| = k \land \destutter(v) = \destutter(u)\}$ if $k \geq |\destutter(u)|$, and $\stutter_k(u) = \emptyset$ otherwise.
 
-\subsection{Signal Temporal Logic} \label{sec:stl}
+\subsubsection{Signal Temporal Logic (STL)} \label{sec:stl}
 
 Let $A,B \subset \R$.
 %
@@ -99,7 +100,7 @@ Moreover, the untimed temporal operators are defined through their timed counter
 %we define $[w \models \varphi]_3 = \top$ iff $[w w' \models \varphi]_{\mathsf{STL}}$ for every infinite-length signal $w'$, define $[w \models \varphi]_3 = \bot$ iff $[w w' \models \lnot \varphi]_{\mathsf{STL}}$ for every infinite-length signal $w'$, and $[w \models \varphi]_3 = \?$ otherwise.
 
 
-\subsection{Distributed Semantics of Signal Temporal Logic}
+\subsubsection{Distributed Semantics of STL} \label{sec:diststl}
 
 We consider an asynchronous and loosely-coupled message-passing system of $n \geq 2$ reliable agents producing a set of signals $x_1, \ldots, x_n$, where for some $d \in \R_{> 0}$ we have $x_i : [0,d) \to \R$ for all $1 \leq i \leq n$.
 %
@@ -118,11 +119,6 @@ We represent the local clock of the $i$th agent as an increasing and divergent f
 We denote by $c_i^{-1}$ the inverse of the local clock function $c_i$.
 
 We assume that the system is \emph{partially synchronous}: the agents use a clock synchronization algorithm that guarantees a bounded clock skew with respect to the global clock, i.e., $|c_i(T) - c_j(T)| < \varepsilon$ for all $1 \leq i,j \leq N$ and $T \in \R_{\geq 0}$, where $\varepsilon \in \R_{> 0}$ is the maximum clock skew.
-
-\alert{
-We assume that signals have \emph{bounded variability} with respect to the global clock: for each signal $x_i$ and every pair $(t, x_i(t)), (t', x_i(t')) \in E_i$ of edges, we have $|c_j^{-1}(t) - c_j^{-1}(t')| \geq \delta$ where $\delta \in \R_{\geq 0}$ is the variability bound.
-}
-\ege{This definition made sense when we defined partial synchrony with respect to the global clock. It seems off with the pairwise definition of partial synchrony. Do we even use this assumption now? Maybe we can assume equally spaced edges for the theoretical analysis and epsilon in relation to sampling frequency?}
 
 \begin{definition} \label{defn:hb}
 	A \emph{distributed signal} is a pair $(S, {\hb})$, where $S = (x_1, \ldots, x_n)$ is a vector of 
@@ -152,18 +148,21 @@ A \emph{consistent cut flow} is a function $\ccf : \R_{\geq 0} \to 2^V$ that map
 
 For all $T,T' \in \R_{\geq 0}$ and $1 \leq i \leq n$, if $T < T'$, then for every pair of events $(c_i(T), x_i(c_i(T))) \in \ccf(T)$ and $(c_i(T'), x_i(c_i(T'))) \in \ccf(T')$ we have $(c_i(T), x_i(c_i(T))) \hb (c_i(T'), x_i(c_i(T')))$.
 We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distributed signal $(S,{\hb})$.
-Observe that a consistent cut flow of a distributed signal induces a vector of synchronous signals which can be evaluated using the standard semantics described in \cref{sec:stl}.
 
 \begin{example}
 	\alert{TODO: consistent cut, frontier, consistent cut flow}
 \end{example}
 
+Observe that a consistent cut flow of a distributed signal induces a vector of synchronous signals which can be evaluated using the standard semantics described in \cref{sec:stl}.
 Let $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots, x_n$.
 A consistent cut flow $\ccf \in \CCF(S,{\hb})$ yields a trace $w_{\ccf} = (x'_1, \ldots x'_n)$ on a temporal domain $[0,D)$ where $D \in \R_{> 0}$ such that $(c_i(T), x_i(c_i(T))) \in \ccf(T)$ implies $x_i'(T) = x_i(c_i(T))$ for all $1 \leq i \leq n$ and $T \in [0, D)$.
 The set of traces of $(S,{\hb})$ is given by $\tr(S,{\hb}) = \{ w_{\ccf} \st \ccf \in \CCF(S,{\hb})\}$.
-\alert{Moreover, we write $\tr(S,{\hb},\delta)$ for the largest subset of $\tr(S,{\hb})$ where all signals of all traces satisfy the bounded variability assumption with respect to the constant $\delta$.}
 
-We define the satisfaction of an STL formula $\varphi$ by a distributed signal $(S,{\hb})$ over a three-valued domain $\{\top, \bot, {?}\}$.
+We define the satisfaction of an STL formula $\varphi$ by a distributed signal $(S,{\hb})$ over a three-valued domain $\{\top, \bot, {?}\}$
+If the set of synchronous traces $\tr(S,{\hb})$ defined by a distributed signal $(S,{\hb})$ is contained in the set of traces allowed by the formula $\varphi$, then $(S,{\hb})$ satisfies $\varphi$.
+Similarly, if $\tr(S,{\hb})$ has an empty intersection with the set of traces $\varphi$ defines, then $(S,{\hb})$ violates $\varphi$.
+Otherwise, the evaluation is inconclusive since some traces satisfy the property and some violate it.
+
 \small
 \begin{equation*}
 	[(S,{\hb}) \models \varphi]_{\mathsf{STL}} = 
@@ -174,6 +173,27 @@ We define the satisfaction of an STL formula $\varphi$ by a distributed signal $
 	\end{cases}
 \end{equation*}
 \normalsize
-If the set of synchronous traces $\tr(S,{\hb})$ defined by a distributed signal $(S,{\hb})$ is contained in the set of traces allowed by the formula $\varphi$, then $(S,{\hb})$ satisfies $\varphi$.
-Similarly, if $\tr(S,{\hb})$ has an empty intersection with the set of traces $\varPhi$ defines, then $(S,{\hb})$ violates $\varphi$.
-Otherwise, the evaluation is inconclusive since some traces satisfy the property and some violate it.
+
+\section{Overapproximation of the STL Distributed Semantics}
+To address the computational overhead in exact distributed monitoring, we define a new logic STL$^+$ whose syntax is the same as STL but semantics provide a sound approximation of the STL distributed semantics presented in \cref{sec:diststl}.
+In essence, given a distributed signal $(S,{\hb})$, STL$^+$ considers an overapproximation $\tr^+(S,{\hb})$ of the set $\tr(S,{\hb})$ of synchronous traces.
+A signal $(S,{\hb})$ satisfies (resp. violates) an STL$^+$ formula $\varphi$ iff all the traces in $\tr^+(S,{\hb})$ belong to the language of $\varphi$ (resp. $\lnot \varphi$).
+
+\small
+\begin{equation*}
+	[(S,{\hb}) \models \varphi]_{\mathsf{STL}^+} = 
+	\begin{cases}
+		\top & \text{ if } \forall w \in \tr^+(S,{\hb}) : [w \models \varphi]_{\mathsf{STL}} \\
+		\bot & \text{ if } \forall w \in \tr^+(S,{\hb}) : [w \models \lnot\varphi]_{\mathsf{STL}} \\
+		\,? & \text{ otherwise}
+	\end{cases}
+\end{equation*}
+\normalsize
+
+In \cref{sec:approach,sec:algorithm}, we respectively define $\tr^+$ and present an algorithm to compute the semantics of STL$^+$.
+We finally prove the correctness of our approach.
+
+\begin{theorem}
+	For every STL formula $\varphi$ and every distributed signal $(S,{\hb})$, if $[(S,{\hb}) \models \varphi]_{\mathsf{STL}^+} = \top$ (resp. $\bot$) then $[(S,{\hb}) \models \varphi]_{\mathsf{STL}} = \top$ (resp. $\bot$).
+\end{theorem}
+
