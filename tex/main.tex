@@ -12,9 +12,11 @@
 \usepackage{tikz}
 \usetikzlibrary{backgrounds, positioning, arrows, calc}
 \usepackage{mathtools}
-\usepackage[linesnumbered,vlined,noend]{algorithm2e}
+\usepackage[linesnumbered,vlined,noend, ruled]{algorithm2e}
 \usepackage[inline]{enumitem}  
 \usepackage{cleveref}
+\usepackage{lineno}
+%\linenumbers
 \renewcommand{\cref}{\Cref}
 
 
@@ -151,20 +153,21 @@
 \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 \newcommand\Circle[1][1.4]{\tikz[baseline=-3.3]{\draw(0,0)circle[radius=#1mm];}}
 
-%\setlength{\belowcaptionskip}{-2em}
-
 % ----- THEOREMS
 \newtheorem{observation}[theorem]{Fact}
 
 \title{Approximate Distributed Monitoring under Partial Asynchrony: Balancing Speed with Accuracy} 
+\titlerunning{Approximate Distributed Monitoring under Partial Asynchrony}
 %\author{Borzoo Bonakdarpour\inst{1} \and Anik Momtaz\inst{1} \and Dejan Ni\v{c}kovi\'{c}\inst{2} \and N. Ege Sara\c{c}\inst{3}} %
 %\institute{Michigan State University \and AIT Austrian Institute of Technology \and Institute of Science and Technology Austria (ISTA)} %
 \author{Author(s)} %
 \institute{Affiliation(s)} %
 \authorrunning{Author(s)} %
+
 \date{}
 
 %\renewcommand{\baselinestretch}{.98}
+%\setlength{\belowcaptionskip}{-2em}
 
 \begin{document}
 	\maketitle
@@ -192,5 +195,5 @@
 	\bibliographystyle{splncs04}
 	\bibliography{main}
 	
-%	\input appendix
+	\input appendix
 \end{document}

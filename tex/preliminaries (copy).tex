@@ -77,7 +77,9 @@ Let $\varphi_1, \varphi_2$ be STL formulas and let $t \in [0,d)$.
 	(w,t) \models \lnot \varphi_1 \iff & \overline{(w,t) \models \varphi_1} \\
 	(w,t) \models \varphi_1 \land \varphi_2 \iff & (w,t) \models \varphi_1 \land (w,t) \models \varphi_2 \\
 	(w,t) \models \varphi_1 \until_I \varphi_2 \iff & \exists t' \in (t \oplus I) \cap [0,d) :  \\
-	& (w,t') \models \varphi_2 \land \forall t'' \in (t, t') : (w,t'') \models \varphi_1
+	& (w,t') \models \varphi_2 \land \forall t'' \in (t, t') : (w,t'') \models \varphi_1 \\
+	%	[w,t \models \LTLf_I \varphi_1] &\iff \exists t' \in t \oplus I : [w,t' \models \varphi_1] \\
+	%	[w,t \models \LTLg_I \varphi_1] &\iff \forall t' \in t \oplus I : [w,t' \models \varphi_1] \\
 \end{align*}
 \normalsize
 
@@ -163,7 +165,7 @@ Otherwise, the evaluation is inconclusive since some traces satisfy the property
 
 \small
 \begin{equation*}
-	[(S,{\hb}) \models \varphi] = 
+	(S,{\hb}) \models \varphi = 
 	\begin{cases}
 		\top & \text{ if } \forall w \in \tr(S,{\hb}) : w \models \varphi \\
 		\bot & \text{ if } \forall w \in \tr(S,{\hb}) : w \models \lnot\varphi \\
@@ -179,7 +181,7 @@ A signal $(S,{\hb})$ satisfies (resp. violates) an STL$^+$ formula $\varphi$ iff
 
 \small
 \begin{equation*}
-	[(S,{\hb}) \models \varphi]_+ = 
+	(S,{\hb}) \models_+ \varphi = 
 	\begin{cases}
 		\top & \text{ if } \forall w \in \tr^+(S,{\hb}) : w \models \varphi \\
 		\bot & \text{ if } \forall w \in \tr^+(S,{\hb}) : w \models \lnot\varphi \\
@@ -192,6 +194,6 @@ In \cref{sec:approach,sec:algorithm}, we respectively define $\tr^+$ and present
 We finally prove the correctness of our approach.
 
 \begin{theorem} \label{cl:stlsound}
-	For every STL formula $\varphi$ and every distributed signal $(S,{\hb})$, if $[(S,{\hb}) \models \varphi]_+ = \top$ (resp. $\bot$) then $[(S,{\hb}) \models \varphi] = \top$ (resp. $\bot$).
+	For every STL formula $\varphi$ and every distributed signal $(S,{\hb})$, if $(S,{\hb}) \models_+ \varphi$ is $\top$ (resp. $\bot$) then $(S,{\hb}) \models \varphi$ is also $\top$ (resp. $\bot$).
 \end{theorem}
 
