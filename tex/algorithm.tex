@@ -48,43 +48,49 @@ First, we define bitwise operations on boolean value expressions encoding atomic
 Then, we present how these extend to asynchronous products of value expressions.
 
 Let $u$ and $v$ be boolean value expressions of length $\ell$.
-We denote by $u \BitAnd v$ the bitwise-and operation and by $\BitNeg u$ the bitwise-negation operation.
-In addition, we define the following bitwise-temporal operators:
+We denote by $u \BitAnd v$ the bitwise-and operation, by $u \BitOr v$ the bitwise-or, and by $\BitNeg u$ the bitwise-negation.
+In addition, we define the \emph{bitwise strong-until} operator as follows:
 
-\alert{TODO: Check these and simplify.}
 \small
-\begin{align*}
-	&\mathsf{E} u = \left( \max_{i \leq j \leq \ell} u[j] \right)_{1 \leq i \leq \ell} \hspace*{0.7em} \mathsf{A} u = \left( \min_{i \leq j \leq \ell} u[j] \right)_{1 \leq i \leq \ell}\\
-	&u \mathsf{U}^0 v = \left( \max_{i \leq j \leq \ell} \left( \min \left( v[j], \min_{i \leq k \leq j} u[k] \right) \right) \right)_{1 \leq i \leq \ell} \\
-	&u \mathsf{U}^1 v = \left( \max \left( u[i..] \mathsf{U}^0 v[i..], \mathsf{A} u[i..] \right) \right)_{1 \leq i \leq \ell} \\
-\end{align*}
+\[ u \mathsf{U}^0 v = \left( \max_{i \leq j \leq \ell} \left( \min \left( v[j], \min_{i \leq k \leq j} u[k] \right) \right) \right)_{1 \leq i \leq \ell} \]
 \normalsize
-
-The operators $\mathsf{E}$ and $\mathsf{A}$ respectively correspond to \emph{eventually} and \emph{always}.
-Moreover, $\mathsf{U}^0$ corresponds to the standard (strong) \emph{until} operator while $\mathsf{U}^1$ is the \emph{weak until}.
-%As usual, $\mathsf{A} u = u \mathsf{U}^1 0^\ell$ and $\mathsf{E} u = 1^\ell \mathsf{U}^0 u$.
+As usual, we derive \emph{bitwise eventually} as $\mathsf{E} u = 1^\ell \mathsf{U}^0 u$, \emph{bitwise always} as $\mathsf{A} u = \BitNeg (\mathsf{E} \BitNeg u)$, and \emph{bitwise weak-until as} follows:
+\[ u \mathsf{U}^1 v = \left( \max \left( u[i..] \mathsf{U}^0 v[i..], \mathsf{A} u[i..] \right) \right)_{1 \leq i \leq \ell} \]
 This distinction will be useful later when we evaluate a formula segment by segment.
-We remark that the definitions of these operators coincide with the robustness semantics of discrete time STL.
+We remark that the definitions of these operators coincide with the robustness semantics of (discrete time) STL.
 Finally, note that the output of these operations is a value expression of length $\ell$.
 For example, if $u = 010$, we have $\mathsf{E} u = 110$ and $\mathsf{A} u = 000$.
+
+%\small
+%\begin{align*}
+%	&\mathsf{E} u = \left( \max_{i \leq j \leq \ell} u[j] \right)_{1 \leq i \leq \ell} \hspace*{0.7em} \mathsf{A} u = \left( \min_{i \leq j \leq \ell} u[j] \right)_{1 \leq i \leq \ell}\\
+%	&u \mathsf{U}^0 v = \left( \max_{i \leq j \leq \ell} \left( \min \left( v[j], \min_{i \leq k \leq j} u[k] \right) \right) \right)_{1 \leq i \leq \ell} \\
+%	&u \mathsf{U}^1 v = \left( \max \left( u[i..] \mathsf{U}^0 v[i..], \mathsf{A} u[i..] \right) \right)_{1 \leq i \leq \ell} \\
+%\end{align*}
+%\normalsize
 
 Now, let $L_1$ and $L_2$ be sets of boolean value expressions.
 We define the following untimed operations:
 
-\alert{TODO: Check these and simplify.}
 \small
 \begin{align*}
 	\lnot L_1 &= \{ \BitNeg u \st u \in L_1 \} \\
-	L_1 \cdot L_2 &= \destutter( \{ u_1 \BitAnd u_2  \} ) \\
-	L_1 \land L_2 &= \destutter( \{  \} ) \\
+%	L_1 \cdot L_2 &= \destutter( \{ u_1 \cdot u_2 \st u_1 \in L_1, u_2 \in L_2 \} ) \\ % THIS IS ALREADY DEFINED?
+	L_1 \land L_2 &= \destutter( \{ u_1 \BitAnd u_2 \st (u_1, u_2) \in L_1 \otimes L_2 \} ) \\
 %	\LTLeventually L_1 &= \destutter( \{  \} ) \\
 %	\LTLalways L_1 &= \destutter( \{  \} ) \\
-	L_1 \until L_2 &= \destutter( \{  \} )
+	L_1 \until^x L_2 &= \destutter( \{ u_1 \mathsf{U}^x u_2 \st (u_1, u_2) \in L_1 \otimes L_2 \} ) \text{ for } x \in \{0,1\} \\
+%	L_1 \until^1 L_2 &= \destutter( \{ u_1 \mathsf{U}^1 u_2 \st (u_1, u_2) \in L_1 \otimes L_2 \} )
 \end{align*}
 \normalsize
-%From these, we also derive $L_1 \lor L_2 =  $\LTLeventually L_1 = \{1\} \until L_1$, and $\LTLalways L_1 = \lnot \LTLeventually \lnot L_1$
+Similarly as above, we derive
+$L_1 \lor L_2 = \lnot(L_1 \land L_2)$,
+$\LTLeventually L_1 = \{1\} \until^0 L_1$, and
+$\LTLalways L_1 = \lnot \LTLeventually \lnot L_1$.
 
-EXAMPLES
+\begin{example}
+	\alert{demonstrate above operations}
+\end{example}
 
 We additionally define the following timed operators:
 
