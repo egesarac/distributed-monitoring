@@ -1,4 +1,5 @@
 \section{Monitoring Algorithm} \label{sec:algorithm}
+\alert{TODO9: UPDATE}
 In this section, given a distributed signal $(S,{\hb})$, we describe an algorithm to compute $[(S,{\hb}) \models \varphi]_+$.
 The algorithm makes use of the function $\gamma$ defined in \cref{sec:approach} without explicitly computing $\tr^+(S,{\hb})$.
 To achieve this, we first describe the notion of \emph{asynchronous product} of value expressions to capture potential interleavings within segments.
@@ -11,7 +12,7 @@ Finally, we discuss how \emph{bit vectors} can represent asynchronous products a
 	This allows us to express more complex properties where atomic propositions can be functions of real-valued signals.
 \end{remark}
 
-\subsubsection{Asynchronous Product of Value Expressions}
+\subsubsection{Asynchronous Products}
 Consider the value expressions $u_1 = 0 \cdot 1$ and $u_2 = 1 \cdot 0$ encoding the behaviors of two signals within a segment.
 Due to partial asynchrony, the behaviors within segments can be seen as completely asynchronous.
 To capture the potential interleavings of these behaviors, we consider how the values in $u_1$ and $u_2$ can align.
@@ -20,12 +21,15 @@ In particular, there are three potential alignments:
 (ii) the falling edge of $u_2$ happens before the rising edge of $u_1$, and
 (iii) the two edges happen simultaneously.
 We respectively represent these with the tuples $(011, 110)$, $(001, 100)$, and $(01, 10)$ where the first component encodes $u_1$ and the second $u_2$.
-
 Formally, given two value expressions $u_1$ and $u_2$, we define their \emph{asynchronous product} as follows:
+
 \small
-$$u_1 \otimes u_2 = \{ \destutter(v_1, v_2) \st v_i \in \stutter_k(u_i), k = |u_1| + |u_2| - 1, i \in \{1,2\} \}$$  
+\[ u_1 \otimes u_2 = \{ \destutter(v_1, v_2) \st v_i \in \stutter_k(u_i), k = |u_1| + |u_2| - 1, i \in \{1,2\} \} \]  
 \normalsize
-Moreover, given two sets $L_1$ and $L_2$ of value expressions, we write $L_1 \otimes L_2 = \{ u_1 \otimes u_2 \st u_i \in L_i, i \in \{1,2\} \}$.
+Moreover, given two sets $L_1$ and $L_2$ of value expressions, we define the following: 
+\small
+\[ L_1 \otimes L_2 = \{ u_1 \otimes u_2 \st u_1 \in L_1, u_2 \in L_2 \} \]  
+\normalsize
 
 Asynchronous products of value expressions allow us to lift value expressions to satisfaction signals of formulas.
 
@@ -37,26 +41,25 @@ Asynchronous products of value expressions allow us to lift value expressions to
 	Taking the bitwise conjunction of this pair gives us the expression $0 \cdot 1 \cdot 0$ as a potential behavior for the satisfaction of $x_1 \land x_2$ in this segment.
 \end{example}
 
-\subsubsection{Computing the Semantics of STL$^+$}
+\subsubsection{Untimed Operations}
 As hinted in \cref{ex:asyncprod}, to compute the semantics, we apply bitwise operations on value expressions and their asynchronous products to transform them into encodings of satisfaction signals of formulas.
 Consider the distributed signal $(S, {\hb})$ in \cref{ex:canonseg} and suppose we want to compute $[(S, {\hb}) \models \LTLeventually (x_1 \land x_2)]_+$.
 To achieve this, we first compute for each segment in $G_S$ the set of value expressions for the satisfaction of $x_1 \land x_2$, and then from these compute that of $\LTLeventually (x_1 \land x_2)$.
 This compositional approach allows us to evaluate arbitrary STL$^+$ formulas.
 
-Let us start with the building blocks of our approach.
 First, we define bitwise operations on boolean value expressions encoding atomic propositions.
-Then, we present how these extend to asynchronous products of value expressions.
+Then, we use these to evaluate (untimed) STL formulas over sets of value expressions.
 
 Let $u$ and $v$ be boolean value expressions of length $\ell$.
 We denote by $u \BitAnd v$ the bitwise-and operation, by $u \BitOr v$ the bitwise-or, and by $\BitNeg u$ the bitwise-negation.
-In addition, we define the \emph{bitwise strong-until} operator as follows:
+In addition, we define the \emph{bitwise strong until} operator as follows:
 
 \small
 \[ u \mathsf{U}^0 v = \left( \max_{i \leq j \leq \ell} \left( \min \left( v[j], \min_{i \leq k \leq j} u[k] \right) \right) \right)_{1 \leq i \leq \ell} \]
 \normalsize
-As usual, we derive \emph{bitwise eventually} as $\mathsf{E} u = 1^\ell \mathsf{U}^0 u$, \emph{bitwise always} as $\mathsf{A} u = \BitNeg (\mathsf{E} \BitNeg u)$, and \emph{bitwise weak-until as} follows:
-\[ u \mathsf{U}^1 v = \left( \max \left( u[i..] \mathsf{U}^0 v[i..], \mathsf{A} u[i..] \right) \right)_{1 \leq i \leq \ell} \]
-This distinction will be useful later when we evaluate a formula segment by segment.
+As usual, we derive \emph{bitwise eventually} as $\mathsf{E} u = 1^\ell \mathsf{U}^0 u$, \emph{bitwise always} as $\mathsf{A} u = \BitNeg (\mathsf{E} \BitNeg u)$, and \emph{bitwise weak until} as $u \mathsf{U}^1 v = (u \mathsf{U}^0 v) \BitOr (\mathsf{A} u)$.
+%\[ u \mathsf{U}^1 v = \left( \max \left( (u \mathsf{U}^0 v)[i], (\mathsf{A} u)[i] \right) \right)_{1 \leq i \leq \ell} \]
+The distinction between $\mathsf{U}^0$ and $\mathsf{U}^1$ will be useful later when we evaluate a formula segment by segment.
 We remark that the definitions of these operators coincide with the robustness semantics of (discrete time) STL.
 Finally, note that the output of these operations is a value expression of length $\ell$.
 For example, if $u = 010$, we have $\mathsf{E} u = 110$ and $\mathsf{A} u = 000$.
@@ -69,37 +72,172 @@ For example, if $u = 010$, we have $\mathsf{E} u = 110$ and $\mathsf{A} u = 000$
 %\end{align*}
 %\normalsize
 
-Now, let $L_1$ and $L_2$ be sets of boolean value expressions.
-We define the following untimed operations:
+Let  $(S, {\hb})$ be a distributed signal.
+Consider an atomic proposition $p \in \AP$ encoded as $x_p \in S$ and let $\varphi_1, \varphi_2$ be two STL formulas.
+We define the evaluation of untimed formulas with respect to $(S, {\hb})$ and a segment $I \in G_S$ inductively:
+%Now, let $L_1$ and $L_2$ be two sets of value expressions.
+%We define the following untimed operations:
 
 \small
 \begin{align*}
-	\lnot L_1 &= \{ \BitNeg u \st u \in L_1 \} \\
-%	L_1 \cdot L_2 &= \destutter( \{ u_1 \cdot u_2 \st u_1 \in L_1, u_2 \in L_2 \} ) \\ % THIS IS ALREADY DEFINED?
-	L_1 \land L_2 &= \destutter( \{ u_1 \BitAnd u_2 \st (u_1, u_2) \in L_1 \otimes L_2 \} ) \\
-%	\LTLeventually L_1 &= \destutter( \{  \} ) \\
-%	\LTLalways L_1 &= \destutter( \{  \} ) \\
-	L_1 \until^x L_2 &= \destutter( \{ u_1 \mathsf{U}^x u_2 \st (u_1, u_2) \in L_1 \otimes L_2 \} ) \text{ for } x \in \{0,1\} \\
-%	L_1 \until^1 L_2 &= \destutter( \{ u_1 \mathsf{U}^1 u_2 \st (u_1, u_2) \in L_1 \otimes L_2 \} )
+%	\lnot L_1 &= \{ \BitNeg u \st u \in L_1 \} \\
+%%	L_1 \cdot L_2 &= \destutter( \{ u_1 \cdot u_2 \st u_1 \in L_1, u_2 \in L_2 \} ) \\ % THIS IS ALREADY DEFINED?
+%	L_1 \land L_2 &= \destutter( \{ u_1 \BitAnd u_2 \st (u_1, u_2) \in L_1 \otimes L_2 \} ) \\
+%%	\LTLeventually L_1 &= \destutter( \{  \} ) \\
+%%	\LTLalways L_1 &= \destutter( \{  \} ) \\
+%	L_1 \until^0 L_2 &= \destutter( \{ u_1 \mathsf{U}^0 u_2 \st (u_1, u_2) \in L_1 \otimes L_2 \} )
+%%	L_1 \until^1 L_2 &= \destutter( \{ u_1 \mathsf{U}^1 u_2 \st (u_1, u_2) \in L_1 \otimes L_2 \} )
+	\llbracket (S, {\hb}), I \models p \rrbracket &= \gamma(x_p, I) \\
+	\llbracket (S, {\hb}), I \models \lnot \varphi_1 \rrbracket &= \{\BitNeg u \st u \in  \llbracket (S, {\hb}), I \models \varphi_1 \rrbracket \} \\
+	\llbracket (S, {\hb}), I \models \varphi_1 \land \varphi_2 \rrbracket &= \{ u_1 \BitAnd u_2 \st (u_1, u_2) \in \llbracket (S, {\hb}), I \models \varphi_1 \rrbracket \otimes \llbracket (S, {\hb}), I \models \varphi_2 \rrbracket  \} \\
+	\llbracket (S, {\hb}), I \models \varphi_1 \until \varphi_2 \rrbracket &= \{ u_1 \mathsf{U}^a u_2 \st (u_1, u_2) \in \llbracket (S, {\hb}), I \models \varphi_1 \rrbracket \otimes \llbracket (S, {\hb}), I \models \varphi_2 \rrbracket, \\
+	 &\hspace{12.2em} a \in \first(\llbracket (S, {\hb}), I' \models \varphi_1 \until \varphi_2 \rrbracket) \}
 \end{align*}
 \normalsize
-Similarly as above, we derive
-$L_1 \lor L_2 = \lnot(L_1 \land L_2)$,
-$\LTLeventually L_1 = \{1\} \until^0 L_1$, and
-$\LTLalways L_1 = \lnot \LTLeventually \lnot L_1$.
+where $I'$ is the segment that follows $I$ in $G_S$, if it exists.
+For completeness, for every formula $\varphi$ we define $\llbracket (S, {\hb}), I' \models \varphi \rrbracket = \{0\}$ when $I' \notin G_S$.
+When $I$ is the first segment in $G_S$, we simply write $\llbracket (S, {\hb}) \models \varphi \rrbracket$.
+Similarly as above, we can use the standard derived operators to compute the corresponding sets of value expressions.
+Intuitively, for a given formula and a segment, the evaluation above produces a set of value expressions enconding the formula's satisfaction within the segment.
+%$L_1 \lor L_2 = \lnot(L_1 \land L_2)$,
+%$\LTLeventually L_1 = \{1\} \until^0 L_1$,
+%$\LTLalways L_1 = \lnot \LTLeventually \lnot L_1$, and
+%$L_1 \until^1 L_2 = (L_1 \until^0 L_2) \lor (\LTLalways L_1)$.
+%Notice that, since sets of value expressions corresponding to atomic propropositions are captured by the $\gamma$ function, we can compute the sets of value expressions for each segment and (untimed) subformula.
 
 \begin{example}
-	\alert{demonstrate above operations}
+	\alert{TODO8: UPDATE}
+	Recall the distributed signal $(S, {\hb})$ in \cref{ex:canonseg} and its $\gamma$ function given in \cref{fig:valexpr}b.
+	Suppose we are interested in the satisfaction of the formula $\LTLeventually(x_1 \land x_2)$ in the segment $[5,7)$.
+	Let $L_1 = \gamma(x_1, [5,7))$ and $L_2 = \gamma(x_2, [5,7))$.
+	First, we compute $L_1 \land L_2$ by computing the bitwise conjunction over the asynchronous product and destuttering.
+	For example, since $010 \in L_1$ and $01 \in L_2$, the pair $(0010,0111)$ is in the product, whose conjunction gives us $010$ after destuttering. 
+	Repeating this for the rest, we obtain the set $L = \{ 0, 01, 010, 1, 10 \}$.
+	Finally, we compute $\LTLeventually L$ by applying each expression the bitwise eventually operator (or, equivalently, computing $\{1\} \until^0 L$) and destuttering.
+	The resulting set $\LTLeventually L = \{0, 1, 10\}$ encondes the satisfaction signal of $\LTLeventually(x_1 \land x_2)$ in $[5,7)$.
 \end{example}
 
-We additionally define the following timed operators:
+\subsubsection{Timed Operations}
+Handling timed operations requires a closer inspection as value expressions are untimed by definition.
+We address this issue by considering how a given evaluation interval relates with the segments in a given signal's canonical segmentation.
+\alert{TODO1:UPDATE}
+For example, suppose we are given a distributed signal $(S,{\hb})$ with the segmentation $G_S = \{ [0,4), [4,6), [6,9) \}$ and an evaluation interval $J = [0,5)$.
+To compute how $J$ relates with the segmentation with respect to $I =[0,4)$, we take $J$ as a window whose starting point slides over $I$.
+Initially, $J$ covers the entire segment $[0,4)$ and the beginning of $[4,6)$, for which the potential behaviors of signals are captured by the set $\gamma(x, [0,4)) \cdot \pfx(\gamma(x, [4,6)))$ for each $x \in S$.
+Now, if we slide the window and take $J' = [3,7)$, the window covers the ending of $[0,4)$, the entire $[4,6)$, and the beginning of $[6,9)$, for which the potential behaviors are captured by the set $\sfx(\gamma(x, [0,4))) \cdot \gamma(x, [4,6)) \cdot \pfx(\gamma(x, [6,9))$ for each $x \in S$.
+We call these sets the \emph{profiles} of $J$ and $J'$ with respect to $(S,{\hb})$, $\gamma$nd $I \in G_S$.
 
-\TODO
+\alert{TODO2: THIS SHOULD COVER ANY FORMULA'S VALUE EXPRESSION SET}
+Let $(S,{\hb})$ be a distributed signal, $G_S$ be its canonical segmentation, $L$ be a set of value expressions
+Given 
+Given a set $L$ of value expressions over a segment $I$ and an interval $J$, we
+Given an interval $J$, we call the set of value expressions obtained this way the \emph{profile} of $J$ with respect to $(S,{\hb})$, $x \in S$, and $I \in G_S$, and define it formally as follows:
 
-Finally, given a distributed signal $(S, {\hb})$ and an STL$^+$ formula $\varphi$, we compute $[(S, {\hb}) \models \varphi]_+$ as follows.
+\small
+\begin{multline*}
+	\mathsf{profile}((S,{\hb}), x, I, J) =
+	\begin{cases}
+		\pfx(\gamma(x,I)) & \text{if } \\
+		\infx(\gamma(x,I)) & \text{if } \\
+		\gamma(x,I) \cdot \kappa((S,{\hb}), I, J) & \text{if } \\
+		\gamma(x,I) \cdot \kappa((S,{\hb}), I, J) \cdot \first(\gamma(x,I')) & \text{if } \\		
+		\gamma(x,I) \cdot \kappa((S,{\hb}), I, J) \cdot \pfx(\gamma(x,I')) & \text{if } \\
+		\sfx(\gamma(x,I)) \cdot \kappa((S,{\hb}), I, J) & \text{if } \\
+		\sfx(\gamma(x,I)) \cdot \kappa((S,{\hb}), I, J) \cdot \first(\gamma(x,I')) & \text{if } \\
+		\sfx(\gamma(x,I)) \cdot \kappa((S,{\hb}), I, J) \cdot \pfx(\gamma(x,I')) & \text{if } \\
+	\end{cases}
+\end{multline*}
+\normalsize
+where
+$I'$ is the segment in $G_S$ that contains the right end point 
 
-\TODO
+\small
+\begin{align*}
+	\mathsf{pfs}((S,{\hb}), x, I, J) = \{\mathsf{profile}((S,{\hb}), x, I, J') \st J' \subseteq I \oplus J, J' \sim J\}
+\end{align*}
+\normalsize
+% kind of like the old version
+%We simply write $\mathsf{profiles}(x, J)$ when the rest is clear from the context.
+where $J' \sim J$ holds when $|J'| = |J|$ and $J'$ contains an end point (left or right) iff $J$ does so.
+Note that although infinitely many intervals $J'$ satisfy the conditions given above (due to denseness of time), the set defined by $\mathsf{pfs}$ is finite.
+\alert{TODO3: INTRODUCE EXAMPLE AND FIGURE}
 
+\begin{example}
+	\alert{TODO5: PROFILES}
+\end{example}
+
+\begin{figure} 
+	\centering
+%	\includegraphics[scale=0.45]{.png}
+	\caption{\alert{TODO6}}
+	\label{fig:profiles}
+\end{figure}
+
+
+Once we compute the profiles of a given evaluation interval $J$ with respect to a distributed signal $(S,{\hb})$ and a segment $I \in G_S$, we can compute the value expressions encoding the satisfaction of timed formulas over $J$ in segment $I$ as follows:
+
+\small
+\alert{TODO4: CHECK}
+\begin{align*}
+	\llbracket (S, {\hb}), I \models \varphi_1 \until_J \varphi_2 \rrbracket &= \{ u_1 \mathsf{U}^0 u_2 \st (u_1, u_2) \in P_1 \otimes Q_1 \} \cdot \ldots \cdot \{ u_1 \mathsf{U}^0 u_2 \st (u_1, u_2) \in P_k \otimes Q_k \}
+\end{align*}
+\normalsize
+where \TODO
+
+% formula over J in segment I for S = apply formula to profiles, concat, destutter
+
+%Note that due to additional concatenations and prefixing and suffixing, this makes grows the overapproximation.
+
+\begin{example}
+	\alert{TODO7: A TIMED OPERATOR}
+\end{example}
+
+\subsubsection{Computing the Semantics of STL$^+$}
+
+Putting it all together, given a distributed signal $(S, {\hb})$ and an STL$^+$ formula $\varphi$, we compute $[(S,{\hb}) \models \varphi]_+$ as follows.
+
+\begin{theorem} \label{cl:algo}
+	For every distributed signal $(S,{\hb})$, we have $[(S,{\hb}) \models \varphi]_+ = \top$ (resp. $\bot$, ${\,?}$) iff $\first(\llbracket (S, {\hb}) \models \varphi \rrbracket) = \{1\}$ (resp. $\{0\}$, $\{0,1\}$).
+%	\begin{itemize}
+	%		\item $[(S,{\hb}) \models \varphi]_{\mathsf{STL}^+} = \top \iff ... = \{1\}$
+	%		\item $[(S,{\hb}) \models \varphi]_{\mathsf{STL}^+} = \bot \iff ... = \{0\}$
+	%		
+	%		\item $[(S,{\hb}) \models \varphi]_{\mathsf{STL}^+} = {\,?} \iff ... = \{0, 1\}$
+	%	\end{itemize}
+\end{theorem}
+
+%\begin{enumerate}
+%	\item 
+%	Enumerate the subformulas of $\varphi$ such that each formula has an enumeration number smaller than the numbers of all its subformulas.
+%	Let $\varphi_1, \ldots, \varphi_m$ be such an enumeration.
+%	Note that $\varphi_1 = \varphi$.
+%	
+%	\item
+%	Compute the canonical segmentation $G_{S} = \{ [t_1, t_2), \ldots, [t_k, t_{k+1}) \}$ of $(S, {\hb})$.
+%	
+%	\item
+%	Compute the value expressions of signals with respect to the canonical segmentation, i.e., for each $1 \leq j \leq k$ and $1 \leq i \leq n$, compute $\gamma([t_j, t_{j+1}), i)$.
+%	
+%	\item
+%	Compute the value expressions of subformulas with respect to the canonical segmentation, i.e., for each $1 \leq j \leq k$ and $1 \leq \ell \leq m$, compute $[S, t_j \models \varphi_\ell]$.
+%	
+%	\item
+%	Output the set $\mathsf{Out}(\varphi, S, {\hb}, \varepsilon, \delta) = \destutter([S,t_1 \models \varphi_1] \cdot \ldots \cdot [S,t_k \models \varphi_1])$ of value expressions. 
+%\end{enumerate}
+
+
+%\small
+%\begin{align*}
+%	[(S, {\hb}) \models ]_+ &= \first(  )\\
+%	[(S, {\hb}) \models AAAAAAAAA]_+ &= \\
+%	[(S, {\hb}) \models AAAAAAAAA]_+ &= \\
+%	[(S, {\hb}) \models AAAAAAAAA]_+ &= \\
+%	[(S, {\hb}) \models AAAAAAAAA]_+ &= \\
+%%		\llbracket (S, {\hb}) \models p \rrbracket &= AAAA \\
+%%	\llbracket (S, {\hb}) \models \lnot \varphi_1 \rrbracket &= \lnot \llbracket (S, {\hb}) \models \varphi_1 \rrbracket \\
+%%	\llbracket (S, {\hb}) \models \varphi_1 \land \varphi_2 \rrbracket &= \llbracket (S, {\hb}) \models \varphi_1 \rrbracket \\
+%\end{align*}
+%\normalsize
 %\SetKwComment{Comment}{/* }{ */}
 %\begin{algorithm}
 %	\caption{An algorithm with caption}\label{alg:two}
@@ -120,23 +258,15 @@ Finally, given a distributed signal $(S, {\hb})$ and an STL$^+$ formula $\varphi
 %	}
 %\end{algorithm}
 
-%\begin{lemma} \label{cl:algo}
-%	For every distributed signal $(S,{\hb})$, we have $[(S,{\hb}) \models \varphi]_+ = \top$ (resp. $\bot$, ${\,?}$) iff $\alert{...} = \{1\}$ (resp. $\{0\}$, $\{0,1\}$).
-%%	\begin{itemize}
-%%		\item $[(S,{\hb}) \models \varphi]_{\mathsf{STL}^+} = \top \iff ... = \{1\}$
-%%		\item $[(S,{\hb}) \models \varphi]_{\mathsf{STL}^+} = \bot \iff ... = \{0\}$
-%%		
-%%		\item $[(S,{\hb}) \models \varphi]_{\mathsf{STL}^+} = {\,?} \iff ... = \{0, 1\}$
-%%	\end{itemize}
-%\end{lemma}
 
 
 
 
 
-\subsubsection{Boolean Asynchronous Products as Bit Vectors}
-getting to atomic propositions represented as bitvectors
-intuition on shortcuts
+
+%\subsubsection{Boolean Asynchronous Products as Bit Vectors}
+%getting to atomic propositions represented as bitvectors
+%intuition on shortcuts
 
 
 provide equivalent shortcuts for bitvectors.
