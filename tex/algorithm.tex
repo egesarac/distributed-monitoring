@@ -1,10 +1,11 @@
 \section{Monitoring Algorithm} \label{sec:algorithm}
-\alert{TODO9: UPDATE}
 In this section, given a distributed signal $(S,{\hb})$, we describe an algorithm to compute $[(S,{\hb}) \models \varphi]_+$.
 The algorithm makes use of the function $\gamma$ defined in \cref{sec:approach} without explicitly computing $\tr^+(S,{\hb})$.
 To achieve this, we first describe the notion of \emph{asynchronous product} of value expressions to capture potential interleavings within segments.
-Then, we present an algorithm to compute the \emph{semantics} $[(S,{\hb}) \models \varphi]_+$ using operations on value expressions and their asynchronous products that encode $\gamma$. 
-Finally, we discuss how \emph{bit vectors} can represent asynchronous products and allow us to manipulate them faster.
+We continue with the evaluation of \emph{untimed operators} and then \emph{timed operators}.
+Finally, we conclude with putting all these together to compute the \emph{semantics} of STL$^+$ and discuss an efficient implementation of the monitoring algorithm using \emph{bit vectors} to represent and manipulate sets of boolean value expressions.
+%Then, we present an algorithm to compute the \emph{semantics} $[(S,{\hb}) \models \varphi]_+$ using operations on value expressions and their asynchronous products that encode $\gamma$. 
+%Finally, we discuss how \emph{bit vectors} can represent asynchronous products and allow us to manipulate them faster.
 
 \begin{remark}
 	For the sake of convenience, we focus on boolean signals for the rest of the section.
@@ -106,95 +107,130 @@ Intuitively, for a given formula and a segment, the evaluation above produces a 
 %Notice that, since sets of value expressions corresponding to atomic propropositions are captured by the $\gamma$ function, we can compute the sets of value expressions for each segment and (untimed) subformula.
 
 \begin{example}
-	\alert{TODO8: UPDATE}
 	Recall the distributed signal $(S, {\hb})$ in \cref{ex:canonseg} and its $\gamma$ function given in \cref{fig:valexpr}b.
-	Suppose we are interested in the satisfaction of the formula $\LTLeventually(x_1 \land x_2)$ in the segment $[5,7)$.
-	Let $L_1 = \gamma(x_1, [5,7))$ and $L_2 = \gamma(x_2, [5,7))$.
-	First, we compute $L_1 \land L_2$ by computing the bitwise conjunction over the asynchronous product and destuttering.
-	For example, since $010 \in L_1$ and $01 \in L_2$, the pair $(0010,0111)$ is in the product, whose conjunction gives us $010$ after destuttering. 
-	Repeating this for the rest, we obtain the set $L = \{ 0, 01, 010, 1, 10 \}$.
-	Finally, we compute $\LTLeventually L$ by applying each expression the bitwise eventually operator (or, equivalently, computing $\{1\} \until^0 L$) and destuttering.
-	The resulting set $\LTLeventually L = \{0, 1, 10\}$ encondes the satisfaction signal of $\LTLeventually(x_1 \land x_2)$ in $[5,7)$.
+	Suppose we want to compute $\llbracket (S, {\hb}), [5,7) \models \LTLeventually(x_1 \land x_2) \rrbracket$.
+	First, we compute $\llbracket (S, {\hb}), [5,7) \models x_1 \land x_2 \rrbracket$ by computing the bitwise conjunction over the asynchronous product $\gamma(x_1, [5,7)) \otimes \gamma(x_2, [5,7))$ and destuttering.
+	For example, since $010 \in \gamma(x_1, [5,7))$ and $01 \in \gamma(x_2, [5,7))$, the pair $(0010,0111)$ is in the product, whose conjunction gives us $010$ after destuttering. 
+	Repeating this for the rest, we obtain $\llbracket (S, {\hb}), [5,7) \models x_1 \land x_2 \rrbracket = \{ 0, 01, 010, 1, 10 \}$.
+	Finally, we compute $\llbracket (S, {\hb}), [5,7) \models \LTLeventually(x_1 \land x_2) \rrbracket$ by applying each expression in $\llbracket (S, {\hb}), [5,7) \models x_1 \land x_2 \rrbracket$ the bitwise eventually operator and destuttering.
+	The resulting set $\{0, 1, 10\}$ encondes the satisfaction signal of $\LTLeventually(x_1 \land x_2)$ in $[5,7)$.
+	Note that we do not need to consider the evaluation of the next segment for the eventually operator since $\llbracket (S, {\hb}), [7,8) \models x_1 \land x_2 \rrbracket = \{0\}$.
 \end{example}
 
 \subsubsection{Timed Operations}
 Handling timed operations requires a closer inspection as value expressions are untimed by definition.
-We address this issue by considering how a given evaluation interval relates with the segments in a given signal's canonical segmentation.
-\alert{TODO1:UPDATE}
-For example, suppose we are given a distributed signal $(S,{\hb})$ with the segmentation $G_S = \{ [0,4), [4,6), [6,9) \}$ and an evaluation interval $J = [0,5)$.
-To compute how $J$ relates with the segmentation with respect to $I =[0,4)$, we take $J$ as a window whose starting point slides over $I$.
-Initially, $J$ covers the entire segment $[0,4)$ and the beginning of $[4,6)$, for which the potential behaviors of signals are captured by the set $\gamma(x, [0,4)) \cdot \pfx(\gamma(x, [4,6)))$ for each $x \in S$.
-Now, if we slide the window and take $J' = [3,7)$, the window covers the ending of $[0,4)$, the entire $[4,6)$, and the beginning of $[6,9)$, for which the potential behaviors are captured by the set $\sfx(\gamma(x, [0,4))) \cdot \gamma(x, [4,6)) \cdot \pfx(\gamma(x, [6,9))$ for each $x \in S$.
-We call these sets the \emph{profiles} of $J$ and $J'$ with respect to $(S,{\hb})$, $\gamma$nd $I \in G_S$.
+We address this issue by considering how a given evaluation interval relates with a given segmentation.
+For example, take a segmentation $G_S = \{ [0,4), [4,6), [6,10) \}$ and an evaluation interval $J = [0,5)$.
+Suppose we are interested in how a signal $x \in S$ behaves with respect to $J$ over the first segment $I = [0,4)$.
+First, to see how $J$ relates with $G_S$ with respect to $I =[0,4)$, we  ``slide'' the interval $J$ over $I \oplus J = [0,9)$ and consider the different ways it intersects the segments in $G_S$.
+Initially, $J$ covers the entire segment $[0,4)$ and the beginning of $[4,6)$, for which the potential behaviors of $x$ are captured by the set $\gamma(x, [0,4)) \cdot \pfx(\gamma(x, [4,6)))$.
+Now, if we slide the window and take $J' = [3,7)$, the window covers the ending of $[0,4)$, the entire $[4,6)$, and the beginning of $[6,10)$, for which the potential behaviors are captured by the set $\sfx(\gamma(x, [0,4))) \cdot \gamma(x, [4,6)) \cdot \pfx(\gamma(x, [6,9))$.
+We call these sets the \emph{profiles} of $J$ and $J'$ with respect to $(S,{\hb})$, $x$, and $I$.
 
-\alert{TODO2: THIS SHOULD COVER ANY FORMULA'S VALUE EXPRESSION SET}
-Let $(S,{\hb})$ be a distributed signal, $G_S$ be its canonical segmentation, $L$ be a set of value expressions
-Given 
-Given a set $L$ of value expressions over a segment $I$ and an interval $J$, we
-Given an interval $J$, we call the set of value expressions obtained this way the \emph{profile} of $J$ with respect to $(S,{\hb})$, $x \in S$, and $I \in G_S$, and define it formally as follows:
+Let $(S,{\hb})$ be a distributed signal, $I \in G_S$ be a segment, and $\varphi$ be an STL formula.
+Let us introduce the notation we use in the definition below.
+First, we abbreviate the set $\llbracket (S,{\hb}), I \models \varphi \rrbracket$ of value expressions as $\tau_{\varphi,I}$.
+Second, given an interval $K$, we respectively denote by $l_K$ and $r_K$ its left and right end points.
+Third, recall that we denote by $F$ the set of end points of $G_S$ (see \cref{sec:approach}).
+Given an interval $J$, we define the \emph{profile} of $J$ with respect to $(S,{\hb})$, $\varphi$, and $I$ as follows.
 
-\small
-\begin{multline*}
-	\mathsf{profile}((S,{\hb}), x, I, J) =
+\scriptsize
+\begin{equation*}
+	\mathsf{profile}((S,{\hb}), \varphi, I, J) =
 	\begin{cases}
-		\pfx(\gamma(x,I)) & \text{if } \\
-		\infx(\gamma(x,I)) & \text{if } \\
-		\gamma(x,I) \cdot \kappa((S,{\hb}), I, J) & \text{if } \\
-		\gamma(x,I) \cdot \kappa((S,{\hb}), I, J) \cdot \first(\gamma(x,I')) & \text{if } \\		
-		\gamma(x,I) \cdot \kappa((S,{\hb}), I, J) \cdot \pfx(\gamma(x,I')) & \text{if } \\
-		\sfx(\gamma(x,I)) \cdot \kappa((S,{\hb}), I, J) & \text{if } \\
-		\sfx(\gamma(x,I)) \cdot \kappa((S,{\hb}), I, J) \cdot \first(\gamma(x,I')) & \text{if } \\
-		\sfx(\gamma(x,I)) \cdot \kappa((S,{\hb}), I, J) \cdot \pfx(\gamma(x,I')) & \text{if } \\
+		\pfx(\tau_{\varphi,I}) & \text{if } l_I = l_J \land r_I > r_J \\
+		\infx(\tau_{\varphi,I}) & \text{if } l_I < l_J \land r_I > r_J \\
+		\tau_{\varphi,I} \cdot \kappa(\varphi, I, J) & \text{if } l_I = l_J \land r_I \leq r_J \land r_J \in F \setminus J \\
+		\tau_{\varphi,I} \cdot \kappa(\varphi, I, J) \cdot \first(\tau_{\varphi,I'}) & \text{if } l_I = l_J \land r_I \leq r_J \land r_J \in F \cap J  \\		
+		\tau_{\varphi,I} \cdot \kappa(\varphi, I, J) \cdot \pfx(\tau_{\varphi,I'}) & \text{if } l_I = l_J \land r_I \leq r_J \land r_J \notin F  \\
+		\sfx(\tau_{\varphi,I}) \cdot \kappa(\varphi, I, J) & \text{if }  l_I < l_J < r_I \leq r_J \land r_J \in F \setminus J  \\
+		\sfx(\tau_{\varphi,I}) \cdot \kappa(\varphi, I, J) \cdot \first(\tau_{\varphi,I'}) & \text{if } l_I < l_J < r_I \leq r_J \land r_J \in F \cap J \\
+		\sfx(\tau_{\varphi,I}) \cdot \kappa(\varphi, I, J) \cdot \pfx(\tau_{\varphi,I'}) & \text{if } l_I < l_J < r_I \leq r_J \land r_J \notin F \\
+		\{\epsilon\} & \text{otherwise}
 	\end{cases}
-\end{multline*}
+\end{equation*}
 \normalsize
-where
-$I'$ is the segment in $G_S$ that contains the right end point 
+where we assume $J$ is trimmed to fit the temporal domain of $S$ and $I' \in G_S$ is such that $r_J \in I'$.
+Moreover, $\kappa(\varphi, I, J)$ is the concatenation $\tau_{\varphi,I_1} \cdot \ldots \cdot \tau_{\varphi,I_m}$ such that $I, I_1, \ldots, I_m, I'$ are consecutive segments in $G_S$.
+If $I_1, \ldots, I_m$ do not exist, we let $\kappa(\varphi, I, J) = \{\epsilon\}$.
+Note that the last case happens when $I \cap J$ is empty.
+%where $I'$ is the segment in $G_S$ that contains the right end point of $J$ if it exists, and it is the last segment in $G_S$ otherwise.
+%Moreover, $\kappa(\varphi, I, J)$ is the concatenation $\tau_{\varphi,I_1} \cdot \ldots \cdot \tau_{\varphi,I_m}$ such that $I, I_1, \ldots, I_m, I'$ are consecutive segments in $G_S$.
+%If $I_1, \ldots, I_m$ do not exist, we let $\kappa(\varphi, I, J) = \{\epsilon\}$.
+%Finally, note that we assume the interval $J$ is trimmed to fit temporal domain of $S$.
+We now formalize the intuitive approach of ``sliding'' $J$ over the segmentation to obtain the various profiles it produces as follows.
 
 \small
 \begin{align*}
-	\mathsf{pfs}((S,{\hb}), x, I, J) = \{\mathsf{profile}((S,{\hb}), x, I, J') \st J' \subseteq I \oplus J, J' \sim J\}
+	\mathsf{pfs}((S,{\hb}), \varphi, I, J) = \{\destutter(\mathsf{profile}((S,{\hb}), \varphi, I, J')) \st J' \subseteq I \oplus J, J' \sim J\}
 \end{align*}
 \normalsize
 % kind of like the old version
 %We simply write $\mathsf{profiles}(x, J)$ when the rest is clear from the context.
 where $J' \sim J$ holds when $|J'| = |J|$ and $J'$ contains an end point (left or right) iff $J$ does so.
 Note that although infinitely many intervals $J'$ satisfy the conditions given above (due to denseness of time), the set defined by $\mathsf{pfs}$ is finite.
-\alert{TODO3: INTRODUCE EXAMPLE AND FIGURE}
+We demonstrate this and the computation of $\mathsf{pfs}$ in \cref{ex:profiles} and \cref{fig:profiles}.
 
-\begin{example}
-	\alert{TODO5: PROFILES}
+\begin{example} \label{ex:profiles}
+	Recall the distributed signal $(S, {\hb})$ in \cref{ex:canonseg} and its $\gamma$ function given in \cref{fig:valexpr}b.
+	We demonstrate the computation of $\mathsf{pfs}((S,{\hb}), x_1, [1,3), [0,1))$.
+	Intuitively, sliding the interval $[0,1)$ over the window $[1,3) \oplus [0,1)$ (as shown in \cref{fig:profiles}) gives us the following sets:
+	\begin{align*}
+		P_1 &= \destutter(\pfx(\gamma(x_1, [1,3)))) = \{ 0, 01, 1 \}\\
+%		&= \{ 0, 01, 1 \} \\
+		P_2 &= \destutter(\infx(\gamma(x_1, [1,3)))) = \{ 0, 01, 1 \} \\
+%		&= \{ 0, 01, 1 \} \\
+		P_3 &= \destutter(\sfx(\gamma(x_1, [1,3)))) = \{ 0, 01, 1 \} \\
+%		&= \{ 0, 01, 1 \} \\
+		P_4 &= \destutter(\sfx(\gamma(x_1, [1,3))) \cdot \pfx(\gamma(x_1, [3,4)))) \\
+		&= \{ 0, 01, 010, 0101, 01010, 1, 10, 101, 1010 \}
+	\end{align*}
+	Therefore, we obtain $\mathsf{pfs}((S,{\hb}), x_1, [1,3), [0,1)) = \{P_1, P_2, P_3, P_4\}$.
+	This set overapproximates the potential behaviors of $x_1$, for all $t \in [1,3)$, in the interval $t \oplus [0,1)$.
 \end{example}
 
 \begin{figure} 
 	\centering
-%	\includegraphics[scale=0.45]{.png}
-	\caption{\alert{TODO6}}
+	\includegraphics[scale=0.45]{profiles.png}
+	\caption{The profiles of $J = [0,1)$ with respect to $x_1 \in S$ of \cref{ex:canonseg}. The four representative intervals of each profile is shown with solid black lines below the tabular representation of $\gamma$ for $x_1$.}
 	\label{fig:profiles}
 \end{figure}
 
+Let $\varphi_1$ and $\varphi_2$ be two STL formulas.
+Intuitively, once we have the profiles of a given interval $J$ with respect to $\varphi_1$ and $\varphi_2$, we can evaluate the corresponding untimed formulas on the product of these profiles and concatenate them.
+%This captures the behavior of the satisfaction signals with respect to a bounded interval, but introduces further imprecision due to additional concatenations.
+Formally, we handle the evaluation of timed formulas inductively as follows.
 
-Once we compute the profiles of a given evaluation interval $J$ with respect to a distributed signal $(S,{\hb})$ and a segment $I \in G_S$, we can compute the value expressions encoding the satisfaction of timed formulas over $J$ in segment $I$ as follows:
-
-\small
-\alert{TODO4: CHECK}
+\scriptsize
 \begin{align*}
-	\llbracket (S, {\hb}), I \models \varphi_1 \until_J \varphi_2 \rrbracket &= \{ u_1 \mathsf{U}^0 u_2 \st (u_1, u_2) \in P_1 \otimes Q_1 \} \cdot \ldots \cdot \{ u_1 \mathsf{U}^0 u_2 \st (u_1, u_2) \in P_k \otimes Q_k \}
+	\llbracket (S, {\hb}), I \models \varphi_1 \until_J \varphi_2 \rrbracket &= \destutter( \{ u_1 \mathsf{U}^0 u_2 \st (u_1, u_2) \in P_1 \otimes Q_1 \} \cdot \ldots \cdot \{ u_1 \mathsf{U}^0 u_2 \st (u_1, u_2) \in P_k \otimes Q_k \} )
 \end{align*}
 \normalsize
-where \TODO
+where $\mathsf{pfs}((S,{\hb}), \varphi_1, I, J) = \{P_1, \ldots, P_k \}$ and $\mathsf{pfs}((S,{\hb}), \varphi_2, I, J) = \{Q_1, \ldots, Q_k \}$ such that the intervals producing $P_i$ and $Q_i$ respectively start before those producing $P_{i+1}$ and $Q_{i+1}$ for all $1 \leq i < k$.
 
 % formula over J in segment I for S = apply formula to profiles, concat, destutter
 
 %Note that due to additional concatenations and prefixing and suffixing, this makes grows the overapproximation.
 
-\begin{example}
-	\alert{TODO7: A TIMED OPERATOR}
+\begin{example} \label{ex:timed}
+	Let $(S, {\hb})$ be as in \cref{ex:canonseg} and its $\gamma$ function as given in \cref{fig:valexpr}b.
+	We demonstrate the evaluation of the timed formula $\LTLeventually_{[0,1)} x_1$ over the segment $[1,3)$.
+	Recall from \cref{ex:profiles} the set $\mathsf{pfs}((S,{\hb}), x_1, [1,3), [0,1)) = \{P_1, P_2, P_3, P_4\}$ of profiles.
+	First, we apply the bitwise eventually operator to each value expression in each of these profiles separately:
+	$\{ \mathsf{E} u \st u \in P_1 \} = \{ 0, 1 \}$, $\{ \mathsf{E} u \st u \in P_2 \} = \{ 0, 1 \}$, $\{ \mathsf{E} u \st u \in P_3 \} = \{ 0, 1 \}$, and $\{ \mathsf{E} u \st u \in P_4 \} = \{ 0, 10, 1 \}$.
+%	\begin{align*}
+%		P_1' &= \{ \mathsf{E} u \st u \in P_1 \} = \{ 0, 1 \} \\
+%		P_2' &= \{ \mathsf{E} u \st u \in P_2 \} = \{ 0, 1 \} \\
+%		P_3' &= \{ \mathsf{E} u \st u \in P_3 \} = \{ 0, 1 \} \\
+%		P_4' &= \{ \mathsf{E} u \st u \in P_4 \} = \{ 0, 10, 1 \} \\
+%	\end{align*}
+	Then, we concatenate these sets and destutter to obtain the following:
+	\[ 	\llbracket (S, {\hb}), [1,3) \models \LTLeventually_{[0,1)} x_1 \rrbracket = \{ 0, 01, 010, 0101, 01010, 1, 10, 101, 1010 \}  \]
 \end{example}
 
 \subsubsection{Computing the Semantics of STL$^+$}
 
-Putting it all together, given a distributed signal $(S, {\hb})$ and an STL$^+$ formula $\varphi$, we compute $[(S,{\hb}) \models \varphi]_+$ as follows.
+Putting it all together, given a distributed signal $(S, {\hb})$ and an STL$^+$ formula $\varphi$, we can compute $[(S,{\hb}) \models \varphi]_+$ thanks to the following theorem.
 
 \begin{theorem} \label{cl:algo}
 	For every distributed signal $(S,{\hb})$, we have $[(S,{\hb}) \models \varphi]_+ = \top$ (resp. $\bot$, ${\,?}$) iff $\first(\llbracket (S, {\hb}) \models \varphi \rrbracket) = \{1\}$ (resp. $\{0\}$, $\{0,1\}$).
@@ -264,13 +300,14 @@ Putting it all together, given a distributed signal $(S, {\hb})$ and an STL$^+$ 
 
 
 
-%\subsubsection{Boolean Asynchronous Products as Bit Vectors}
-%getting to atomic propositions represented as bitvectors
-%intuition on shortcuts
-
-
-provide equivalent shortcuts for bitvectors.
-
-
+\subsubsection{Sets of Boolean Value Expressions as Bit Vectors}
+Evidently, asynchronous products are expensive to compute.
+Our implementation of the algorithm we describe in this section relies on the following observation:
+Sets of boolean value expressions and their operations can be efficiently implemented through bit vectors.
+Intuitively, to represent such a set, we can encode each element using its first bit and its length since value expressions are boolean and always destuttered.
+Moreover, to evaluate untimed operations on such sets, we only need to know the maximal lengths of the four possible types of expressions ($0 \ldots 0$, $0 \ldots 1$, $1 \ldots 0$, and $1 \ldots 1$) and whether the set contains $0$ or $1$ (to handle some edge cases).
+This is because value expressions corresponding to same segments can be seen as completely asynchronous and the possible interleavings obtained from shorter expressions can be obtained from longer ones.
+This approach enables, for example, an algorithm for conjunction of sets of value expressions that runs in $O(|u| + |v|)$ time where $u$ and $v$ are the longest expressions in the two sets.
+Note that the same idea also applies to untimed temporal operators.
 
 

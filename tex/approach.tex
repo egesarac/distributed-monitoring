@@ -6,8 +6,7 @@ Finally, we define $\tr^+$ based on these notions, and show that it soundly appr
 
 \begin{remark}
 	We assume boolean signals in this section for convenience.
-	The definitions and results presented here extend to real-valued signals.
-	\alert{TODO: EXPLAIN BETTER}
+	The definitions and results presented here extend to real-valued signals because finite-length piecewise-constant signals will only use a finite number of values.
 \end{remark}
 
 \subsubsection{Canonical Segmentation}
@@ -61,6 +60,7 @@ We represent this knowledge as a finite word $v = 0 \cdot 1$.
 This representation is called a \emph{value expression} and it encodes the uncertain behavior of an observed signal relative to the monitor.
 Formally, a value expression is an element of $\Sigma^*$ where $\Sigma$ is the finite alphabet of values the signal takes.
 Given a signal $x$ and an edge $(t, x(t))$, the value expression corresponding to the uncertainty region $(\theta_{\text{lo}}(x,t), \theta_{\text{hi}}(x,t))$ is given by $v_{x,t} = v_- \cdot v_+$ where $v_- = \lim_{s \to t^-} x(s)$ and $v_+ = \lim_{s \to t^+} x(s)$.
+Let us remark that this definition is general because finite-length piecewise-constant real-valued signals will only have a finite number of values, making $\Sigma$ finite.
 
 Notice that (i) uncertainty regions may overlap, and (ii) the canonical segmentation may split an uncertainty region into multiple segments.
 Consider a signal $x$ with a rising edge in $(1,5)$ and a falling edge in $(4,8)$.
