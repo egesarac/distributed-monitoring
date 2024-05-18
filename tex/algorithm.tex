@@ -1,5 +1,146 @@
 \section{Monitoring Algorithm} \label{sec:algorithm}
-\alert{TODO}
+In this section, given a distributed signal $(S,{\hb})$, we describe an algorithm to compute $[(S,{\hb}) \models \varphi]_+$.
+The algorithm makes use of the function $\gamma$ defined in \cref{sec:approach} without explicitly computing $\tr^+(S,{\hb})$.
+To achieve this, we first describe the notion of \emph{asynchronous product} of value expressions to capture potential interleavings within segments.
+Then, we present an algorithm to compute the \emph{semantics} $[(S,{\hb}) \models \varphi]_+$ using operations on value expressions and their asynchronous products that encode $\gamma$. 
+Finally, we discuss how \emph{bit vectors} can represent asynchronous products and allow us to manipulate them faster.
+
+\begin{remark}
+	For the sake of convenience, we focus on boolean signals for the rest of the section.
+	Note that asynchronous products and the algorithm to compute $[(S,{\hb}) \models \varphi]_+$ can be extended to value expressions over arbitrary finite alphabets, e.g., encoding real-valued signals.
+	This allows us to express more complex properties where atomic propositions can be functions of real-valued signals.
+\end{remark}
+
+\subsubsection{Asynchronous Product of Value Expressions}
+Consider the value expressions $u_1 = 0 \cdot 1$ and $u_2 = 1 \cdot 0$ encoding the behaviors of two signals within a segment.
+Due to partial asynchrony, the behaviors within segments can be seen as completely asynchronous.
+To capture the potential interleavings of these behaviors, we consider how the values in $u_1$ and $u_2$ can align.
+In particular, there are three potential alignments:
+(i) the rising edge of $u_1$ happens before the falling edge of $u_2$,
+(ii) the falling edge of $u_2$ happens before the rising edge of $u_1$, and
+(iii) the two edges happen simultaneously.
+We respectively represent these with the tuples $(011, 110)$, $(001, 100)$, and $(01, 10)$ where the first component encodes $u_1$ and the second $u_2$.
+
+Formally, given two value expressions $u_1$ and $u_2$, we define their \emph{asynchronous product} as follows:
+\small
+$$u_1 \otimes u_2 = \{ \destutter(v_1, v_2) \st v_i \in \stutter_k(u_i), k = |u_1| + |u_2| - 1, i \in \{1,2\} \}$$  
+\normalsize
+Moreover, given two sets $L_1$ and $L_2$ of value expressions, we write $L_1 \otimes L_2 = \{ u_1 \otimes u_2 \st u_i \in L_i, i \in \{1,2\} \}$.
+
+Asynchronous products of value expressions allow us to lift value expressions to satisfaction signals of formulas.
+
+\begin{example} \label{ex:asyncprod}
+	Recall the distributed signal $(S, {\hb})$ in \cref{ex:canonseg} and its $\gamma$ function given in \cref{fig:valexpr}b.
+	Suppose we want to compute the value expressions encoding the satisfaction of $x_1 \land x_2$ in the segment $[1,3)$.
+	We can achieve this by first computing the asynchronous product $\gamma(x_1, [3,4)) \otimes \gamma(x_2, [3,4))$, and then computing the bitwise conjunction of each pair in the set.
+	For example, considering the expression $0 \cdot 1 \cdot 0$ for $x_1$ and $0 \cdot 1$ for $x_2$, the product contains the pair $(010, 011)$.
+	Taking the bitwise conjunction of this pair gives us the expression $0 \cdot 1 \cdot 0$ as a potential behavior for the satisfaction of $x_1 \land x_2$ in this segment.
+\end{example}
+
+\subsubsection{Computing the Semantics of STL$^+$}
+As hinted in \cref{ex:asyncprod}, to compute the semantics, we apply bitwise operations on value expressions and their asynchronous products to transform them into encodings of satisfaction signals of formulas.
+Consider the distributed signal $(S, {\hb})$ in \cref{ex:canonseg} and suppose we want to compute $[(S, {\hb}) \models \LTLeventually (x_1 \land x_2)]_+$.
+To achieve this, we first compute for each segment in $G_S$ the set of value expressions for the satisfaction of $x_1 \land x_2$, and then from these compute that of $\LTLeventually (x_1 \land x_2)$.
+This compositional approach allows us to evaluate arbitrary STL$^+$ formulas.
+
+Let us start with the building blocks of our approach.
+First, we define bitwise operations on boolean value expressions encoding atomic propositions.
+Then, we present how these extend to asynchronous products of value expressions.
+
+Let $u$ and $v$ be boolean value expressions of length $\ell$.
+We denote by $u \BitAnd v$ the bitwise-and operation, by $u \BitOr v$ the bitwise-or, and by $\BitNeg u$ the bitwise-negation.
+In addition, we define the \emph{bitwise strong-until} operator as follows:
+
+\small
+\[ u \mathsf{U}^0 v = \left( \max_{i \leq j \leq \ell} \left( \min \left( v[j], \min_{i \leq k \leq j} u[k] \right) \right) \right)_{1 \leq i \leq \ell} \]
+\normalsize
+As usual, we derive \emph{bitwise eventually} as $\mathsf{E} u = 1^\ell \mathsf{U}^0 u$, \emph{bitwise always} as $\mathsf{A} u = \BitNeg (\mathsf{E} \BitNeg u)$, and \emph{bitwise weak-until as} follows:
+\[ u \mathsf{U}^1 v = \left( \max \left( u[i..] \mathsf{U}^0 v[i..], \mathsf{A} u[i..] \right) \right)_{1 \leq i \leq \ell} \]
+This distinction will be useful later when we evaluate a formula segment by segment.
+We remark that the definitions of these operators coincide with the robustness semantics of (discrete time) STL.
+Finally, note that the output of these operations is a value expression of length $\ell$.
+For example, if $u = 010$, we have $\mathsf{E} u = 110$ and $\mathsf{A} u = 000$.
+
+%\small
+%\begin{align*}
+%	&\mathsf{E} u = \left( \max_{i \leq j \leq \ell} u[j] \right)_{1 \leq i \leq \ell} \hspace*{0.7em} \mathsf{A} u = \left( \min_{i \leq j \leq \ell} u[j] \right)_{1 \leq i \leq \ell}\\
+%	&u \mathsf{U}^0 v = \left( \max_{i \leq j \leq \ell} \left( \min \left( v[j], \min_{i \leq k \leq j} u[k] \right) \right) \right)_{1 \leq i \leq \ell} \\
+%	&u \mathsf{U}^1 v = \left( \max \left( u[i..] \mathsf{U}^0 v[i..], \mathsf{A} u[i..] \right) \right)_{1 \leq i \leq \ell} \\
+%\end{align*}
+%\normalsize
+
+Now, let $L_1$ and $L_2$ be sets of boolean value expressions.
+We define the following untimed operations:
+
+\small
+\begin{align*}
+	\lnot L_1 &= \{ \BitNeg u \st u \in L_1 \} \\
+%	L_1 \cdot L_2 &= \destutter( \{ u_1 \cdot u_2 \st u_1 \in L_1, u_2 \in L_2 \} ) \\ % THIS IS ALREADY DEFINED?
+	L_1 \land L_2 &= \destutter( \{ u_1 \BitAnd u_2 \st (u_1, u_2) \in L_1 \otimes L_2 \} ) \\
+%	\LTLeventually L_1 &= \destutter( \{  \} ) \\
+%	\LTLalways L_1 &= \destutter( \{  \} ) \\
+	L_1 \until^x L_2 &= \destutter( \{ u_1 \mathsf{U}^x u_2 \st (u_1, u_2) \in L_1 \otimes L_2 \} ) \text{ for } x \in \{0,1\} \\
+%	L_1 \until^1 L_2 &= \destutter( \{ u_1 \mathsf{U}^1 u_2 \st (u_1, u_2) \in L_1 \otimes L_2 \} )
+\end{align*}
+\normalsize
+Similarly as above, we derive
+$L_1 \lor L_2 = \lnot(L_1 \land L_2)$,
+$\LTLeventually L_1 = \{1\} \until^0 L_1$, and
+$\LTLalways L_1 = \lnot \LTLeventually \lnot L_1$.
+
+\begin{example}
+	\alert{demonstrate above operations}
+\end{example}
+
+We additionally define the following timed operators:
+
+\TODO
+
+Finally, given a distributed signal $(S, {\hb})$ and an STL$^+$ formula $\varphi$, we compute $[(S, {\hb}) \models \varphi]_+$ as follows.
+
+\TODO
+
+%\SetKwComment{Comment}{/* }{ */}
+%\begin{algorithm}
+%	\caption{An algorithm with caption}\label{alg:two}
+%	\KwData{$n \geq 0$}
+%	\KwResult{$y = x^n$}
+%	$y \gets 1$\;
+%	$X \gets x$\;
+%	$N \gets n$\;
+%	\While{$N \neq 0$}{
+%		\eIf{$N$ is even}{
+%			$X \gets X \times X$\;
+%			$N \gets \frac{N}{2}$ \Comment*[r]{This is a comment}
+%		}{\If{$N$ is odd}{
+%				$y \gets y \times X$\;
+%				$N \gets N - 1$\;
+%			}
+%		}
+%	}
+%\end{algorithm}
+
+%\begin{lemma} \label{cl:algo}
+%	For every distributed signal $(S,{\hb})$, we have $[(S,{\hb}) \models \varphi]_+ = \top$ (resp. $\bot$, ${\,?}$) iff $\alert{...} = \{1\}$ (resp. $\{0\}$, $\{0,1\}$).
+%%	\begin{itemize}
+%%		\item $[(S,{\hb}) \models \varphi]_{\mathsf{STL}^+} = \top \iff ... = \{1\}$
+%%		\item $[(S,{\hb}) \models \varphi]_{\mathsf{STL}^+} = \bot \iff ... = \{0\}$
+%%		
+%%		\item $[(S,{\hb}) \models \varphi]_{\mathsf{STL}^+} = {\,?} \iff ... = \{0, 1\}$
+%%	\end{itemize}
+%\end{lemma}
+
+
+
+
+
+\subsubsection{Boolean Asynchronous Products as Bit Vectors}
+getting to atomic propositions represented as bitvectors
+intuition on shortcuts
+
+
+provide equivalent shortcuts for bitvectors.
+
 
 
 

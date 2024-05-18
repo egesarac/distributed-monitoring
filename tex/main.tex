@@ -12,9 +12,11 @@
 \usepackage{tikz}
 \usetikzlibrary{backgrounds, positioning, arrows, calc}
 \usepackage{mathtools}
-\usepackage[linesnumbered,vlined,noend]{algorithm2e}
+\usepackage[linesnumbered,vlined,noend, ruled]{algorithm2e}
 \usepackage[inline]{enumitem}  
 \usepackage{cleveref}
+\usepackage{lineno}
+\linenumbers
 \renewcommand{\cref}{\Cref}
 
 
@@ -105,7 +107,7 @@
 % ----- LTL SYNTAX
 \newcommand{\LTLf}{\ensuremath{\lozenge}}
 \let\LTLfinally\LTLf
-\let\LTLeventualy\LTLf
+\let\LTLeventually\LTLf
 \newcommand{\LTLg}{\ensuremath{\square}}
 \let\LTLalways\LTLg
 \let\LTLglobally\LTLg
@@ -151,28 +153,29 @@
 \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 \newcommand\Circle[1][1.4]{\tikz[baseline=-3.3]{\draw(0,0)circle[radius=#1mm];}}
 
-%\setlength{\belowcaptionskip}{-2em}
-
 % ----- THEOREMS
 \newtheorem{observation}[theorem]{Fact}
 
-\title{Approximate Distributed Monitoring under Partial Asynchrony: Balancing Speed with Accuracy} 
+\title{Approximate Distributed Monitoring under Partial Synchrony: Balancing Speed with Accuracy} 
+\titlerunning{Approximate Distributed Monitoring under Partial Synchrony}
 %\author{Borzoo Bonakdarpour\inst{1} \and Anik Momtaz\inst{1} \and Dejan Ni\v{c}kovi\'{c}\inst{2} \and N. Ege Sara\c{c}\inst{3}} %
 %\institute{Michigan State University \and AIT Austrian Institute of Technology \and Institute of Science and Technology Austria (ISTA)} %
 \author{Author(s)} %
 \institute{Affiliation(s)} %
 \authorrunning{Author(s)} %
+
 \date{}
 
 %\renewcommand{\baselinestretch}{.98}
+%\setlength{\belowcaptionskip}{-2em}
 
 \begin{document}
 	\maketitle
 	
 	\begin{abstract}
-		In distributed systems with processes that do not share a global clock, \emph{partial asynchrony} is achieved by clock synchronisation 
+		In distributed systems with processes that do not share a global clock, \emph{partial synchrony} is achieved by clock synchronization 
 		that guarantees bounded clock skew among all applications. Existing solutions for distributed runtime verification under partial 
-		asynchrony against temporal logic specifications are exact but suffer from significant computational overhead. In this paper, we propose an \emph{approximate} 
+		Synchrony against temporal logic specifications are exact but suffer from significant computational overhead. In this paper, we propose an \emph{approximate} 
 		distributed monitoring algorithm for Signal Temporal Logic (STL) that mitigates this issue by abstracting away potential interleaving behaviors. 
 		This conservative abstraction enables a significant speedup of the distributed monitors, albeit with a trade-off in accuracy. We address this 
 		trade-off with a methodology that combines our approximate monitor with its exact counterpart, resulting in enhanced monitoring 
@@ -192,5 +195,5 @@
 	\bibliographystyle{splncs04}
 	\bibliography{main}
 	
-%	\input appendix
+	\input appendix
 \end{document}

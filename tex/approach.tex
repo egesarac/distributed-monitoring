@@ -70,7 +70,6 @@ Similarly, the behavior in $[4,5)$ is given by $\sfx(v_1) \cdot \pfx(v_2)$, whic
 Formally, given a distributed signal $(S,{\hb})$, we define a function $\gamma : S \times G_S \to 2^{\Sigma^*}$ that maps each signal and segment of the canonical segmentation to a set of value expressions, capturing the signal's potential behaviors in the given segment.
 Let $x$ be a signal in $S$, and let $R_1, \ldots, R_m$ be its uncertainty regions where $R_i = (t_i, t_i')$ and the corresponding value expression is $v_i$ for all $1 \leq i \leq m$.
 Now, let $I \in G_S$ be a segment with $I = [s, s')$ and for each $1 \leq i \leq m$ define the set $V_i$ of value expressions capturing how $I$ relates with $R_i$ as follows:
-
 \small
 \begin{equation*}
 	V_i = 
@@ -83,8 +82,9 @@ Now, let $I \in G_S$ be a segment with $I = [s, s')$ and for each $1 \leq i \leq
 	\end{cases}
 \end{equation*}
 \normalsize
-Note that the last case happens only when $I \cap R_i$ is empty.
-We finally define $\gamma(x,I) = \destutter(V_1 \cdot V_2 \cdot \ldots \cdot V_m) \setminus \{\epsilon\}$.
+The last case happens only when $I \cap R_i$ is empty.
+We finally define $\gamma$ as follows:
+\[ \gamma(x,I) = \destutter(V_1 \cdot V_2 \cdot \ldots \cdot V_m) \setminus \{\epsilon\} \]
 Observe that $\gamma(x,I)$ contains all the potential behaviors of $x$ in segment $I$ by construction.
 However, it is potentially overapproximate.
 This is mainly because the sets $V_1, \ldots, V_m$ contain redundancy by definition and the concatenation does not guarantee that an edge is considered exactly once.
@@ -128,7 +128,7 @@ Let $(t_1, x'(t_1)), \ldots, (t_\ell, x'(t_\ell))$ be the edges of $x'$ in segme
 The signals $x$ and $x'$ are \emph{consistent in $I$} iff the value expression $x'(s) \cdot x'(t_1) \cdot \ldots \cdot x'(t_\ell)$ belongs to $\gamma(x,I)$.
 Moreover, $x$ and $x'$ are \emph{consistent} iff they are consistent in $I$ for all $I \in G_S$.
 Now, let $S = (x_1, \ldots, x_n)$ and define $\tr^+(S,{\hb})$ as follows:
-$$ \tr^+(S,{\hb}) = \{ (x_1', \ldots, x_n') \st \text{$x_i$ and $x_i'$ are consistent for all $1 \leq i \leq n$}\} $$
+\[ \tr^+(S,{\hb}) = \{ (x_1', \ldots, x_n') \st \text{$x_i$ and $x_i'$ are consistent for all $1 \leq i \leq n$}\} \]
 
 
 
@@ -145,7 +145,7 @@ $$ \tr^+(S,{\hb}) = \{ (x_1', \ldots, x_n') \st \text{$x_i$ and $x_i'$ are consi
 
 Finally, we show the correctness of the canonical overapproximation.
 
-\begin{lemma}
+\begin{lemma} \label{cl:trsound}
 	For every distributed signal $(S,{\hb})$, we have $\tr(S,{\hb}) \subseteq \tr^+(S,{\hb})$.
 \end{lemma}
 
