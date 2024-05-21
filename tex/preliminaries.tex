@@ -22,7 +22,7 @@ $u$, by $u[..i]$ the prefix of $u$ of length $i$, and by $u[i..]$ the suffix of 
 %
 Given $u \in \Sigma^*$ and $\ell \geq 1$, we denote by $u^\ell$ the word obtained by concatenating $u$ by itself $\ell - 1$ times.
 Moreover, given $L \subseteq \Sigma^*$, we define $\first(L) = \{ u[0] \st u \in L\}$.
-For sets $L_1, L_2 \in \Sigma^*$ of words, we let $L_1 \cdot L_2 = \{u \cdot v \st u \in L_1, v \in L_2\}$.
+For sets $L_1, L_2 \subseteq \Sigma^*$ of words, we let $L_1 \cdot L_2 = \{u \cdot v \st u \in L_1, v \in L_2\}$.
 For tuples $(u_1, \ldots, u_m)$ and $(v_1, \ldots, v_m)$ of words, we let $(u_1, \ldots, u_m) \cdot (v_1, \ldots, v_m) = (u_1 v_1, \ldots, u_m v_m)$.
 
 We define the function $\destutter : \Sigma^* \to \Sigma^*$ inductively as follows.
@@ -31,6 +31,9 @@ For all $\sigma \in \Sigma \cup \{\epsilon\}$, let $\destutter(\sigma) = \sigma$
 For all $u \in \Sigma^*$ such that $u = \sigma_1 \sigma_2 v$ for some $\sigma_1,\sigma_2 \in 
 \Sigma$ and $v \in \Sigma^*$, let (i) $\destutter(u) = \destutter(\sigma_2 v)$ if $\sigma_1 = 
 \sigma_2$, and (ii) $\destutter(u) = \sigma_1 \cdot \destutter(\sigma_2 v)$ otherwise.
+\borzoo{why 
+	not just saying destutter(...) = (destutter(), destutter(), ...)}
+\ege{because it is a ``synchronized'' destutter. all words have to agree when a letter is removed.}
 %
 By extension, for a set $L \subseteq \Sigma^*$ of finite words, we write $\destutter(L) = 
 \{\destutter(u) \st u \in L\}$.
@@ -41,7 +44,7 @@ Given a tuple $(u_1, \ldots, u_m) = (\sigma_{1,1} \sigma_{1,2} v_1, \ldots, \sig
 
 Moreover, given an integer $k \geq 0$, we define $\stutter_k : \Sigma^* \to \Sigma^*$ such that $\stutter_k(u) = \{v \in \Sigma^* \st |v| = k \land \destutter(v) = \destutter(u)\}$ if $k \geq |\destutter(u)|$, and $\stutter_k(u) = \emptyset$ otherwise.
 
-\subsubsection{Signal Temporal Logic (STL)} \label{sec:stl}
+\subsubsection{Signal Temporal Logic (STL) \cite{MalerN13}.} \label{sec:stl}
 
 Let $A,B \subset \R$.
 %
@@ -57,7 +60,7 @@ An \emph{edge} of $x$ is an event $(t, x(t))$ such that $\lim_{s \to t^-} x(s) \
 In particular, an edge is \emph{rising} if $\lim_{s \to t^-} x(s) < \lim_{s \to t^+} x(s)$, and it is \emph{falling} otherwise.
 A signal $x : [0,d) \to \R$ can be represented finitely by its initial value and edges: if $x$ has $m$ edges, then $x = (t_0, v_0) (t_1, v_1) \ldots (t_m, v_m)$ such that $t_0 = 0$, $t_{i-1} < t_i$, and $(t_i, v_i)$ is an edge of $x$ for all $1 \leq i \leq m$.
 
-Let $\AP$ be a set of atomic propositions.
+Let $\AP$ be a set of \emph{atomic propositions}.
 The syntax is given by the following grammar where $p \in \AP$ and $I \subseteq \R_{\geq 0}$ is an interval.
 \[ \varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \land \varphi ~|~ \varphi \until_I \varphi \]
 
@@ -67,7 +70,7 @@ i.e., a proposition $p \in \AP$ over a trace $w = (x_1, \ldots, x_n)$ is defined
 %i.e., a proposition $p \in \AP$ over a trace $w = (x_1, \ldots, x_n)$ is defined as $f_p(x_1(t), \ldots, x_n(t)) \sim_p c_p$ where $f_p : \R^n \to \R$ is a function, $c_p \in \R$ is a constant, and ${\sim_p} \in \{{<}, {\leq}, {\geq}, {>}\}$.
 Given intervals $I,J \subseteq \R_{\geq 0}$, we define $I \oplus J = \{i + j \st i \in I \land j \in J\}$, and we simply write $t$ for the singleton set $\{t\}$. 
 
-Below we recall the finite-trace qualitative semantics of STL defined over $\B$ \cite{MalerN13}.
+Below, we recall the finite-trace qualitative semantics of STL defined over $\B$ \cite{MalerN13}.
 Let $d \in \R_{> 0}$ and $w = (x_1, \ldots, x_n)$ with $x_i : [0,d) \to \R$ for all $1 \leq i \leq n$.
 Let $\varphi_1, \varphi_2$ be STL formulas and let $t \in [0,d)$.
 
@@ -88,7 +91,7 @@ $\true = \lnot \false$,
 $ \varphi_1 \lor \varphi_2 = \lnot (\lnot \varphi_1 \land \lnot \varphi_2)$,
 $\LTLf_I \varphi = \true \until_I \varphi$, and
 $\LTLg_I \varphi = \lnot \LTLf_I \lnot \varphi$.
-Moreover, the untimed temporal operators are defined through their timed counterparts on the interval $(0,\infty)$, e.g., $\varphi_1 \until \varphi_2 = \varphi_1 \until_{(0,\infty)} \varphi_2$.
+Moreover, the untimed temporal operators are defined through their timed counterparts on the interval $[0,\infty)$, e.g., $\varphi_1 \until \varphi_2 = \varphi_1 \until_{[0,\infty)} \varphi_2$.
 %Note that our interpretation of the untimed until operator is strict.
 %The non-strict variant can be defined in terms of the strict one as follows: $\varphi_1 \underline{\until} \varphi_2 = \varphi_2 \lor (\varphi_1 \land (\varphi_1 \until \varphi_2))$.
 
@@ -98,7 +101,7 @@ Moreover, the untimed temporal operators are defined through their timed counter
 %we define $[w \models \varphi]_3 = \top$ iff $[w w' \models \varphi]_{\mathsf{STL}}$ for every infinite-length signal $w'$, define $[w \models \varphi]_3 = \bot$ iff $[w w' \models \lnot \varphi]_{\mathsf{STL}}$ for every infinite-length signal $w'$, and $[w \models \varphi]_3 = \?$ otherwise.
 
 
-\subsubsection{Distributed Semantics of STL} \label{sec:diststl}
+\subsubsection{Distributed Semantics of STL \cite{MomtazAB23}.} \label{sec:diststl}
 
 We consider an asynchronous and loosely-coupled message-passing system of $n \geq 2$ reliable agents producing a set of signals $x_1, \ldots, x_n$, where for some $d \in \R_{> 0}$ we have $x_i : [0,d) \to \R$ for all $1 \leq i \leq n$.
 %
@@ -151,7 +154,7 @@ We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distribu
 
 Observe that a consistent cut flow of a distributed signal induces a vector of synchronous signals which can be evaluated using the standard semantics described in \cref{sec:stl}.
 Let $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots, x_n$.
-A consistent cut flow $\ccf \in \CCF(S,{\hb})$ yields a trace $w_{\ccf} = (x'_1, \ldots x'_n)$ on a temporal domain $[0,D)$ where $D \in \R_{> 0}$ such that $(c_i(T), x_i(c_i(T))) \in \ccf(T)$ implies $x_i'(T) = x_i(c_i(T))$ for all $1 \leq i \leq n$ and $T \in [0, D)$.
+A consistent cut flow $\ccf \in \CCF(S,{\hb})$ yields a trace $w_{\ccf} = (x'_1, \ldots x'_n)$ on the temporal domain $[0,d)$ such that $(c_i(T), x_i(c_i(T))) \in \ccf(T)$ implies $x_i'(T) = x_i(c_i(T))$ for all $1 \leq i \leq n$ and $T \in [0, d)$.
 The set of traces of $(S,{\hb})$ is given by $\tr(S,{\hb}) = \{ w_{\ccf} \st \ccf \in \CCF(S,{\hb})\}$.
 
 We define the satisfaction of an STL formula $\varphi$ by a distributed signal $(S,{\hb})$ over a three-valued domain $\{\top, \bot, {?}\}$
@@ -171,7 +174,7 @@ Otherwise, the evaluation is inconclusive since some traces satisfy the property
 \normalsize
 
 \section{Overapproximation of the STL Distributed Semantics}
-To address the computational overhead in exact distributed monitoring, we define a new logic STL$^+$ whose syntax is the same as STL but semantics provide a sound approximation of the STL distributed semantics presented in \cref{sec:diststl}.
+To address the computational overhead in exact distributed monitoring, we define a ``new'' logic \borzoo{I wouldn't say we are defining a new logic. It's a bit too strong.} STL$^+$ whose syntax is the same as STL but semantics provide a sound approximation of the STL distributed semantics presented in \cref{sec:diststl}.
 In essence, given a distributed signal $(S,{\hb})$, STL$^+$ considers an overapproximation $\tr^+(S,{\hb})$ of the set $\tr(S,{\hb})$ of synchronous traces.
 A signal $(S,{\hb})$ satisfies (resp. violates) an STL$^+$ formula $\varphi$ iff all the traces in $\tr^+(S,{\hb})$ belong to the language of $\varphi$ (resp. $\lnot \varphi$).
 
@@ -192,4 +195,5 @@ We finally prove the correctness of our approach.
 \begin{theorem} \label{cl:stlsound}
 	For every STL formula $\varphi$ and every distributed signal $(S,{\hb})$, if $[(S,{\hb}) \models \varphi]_+ = \top$ (resp. $\bot$) then $[(S,{\hb}) \models \varphi] = \top$ (resp. $\bot$).
 \end{theorem}
-
+\borzoo{This is not true for $\bot$, right? The other direction is true for $\bot$ though.}
+\ege{The statement is true for both. The distributed semantics of STL also universally quantifies over traces.}
