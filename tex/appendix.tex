@@ -12,7 +12,27 @@
 \end{proof}
 
 \begin{proof}[Proof of \cref{cl:trsound}]
-	\TODO
+	Let $(S,{\hb})$ be a distributed signal where $S = (x_1, \ldots, x_n)$.
+	Let $w = (y_1, \ldots, y_n) \in \tr(S,{\hb})$ be a trace.
+	We want to show that $w \in \tr^+(S,{\hb})$.
+	First, recall the following:
+	\[ \tr^+(S,{\hb}) = \{ (x_1', \ldots, x_n') \st \text{$x_i'$ is consistent with $x_i$ for all $1 \leq i \leq n$}\} \]
+	To achieve our goal, we need to show that $x_i$ and $y_i$ are consistent for all $1 \leq i \leq n$.
+	Let $1 \leq i \leq n$ be arbitrary, and let $I = [t_0, s)$ be a segment in $G_S$.
+	Moreover, let $(t_1, y_i(t_1)), \ldots, (t_\ell, y_i(t_\ell))$ be the edges of $y_i$ in segment $I$ with $t_j < t_{j+1}$ for all $1 \leq j < \ell$.
+	We want to show that the expression $y_i(t_0) \cdot y_i(t_1) \cdot \ldots \cdot y_i(t_\ell)$ belongs to $\gamma(x_i,I)$.
+	We sketch the proof below.
+	
+	Note that $w$ can be seen as a trace obtained through an $\varepsilon$-retiming of $S$ (see \cite[Section 4.2]{MomtazAB23}).
+	It is then clear that the timestamps of the events (and thus edges) of $x_i$ are mapped to clock values that are less than $\varepsilon$ away.
+	In particular, $|t - c^{-1}_i(t)| < \varepsilon$ for all $t \in \{t_0, t_1, \ldots, t_\ell\}$, where $c^{-1}_i(t)$ is the local clock value of $x_i$ that is mapped to $t$.
+	Since $y_i$ has $\ell$ edges in $I$, it holds that $x_i$ has at least $\ell$ edges in $[t_0 - \varepsilon, s + \varepsilon)$.
+	Since $I$ is a segment in $G_S$, there are $\ell$ of these that are consecutive such that the intersection of their uncertainty regions contain $(t_0,s)$, i.e., $(t_0,s) \subseteq \bigcap_{1 \leq j \leq \ell} (\theta_{\text{lo}}(t_j'), \theta_{\text{hi}}(t_j'))$ where $t_j' = c^{-1}_i(t_j)$ is the corresponding timestamp in $x_i$ for all $0 \leq j \leq \ell$.
+	In particular, note that $y_i(t_j) = x_i(t_j')$ for all $0 \leq j \leq \ell$.
+		
+	Now, notice that, by definition, $\gamma(x_i, I)$ takes into account every edge of $x_i$ whose uncertainty region has a nonempty intersection with $I$.
+	Moreover, thanks to concatenation in its definition, it contains a value expression in which all $\ell$ edges occur and their order is preserved.
+	We conclude that $x_i(t_0') \cdot x_i(t_1') \cdot \ldots \cdot x_i(t_\ell') \in \gamma(x_i, I)$.
 \end{proof}
 
 \begin{proof}[Proof of \cref{cl:algo}]
