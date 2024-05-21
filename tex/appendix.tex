@@ -1,7 +1,14 @@
 \section*{Appendix}
 
 \begin{proof}[Proof of \cref{cl:stlsound}]
-	\TODO
+	Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal.
+	Assume $[(S,{\hb}) \models \varphi]_+ = \top$.
+	We want to show that $[(S,{\hb}) \models \varphi] = \top$.
+	Expanding the definition of $[(S,{\hb}) \models \varphi]_+ = \top$, we have $w \models \varphi$ for all $w \in \tr^+(S,{\hb})$.
+	By \cref{cl:trsound}, we have $\tr(S,{\hb}) \subseteq \tr^+(S,{\hb})$.
+	Then, it holds that $w \models \varphi$ for all $w \in \tr(S,{\hb})$.
+	Therefore, $[(S,{\hb}) \models \varphi] = \top$ by definition.
+	The case of $[(S,{\hb}) \models \varphi]_+ = \bot$ follows from the same arguments.
 \end{proof}
 
 \begin{proof}[Proof of \cref{cl:trsound}]
