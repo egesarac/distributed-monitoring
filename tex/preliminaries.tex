@@ -31,9 +31,6 @@ For all $\sigma \in \Sigma \cup \{\epsilon\}$, let $\destutter(\sigma) = \sigma$
 For all $u \in \Sigma^*$ such that $u = \sigma_1 \sigma_2 v$ for some $\sigma_1,\sigma_2 \in 
 \Sigma$ and $v \in \Sigma^*$, let (i) $\destutter(u) = \destutter(\sigma_2 v)$ if $\sigma_1 = 
 \sigma_2$, and (ii) $\destutter(u) = \sigma_1 \cdot \destutter(\sigma_2 v)$ otherwise.
-\borzoo{why 
-	not just saying destutter(...) = (destutter(), destutter(), ...)}
-\ege{because it is a ``synchronized'' destutter. all words have to agree when a letter is removed.}
 %
 By extension, for a set $L \subseteq \Sigma^*$ of finite words, we write $\destutter(L) = 
 \{\destutter(u) \st u \in L\}$.
@@ -161,6 +158,7 @@ We define the satisfaction of an STL formula $\varphi$ by a distributed signal $
 If the set of synchronous traces $\tr(S,{\hb})$ defined by a distributed signal $(S,{\hb})$ is contained in the set of traces allowed by the formula $\varphi$, then $(S,{\hb})$ satisfies $\varphi$.
 Similarly, if $\tr(S,{\hb})$ has an empty intersection with the set of traces $\varphi$ defines, then $(S,{\hb})$ violates $\varphi$.
 Otherwise, the evaluation is inconclusive since some traces satisfy the property and some violate it.
+Notice that we quantify universally over traces for both satisfaction and violation.
 
 \small
 \begin{equation*}
@@ -174,8 +172,10 @@ Otherwise, the evaluation is inconclusive since some traces satisfy the property
 \normalsize
 
 \section{Overapproximation of the STL Distributed Semantics}
-To address the computational overhead in exact distributed monitoring, we define a ``new'' logic \borzoo{I wouldn't say we are defining a new logic. It's a bit too strong.} STL$^+$ whose syntax is the same as STL but semantics provide a sound approximation of the STL distributed semantics presented in \cref{sec:diststl}.
-In essence, given a distributed signal $(S,{\hb})$, STL$^+$ considers an overapproximation $\tr^+(S,{\hb})$ of the set $\tr(S,{\hb})$ of synchronous traces.
+To address the computational overhead in exact distributed monitoring, we define STL$^+$, a variant of STL whose syntax is the same as STL but semantics provide a sound approximation of the STL distributed semantics.
+STL$^+$ is better adapted to distributed monitoring as it overapproximates the set of traces.
+In particular, given a distributed signal $(S,{\hb})$, STL$^+$ considers an approximation 
+$\tr^+(S,{\hb})$ of the set $\tr(S,{\hb})$ of synchronous traces where $ \tr(S,{\hb}) \subseteq \tr^+(S,{\hb})$.
 A signal $(S,{\hb})$ satisfies (resp. violates) an STL$^+$ formula $\varphi$ iff all the traces in $\tr^+(S,{\hb})$ belong to the language of $\varphi$ (resp. $\lnot \varphi$).
 
 \small
@@ -195,5 +195,6 @@ We finally prove the correctness of our approach.
 \begin{theorem} \label{cl:stlsound}
 	For every STL formula $\varphi$ and every distributed signal $(S,{\hb})$, if $[(S,{\hb}) \models \varphi]_+ = \top$ (resp. $\bot$) then $[(S,{\hb}) \models \varphi] = \top$ (resp. $\bot$).
 \end{theorem}
-\borzoo{This is not true for $\bot$, right? The other direction is true for $\bot$ though.}
-\ege{The statement is true for both. The distributed semantics of STL also universally quantifies over traces.}
+
+Notice that both the distributed semantics of STL and the semantics of STL$^+$ quantify universally over the set of traces for the verdicts $\top$ and $\bot$.
+Therefore, the \cref{cl:stlsound} holds for the verdicts $\top$ and $\bot$, but not for ${\,?}$.
