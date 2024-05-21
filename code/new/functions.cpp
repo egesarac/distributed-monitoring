@@ -1511,7 +1511,14 @@ vector<vector<bitset<N>>> bitsetBoundedAlways(vector<vector<bitset<N>>> v1, vect
     {
         vector<vector<bitset<N>>> temp = getProfiles(v1, segmentation, segmentation[i], segmentation[i + 1], a, b, leftClosed, rightClosed);
 
-        temp = bitsetAlways(temp);
+        for (int k = 0; k < temp.size(); k++)
+        {
+            vector<vector<bitset<N>>> tempPerSegment;
+            tempPerSegment.push_back(temp[k]);
+            tempPerSegment = bitsetEventually(tempPerSegment);
+            temp[k] = tempPerSegment[0];
+        }
+
         for (int j = 1; j < temp.size(); j++)
         {
             temp[0] = bitsetConcat(temp[0], temp[j]);
@@ -1537,7 +1544,14 @@ vector<vector<bitset<N>>> bitsetBoundedEventually(vector<vector<bitset<N>>> v1, 
     {
         vector<vector<bitset<N>>> temp = getProfiles(v1, segmentation, segmentation[i], segmentation[i + 1], a, b, leftClosed, rightClosed);
 
-        temp = bitsetEventually(temp);
+        for (int k = 0; k < temp.size(); k++)
+        {
+            vector<vector<bitset<N>>> tempPerSegment;
+            tempPerSegment.push_back(temp[k]);
+            tempPerSegment = bitsetEventually(tempPerSegment);
+            temp[k] = tempPerSegment[0];
+        }
+
         for (int j = 1; j < temp.size(); j++)
         {
             temp[0] = bitsetConcat(temp[0], temp[j]);

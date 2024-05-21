@@ -8,16 +8,13 @@ from z3.z3 import ForAll
 set_option(rational_to_decimal=True)
 set_option(max_args=100000000, max_lines=10000000000, max_depth=100000000, max_visited=10000000)
 
-a = 0
-b = 1
-
 def prog_always_conjunction(eps, segCount, data_0, data_1):
 
     # initialize z3 solver
     s = Solver()
 
-    pad = min(2 * eps, len(data_0) - 1)
-    # pad = 2
+    # pad = min(2 * eps, len(data_0) - 1)
+    pad = 2
     peps = pad * eps
 
     # initialize signal duration and segment duration
@@ -265,14 +262,12 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
         )
 
         # violation check
-        a = pad * 0
-        b = pad * 2
         v = Int("v")
-        s.add(And(v >= a, v < b))
+        s.add(And(v >= timestamps_0[0], v <= timestamps_0[-1]))
 
         s.add(
             Implies(
-                And(v >= a, v < b),
+                And(v >= timestamps_0[0], v <= timestamps_0[-1]),
                 z3Interpolate(c_flow, v) < 2
             )
         )
@@ -585,8 +580,8 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
     # initialize z3 solver
     s = Solver()
 
-    pad = min(2 * eps, len(data_0) - 1)
-    # pad = 2
+    # pad = min(2 * eps, len(data_0) - 1)
+    pad = 2
     peps = pad * eps
 
     # initialize signal duration and segment duration
@@ -837,20 +832,15 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
         v = Int("v")
         s.add(And(v >= timestamps_0[0], v <= timestamps_0[-1]))
 
-        a = pad * 0
-        b = pad * 2
-        u = Int("u")
-        s.add(And(u >= v + a, u < v + b))
-
         s.add(
             ForAll(v,
                 Implies(
-                    And(u >= v + a, u <= v + b),
-                    z3Interpolate(c_flow, u) < 2
+                    And(v >= timestamps_0[0], v <= timestamps_0[-1]),
+                    z3Interpolate(c_flow, v) < 2
                 )
             )
         )
-        
+
         # print(s.assertions())
         if s.check() == sat:
             m = s.model()
@@ -875,8 +865,8 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
     # initialize z3 solver
     s = Solver()
 
-    pad = min(2 * eps, len(data_0) - 1)
-    # pad = 2
+    # pad = min(2 * eps, len(data_0) - 1)
+    pad = 2
     peps = pad * eps
 
     # initialize signal duration and segment duration
@@ -1124,15 +1114,13 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
         )
 
         # violation check
-        a = pad * 0
-        b = pad * 2
         v = Int("v")
-        s.add(And(v >= a, v < b))
+        s.add(And(v >= timestamps_0[0], v <= timestamps_0[-1]))
 
         s.add(
             ForAll(v,
                 Implies(
-                    And(v >= a, v < b),
+                    And(v >= timestamps_0[0], v <= timestamps_0[-1]),
                     z3Interpolate(c_flow, v) == 0
                 )
             )
@@ -1392,7 +1380,7 @@ def z3SqDist1d(x1, x2):
 
 def getDataTest(agent_ID):
 
-    file = open("{}/test{}.txt".format(os.path.dirname(os.path.abspath(__file__)), agent_ID))
+    file = open("test{}.txt".format(agent_ID))
     line = file.readline()
 
     data = []
@@ -1474,51 +1462,169 @@ def main():
     # set repeat count for confidence interval
     repeat = 1
 
-    for bb in range(1, 2):
-        for d in range(8, 16):
-            for eps in (1, 2, 4, 8):
-                # if d < eps:
-                #     continue
-                # if d < bb:
-                #     continue
+    # for d in range(32,33):
+    #     for eps in (1, 2, 4, 8):
+    #         if d < eps:
+    #             continue
+            
+    #         for c in range(100):
+    #             flag = False
+    #             flagneg = False
+    #             out = "0"
+    #             outneg = "0"
+    #             data_0 = getData(d, c)
+    #             data_1 = getData(d, c + 100)
 
-                if (eps <= d and bb <= d):
-                    for c in range(100):
-                        flag = False
-                        flagneg = False
-                        out = "0"
-                        outneg = "0"
-                        data_0 = getData(d, c)
-                        data_1 = getData(d, c + 100)
+    #             prep_time = 0
+    #             eval_time = 0
+    #             neg_time = 0
+    #             for i in range(repeat):
+    #                 t0 = time.time()
+    #                 data0 = preprocess(data_0, d)
+    #                 data1 = preprocess(data_1, d)
+    #                 t1 = time.time()
+    #                 flag = prog_always_conjunction(eps, 1, data0, data1)
+    #                 t2 = time.time()
+    #                 flagneg = prog_eventually_disjunction(eps, 1, negate(data0), negate(data1))
+    #                 t3 = time.time()
 
-                        prep_time = 0
-                        eval_time = 0
-                        neg_time = 0
-                        for i in range(repeat):
-                            t0 = time.time()
-                            data0 = preprocess(data_0, d)
-                            data1 = preprocess(data_1, d)
-                            t1 = time.time()
-                            flag = prog_eventually_disjunction(eps, 1, data0, data1)
-                            t2 = time.time()
-                            flagneg = prog_always_conjunction(eps, 1, negate(data0), negate(data1))
-                            t3 = time.time()
+    #                 prep_time += t1 - t0 
+    #                 eval_time += t2 - t1 
+    #                 neg_time += t3 - t2
 
-                            prep_time += t1 - t0 
-                            eval_time += t2 - t1 
-                            neg_time += t3 - t2
+    #             if (flag):
+    #                 out = "1"
+    #             if (flagneg):
+    #                 outneg = "1"
 
-                        if (flag):
-                            out = "1"
-                        if (flagneg):
-                            outneg = "1"
+    #             line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str((prep_time + eval_time) / repeat) + " " + str((prep_time + neg_time) / repeat) + " " + out + " " + outneg
+    #             print("AC " + line)
+    #             results = open("results_ac_smt+neg.txt", "a")
+    #             results.write(line + "\n")
+    #             results.close()
 
-                        line = str(bb) + " " + str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str((prep_time + eval_time) / repeat) + " " + str((prep_time + neg_time) / repeat) + " " + out + " " + outneg
-                        print("ED " + line)
-                        results = open("results_ec_smt+negTIMED.txt", "a")
-                        results.write(line + "\n")
-                        results.close()
+    # for d in range(32,33):
+    #     for eps in (1, 2, 4, 8):
+    #         if d < eps:
+    #             continue
+            
+    #         for c in range(100):
+    #             flag = False
+    #             flagneg = False
+    #             out = "0"
+    #             outneg = "0"
+    #             data_0 = getData(d, c)
+    #             data_1 = getData(d, c + 100)
 
+    #             prep_time = 0
+    #             eval_time = 0
+    #             neg_time = 0
+    #             for i in range(repeat):
+    #                 t0 = time.time()
+    #                 data0 = preprocess(data_0, d)
+    #                 data1 = preprocess(data_1, d)
+    #                 t1 = time.time()
+    #                 flag = prog_always_disjunction(eps, 1, data0, data1)
+    #                 t2 = time.time()
+    #                 flagneg = prog_eventually_conjunction(eps, 1, negate(data0), negate(data1))
+    #                 t3 = time.time()
+
+    #                 prep_time += t1 - t0 
+    #                 eval_time += t2 - t1 
+    #                 neg_time += t3 - t2
+
+    #             if (flag):
+    #                 out = "1"
+    #             if (flagneg):
+    #                 outneg = "1"
+            
+    #             line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str((prep_time + eval_time) / repeat) + " " + str((prep_time + neg_time) / repeat) + " " + out + " " + outneg
+    #             print("AD " + line)
+    #             results = open("results_ad_smt+neg.txt", "a")
+    #             results.write(line + "\n")
+    #             results.close()
+
+    for d in range(32,33):
+        for eps in (4, 8):
+            if d < eps:
+                continue
+            
+            for c in range(100):
+                flag = False
+                flagneg = False
+                out = "0"
+                outneg = "0"
+                data_0 = getData(d, c)
+                data_1 = getData(d, c + 100)
+
+                prep_time = 0
+                eval_time = 0
+                neg_time = 0
+                for i in range(repeat):
+                    t0 = time.time()
+                    data0 = preprocess(data_0, d)
+                    data1 = preprocess(data_1, d)
+                    t1 = time.time()
+                    flag = prog_eventually_conjunction(eps, 1, data0, data1)
+                    t2 = time.time()
+                    flagneg = prog_always_disjunction(eps, 1, negate(data0), negate(data1))
+                    t3 = time.time()
+
+                    prep_time += t1 - t0 
+                    eval_time += t2 - t1 
+                    neg_time += t3 - t2
+
+                if (flag):
+                    out = "1"
+                if (flagneg):
+                    outneg = "1"
+
+                line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str((prep_time + eval_time) / repeat) + " " + str((prep_time + neg_time) / repeat) + " " + out + " " + outneg
+                print("EC " + line)
+                results = open("results_ec_smt+neg.txt", "a")
+                results.write(line + "\n")
+                results.close()
+
+    for d in range(32,33):
+        for eps in (1, 2, 4, 8):
+            if d < eps:
+                continue
+            
+            for c in range(100):
+                flag = False
+                flagneg = False
+                out = "0"
+                outneg = "0"
+                data_0 = getData(d, c)
+                data_1 = getData(d, c + 100)
+
+                prep_time = 0
+                eval_time = 0
+                neg_time = 0
+                for i in range(repeat):
+                    t0 = time.time()
+                    data0 = preprocess(data_0, d)
+                    data1 = preprocess(data_1, d)
+                    t1 = time.time()
+                    flag = prog_eventually_disjunction(eps, 1, data0, data1)
+                    t2 = time.time()
+                    flagneg = prog_always_conjunction(eps, 1, negate(data0), negate(data1))
+                    t3 = time.time()
+
+                    prep_time += t1 - t0 
+                    eval_time += t2 - t1 
+                    neg_time += t3 - t2
+                
+                if (flag):
+                    out = "1"
+                if (flagneg):
+                    outneg = "1"
+
+                line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str((prep_time + eval_time) / repeat) + " " + str((prep_time + neg_time) / repeat) + " " + out + " " + outneg
+                print("ED" + line)
+                results = open("results_ed_smt+neg.txt", "a")
+                results.write(line + "\n")
+                results.close()
 
 if __name__ == "__main__":
     main()

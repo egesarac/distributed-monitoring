@@ -27,9 +27,10 @@ int main()
     int n = 2;
     int del = 1;
 
-    // long long a = 0;
-    // bool leftClosed = true;
-    // bool rightClosed = false;
+    long long a = 0;
+    long long b = 1000;
+    bool leftClosed = true;
+    bool rightClosed = false;
 
 
     ofstream results;
@@ -52,12 +53,12 @@ int main()
                 continue;
             }
 
-                for (int c = 0; c < 100; c++)
+                for (int c = 9; c < 100; c++)
                 {
                     /* read signal data */
                     vector<vector<pair<long long, double>>> signalsReal(n);
-                    signalsReal[0] = getData("dataNew/" + to_string(d / 1000) + "_" + to_string(c) + ".txt");
-                    signalsReal[1] = getData("dataNew/" + to_string(d / 1000) + "_" + to_string(c + 100) + ".txt");
+                    signalsReal[0] = getData("dataNew/" + to_string(d / 1000) + "_" + to_string(c) + ".txt", d / 1000);
+                    signalsReal[1] = getData("dataNew/" + to_string(d / 1000) + "_" + to_string(c + 100) + ".txt", d / 1000);
 
                     /* prepare the bit masks */
                     evenMask = generateBitmask(0);
@@ -105,7 +106,7 @@ int main()
                         // test = bitsetAlways(bitsetConjunction(aps[0], aps[1]));
 
                         // always(x1 or x2)
-                        test = bitsetAlways(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))));
+                        // test = bitsetAlways(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))));
 
                         // eventually(x1 and x2)
                         // test = bitsetEventually(bitsetConjunction(aps[0], aps[1]));
@@ -129,7 +130,7 @@ int main()
                         // test = bitsetAlways(bitsetNegation(bitsetConjunction(aps[0], bitsetBoundedAlways(bitsetNegation(aps[1]), segmentation, 1000, 2000, true, true))));
 
                         // eventually_I(x1 or x2)
-                        // test = bitsetBoundedEventually(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))), segmentation, a, b, leftClosed, rightClosed);
+                        test = bitsetBoundedEventually(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))), segmentation, a, b, leftClosed, rightClosed);
 
                         // vector<set<pair<string, string>>> prod = asyncProd(aps[0], aps[1]);
                         // vector<set<string>> prodTest = prodUntilNonStrict(prod, false); // pass 'false' for strong until, 'true' for weak until
