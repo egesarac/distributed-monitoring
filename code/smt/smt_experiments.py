@@ -8,10 +8,7 @@ from z3.z3 import ForAll
 set_option(rational_to_decimal=True)
 set_option(max_args=100000000, max_lines=10000000000, max_depth=100000000, max_visited=10000000)
 
-a = 0
-b = 1
-
-def prog_always_conjunction(eps, segCount, data_0, data_1):
+def prog_always_conjunction(eps, segCount, data_0, data_1, bb):
 
     # initialize z3 solver
     s = Solver()
@@ -266,7 +263,7 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
 
         # violation check
         a = pad * 0
-        b = pad * 2
+        b = pad * bb
         v = Int("v")
         s.add(And(v >= a, v < b))
 
@@ -297,7 +294,7 @@ def prog_always_conjunction(eps, segCount, data_0, data_1):
 
 
 
-def prog_always_disjunction(eps, segCount, data_0, data_1):
+def prog_always_disjunction(eps, segCount, data_0, data_1, bb):
 
     # initialize z3 solver
     s = Solver()
@@ -580,7 +577,7 @@ def prog_always_disjunction(eps, segCount, data_0, data_1):
     return flag
 
 
-def prog_eventually_conjunction(eps, segCount, data_0, data_1):
+def prog_eventually_conjunction(eps, segCount, data_0, data_1, bb):
 
     # initialize z3 solver
     s = Solver()
@@ -833,12 +830,12 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
             )
         )
 
-        # violation check
+        # violation check THIS IS WRONG
         v = Int("v")
         s.add(And(v >= timestamps_0[0], v <= timestamps_0[-1]))
 
         a = pad * 0
-        b = pad * 2
+        b = pad * bb
         u = Int("u")
         s.add(And(u >= v + a, u < v + b))
 
@@ -870,7 +867,7 @@ def prog_eventually_conjunction(eps, segCount, data_0, data_1):
     return flag
 
 
-def prog_eventually_disjunction(eps, segCount, data_0, data_1):
+def prog_eventually_disjunction(eps, segCount, data_0, data_1, bb):
 
     # initialize z3 solver
     s = Solver()
@@ -1125,7 +1122,7 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
 
         # violation check
         a = pad * 0
-        b = pad * 2
+        b = pad * bb
         v = Int("v")
         s.add(And(v >= a, v < b))
 
@@ -1157,7 +1154,7 @@ def prog_eventually_disjunction(eps, segCount, data_0, data_1):
     return flag
 
 
-def prog_until(eps, segCount, data_0, data_1):
+def prog_until(eps, segCount, data_0, data_1, bb):
 
     # initialize z3 solver
     s = Solver()
@@ -1474,8 +1471,8 @@ def main():
     # set repeat count for confidence interval
     repeat = 1
 
-    for bb in range(1, 2):
-        for d in range(8, 16):
+    for bb in range(1,9):
+        for d in (4, 8):
             for eps in (1, 2, 4, 8):
                 # if d < eps:
                 #     continue
@@ -1499,9 +1496,9 @@ def main():
                             data0 = preprocess(data_0, d)
                             data1 = preprocess(data_1, d)
                             t1 = time.time()
-                            flag = prog_eventually_disjunction(eps, 1, data0, data1)
+                            flag = prog_eventually_disjunction(eps, 1, data0, data1, bb)
                             t2 = time.time()
-                            flagneg = prog_always_conjunction(eps, 1, negate(data0), negate(data1))
+                            flagneg = prog_always_conjunction(eps, 1, negate(data0), negate(data1), bb)
                             t3 = time.time()
 
                             prep_time += t1 - t0 
@@ -1515,7 +1512,7 @@ def main():
 
                         line = str(bb) + " " + str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str((prep_time + eval_time) / repeat) + " " + str((prep_time + neg_time) / repeat) + " " + out + " " + outneg
                         print("ED " + line)
-                        results = open("results_ec_smt+negTIMED.txt", "a")
+                        results = open("results_ec_smt+negTIMEDNEW.txt", "a")
                         results.write(line + "\n")
                         results.close()
 

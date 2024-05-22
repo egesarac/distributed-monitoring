@@ -380,8 +380,8 @@ def prog_ms3(eps, segCount, data_0, data_1, data_2):
         timestamps_2 = []
         segvar_2 = []
         drone2_x = Function('drone2_x', IntSort(), RealSort())
-        drone2_y = Function('drone2_x', IntSort(), RealSort())
-        drone2_z = Function('drone2_x', IntSort(), RealSort())
+        drone2_y = Function('drone2_y', IntSort(), RealSort())
+        drone2_z = Function('drone2_z', IntSort(), RealSort())
 
         for j in range(segmentLowerBound, segmentUpperBound + 1):
 
@@ -757,8 +757,8 @@ def prog_ms4(eps, segCount, data_0, data_1, data_2, data_3):
         timestamps_2 = []
         segvar_2 = []
         drone2_x = Function('drone2_x', IntSort(), RealSort())
-        drone2_y = Function('drone2_x', IntSort(), RealSort())
-        drone2_z = Function('drone2_x', IntSort(), RealSort())
+        drone2_y = Function('drone2_y', IntSort(), RealSort())
+        drone2_z = Function('drone2_z', IntSort(), RealSort())
 
         for j in range(segmentLowerBound, segmentUpperBound + 1):
 
@@ -784,8 +784,8 @@ def prog_ms4(eps, segCount, data_0, data_1, data_2, data_3):
         timestamps_3 = []
         segvar_3 = []
         drone3_x = Function('drone3_x', IntSort(), RealSort())
-        drone3_y = Function('drone3_x', IntSort(), RealSort())
-        drone3_z = Function('drone3_x', IntSort(), RealSort())
+        drone3_y = Function('drone3_y', IntSort(), RealSort())
+        drone3_z = Function('drone3_z', IntSort(), RealSort())
 
         for j in range(segmentLowerBound, segmentUpperBound + 1):
 
@@ -1131,7 +1131,7 @@ def prog_ms4(eps, segCount, data_0, data_1, data_2, data_3):
 def getData(agent_ID):
 
     # file = open('/home/ege/Desktop/repos/distributed-monitoring/code/smt/data/uav/s1_uav_{}'.format(agent_ID))
-    file = open('data/uav/s1_uav_{}'.format(agent_ID))
+    file = open('{}/data/uav/s1_uav_{}'.format(os.path.dirname(os.path.abspath(__file__)), agent_ID))
     line = file.readline()
 
     data = []
@@ -1209,8 +1209,8 @@ def main():
     repeat = 1
     d = 1
 
-    for n in (3, 4):
-        for eps in (1, 2, 4, 8):
+    for n in (2, 3, 4):
+        for eps in (1, 2, 3, 4, 5):
             # eps = eps * 0.05
 
             if (n == 2):
