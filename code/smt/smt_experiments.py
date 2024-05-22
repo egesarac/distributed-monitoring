@@ -1482,15 +1482,15 @@ def main():
     # set repeat count for confidence interval
     repeat = 1
 
-    for bb in range(1,5):
-        for d in (4, 5):
-            for eps in (1, 2, 4):
+    for bb in range(1,9):
+        for d in (8, 9):
+            for eps in (1, 2, 4, 8):
                 # if d < eps:
                 #     continue
                 # if d < bb:
                 #     continue
 
-                if (eps <= d and bb <= d and d == 4):
+                if (eps <= d and bb <= d and d == 8):
                     for c in range(100):
                         flag = False
                         flagneg = False
