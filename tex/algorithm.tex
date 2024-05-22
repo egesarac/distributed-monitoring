@@ -3,12 +3,14 @@ In this section, given a distributed signal $(S,{\hb})$, we describe an algorith
 The algorithm makes use of the function $\gamma$ defined in \cref{sec:approach} without explicitly computing $\tr^+(S,{\hb})$.
 To achieve this, we first describe the notion of \emph{asynchronous product} of value expressions to capture potential interleavings within segments.
 We continue with the evaluation of \emph{untimed operators} and then \emph{timed operators}.
-Finally, we conclude with putting all these together to compute the \emph{semantics} of STL$^+$ and discuss an efficient implementation of the monitoring algorithm using \emph{bit vectors} to represent and manipulate sets of boolean value expressions.
+Finally, we conclude with putting all these together to compute the \emph{semantics} of STL$^+$ 
+and discuss an efficient implementation of the monitoring algorithm using \emph{bit vectors} to 
+represent and manipulate sets of Boolean value expressions.
 %Then, we present an algorithm to compute the \emph{semantics} $[(S,{\hb}) \models \varphi]_+$ using operations on value expressions and their asynchronous products that encode $\gamma$. 
 %Finally, we discuss how \emph{bit vectors} can represent asynchronous products and allow us to manipulate them faster.
 
 \begin{remark}
-	For the sake of convenience, we focus on boolean signals for the rest of the section.
+	For the sake of convenience, we focus on Boolean signals for the rest of the section.
 	Note that asynchronous products and the algorithm to compute $[(S,{\hb}) \models \varphi]_+$ can be extended to value expressions over arbitrary finite alphabets, e.g., encoding real-valued signals.
 	This allows us to express more complex properties where atomic propositions can be functions of real-valued signals.
 \end{remark}
@@ -23,9 +25,10 @@ In particular, there are three potential alignments:
 (iii) the two edges happen simultaneously.
 We respectively represent these with the tuples $(011, 110)$, $(001, 100)$, and $(01, 10)$ where the first component encodes $u_1$ and the second $u_2$.
 Formally, given two value expressions $u_1$ and $u_2$, we define their \emph{asynchronous product} as follows:
-
+%
 \small
-\[ u_1 \otimes u_2 = \{ \destutter(v_1, v_2) \st v_i \in \stutter_k(u_i), k = |u_1| + |u_2| - 1, i \in \{1,2\} \} \]  
+\[ u_1 \otimes u_2 = \big\{ \destutter(v_1, v_2) \st v_i \in \stutter_k(u_i), k = |u_1| + |u_2| - 1, i \in 
+\{1,2\} \big\} \]  
 \normalsize
 Moreover, given two sets $L_1$ and $L_2$ of value expressions, we define the following: 
 \small
