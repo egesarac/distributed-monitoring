@@ -380,8 +380,8 @@ def prog_ms3(eps, segCount, data_0, data_1, data_2):
         timestamps_2 = []
         segvar_2 = []
         drone2_x = Function('drone2_x', IntSort(), RealSort())
-        drone2_y = Function('drone2_x', IntSort(), RealSort())
-        drone2_z = Function('drone2_x', IntSort(), RealSort())
+        drone2_y = Function('drone2_y', IntSort(), RealSort())
+        drone2_z = Function('drone2_z', IntSort(), RealSort())
 
         for j in range(segmentLowerBound, segmentUpperBound + 1):
 
@@ -605,7 +605,7 @@ def prog_ms3(eps, segCount, data_0, data_1, data_2):
         # c_flow = Function('c_flow', IntSort(), IntSort())
 
         # mutual separation
-        s.add(And([c_flow(i) == min(z3SqDist3d(drone0_x(c0(i)), drone1_x(c1(i)), drone0_y(c0(i)), drone1_y(c1(i)), drone0_z(c0(i)), drone1_z(c1(i))),
+        s.add(And([c_flow(i) == z3min3(z3SqDist3d(drone0_x(c0(i)), drone1_x(c1(i)), drone0_y(c0(i)), drone1_y(c1(i)), drone0_z(c0(i)), drone1_z(c1(i))),
                                  z3SqDist3d(drone0_x(c0(i)), drone2_x(c2(i)), drone0_y(c0(i)), drone2_y(c2(i)), drone0_z(c0(i)), drone2_z(c2(i))),
                                  z3SqDist3d(drone1_x(c1(i)), drone2_x(c2(i)), drone1_y(c1(i)), drone2_y(c2(i)), drone1_z(c1(i)), drone2_z(c2(i)))) for i in range(timestamps_0[0], timestamps_0[-1] + 1)]))
 
@@ -757,8 +757,8 @@ def prog_ms4(eps, segCount, data_0, data_1, data_2, data_3):
         timestamps_2 = []
         segvar_2 = []
         drone2_x = Function('drone2_x', IntSort(), RealSort())
-        drone2_y = Function('drone2_x', IntSort(), RealSort())
-        drone2_z = Function('drone2_x', IntSort(), RealSort())
+        drone2_y = Function('drone2_y', IntSort(), RealSort())
+        drone2_z = Function('drone2_z', IntSort(), RealSort())
 
         for j in range(segmentLowerBound, segmentUpperBound + 1):
 
@@ -784,8 +784,8 @@ def prog_ms4(eps, segCount, data_0, data_1, data_2, data_3):
         timestamps_3 = []
         segvar_3 = []
         drone3_x = Function('drone3_x', IntSort(), RealSort())
-        drone3_y = Function('drone3_x', IntSort(), RealSort())
-        drone3_z = Function('drone3_x', IntSort(), RealSort())
+        drone3_y = Function('drone3_y', IntSort(), RealSort())
+        drone3_z = Function('drone3_z', IntSort(), RealSort())
 
         for j in range(segmentLowerBound, segmentUpperBound + 1):
 
@@ -1091,7 +1091,7 @@ def prog_ms4(eps, segCount, data_0, data_1, data_2, data_3):
         # c_flow = Function('c_flow', IntSort(), IntSort())
 
         # mutual separation
-        s.add(And([c_flow(i) == min(z3SqDist3d(drone0_x(c0(i)), drone1_x(c1(i)), drone0_y(c0(i)), drone1_y(c1(i)), drone0_z(c0(i)), drone1_z(c1(i))),
+        s.add(And([c_flow(i) == z3min6(z3SqDist3d(drone0_x(c0(i)), drone1_x(c1(i)), drone0_y(c0(i)), drone1_y(c1(i)), drone0_z(c0(i)), drone1_z(c1(i))),
                                  z3SqDist3d(drone0_x(c0(i)), drone2_x(c2(i)), drone0_y(c0(i)), drone2_y(c2(i)), drone0_z(c0(i)), drone2_z(c2(i))),
                                  z3SqDist3d(drone0_x(c0(i)), drone3_x(c3(i)), drone0_y(c0(i)), drone3_y(c3(i)), drone0_z(c0(i)), drone3_z(c3(i))),
                                  z3SqDist3d(drone1_x(c1(i)), drone2_x(c2(i)), drone1_y(c1(i)), drone2_y(c2(i)), drone1_z(c1(i)), drone2_z(c2(i))),
@@ -1130,8 +1130,8 @@ def prog_ms4(eps, segCount, data_0, data_1, data_2, data_3):
    
 def getData(agent_ID):
 
-    file = open('/home/ege/Desktop/repos/distributed-monitoring/code/smt/data/uav/s1_uav_{}'.format(agent_ID))
-    # file = open('data/uav/{}'.format(agent_ID))
+    # file = open('/home/ege/Desktop/repos/distributed-monitoring/code/smt/data/uav/s1_uav_{}'.format(agent_ID))
+    file = open('{}/data/uav/s1_uav_{}'.format(os.path.dirname(os.path.abspath(__file__)), agent_ID))
     line = file.readline()
 
     data = []
@@ -1158,6 +1158,25 @@ def getData(agent_ID):
 
     return data
 
+def z3min(x1, x2):
+
+    return If(x1 < x2, x1, x2)
+
+def z3min3(x1, x2, x3):
+
+    return If(x1 < x2, z3min(x1, x3),  z3min(x2, x3))
+
+def z3min4(x1, x2, x3, x4):
+
+    return If(x1 < x2, z3min3(x1, x3, x4), z3min3(x2, x3, x4))
+
+def z3min5(x1, x2, x3, x4, x5):
+
+    return If(x1 < x2, z3min4(x1, x3, x4, x5), z3min4(x2, x3, x4, x5))
+
+def z3min6(x1, x2, x3, x4, x5, x6):
+
+    return If(x1 < x2, z3min5(x1, x3, x4, x5, x6), z3min5(x2, x3, x4, x5, x6))
 
 def z3Interpolate(f, p):
 
@@ -1191,7 +1210,7 @@ def main():
     d = 1
 
     for n in (2, 3, 4):
-        for eps in (1, 2, 4, 8):
+        for eps in (1, 2, 3, 4, 5):
             # eps = eps * 0.05
 
             if (n == 2):

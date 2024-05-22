@@ -22,8 +22,8 @@ using namespace std;
 int main()
 {
     /* set variables */
-    vector<long long> N{2,3,4};
-    vector<long long> EPS{1,2,4,8};
+    vector<long long> N{3,4};
+    vector<long long> EPS{1,2,3,4,5};
     int k = 50;
     int d = 1000;
     int del = 1;
