@@ -236,7 +236,7 @@ where $\mathsf{pfs}((S,{\hb}), \varphi_1, I, J) = \{P_1, \ldots, P_k \}$ and $\m
 Putting it all together, given a distributed signal $(S, {\hb})$ and an STL$^+$ formula $\varphi$, we can compute $[(S,{\hb}) \models \varphi]_+$ thanks to the following theorem.
 
 \begin{theorem} \label{cl:algo}
-	For every distributed signal $(S,{\hb})$, we have $[(S,{\hb}) \models \varphi]_+ = \top$ (resp. $\bot$, ${\,?}$) iff $\first(\llbracket (S, {\hb}) \models \varphi \rrbracket) = \{1\}$ (resp. $\{0\}$, $\{0,1\}$).
+	For every distributed signal $(S,{\hb})$ and STL formula $\varphi$, we have $[(S,{\hb}) \models \varphi]_+ = \top$ (resp. $\bot$, ${\,?}$) iff $\first(\llbracket (S, {\hb}) \models \varphi \rrbracket) = \{1\}$ (resp. $\{0\}$, $\{0,1\}$).
 %	\begin{itemize}
 	%		\item $[(S,{\hb}) \models \varphi]_{\mathsf{STL}^+} = \top \iff ... = \{1\}$
 	%		\item $[(S,{\hb}) \models \varphi]_{\mathsf{STL}^+} = \bot \iff ... = \{0\}$
