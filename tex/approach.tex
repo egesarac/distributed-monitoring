@@ -33,7 +33,7 @@ By extension, a segmentation of a collection of signals with the same temporal d
 Let $(S,{\hb})$ be a distributed signal of $n$ signals.
 The \emph{canonical segmentation} $G_S$ of $(S,{\hb})$ is the segmentation of $S$ where the end points of the segments coincide with the end points of its temporal domain and uncertainty regions.
 Formally, we define $G_S$ as follows.
-For each signal $x_i$, \borzoo{where $1 \leq i \leq n$,} let $F_i$ be the set of end points of its 
+For each signal $x_i$, where $1 \leq i \leq n$, let $F_i$ be the set of end points of its 
 uncertainty regions.
 %Let $d' = \max(d, \max (\bigcup_{i = 1}^{n} F_i))$, which corresponds to the duration of the distributed signal with respect to the monitor's clock.
 %
@@ -61,15 +61,16 @@ Then, the canonical segmentation of $(S,{\hb})$ is $G_S = \{I_1, \ldots, I_{|F| 
 \subsubsection{Value Expressions}
 Consider a boolean signal $x$ with a rising edge with an uncertainty region of $(t_1, t_2)$.
 As discussed above, the monitor only knows that the value of $x$ changes from 0 to 1 in this interval.
-We represent this knowledge as a finite word $v = 0 \cdot 1$.
+We represent this knowledge as a finite word $v = 01$ over the alphabet $\Sigma = \{0,1\}$.
 This representation is called a \emph{value expression} and it encodes the uncertain behavior of an observed signal relative to the monitor.
 Formally, a value expression is an element of $\Sigma^*$ where $\Sigma$ is the finite alphabet of values the signal takes.
 Given a signal $x$ and an edge $(t, x(t))$, the value expression corresponding to the uncertainty region $(\theta_{\text{lo}}(x,t), \theta_{\text{hi}}(x,t))$ is given by $v_{x,t} = v_- \cdot v_+$ where $v_- = \lim_{s \to t^-} x(s)$ and $v_+ = \lim_{s \to t^+} x(s)$.
+When drop the concatenation symbol $\cdot$ when the letters are clear from the context.
 Let us remark that this definition is general because finite-length piecewise-constant real-valued signals will only have a finite number of values, making $\Sigma$ finite.
 
 Notice that (i) uncertainty regions may overlap, and (ii) the canonical segmentation may split an uncertainty region into multiple segments.
 Consider a signal $x$ with a rising edge in $(1,5)$ and a falling edge in $(4,8)$.
-The corresponding value expressions are respectively $v_1 = 0 \cdot 1$ and $v_2 = 1 \cdot 0$.
+The corresponding value expressions are respectively $v_1 = 01$ and $v_2 = 10$.
 Notice that the behavior of $x$ in the interval $[1,4)$ can be expressed as $\pfx(v_1)$, encoding whether the rising edge has happened yet or not.
 Similarly, the behavior in $[4,5)$ is given by $\sfx(v_1) \cdot \pfx(v_2)$, which captures whether the edges occur in this interval (thanks to prefixing and suffixing) and the fact that the rising edge happens before the falling edge (thanks to concatenation).
 
@@ -89,7 +90,7 @@ Now, let $I \in G_S$ be a segment with $I = [s, s')$ and for each $1 \leq i \leq
 	\end{cases}
 \end{equation}
 \normalsize
-\borzoo{Can we define destutter like this too?}The last case happens only when $I \cap R_i$ is 
+The last case happens only when $I \cap R_i$ is 
 empty.
 We finally define $\gamma$ as follows:
 \[ \gamma(x,I) = \destutter(V_1 \cdot V_2 \cdot \ldots \cdot V_m) \setminus \{\epsilon\} \]
@@ -101,11 +102,10 @@ This is mainly because the sets $V_1, \ldots, V_m$ contain redundancy by definit
 \begin{example} \label{ex:valexpr}
 	Recall the distributed signal $(S, {\hb})$ in \cref{ex:canonseg} and \cref{fig:canonseg}.
 	In \cref{fig:valexpr}a, we show the value expressions corresponding to its uncertainty regions.
-	For example, the falling edge of $x_1$ has an uncertainty region of $(3,7)$, represented by the value expression $1 \cdot 0$.
+	For example, the falling edge of $x_1$ has an uncertainty region of $(3,7)$, represented by the value expression $10$.
 	In \cref{fig:valexpr}b, we give the function $\gamma$ for $(S, {\hb})$.
-	For example, $\gamma(x_1, [3,4))$ is obtained from $\sfx(0 \cdot 1) \cdot \pfx(1 \cdot 0)$ and 
-	$\gamma(x_2, [0,1)) = \{0\}$.\borzoo{I would put the value expressions in a set in Fig 2.b, also 
-	write the full set in text like you did for $x_2$, i.e., $\gamma(x_1, [3,4)) = \{0.1, 0.1.0, 1, 1.0\}$.}
+	For example, $\gamma(x_1, [3,4)) = (\sfx(01) \cdot \pfx(10)) \setminus \{\epsilon\} = \{ 01, 010, 1, 10\}$, and 
+	$\gamma(x_2, [0,1)) = \{0\}$.
 \end{example}
 
 \begin{figure} 
@@ -146,15 +146,14 @@ Now, let $S = (x_1, \ldots, x_n)$ and define $\tr^+(S,{\hb})$ as follows:
 \begin{example} \label{ex:overapx}
 	Recall the distributed signal $(S, {\hb})$ in \cref{ex:canonseg} whose $\gamma$ function is given in \cref{fig:valexpr}b.
 	Consider the synchronous trace $w \in \tr(S, {\hb})$ where the rising edges of both signals occur at time 3 and the falling edges at time 5.
-	One can verify that $w \in \tr^+(S,{\hb})$ since for each $i \in \{1,2\}$ the value expression 1 is contained in $\gamma(x_i, [3,4))$ and $\gamma(x_i, [4,5))$ while 0 is contained in the remaining sets $\gamma$ maps $x_i$ to.
-	\borzoo{I would say a signal such as $w$ would be included $\tr^+$.}
+	A signal such as $w$ would be included in $\tr^+(S,{\hb})$ since for each $i \in \{1,2\}$ the value expression 1 is contained in $\gamma(x_i, [3,4))$ and $\gamma(x_i, [4,5))$ while 0 is contained in the remaining sets $\gamma$ maps $x_i$ to.
 	Now, consider a synchronous trace $(x_1', x_2')$ where both signals are initially 0, have rising edges at time 2 and 3.5, and falling edges at time 3 and 5.
 	Evidently, this trace does not belong to $\tr(S, {\hb})$ since $x_1'$ and $x_2'$ have more edges than $x_1$ and $x_2$.
 	Nonetheless, it belongs to $\tr^+(S,{\hb})$ since $x_1'$ and $x_2'$ are respectively consistent with $x_1$ and $x_2$.
-	To witness, notice that for each $i \in \{1,2\}$ the value expression $0 \cdot 1$ is contained in $\gamma(x_i, [1,3))$ and $\gamma(x_i, [3,4))$, the expression $1$ is contained in $\gamma(x_i, [4,5))$, and 0 is contained in the remaining sets $\gamma$ maps $x_i$ to.
+	To witness, notice that for each $i \in \{1,2\}$ the value expression $01$ is contained in $\gamma(x_i, [1,3))$ and $\gamma(x_i, [3,4))$, the expression $1$ is contained in $\gamma(x_i, [4,5))$, and 0 is contained in the remaining sets $\gamma$ maps $x_i$ to.
 \end{example}
 
-Finally, we prove $\tr^+$ overapproximates $\tr$.
+Finally, we prove that $\tr^+$ overapproximates $\tr$.
 
 \begin{lemma} \label{cl:trsound}
 	For every distributed signal $(S,{\hb})$, we have $\tr(S,{\hb}) \subseteq \tr^+(S,{\hb})$.
