@@ -1484,7 +1484,7 @@ def main():
 
     for bb in range(8, 9):
         for d in (8, 9):
-            for eps in (8, 9):
+            for eps in (1,2,4):
                 # if d < eps:
                 #     continue
                 # if d < bb:

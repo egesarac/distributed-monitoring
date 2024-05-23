@@ -114,3 +114,38 @@ We now proceed to prove \cref{cl:algo}.
 	\noindent\textbf{Timed until.}
 	\TODO
 \end{proof}
+
+\newpage
+
+\subsubsection{Generalization to Real-Valued Signals}
+The methods described in \cref{sec:approach} and here can be generalized to handle arithmetic operations over real-valued signals and numerical predicates.
+The key observation enabling this is that such finite-length piecewise-constant signals take only finitely many values.
+Then, letting $\Sigma$ be a finite alphabet of these values, we are able to compute the $\gamma$ function as described.
+To handle arithmetic operations, we can compute the asynchronous product of the signals involved and apply the given operation letter-by-letter.
+Finally, to transform them into atomic propositions, we can compare the resulting value expressions letter-by-letter with a constant.
+We call this approach \textsc{Orig}.
+For example, suppose the asynchronous product of two signals $x_1$ and $x_2$ contains $(2\cdot2\cdot3, 1\cdot0\cdot1)$.
+Applying addition to this pair letter by letter would give us $3 \cdot 2 \cdot 4$, and applying the comparison $> 2$ would result in the Boolean value expression $101$.
+Repeating this for all pairs, we obtain the atomic proposition required.
+
+As described in the previous subsection, we can efficiently represent and manipulate Boolean value expressions, avoiding explicit computation of asynchronous products.
+This method does not apply to real-valued signals in general, therefore formulas with numerical predicates cause an additional overhead.
+However, there are several ways how we can avoid explicit computation of asynchronous products for some classes of formulas and numerical predicates.
+
+Since signals are completely asynchronous within segments, we can ignore the order and compute a set of potential \emph{values} instead of a set of \emph{sequences of values}.
+Continuing the example above, instead of repeating the process above for all the interleavings, we can consider the value sets $X_1 = \{2,3\}$ for $x_1$ and $X_2 = \{0,1\}$ for $x_2$ to conclude by pairwise addition that the values of $x_1 + x_2$ come from the set $\{2, 3, 4\}$.
+Then, we can simply assume that $x_1 + x_2$ is constant with one of these values within the segment.  
+We call this approach \textsc{Fine}.
+Notice that ignoring the order may lead to additionally overapproximating the original set of traces.
+Therefore, \textsc{Fine} does not apply to formulas where the order of values matters, e.g.,  $x_1 > c_1 \until x_2 > c_2$.
+Nonetheless, when it applies, e.g. for $\LTLalways((x_1 - x_2) \times x_3 > c)$, it saves us the time to explicitly compute the interleavings and the value expressions.
+
+We can take \textsc{Fine} further and only consider the extreme values.
+Some arithmetic operations are \emph{monotonic} in the sense that the extreme values of the output's value expressions can be computed from those of inputs.
+For example, since $\min X_1 = 2$, $\max X_1 = 3$, $\min X_2 = 0$, and $\max X_2 = 1$, we immediately obtain that the minimal and maximal values of $x_1 + x_2$ are 2 and 4.
+We call this approach \textsc{Coarse}.
+
+Finally, instead of assuming that the monitor runs on a separate agent, we can assume it runs on one of the monitored agents.
+This helps reduce the computational overhead caused by asynchrony by taking the agent where the monitor runs as a reference point, removing any uncertainty associated with this agent's signal.
+We call this approach \textsc{Relative}.
+We will demonstrate the benefits and downsides of each of these in \cref{sec:experiments}.
