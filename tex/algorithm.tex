@@ -45,23 +45,27 @@ Asynchronous products of value expressions allow us to lift value expressions to
 	Taking the bitwise conjunction of this pair gives us the expression $0 \cdot 1 \cdot 0$ as a potential behavior for the satisfaction of $x_1 \land x_2$ in this segment.
 \end{example}
 
-\subsubsection{Untimed Operations}
+\subsubsection{Untimed Operations.}
 As hinted in \cref{ex:asyncprod}, to compute the semantics, we apply bitwise operations on value expressions and their asynchronous products to transform them into encodings of satisfaction signals of formulas.
-Consider the distributed signal $(S, {\hb})$ in \cref{ex:canonseg} and suppose we want to compute $[(S, {\hb}) \models \LTLeventually (x_1 \land x_2)]_+$.
+Consider the distributed signal $(S, {\hb})$ in \cref{ex:canonseg} and suppose we want to determine 
+$[(S, {\hb}) \models \LTLeventually (x_1 \land x_2)]_+$.
 To achieve this, we first compute for each segment in $G_S$ the set of value expressions for the satisfaction of $x_1 \land x_2$, and then from these compute that of $\LTLeventually (x_1 \land x_2)$.
 This compositional approach allows us to evaluate arbitrary STL$^+$ formulas.
 
-First, we define bitwise operations on boolean value expressions encoding atomic propositions.
+First, we define bitwise operations on Boolean value expressions encoding atomic propositions.
 Then, we use these to evaluate (untimed) STL formulas over sets of value expressions.
-
-Let $u$ and $v$ be boolean value expressions of length $\ell$.
+%
+Let $u$ and $v$ be Boolean value expressions of length $\ell$.
 We denote by $u \BitAnd v$ the bitwise-and operation, by $u \BitOr v$ the bitwise-or, and by $\BitNeg u$ the bitwise-negation.
 In addition, we define the \emph{bitwise strong until} operator as follows:
 
 \small
 \[ u \mathsf{U}^0 v = \left( \max_{i \leq j \leq \ell} \left( \min \left( v[j], \min_{i \leq k \leq j} u[k] \right) \right) \right)_{1 \leq i \leq \ell} \]
 \normalsize
-As usual, we derive \emph{bitwise eventually} as $\mathsf{E} u = 1^\ell \mathsf{U}^0 u$, \emph{bitwise always} as $\mathsf{A} u = \BitNeg (\mathsf{E} \BitNeg u)$, and \emph{bitwise weak until} as $u \mathsf{U}^1 v = (u \mathsf{U}^0 v) \BitOr (\mathsf{A} u)$.
+\borzoo{I think we can merge the 2 inner min}As usual, we derive \emph{bitwise eventually} as 
+$\mathsf{E} u = 1^\ell \mathsf{U}^0 u$, \emph{bitwise always} as $\mathsf{A} u = \BitNeg 
+(\mathsf{E} \BitNeg u)$, and \emph{bitwise weak until} as $u \mathsf{U}^1 v = (u \mathsf{U}^0 v) 
+\BitOr (\mathsf{A} u)$.
 %\[ u \mathsf{U}^1 v = \left( \max \left( (u \mathsf{U}^0 v)[i], (\mathsf{A} u)[i] \right) \right)_{1 \leq i \leq \ell} \]
 The distinction between $\mathsf{U}^0$ and $\mathsf{U}^1$ will be useful later when we evaluate a formula segment by segment.
 We remark that the definitions of these operators coincide with the robustness semantics of (discrete time) STL.
