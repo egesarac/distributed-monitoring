@@ -1482,9 +1482,9 @@ def main():
     # set repeat count for confidence interval
     repeat = 1
 
-    for bb in range(1,9):
+    for bb in range(8, 9):
         for d in (8, 9):
-            for eps in (1, 2, 4, 8):
+            for eps in (8, 9):
                 # if d < eps:
                 #     continue
                 # if d < bb:
@@ -1526,53 +1526,6 @@ def main():
                         results = open("ZZZZresults_ed_smt+negTIMEDNEWd8.txt", "a")
                         results.write(line + "\n")
                         results.close()
-
-    for bb in range(1,17):
-        for d in (16, 17):
-            for eps in (1, 2, 4, 8):
-                # if d < eps:
-                #     continue
-                # if d < bb:
-                #     continue
-
-                if (eps <= d and bb <= d and d == 16):
-                    for c in range(100):
-                        flag = False
-                        flagneg = False
-                        out = "0"
-                        outneg = "0"
-                        data_0 = getData(d, c)
-                        data_1 = getData(d, c + 100)
-
-                        prep_time = 0
-                        eval_time = 0
-                        neg_time = 0
-                        for i in range(repeat):
-                            t0 = time.time()
-                            data0 = preprocess(data_0, d)
-                            data1 = preprocess(data_1, d)
-                            t1 = time.time()
-                            flag = prog_eventually_disjunction(eps, 1, data0, data1, bb)
-                            t2 = time.time()
-                            flagneg = prog_always_conjunction(eps, 1, negate(data0), negate(data1), bb)
-                            t3 = time.time()
-
-                            prep_time += t1 - t0 
-                            eval_time += t2 - t1 
-                            neg_time += t3 - t2
-
-                        if (flag):
-                            out = "1"
-                        if (flagneg):
-                            outneg = "1"
-
-                        line = str(bb) + " " + str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str((prep_time + eval_time) / repeat) + " " + str((prep_time + neg_time) / repeat) + " " + out + " " + outneg
-                        print("ED " + line)
-                        results = open("ZZZZresults_ed_smt+negTIMEDNEWd16.txt", "a")
-                        results.write(line + "\n")
-                        results.close()
-
-
 
 if __name__ == "__main__":
     main()
