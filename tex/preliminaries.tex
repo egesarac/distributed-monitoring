@@ -25,19 +25,43 @@ Moreover, given $L \subseteq \Sigma^*$, we define $\first(L) = \{ u[0] \st u \in
 For sets $L_1, L_2 \subseteq \Sigma^*$ of words, we let $L_1 \cdot L_2 = \{u \cdot v \st u \in L_1, v \in L_2\}$.
 For tuples $(u_1, \ldots, u_m)$ and $(v_1, \ldots, v_m)$ of words, we let $(u_1, \ldots, u_m) \cdot (v_1, \ldots, v_m) = (u_1 v_1, \ldots, u_m v_m)$.
 
-We define the function $\destutter : \Sigma^* \to \Sigma^*$ inductively as follows.
+We define the function $\destutter : \Sigma^* \to \Sigma^*$ inductively.
 For all $\sigma \in \Sigma \cup \{\epsilon\}$, let $\destutter(\sigma) = \sigma$.
-%
 For all $u \in \Sigma^*$ such that $u = \sigma_1 \sigma_2 v$ for some $\sigma_1,\sigma_2 \in 
-\Sigma$ and $v \in \Sigma^*$, let (i) $\destutter(u) = \destutter(\sigma_2 v)$ if $\sigma_1 = 
-\sigma_2$, and (ii) $\destutter(u) = \sigma_1 \cdot \destutter(\sigma_2 v)$ otherwise.
-%
-By extension, for a set $L \subseteq \Sigma^*$ of finite words, we write $\destutter(L) = 
+\Sigma$ and $v \in \Sigma^*$, we define it as follows.
+
+\small
+\begin{equation*}
+	\destutter(u) =
+	\begin{cases}
+		\destutter(\sigma_2 v) & \text{if } \sigma_1 = \sigma_2 \\
+		\sigma_1 \cdot \destutter(\sigma_2 v) & \text{otherwise}
+	\end{cases}
+\end{equation*}
+\normalsize
+%For all $\sigma \in \Sigma \cup \{\epsilon\}$, let $\destutter(\sigma) = \sigma$.
+%%
+%For all $u \in \Sigma^*$ such that $u = \sigma_1 \sigma_2 v$ for some $\sigma_1,\sigma_2 \in 
+%\Sigma$ and $v \in \Sigma^*$, let (i) $\destutter(u) = \destutter(\sigma_2 v)$ if $\sigma_1 = 
+%\sigma_2$, and (ii) $\destutter(u) = \sigma_1 \cdot \destutter(\sigma_2 v)$ otherwise.
+%%
+For a set $L \subseteq \Sigma^*$ of finite words, we define $\destutter(L) = 
 \{\destutter(u) \st u \in L\}$.
 %
-Given a tuple $(u_1, \ldots, u_m) = (\sigma_{1,1} \sigma_{1,2} v_1, \ldots, \sigma_{m,1} \sigma_{m,2} v_m)$ of finite words of the same length, we define $\destutter(u_1, \ldots, u_m)$ as expected: (i) $\destutter(u_1, \ldots, u_m) = \destutter(\sigma_{1,2} v_1, \ldots, \sigma_{m,2} v_m)$ if $\sigma_{i,1} = 
-\sigma_{i,2}$ for all $1 \leq i \leq m$, and (ii) $\destutter(u_1, \ldots, u_m) = (\sigma_{1,1}, \ldots, \sigma_{m,1}) \cdot \destutter(\sigma_{1,2} v_1, \ldots, \sigma_{m,2} v_m)$ otherwise.
+To extend $\destutter$ to tuples of words, for all $\sigma \in \Sigma \cup \{\epsilon\}$  let $\destutter(\sigma, \ldots, \sigma) = (\sigma, \ldots, \sigma)$.
+Given a tuple $(u_1, \ldots, u_m) = (\sigma_{1,1} \sigma_{1,2} v_1, \ldots, \sigma_{m,1} \sigma_{m,2} v_m)$ of finite words of the same length, we define $\destutter(u_1, \ldots, u_m)$ as expected:
 
+\small
+\begin{equation*}
+	\destutter(u_1, \ldots, u_m) =
+	\begin{cases}
+		\destutter(\sigma_{1,2} v_1, \ldots, \sigma_{m,2} v_m) \text{ if $\sigma_{i,1} = \sigma_{i,2}$ for all $1 \leq i \leq m$} \\
+		(\sigma_{1,1}, \ldots, \sigma_{m,1}) \cdot \destutter(\sigma_{1,2} v_1, \ldots, \sigma_{m,2} v_m) \text{ otherwise}
+	\end{cases}
+\end{equation*}
+\normalsize
+%Given a tuple $(u_1, \ldots, u_m) = (\sigma_{1,1} \sigma_{1,2} v_1, \ldots, \sigma_{m,1} \sigma_{m,2} v_m)$ of finite words of the same length, we define $\destutter(u_1, \ldots, u_m)$ as expected: (i) $\destutter(u_1, \ldots, u_m) = \destutter(\sigma_{1,2} v_1, \ldots, \sigma_{m,2} v_m)$ if $\sigma_{i,1} = 
+%\sigma_{i,2}$ for all $1 \leq i \leq m$, and (ii) $\destutter(u_1, \ldots, u_m) = (\sigma_{1,1}, \ldots, \sigma_{m,1}) \cdot \destutter(\sigma_{1,2} v_1, \ldots, \sigma_{m,2} v_m)$ otherwise.
 
 Moreover, given an integer $k \geq 0$, we define $\stutter_k : \Sigma^* \to \Sigma^*$ such that $\stutter_k(u) = \{v \in \Sigma^* \st |v| = k \land \destutter(v) = \destutter(u)\}$ if $k \geq |\destutter(u)|$, and $\stutter_k(u) = \emptyset$ otherwise.
 
