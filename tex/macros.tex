@@ -44,6 +44,14 @@
 \newcommand*\ShiftRight{\gg}
 \newcommand*\BitNeg{\ensuremath{\mathord{\sim}}}
 
+\newcounter{resq}[section]
+\newenvironment{resq}[1][]{%
+\refstepcounter{resq}%
+\par\medskip
+ \noindent \textbf{RQ\theresq.}~\textit{#1} \rmfamily}{\medskip}
+\newcommand{\thisquestion}{RQ\theresq\xspace}
+\newcommand{\prevquestion}{RQ\the\numexpr\value{resq}-1\relax\xspace}
+
 % ----- FIGURES
 \tikzstyle{state}=[thick,minimum size=18pt, circle,draw]
 \tikzstyle{transition}=[->,thick,>=stealth,shorten >=1pt,shorten <=1pt]
