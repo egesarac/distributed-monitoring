@@ -11,13 +11,13 @@ represent and manipulate sets of Boolean value expressions.
 
 \begin{remark}
 	For the sake of convenience, we focus on Boolean signals for the rest of the section.
-	Note that asynchronous products and the algorithm to compute $[(S,{\hb}) \models \varphi]_+$ can be extended to value expressions over arbitrary finite alphabets, e.g., encoding real-valued signals.
+	Note that asynchronous products and the algorithm to compute $[(S,{\hb}) \models \varphi]_+$ can be extended to value expressions over arbitrary finite alphabets, e.g., encoding finite-length piecewise-constant real-valued signals.
 	This allows us to express more complex properties where atomic propositions can be functions of real-valued signals.
 \end{remark}
 
 \subsubsection{Asynchronous Products}
 Consider the value expressions $u_1 = 0 \cdot 1$ and $u_2 = 1 \cdot 0$ encoding the behaviors of two signals within a segment.
-Due to partial asynchrony, the behaviors within segments can be seen as completely asynchronous.
+The behaviors within a segment are seen as completely asynchronous.
 To capture the potential interleavings of these behaviors, we consider how the values in $u_1$ and $u_2$ can align.
 In particular, there are three potential alignments:
 (i) the rising edge of $u_1$ happens before the falling edge of $u_2$,
