@@ -11,7 +11,7 @@ Finally, we define $\tr^+$ based on these notions, and show that it soundly appr
 	The definitions and results presented here extend to real-valued signals because finite-length piecewise-constant signals will only use a finite number of values.
 \end{remark}
 
-\subsubsection{Canonical Segmentation}
+\subsubsection{Canonical Segmentation.}
 Consider a Boolean signal $x$ with a rising edge at time $t > \varepsilon$.
 Due to clock skew, this edge occurs in the range $(t - \varepsilon, t + \varepsilon)$ from the monitor's point of view.
 This range is called an \emph{uncertainty region} because in $(t - \varepsilon, t + \varepsilon)$ the monitor cannot tell the value of $x$ precisely, but only that it changes from 0 to 1.
@@ -58,7 +58,7 @@ Then, the canonical segmentation of $(S,{\hb})$ is $G_S = \{I_1, \ldots, I_{|F| 
 \end{figure}
 
 
-\subsubsection{Value Expressions}
+\subsubsection{Value Expressions.}
 Consider a boolean signal $x$ with a rising edge with an uncertainty region of $(t_1, t_2)$.
 As discussed above, the monitor only knows that the value of $x$ changes from 0 to 1 in this interval.
 We represent this knowledge as a finite word $v = 01$ over the alphabet $\Sigma = \{0,1\}$.
