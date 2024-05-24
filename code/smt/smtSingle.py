@@ -1974,8 +1974,10 @@ def prog_always_implies_eventually(eps, segCount, data_0, data_1, a, b):
         u = Int("u")
         v = Int("v")
 
-        s.add(And(v >= u, v <= b))
-        s.add(And(u >= a, u <= b))
+        s.add(And(u >= timestamps0[0], u <= timestamps0[-1]))
+        s.add(
+            And(v >= u + a, v <= u + b)
+        )  # This should probably be min(u + b, timestamps0[-1]) to handle some edge cases
 
         # ALWAYS
         s.add(
@@ -1983,10 +1985,12 @@ def prog_always_implies_eventually(eps, segCount, data_0, data_1, a, b):
                 u,
                 Implies(
                     And(
-                        u >= a,
-                        u <= b,
-                        v >= u,
-                        v <= b,
+                        u >= timestamps0[0],
+                        u <= timestamps0[-1],
+                        v >= u + a,
+                        v
+                        <= u
+                        + b,  # This should probably be min(u + b, timestamps0[-1]) to handle some edge cases
                         z3Interpolate(sig0, u) >= 1,
                     ),
                     z3Interpolate(sig1, v) >= 1,
