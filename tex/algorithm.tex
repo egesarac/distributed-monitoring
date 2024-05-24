@@ -62,7 +62,7 @@ In addition, we define the \emph{bitwise strong until} operator as follows:
 \small
 \[ u \mathsf{U}^0 v = \left( \max_{i \leq j \leq \ell} \left( \min \left( v[j], \min_{i \leq k \leq j} u[k] \right) \right) \right)_{1 \leq i \leq \ell} \]
 \normalsize
-\borzoo{I think we can merge the 2 inner min}As usual, we derive \emph{bitwise eventually} as 
+\borzoo{We can merge the 2 inner min}As usual, we derive \emph{bitwise eventually} as 
 $\mathsf{E} u = 1^\ell \mathsf{U}^0 u$, \emph{bitwise always} as $\mathsf{A} u = \BitNeg 
 (\mathsf{E} \BitNeg u)$, and \emph{bitwise weak until} as $u \mathsf{U}^1 v = (u \mathsf{U}^0 v) 
 \BitOr (\mathsf{A} u)$.
@@ -124,7 +124,7 @@ Intuitively, for a given formula and a segment, the evaluation above produces a 
 	Note that we do not need to consider the evaluation of the next segment for the eventually operator since $\llbracket (S, {\hb}), [7,8) \models x_1 \land x_2 \rrbracket = \{0\}$.
 \end{example}
 
-\subsubsection{Timed Operations}
+\subsubsection{Timed Operations.}
 Handling timed operations requires a closer inspection as value expressions are untimed by definition.
 We address this issue by considering how a given evaluation interval relates with a given segmentation.
 For example, take a segmentation $G_S = \{ [0,4), [4,6), [6,10) \}$ and an evaluation interval $J = [0,5)$.
@@ -139,8 +139,10 @@ Let us introduce the notation we use in the definition below.
 First, we abbreviate the set $\llbracket (S,{\hb}), I \models \varphi \rrbracket$ of value expressions as $\tau_{\varphi,I}$.
 Second, given an interval $K$, we respectively denote by $l_K$ and $r_K$ its left and right end points.
 Third, recall that we denote by $F$ the set of end points of $G_S$ (see \cref{sec:approach}).
-Given an interval $J$, we define the \emph{profile} of $J$ with respect to $(S,{\hb})$, $\varphi$, and $I$ as follows.
-
+Given an interval $J$, we define the \emph{profile} of $J$ with respect to $(S,{\hb})$, $\varphi$, and 
+$I$ as follows: \borzoo{I think we need some intuition for profiles. The formal definition is not so 
+telling.}
+%
 \scriptsize
 \begin{equation*}
 	\mathsf{profile}((S,{\hb}), \varphi, I, J) =
@@ -165,8 +167,9 @@ Note that the last case happens when $I \cap J$ is empty.
 %Moreover, $\kappa(\varphi, I, J)$ is the concatenation $\tau_{\varphi,I_1} \cdot \ldots \cdot \tau_{\varphi,I_m}$ such that $I, I_1, \ldots, I_m, I'$ are consecutive segments in $G_S$.
 %If $I_1, \ldots, I_m$ do not exist, we let $\kappa(\varphi, I, J) = \{\epsilon\}$.
 %Finally, note that we assume the interval $J$ is trimmed to fit temporal domain of $S$.
-We now formalize the intuitive approach of ``sliding'' $J$ over the segmentation to obtain the various profiles it produces as follows.
-
+We now formalize the intuitive approach of ``sliding'' $J$ over the segmentation to obtain the 
+various profiles it produces as follows:
+%
 \small
 \begin{align*}
 	\mathsf{pfs}((S,{\hb}), \varphi, I, J) = \{\destutter(\mathsf{profile}((S,{\hb}), \varphi, I, J')) \st J' \subseteq I \oplus J, J' \sim J\}
@@ -206,8 +209,8 @@ We demonstrate this and the computation of $\mathsf{pfs}$ in \cref{ex:profiles} 
 Let $\varphi_1$ and $\varphi_2$ be two STL formulas.
 Intuitively, once we have the profiles of a given interval $J$ with respect to $\varphi_1$ and $\varphi_2$, we can evaluate the corresponding untimed formulas on the product of these profiles and concatenate them.
 %This captures the behavior of the satisfaction signals with respect to a bounded interval, but introduces further imprecision due to additional concatenations.
-Formally, we handle the evaluation of timed formulas inductively as follows.
-
+Formally, we handle the evaluation of timed formulas inductively as follows:
+%
 \scriptsize
 \begin{align*}
 	\llbracket (S, {\hb}), I \models \varphi_1 \until_J \varphi_2 \rrbracket &= \destutter( \{ u_1 \mathsf{U}^0 u_2 \st (u_1, u_2) \in P_1 \otimes Q_1 \} \cdot \ldots \cdot \{ u_1 \mathsf{U}^0 u_2 \st (u_1, u_2) \in P_k \otimes Q_k \} )
@@ -235,7 +238,7 @@ where $\mathsf{pfs}((S,{\hb}), \varphi_1, I, J) = \{P_1, \ldots, P_k \}$ and $\m
 	\[ 	\llbracket (S, {\hb}), [1,3) \models \LTLeventually_{[0,1)} x_1 \rrbracket = \{ 0, 01, 010, 0101, 01010, 1, 10, 101, 1010 \}  \]
 \end{example}
 
-\subsubsection{Computing the Semantics of STL$^+$}
+\subsubsection{Computing the Semantics of STL$^+$.}
 
 Putting it all together, given a distributed signal $(S, {\hb})$ and an STL$^+$ formula $\varphi$, we can compute $[(S,{\hb}) \models \varphi]_+$ thanks to the following theorem.
 
@@ -307,7 +310,7 @@ Putting it all together, given a distributed signal $(S, {\hb})$ and an STL$^+$ 
 
 
 
-\subsubsection{Sets of Boolean Value Expressions as Bit Vectors}
+\subsubsection{Sets of Boolean Value Expressions as Bit Vectors.}
 Evidently, asynchronous products are expensive to compute.
 Our implementation of the algorithm we describe in this section relies on the following observation:
 Sets of boolean value expressions and their operations can be efficiently implemented through bit vectors.
