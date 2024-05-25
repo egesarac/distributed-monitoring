@@ -1774,7 +1774,7 @@ def prog_always_implies_eventually(eps, segCount, data_0, data_1):
         s.reset()
 
 
-def prog_always_implies_eventually(eps, segCount, data_0, data_1, a, b):
+def prog_always_implies_eventually_timed(eps, segCount, data_0, data_1, a, b):
 
     # initialize z3 solver
     s = Solver()
@@ -2072,7 +2072,7 @@ def getData(d, setID):
 
     # file = open("data/{}_{}_{}_{}_{}.txt".format(d, eps, delim, edges, agent_ID))
     file = open(
-        "{}\\dataNew\\{}_{}.txt".format(
+        "{}/dataNew/{}_{}.txt".format(
             os.path.dirname(os.path.abspath(__file__)), d, setID
         )
     )
@@ -2135,8 +2135,8 @@ def main():
         # prog_eventually_disjunction(eps, 1, data_0, data_1)
         # prog_until(eps, 1, data_0, data_1)
         # prog_eventually_conjunction(eps, 1, data_0, data_1, 4, 7)
-        # prog_always_implies_eventually(eps, 1, data_0, data_1)
-        prog_always_implies_eventually(eps, 1, data_0, data_1, 4, 7)
+        prog_always_implies_eventually(eps, 1, data_0, data_1)
+        # prog_always_implies_eventually_timed(eps, 1, data_0, data_1, 4, 7)
         end = time.time()
         # print("\nTime elapsed :", (end - start), "seconds")
         dur = end - start

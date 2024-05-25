@@ -351,6 +351,7 @@ Nonetheless, when it applies, e.g. for $\LTLalways((x_1 - x_2) \cdot x_3 > c)$, 
 We can take \textsc{Fine} further and only consider the extreme values.
 Some arithmetic operations are \emph{monotonic} in the sense that the extreme values of the output's value expressions can be computed from those of inputs.
 For example, since $\min X_1 = 2$, $\max X_1 = 3$, $\min X_2 = 0$, and $\max X_2 = 1$, we immediately obtain that the minimal and maximal values of $x_1 + x_2$ are 2 and 4.
+This is particularly useful for formulas where the only temporal operator is $\LTLalways$ or $\LTLeventually$.
 We call this approach \textsc{Coarse}.
 
 Finally, instead of assuming that the monitor runs on a separate agent, we can assume it runs on one of the monitored agents.
