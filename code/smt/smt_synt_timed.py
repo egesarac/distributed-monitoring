@@ -266,6 +266,9 @@ def prog_not_always_implies_eventually_timed(eps, segCount, data_0, data_1, a, b
         )
 
         # violation check
+        a = pad * a
+        b = pad * b
+
         u = Int("u")
         v = Int("v")
 
@@ -540,6 +543,9 @@ def prog_always_implies_eventually_timed(eps, segCount, data_0, data_1, a, b):
         )
 
         # violation check
+        a = pad * a
+        b = pad * b
+
         u = Int("u")
         v = Int("v")
 
@@ -1812,10 +1818,50 @@ def main():
     # set repeat count for confidence interval
     repeat = 1
 
-    for d in (16,32):
-        for eps in (2, 4, 8):
-            if (eps <= d):
-                for c in range(4):
+    # for d in (8, 16):
+    #     for eps in (1, 2, 4, 8):
+    #         if (eps <= d and d < 16):
+    #             for c in range(100):
+    #                 flag = False
+    #                 flagneg = False
+    #                 out = "0"
+    #                 outneg = "0"
+    #                 data_0 = getData(d, c)
+    #                 data_1 = getData(d, c + 100)
+
+    #                 prep_time = 0
+    #                 eval_time = 0
+    #                 neg_time = 0
+    #                 for i in range(repeat):
+    #                     t0 = time.time()
+    #                     data0 = preprocess(data_0, d)
+    #                     data1 = preprocess(data_1, d)
+    #                     t1 = time.time()
+    #                     flag = prog_always_implies_eventually_timed(eps, 1, data0, data1, 0, 1)
+    #                     t2 = time.time()
+    #                     flagneg = prog_not_always_implies_eventually_timed(eps, 1, data0, data1, 0, 1)
+    #                     t3 = time.time()
+
+    #                     prep_time += t1 - t0 
+    #                     eval_time += t2 - t1 
+    #                     neg_time += t3 - t2
+
+    #                 if (flag):
+    #                     out = "1"
+    #                 if (flagneg):
+    #                     outneg = "1"
+
+    #                 line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str((prep_time + eval_time) / repeat) + " " + str((prep_time + neg_time) / repeat) + " " + out + " " + outneg
+    #                 print(line)
+    #                 results = open("results_aie01.txt", "a")
+    #                 results.write(line + "\n")
+    #                 results.close()
+
+
+    for d in (4, 8, 16):
+        for eps in (1, 2, 4, 8):
+            if (eps <= d and d < 8):
+                for c in range(100):
                     flag = False
                     flagneg = False
                     out = "0"
@@ -1831,13 +1877,9 @@ def main():
                         data0 = preprocess(data_0, d)
                         data1 = preprocess(data_1, d)
                         t1 = time.time()
-                        flag = prog_always_implies_eventually(eps, 1, data0, data1)
-                        # flag = prog_always_implies_eventually_timed(eps, 1, data0, data1)
-                        # flag = prog_until(eps, 1, data0, data1)
+                        flag = prog_always_implies_eventually_timed(eps, 1, data0, data1, 0, 2)
                         t2 = time.time()
-                        flagneg = prog_not_always_implies_eventually(eps, 1, data0, data1)
-                        # flagneg = prog_not_always_implies_eventually_timed(eps, 1, data0, data1)
-                        # flagneg = prog_not_until(eps, 1, data0, data1)
+                        flagneg = prog_not_always_implies_eventually_timed(eps, 1, data0, data1, 0, 2)
                         t3 = time.time()
 
                         prep_time += t1 - t0 
@@ -1851,54 +1893,9 @@ def main():
 
                     line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str((prep_time + eval_time) / repeat) + " " + str((prep_time + neg_time) / repeat) + " " + out + " " + outneg
                     print(line)
-                    results = open("results_untilSMT.txt", "a")
+                    results = open("results_aie02.txt", "a")
                     results.write(line + "\n")
                     results.close()
-
-    # for bb in range(8, 9):
-    #     for d in (8, 9):
-    #         for eps in (1,2,4):
-    #             # if d < eps:
-    #             #     continue
-    #             # if d < bb:
-    #             #     continue
-
-    #             if (eps <= d and bb <= d and d == 8):
-    #                 for c in range(100):
-    #                     flag = False
-    #                     flagneg = False
-    #                     out = "0"
-    #                     outneg = "0"
-    #                     data_0 = getData(d, c)
-    #                     data_1 = getData(d, c + 100)
-
-    #                     prep_time = 0
-    #                     eval_time = 0
-    #                     neg_time = 0
-    #                     for i in range(repeat):
-    #                         t0 = time.time()
-    #                         data0 = preprocess(data_0, d)
-    #                         data1 = preprocess(data_1, d)
-    #                         t1 = time.time()
-    #                         flag = prog_eventually_disjunction(eps, 1, data0, data1, bb)
-    #                         t2 = time.time()
-    #                         flagneg = prog_always_conjunction(eps, 1, negate(data0), negate(data1), bb)
-    #                         t3 = time.time()
-
-    #                         prep_time += t1 - t0 
-    #                         eval_time += t2 - t1 
-    #                         neg_time += t3 - t2
-
-    #                     if (flag):
-    #                         out = "1"
-    #                     if (flagneg):
-    #                         outneg = "1"
-
-    #                     line = str(bb) + " " + str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str((prep_time + eval_time) / repeat) + " " + str((prep_time + neg_time) / repeat) + " " + out + " " + outneg
-    #                     print("ED " + line)
-    #                     results = open("ZZZZresults_ed_smt+negTIMEDNEWd8.txt", "a")
-    #                     results.write(line + "\n")
-    #                     results.close()
 
 if __name__ == "__main__":
     main()

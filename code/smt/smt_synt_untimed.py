@@ -2398,169 +2398,45 @@ def main():
     # set repeat count for confidence interval
     repeat = 1
 
-    # for d in range(32,33):
-    #     for eps in (1, 2, 4, 8):
-    #         if d < eps:
-    #             continue
-            
-    #         for c in range(100):
-    #             flag = False
-    #             flagneg = False
-    #             out = "0"
-    #             outneg = "0"
-    #             data_0 = getData(d, c)
-    #             data_1 = getData(d, c + 100)
-
-    #             prep_time = 0
-    #             eval_time = 0
-    #             neg_time = 0
-    #             for i in range(repeat):
-    #                 t0 = time.time()
-    #                 data0 = preprocess(data_0, d)
-    #                 data1 = preprocess(data_1, d)
-    #                 t1 = time.time()
-    #                 flag = prog_always_conjunction(eps, 1, data0, data1)
-    #                 t2 = time.time()
-    #                 flagneg = prog_eventually_disjunction(eps, 1, negate(data0), negate(data1))
-    #                 t3 = time.time()
-
-    #                 prep_time += t1 - t0 
-    #                 eval_time += t2 - t1 
-    #                 neg_time += t3 - t2
-
-    #             if (flag):
-    #                 out = "1"
-    #             if (flagneg):
-    #                 outneg = "1"
-
-    #             line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str((prep_time + eval_time) / repeat) + " " + str((prep_time + neg_time) / repeat) + " " + out + " " + outneg
-    #             print("AC " + line)
-    #             results = open("results_ac_smt+neg.txt", "a")
-    #             results.write(line + "\n")
-    #             results.close()
-
-    # for d in range(32,33):
-    #     for eps in (1, 2, 4, 8):
-    #         if d < eps:
-    #             continue
-            
-    #         for c in range(100):
-    #             flag = False
-    #             flagneg = False
-    #             out = "0"
-    #             outneg = "0"
-    #             data_0 = getData(d, c)
-    #             data_1 = getData(d, c + 100)
-
-    #             prep_time = 0
-    #             eval_time = 0
-    #             neg_time = 0
-    #             for i in range(repeat):
-    #                 t0 = time.time()
-    #                 data0 = preprocess(data_0, d)
-    #                 data1 = preprocess(data_1, d)
-    #                 t1 = time.time()
-    #                 flag = prog_always_disjunction(eps, 1, data0, data1)
-    #                 t2 = time.time()
-    #                 flagneg = prog_eventually_conjunction(eps, 1, negate(data0), negate(data1))
-    #                 t3 = time.time()
-
-    #                 prep_time += t1 - t0 
-    #                 eval_time += t2 - t1 
-    #                 neg_time += t3 - t2
-
-    #             if (flag):
-    #                 out = "1"
-    #             if (flagneg):
-    #                 outneg = "1"
-            
-    #             line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str((prep_time + eval_time) / repeat) + " " + str((prep_time + neg_time) / repeat) + " " + out + " " + outneg
-    #             print("AD " + line)
-    #             results = open("results_ad_smt+neg.txt", "a")
-    #             results.write(line + "\n")
-    #             results.close()
-
-    for d in range(32,33):
-        for eps in (4, 8):
-            if d < eps:
-                continue
-            
-            for c in range(100):
-                flag = False
-                flagneg = False
-                out = "0"
-                outneg = "0"
-                data_0 = getData(d, c)
-                data_1 = getData(d, c + 100)
-
-                prep_time = 0
-                eval_time = 0
-                neg_time = 0
-                for i in range(repeat):
-                    t0 = time.time()
-                    data0 = preprocess(data_0, d)
-                    data1 = preprocess(data_1, d)
-                    t1 = time.time()
-                    flag = prog_eventually_conjunction(eps, 1, data0, data1)
-                    t2 = time.time()
-                    flagneg = prog_always_disjunction(eps, 1, negate(data0), negate(data1))
-                    t3 = time.time()
-
-                    prep_time += t1 - t0 
-                    eval_time += t2 - t1 
-                    neg_time += t3 - t2
-
-                if (flag):
-                    out = "1"
-                if (flagneg):
-                    outneg = "1"
-
-                line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str((prep_time + eval_time) / repeat) + " " + str((prep_time + neg_time) / repeat) + " " + out + " " + outneg
-                print("EC " + line)
-                results = open("results_ec_smt+neg.txt", "a")
-                results.write(line + "\n")
-                results.close()
-
-    for d in range(32,33):
+    for d in (4, 8, 16, 32):
         for eps in (1, 2, 4, 8):
-            if d < eps:
-                continue
-            
-            for c in range(100):
-                flag = False
-                flagneg = False
-                out = "0"
-                outneg = "0"
-                data_0 = getData(d, c)
-                data_1 = getData(d, c + 100)
+            if eps <= d:
+                for c in range(2):
+                    flag = False
+                    flagneg = False
+                    out = "0"
+                    outneg = "0"
+                    data_0 = getData(d, c)
+                    data_1 = getData(d, c + 100)
 
-                prep_time = 0
-                eval_time = 0
-                neg_time = 0
-                for i in range(repeat):
-                    t0 = time.time()
-                    data0 = preprocess(data_0, d)
-                    data1 = preprocess(data_1, d)
-                    t1 = time.time()
-                    flag = prog_eventually_disjunction(eps, 1, data0, data1)
-                    t2 = time.time()
-                    flagneg = prog_always_conjunction(eps, 1, negate(data0), negate(data1))
-                    t3 = time.time()
+                    prep_time = 0
+                    eval_time = 0
+                    neg_time = 0
+                    for i in range(repeat):
+                        t0 = time.time()
+                        data0 = preprocess(data_0, d)
+                        data1 = preprocess(data_1, d)
+                        t1 = time.time()
+                        flag = prog_always_implies_eventually(eps, 1, data0, data1)
+                        t2 = time.time()
+                        flagneg = prog_not_always_implies_eventually(eps, 1, data0, data1)
+                        t3 = time.time()
 
-                    prep_time += t1 - t0 
-                    eval_time += t2 - t1 
-                    neg_time += t3 - t2
-                
-                if (flag):
-                    out = "1"
-                if (flagneg):
-                    outneg = "1"
+                        prep_time += t1 - t0 
+                        eval_time += t2 - t1 
+                        neg_time += t3 - t2
 
-                line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str((prep_time + eval_time) / repeat) + " " + str((prep_time + neg_time) / repeat) + " " + out + " " + outneg
-                print("ED" + line)
-                results = open("results_ed_smt+neg.txt", "a")
-                results.write(line + "\n")
-                results.close()
+                    if (flag):
+                        out = "1"
+                    if (flagneg):
+                        outneg = "1"
+
+                    line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str((prep_time + eval_time) / repeat) + " " + str((prep_time + neg_time) / repeat) + " " + out + " " + outneg
+                    print(line)
+                    results = open("TESTUNTIMED.txt", "a")
+                    results.write(line + "\n")
+                    results.close()
+
 
 if __name__ == "__main__":
     main()
