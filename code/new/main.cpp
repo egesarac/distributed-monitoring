@@ -17,34 +17,36 @@
 #include "functions.cpp"
 using namespace std;
 
-#define REP 100
+#define REP 10
 
 int main()
 {
+    vector<vector<bitset<SIZE>>> test1;
+    vector<vector<bitset<SIZE>>> test2;
+
     /* set variables */
-    vector<long long> D{4000, 8000, 16000, 32000};
-    vector<long long> EPS{2000, 4000, 8000};
+    vector<long long> D{4000, 8000};
+    vector<long long> EPS{1000, 2000, 4000, 8000};
     int n = 2;
     int del = 1;
 
     long long a = 0;
-    long long b = 1000;
+    // long long b = 1000;
     bool leftClosed = true;
     bool rightClosed = false;
 
     ofstream results;
-    // string filename = "results_aie02_new.txt";
-    string filename = "ZZZZresults_ed_timed.txt";
+    string filename = "NEW_ED_TIMED_cont.txt";
     results.open(filename);
 
-    // for (long long b = 1000; b <= 16000; b += 1000)
-    // {
+    for (long long b = 1000; b <= 16000; b += 1000)
+    {
     for (auto d : D)
     {
-        // if (d < b)
-        // {
-        //     continue;
-        // }
+        if (d <= b)
+        {
+            continue;
+        }
         for (auto eps : EPS)
         {
             if (d < eps)
@@ -52,7 +54,7 @@ int main()
                 continue;
             }
 
-                for (int c = 84; c < 100; c++)
+                for (int c = 0; c < 100; c++)
                 {
                     /* read signal data */
                     vector<vector<pair<long long, double>>> signalsReal(n);
@@ -119,11 +121,14 @@ int main()
                         // always(x1 implies eventually(x2))
                         // test = bitsetAlways(bitsetNegation(bitsetConjunction(aps[0], bitsetAlways(bitsetNegation(aps[1])))));
                        
-                        // always(x1 implies eventually_[0,1](x2))
-                        // test = bitsetAlways(bitsetNegation(bitsetConjunction(aps[0], bitsetBoundedAlways(bitsetNegation(aps[1]), segmentation, 0, 1000, true, true))));
+                        // always(x1 implies eventually_[0,1)(x2))
+                        // test = bitsetAlways(bitsetNegation(bitsetConjunction(aps[0], bitsetBoundedAlways(bitsetNegation(aps[1]), segmentation, 0, 1000, true, false))));
                         
-                        // always(x1 implies eventually_[0,2](x2))
-                        // test = bitsetAlways(bitsetNegation(bitsetConjunction(aps[0], bitsetBoundedAlways(bitsetNegation(aps[1]), segmentation, 0, 2000, true, true))));
+                        // always(x1 implies eventually_[0,2)(x2))
+                        // test1 = bitsetNegation(bitsetBoundedEventually(aps[1], segmentation, 0, 2000, true, false));
+                        // test2 = bitsetBoundedAlways(bitsetNegation(aps[1]), segmentation, 0, 2000, true, false);
+                        // cout << "t" << endl;
+                        // test = bitsetAlways(bitsetNegation(bitsetConjunction(aps[0], bitsetBoundedAlways(bitsetNegation(aps[1]), segmentation, 0, 2000, true, false))));
                         
                         // eventually_I(x1 or x2)
                         test = bitsetBoundedEventually(bitsetNegation(bitsetConjunction(bitsetNegation(aps[0]), bitsetNegation(aps[1]))), segmentation, a, b, leftClosed, rightClosed);
@@ -154,8 +159,8 @@ int main()
                         out = "0";
                     }
 
-                    string w = to_string(d / 1000) + " " + to_string(eps / 1000) + " " + to_string(del / 1000) + " " + to_string(c) + " ";
-                    // string w = to_string(b) + " " + to_string(d / 1000) + " " + to_string(eps / 1000) + " " + to_string(del / 1000) + " " + to_string(c) + " ";
+                    // string w = to_string(d / 1000) + " " + to_string(eps / 1000) + " " + to_string(del / 1000) + " " + to_string(c) + " ";
+                    string w = to_string(b) + " " + to_string(d / 1000) + " " + to_string(eps / 1000) + " " + to_string(del / 1000) + " " + to_string(c) + " ";
                     
                     // if (invalidSignal)
                     // {
@@ -170,7 +175,7 @@ int main()
                 }
             }
         }
-    // }
+    }
 
     results.close();
 

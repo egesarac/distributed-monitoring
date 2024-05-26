@@ -1255,44 +1255,50 @@ vector<bitset<N>> bitsetConcat(const vector<bitset<N>> &v1, const vector<bitset<
 
 template <std::size_t N>
 vector<vector<bitset<N>>> getProfiles(vector<vector<bitset<N>>> v, vector<long long> segmentation, const long long &t1, const long long &t2, const long long &a, const long long &b, const bool &leftClosed, const bool &rightClosed)
-{ // TODO: real valued time points
+{
     vector<vector<bitset<N>>> profiles;
 
-    // to handle the cases where the window falls out of the signal
-    segmentation.push_back(INT32_MAX);
-    vector<bitset<N>> temp(2);
-    temp[0][0] = true;
-    v.push_back(temp);
+    // // to handle the cases where the window falls out of the signal
+    // segmentation.push_back(INT32_MAX);
+
+    // // this assumes the signal is false
+    // // vector<bitset<N>> temp(2);
+    // // temp[0][0] = true;
+    // // v.push_back(temp);
+
+    // // this assumes the interval is trimmed to fit the temporal domain (equivalently, signal is assumed to extend beyond its domain)
+    // v.push_back(v[v.size() - 1]);
 
     vector<vector<long long>> breakpoints(2);
 
     // TODO: check and improve
-    breakpoints[0].push_back(t1 + a);
-    int low0 = upper_bound(segmentation.begin(), segmentation.end(), t1 + a) - segmentation.begin();
-    int high0 = lower_bound(segmentation.begin(), segmentation.end(), t2 + a) - segmentation.begin() - 1;
+    long long last = segmentation[segmentation.size() - 1];
+    breakpoints[0].push_back(min(t1 + a, last));
+    int low0 = upper_bound(segmentation.begin(), segmentation.end(), min(t1 + a, last)) - segmentation.begin();
+    int high0 = lower_bound(segmentation.begin(), segmentation.end(), min(t2 + a, last)) - segmentation.begin() - 1;
     for (int i = low0; i <= high0; i++)
     {
         breakpoints[0].push_back(segmentation[i] - 1);
         breakpoints[0].push_back(segmentation[i]);
     }
-    if (segmentation[high0] < t2 + a)
+    if (segmentation[high0] < min(t2 + a, last))
     {
-        breakpoints[0].push_back(t2 + a - 1);
-        breakpoints[0].push_back(t2 + a);
+        breakpoints[0].push_back(min(t2 + a, last) - 1);
+        breakpoints[0].push_back(min(t2 + a, last));
     }
 
-    breakpoints[1].push_back(t1 + b);
-    int low1 = upper_bound(segmentation.begin(), segmentation.end(), t1 + b) - segmentation.begin();
-    int high1 = lower_bound(segmentation.begin(), segmentation.end(), t2 + b) - segmentation.begin() - 1;
+    breakpoints[1].push_back(min(t1 + b, last));
+    int low1 = upper_bound(segmentation.begin(), segmentation.end(), min(t1 + b, last)) - segmentation.begin();
+    int high1 = lower_bound(segmentation.begin(), segmentation.end(), min(t2 + b, last)) - segmentation.begin() - 1;
     for (int i = low1; i <= high1; i++)
     {
         breakpoints[1].push_back(segmentation[i] - 1);
         breakpoints[1].push_back(segmentation[i]);
     }
-    if (segmentation[high1] < t2 + b)
+    if (segmentation[high1] < min(t2 + b, last))
     {
-        breakpoints[1].push_back(t2 + b - 1);
-        breakpoints[1].push_back(t2 + b);
+        breakpoints[1].push_back(min(t2 + b, last)- 1);
+        breakpoints[1].push_back(min(t2 + b, last));
     }
 
     // to ignore the last interval which includes the point t2+b
@@ -1302,18 +1308,14 @@ vector<vector<bitset<N>>> getProfiles(vector<vector<bitset<N>>> v, vector<long l
     int i0 = 0;
     int i1 = 0;
 
-    while (i0 < l0 && i1 < l1)
+    while (i0 < l0 && i1 <= l1)
     {
         // find the relation of the current window to the segments, determine which actions to carry for the profile (prefix, suffix, etc)
 
         long long left = breakpoints[0][i0];
         long long right = breakpoints[1][i1];
 
-        // TODO: check -> functions here depend on rightClosed -- might have to concat the first bits of the next segment
-        // int xind = low0 + ((i0 + 1) % 2);
         int xind = upper_bound(segmentation.begin() + low0 - 1, segmentation.begin() + high1 + 1, left) - segmentation.begin() - 1;
-        // int yind = low1 + ((i1 + 1) % 2);
-        // int yind = lower_bound(segmentation.begin() + low0 - 1, segmentation.begin() + high1, right) - segmentation.begin();
         int yind = upper_bound(segmentation.begin() + low0 - 1, segmentation.begin() + high1 + 1, right) - segmentation.begin() - 1;
 
         vector<bitset<N>> pr(2);
@@ -1515,7 +1517,7 @@ vector<vector<bitset<N>>> bitsetBoundedAlways(vector<vector<bitset<N>>> v1, vect
         {
             vector<vector<bitset<N>>> tempPerSegment;
             tempPerSegment.push_back(temp[k]);
-            tempPerSegment = bitsetEventually(tempPerSegment);
+            tempPerSegment = bitsetAlways(tempPerSegment);
             temp[k] = tempPerSegment[0];
         }
 
