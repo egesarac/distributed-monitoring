@@ -1,51 +1,54 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib import colormaps
 
-filename = '../results/GAnd.csv'
+# filenames
+f1 = '../results/gand.csv'
+f2 = '../results/gor.csv'
+f3 = '../results/gimpf.csv'
+f4 = '../results/gimpft1.csv'
 
-df = pd.read_csv(filename)
+dtype = {"d": int, "eps": int, "EDM": float, "ADM": float, "FP": float,"speedup": float, "label": str}
 
-fig, (ax2, ax3) = plt.subplots(1, 2)
+fs = [f1, f2, f3, f4]
 
 
-d_header = [32, 16, 8, 4]
-eps_header = [1, 2, 4, 8]
+fig, axs = plt.subplots(len(fs), 2)
+fig.set_size_inches([8, 10])
 
-data_speedup = [
-        [56623.38521, 34646.87393, 15870.04447, 6404.107085],
-        [28936.10854, 17759.31089, 8803.134475, 4905.198941],
-        [16327.5081, 10739.62168, 7090.823162, 6969.752278],
-        [9521.199206, 9204.74636, 8097.44811, float('nan')]
-        ]
+for i in range(len(fs)):
+    df = pd.read_csv(fs[i], dtype=dtype)
 
-data_speedup_label = [
-        ['251us\n14.24s', '424us\n14.69s', '942us\n14.95s', '2.52s\n15.88s'],
-        ['122us\n3.52s', '203us\n3.60s', '434us\n3.72s', '902us\n4.04s'],
-        ['60us\n981ms', '95us\n1011ms', '154us\n1086ms', '175us\n1204ms'],
-        ['32us\n307ms', '35us\n318ms', '43us\n348ms', 'na']
-        ]
+    data_fp = df.pivot_table('FP', 'eps', 'd', fill_value=float('nan'), dropna=False)
+    data_speedup = df.pivot_table('speedup', 'eps', 'd', fill_value=float('nan'), dropna=False)
+    data_speedup_label = df.pivot_table(values='label', index='eps', columns='d', aggfunc=lambda x: ''.join(str(v) for v in x),
+                                    fill_value='')
+    data_speedup_label = data_speedup_label.applymap(lambda x: x.replace('\\n', '\n'))
 
-data_fp = [
-        [0, 0, 7, 7],
-        [0, 2, 6, 6],
-        [0, 0, 4, 4],
-        [0, 0, 3, float('nan')]
-        ]
+    sns.heatmap(data_speedup, cmap='GnBu', annot=data_speedup_label, linewidth=0.5, ax=axs[i][0], fmt='', vmin=0, vmax=60000)
 
-sns.heatmap(data_speedup, cmap='GnBu', annot=data_speedup_label, linewidth=0.5, ax=ax2, fmt='')
+    axs[i][0].set(xlabel="eps", ylabel="duration")
+    axs[i][0].set_yticks([0.5, 1.5, 2.5, 3.5], labels=list(data_speedup.index.values))
 
-ax2.set(xlabel="eps", ylabel="duration")
-ax2.set_xticks([0.5, 1.5, 2.5, 3.5], labels=eps_header)
-ax2.set_yticks([0.5, 1.5, 2.5, 3.5], labels=d_header)
-ax2.set_title('Speed-up (times) ADM vs. EDM')
+    sns.heatmap(data_fp, cmap='GnBu', annot=data_fp, linewidth=0.5, ax=axs[i][1], vmin=0, vmax=100)
 
-sns.heatmap(data_fp, cmap='GnBu', annot=data_fp, linewidth=0.5, ax=ax3)
+    axs[i][1].set(xlabel="eps", ylabel='')
+    axs[i][1].set_yticks([0.5, 1.5, 2.5, 3.5], labels=list(data_fp.index.values))
 
-ax3.set(xlabel="eps")
-ax3.set_xticks([0.5, 1.5, 2.5, 3.5], labels=eps_header)
-ax3.set_yticks([0.5, 1.5, 2.5, 3.5], labels=d_header)
-ax3.set_title('False Positives (%)')
+    if i==0:
+        axs[i][0].set_xticks([0.5, 1.5, 2.5, 3.5], labels=data_speedup.columns)
+        axs[i][0].set_title('Speed-up (times) ADM vs. EDM')
+        axs[i][1].set_xticks([0.5, 1.5, 2.5, 3.5], labels=data_fp.columns)
+        axs[i][1].set_title('False Positives (%)')
 
-plt.show()
+rows = ['Phi {}'.format(row) for row in ['1', '2', '3', '4']]
+for ax, row in zip(axs[:,0], rows):
+    ax.annotate(row, xy=(0, 0.5), xytext=(-ax.yaxis.labelpad - 5, 0),
+                xycoords=ax.yaxis.label, textcoords='offset points',
+                size='large', ha='right', va='center')
+
+plt.tight_layout()
+plt.savefig("speedup.pdf", format="pdf", bbox_inches="tight")
+
