@@ -2398,10 +2398,10 @@ def main():
     # set repeat count for confidence interval
     repeat = 1
 
-    for d in (4, 8, 16, 32):
+    for d in range(32,33):
         for eps in (1, 2, 4, 8):
             if eps <= d:
-                for c in range(2):
+                for c in range(100):
                     flag = False
                     flagneg = False
                     out = "0"
@@ -2433,7 +2433,7 @@ def main():
 
                     line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str((prep_time + eval_time) / repeat) + " " + str((prep_time + neg_time) / repeat) + " " + out + " " + outneg
                     print(line)
-                    results = open("TESTUNTIMED.txt", "a")
+                    results = open("results_smt_aie32.txt", "a")
                     results.write(line + "\n")
                     results.close()
 
