@@ -1966,7 +1966,6 @@ def prog_until(eps, segCount, data_0, data_1):
         u = Int("u")
         s.add(And(u >= timestamps_0[0], u <= v))
 
-
         s.add(
             ForAll(
                 v,
@@ -1975,25 +1974,10 @@ def prog_until(eps, segCount, data_0, data_1):
                         v >= timestamps_0[0],
                         v <= timestamps_0[-1],
                     ),
-                    And(u >= timestamps_0[0], u <= v, Or(z3Interpolate(sig0, c0(u)) == 0, z3Interpolate(c_flow, v) < 2))
+                    Or(z3Interpolate(sig1, c1(v)) == 0, And(u >= timestamps_0[0], u <= v, z3Interpolate(sig0, c0(u)) == 0))
                 )
             )
         )
-
-        # s.add(
-        #     ForAll(
-        #         u,
-        #         Implies(
-        #             And(
-        #                 u >= timestamps_0[0],
-        #                 u <= v,
-        #                 v >= timestamps_0[0],
-        #                 v <= timestamps_0[-1],
-        #             ),
-        #             And(z3Interpolate(sig0, c0(u)) >= 1, z3Interpolate(c_flow, v) >= 2),
-        #         ),
-        #     )
-        # )
 
         # print(s.assertions())
         if s.check() == sat:
@@ -2281,18 +2265,17 @@ def prog_not_until(eps, segCount, data_0, data_1):
         s.add(And(u >= timestamps_0[0], u <= v))
 
         s.add(
-            ForAll(
-                u,
-                Implies(
-                    And(
-                        u >= timestamps_0[0],
-                        u <= v,
-                        v >= timestamps_0[0],
-                        v <= timestamps_0[-1],
-                    ),
-                    And(z3Interpolate(sig0, c0(u)) >= 1, z3Interpolate(c_flow, v) >= 2),
-                ),
-            )
+            # Exists(
+                # v,
+                And(v >= timestamps_0[0], v <= timestamps_0[-1], z3Interpolate(sig1, c1(v)) == 1,
+                    ForAll(u,
+                           Implies(
+                               And(u >= timestamps_0[0], u <= v),
+                               z3Interpolate(sig0, c0(u)) == 1                               
+                           )
+                    )
+                )
+            # )
         )
 
         # print(s.assertions())
@@ -2399,7 +2382,7 @@ def main():
     repeat = 1
 
     for d in range(32,33):
-        for eps in (1, 2, 4, 8):
+        for eps in (1,2,4,8):
             if eps <= d:
                 for c in range(100):
                     flag = False
@@ -2417,9 +2400,9 @@ def main():
                         data0 = preprocess(data_0, d)
                         data1 = preprocess(data_1, d)
                         t1 = time.time()
-                        flag = prog_always_implies_eventually(eps, 1, data0, data1)
+                        flag = prog_until(eps, 1, data0, data1)
                         t2 = time.time()
-                        flagneg = prog_not_always_implies_eventually(eps, 1, data0, data1)
+                        flagneg = prog_not_until(eps, 1, data0, data1)
                         t3 = time.time()
 
                         prep_time += t1 - t0 
@@ -2433,7 +2416,7 @@ def main():
 
                     line = str(d) + " " + str(eps) + " " + "-" + " " + str(c) + " "  + "-" + " " + str((prep_time + eval_time) / repeat) + " " + str((prep_time + neg_time) / repeat) + " " + out + " " + outneg
                     print(line)
-                    results = open("results_smt_aie32.txt", "a")
+                    results = open("TESTuntil.txt", "a")
                     results.write(line + "\n")
                     results.close()
 
