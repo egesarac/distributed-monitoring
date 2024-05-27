@@ -30,14 +30,79 @@ By extension, a segmentation of a collection of signals with the same temporal d
 %Intuitively, $\theta_{\text{lo}}$ and $\theta_{\text{hi}}$ give us the lower and upper bounds on the value of the monitor's clock for a given edge, i.e., the end points of the uncertainty region of the given edge.
 %We use these to describe a canonical segmentation of a distributed signal.
 
+
 \begin{wrapfigure}{r}{0.5\textwidth}
 	\vspace{-2em}
-	\begin{center}
-		\includegraphics[scale=0.5]{canonseg.png}
-	\end{center}
+	\begin{tikzpicture}[scale=0.6]
+		\footnotesize 
+		
+		% Plot for x1(t)
+		\begin{scope}
+			% Axes
+			\draw[->] (0,0) -- (8.5,0) node[right] {$t$};
+			\draw[->] (0,0) -- (0,1.5) node[above] {$x_1(t)$};
+			
+			% Red shaded areas
+			\fill[pink] (0,1.1) rectangle (4,0.9);
+			\fill[pink] (3,0.1) rectangle (7,-0.1);
+			
+			% Red dashed lines
+			\draw[red, thick, dashed] (0,0) -- (2,0) -- (2,1) -- (5,1) -- (5,0) -- (8,0);
+			
+			% Red dots
+			\fill[red] (0,0) circle (2pt);
+			\fill[red] (2,1) circle (2pt);
+			\fill[red] (5,0) circle (2pt);
+		\end{scope}
+		
+		% Plot for x2(t)
+		\begin{scope}[shift={(0,-2.5)}]
+			% Axes
+			\draw[->] (0,0) -- (8.5,0) node[right] {$t$};
+			\draw[->] (0,0) -- (0,1.5) node[above] {$x_2(t)$};
+			
+			% Red shaded areas
+			\fill[cyan] (1,1.1) rectangle (5,0.9);
+			\fill[cyan] (4,0.1) rectangle (8,-0.1);
+			
+			% Red dashed lines
+			\draw[blue, thick, dashed] (0,0) -- (3,0) -- (3,1) -- (6,1) -- (6,0) -- (8,0);
+			
+			% Red dots
+			\fill[blue] (0,0) circle (2pt);
+			\fill[blue] (3,1) circle (2pt);
+			\fill[blue] (6,0) circle (2pt);
+		\end{scope}
+		
+		% GS boxes
+		\begin{scope}[shift={(0,-4)}]
+			\draw (0,0) rectangle (1,1);
+			\node at (0.5,0.5) {{\tiny $[0,1)$}};
+			\draw (1,0) rectangle (3,1);
+			\node at (2,0.5) {{\tiny $[1,3)$}};
+			\draw (3,0) rectangle (4,1);
+			\node at (3.5,0.5) {{\tiny $[3,4)$}};
+			\draw (4,0) rectangle (5,1);
+			\node at (4.5,0.5) {{\tiny $[4,5)$}};
+			\draw (5,0) rectangle (7,1);
+			\node at (6,0.5) {{\tiny $[5,7)$}};
+			\draw (7,0) rectangle (8,1);
+			\node at (7.5,0.5) {{\tiny $[7,8)$}};
+		\end{scope}
+	\end{tikzpicture}
 	\caption{The signals $x_1$ (top, red, dashed) and $x_2$ (bottom, blue, solid) from \cref{ex:canonseg}. The edges are marked with solid balls and their uncertainty regions are given as semi-transparent boxes around the edges. The resulting canonical segmentation $G_S$ is shown below the graphical representation of the signals.}
 	\label{fig:canonseg}
+	\vspace{-2em}
 \end{wrapfigure}
+
+%\begin{wrapfigure}{r}{0.5\textwidth}
+%	\vspace{-2em}
+%	\begin{center}
+%		\includegraphics[scale=0.5]{canonseg.png}
+%	\end{center}
+%	\caption{The signals $x_1$ (top, red, dashed) and $x_2$ (bottom, blue, solid) from \cref{ex:canonseg}. The edges are marked with solid balls and their uncertainty regions are given as semi-transparent boxes around the edges. The resulting canonical segmentation $G_S$ is shown below the graphical representation of the signals.}
+%	\label{fig:canonseg}
+%\end{wrapfigure}
 
 Let $(S,{\hb})$ be a distributed signal of $n$ signals.
 The \emph{canonical segmentation} $G_S$ of $(S,{\hb})$ is the segmentation of $S$ where the end points of the segments coincide with the end points of its temporal domain and uncertainty regions.
@@ -76,12 +141,64 @@ Let us remark that this definition is general because finite-length piecewise-co
 
 \begin{wrapfigure}{r}{0.5\textwidth}
 	\vspace{-2em}
-	\begin{center}
-		\includegraphics[scale=0.33]{valexpr.png}
-	\end{center}
+
+\begin{tikzpicture}[scale=0.6]
+	\small
+	% Part (a)
+	\node at (-1.5,0) {(a)};
+	\draw[thick] (0,0) -- (8,0);
+	\foreach \x in {0,1,3,4,5,7,8}
+	\draw (\x,0) node[above] {\x};
+	\draw (-0.5,0) node[above] {$t$:};
+	
+	\draw[fill=pink] (-1,-2) rectangle (0,0) node[midway] {$x_1$};
+	\draw[fill=pink] (0,-1) rectangle (4,0) node[midway] {$01$};
+	\draw[fill=pink] (3,-2) rectangle (7,-1) node[midway] {$10$};
+	\draw[fill=pink] (7,-2) rectangle (8,0) node[midway] {$0$};
+	
+	\draw[fill=cyan] (-1,-4) rectangle (0,-2) node[midway] {$x_2$};
+	\draw[fill=cyan] (0,-4) rectangle (1,-2) node[midway] {$0$};
+	\draw[fill=cyan] (1,-3) rectangle (5,-2) node[midway] {$01$};
+	\draw[fill=cyan] (4,-4) rectangle (8,-3) node[midway] {$10$};
+	
+	\draw (0,-4) -- (8,-4);
+	\draw (8,-4) -- (8,0);
+		
+	% Part (b)
+	\node at (-1.5,-5) {(b)};
+	\draw[thick] (0,-5) -- (8,-5);
+	\foreach \x in {0,1,3,4,5,7,8}
+	\draw (\x,-5) node[above] {\x};
+	\draw (-0.5,-5) node[above] {$t$:};
+	
+	\draw[fill=pink] (-1,-7) rectangle (0,-5) node[midway] {$x_1$};
+	\draw[fill=pink] (0,-7) rectangle (1,-5) node[midway] {\scriptsize\begin{tabular}{c}\{0,\\ 01\}\\\end{tabular}};
+	\draw[fill=pink] (1,-7) rectangle (3,-5) node[midway] {\scriptsize\begin{tabular}{c}\{0,\\ 01,\\ 1\}\\\end{tabular}};
+	\draw[fill=pink] (3,-7) rectangle (4,-5) node[midway] {\scriptsize{\begin{tabular}{c}\{01,\\ 010,\\ 1,\\ 10\}\\\end{tabular}}};
+	\draw[fill=pink] (4,-7) rectangle (5,-5) node[midway] {\scriptsize\begin{tabular}{c}\{1,\\ 10,\\ 0\}\\\end{tabular}};
+	\draw[fill=pink] (5,-7) rectangle (7,-5) node[midway] {{\scriptsize\begin{tabular}{c}\{10,\\ 0\}\\\end{tabular}}};
+	\draw[fill=pink] (7,-7) rectangle (8,-5) node[midway] {{\scriptsize\begin{tabular}{c}\{0\}\\\end{tabular}}};
+	
+	\draw[fill=cyan] (-1,-9) rectangle (0,-7) node[midway] {$x_2$};
+	\draw[fill=cyan] (0,-9) rectangle (1,-7) node[midway] {{\scriptsize\begin{tabular}{c}\{0\}\\\end{tabular}}};
+	\draw[fill=cyan] (1,-9) rectangle (3,-7) node[midway] {\scriptsize\begin{tabular}{c}\{0,\\ 01\}\\\end{tabular}};
+	\draw[fill=cyan] (3,-9) rectangle (4,-7) node[midway] {\scriptsize\begin{tabular}{c}\{0,\\ 01,\\ 1\}\\\end{tabular}};
+	\draw[fill=cyan] (4,-9) rectangle (5,-7) node[midway] {\scriptsize{\begin{tabular}{c}\{01,\\ 010,\\ 1,\\ 10\}\\\end{tabular}}};
+	\draw[fill=cyan] (5,-9) rectangle (7,-7) node[midway] {\scriptsize\begin{tabular}{c}\{1,\\ 10,\\ 0\}\\\end{tabular}};
+	\draw[fill=cyan] (7,-9) rectangle (8,-7) node[midway] {{\scriptsize\begin{tabular}{c}\{10,\\ 0\}\\\end{tabular}}};
+\end{tikzpicture}
 	\caption{(a) The uncertainty regions of the distributed signal in \cref{ex:canonseg} and the corresponding value expressions. (b) The tabular representation of the function $\gamma$ for the given distributed signal.}
 	\label{fig:valexpr}
 \end{wrapfigure}
+
+%\begin{wrapfigure}{r}{0.5\textwidth}
+%	\vspace{-2em}
+%	\begin{center}
+%		\includegraphics[scale=0.33]{valexpr.png}
+%	\end{center}
+%	\caption{(a) The uncertainty regions of the distributed signal in \cref{ex:canonseg} and the corresponding value expressions. (b) The tabular representation of the function $\gamma$ for the given distributed signal.}
+%	\label{fig:valexpr}
+%\end{wrapfigure}
 
 Notice that (i) uncertainty regions may overlap, and (ii) the canonical segmentation may split an uncertainty region into multiple segments.
 Consider a signal $x$ with a rising edge in $(1,5)$ and a falling edge in $(4,8)$.

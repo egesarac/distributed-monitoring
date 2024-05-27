@@ -174,11 +174,49 @@ We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distribu
 	Moreover, the frontiers of these consistent cuts can be seen as produced by a consistent cut flow $\ccf$, e.g., with $\ccf(0.5) = \fr(C_1)$, $\ccf(1) = \fr(C_2)$, and $\ccf(2) = \fr(C_3)$.	
 \end{example}
 
+%\begin{wrapfigure}{r}{0.3\textwidth}
+%	\vspace{-2em}
+%	\begin{center}
+%		\includegraphics[scale=0.9]{distsig.png}
+%	\end{center}
+%	\caption{The distributed signal in \cref{ex:distsig} with consistent cuts $C_1, C_2, C_3$}
+%	\label{fig:distsig}
+%\end{wrapfigure}
+
 \begin{wrapfigure}{r}{0.3\textwidth}
 	\vspace{-2em}
-	\begin{center}
-		\includegraphics[scale=0.55]{distsig.png}
-	\end{center}
+	\centering
+	\begin{tikzpicture}[scale=0.75]
+		% Draw the arrows
+		\draw[very thick, ->] (0,0) node[below] {$x_1$} -- (0,3.5) ;
+		\draw[very thick, ->] (2,0) node[below] {$x_2$} -- (2,3.5) ;
+		
+		% Draw the lines with labels extended further left and right
+		\draw[blue] (-1,0.45) -- (3,0.65) node[right, below right, black] {C$_1$};
+		\draw[blue] (-1,1.8) -- (3,1.0) node[right, black] {C$_2$};
+		\draw[blue] (-1,2.95) -- (3,2.75) node[right, black] {C$_3$};
+		
+		% Dashed line extended further left and right
+		\draw[red, dashed] (-1,0.5) -- (3,3.15) node[midway, above, black] {C$'$};
+		
+		% Labels on the left arrow with markers
+		\node[left] at (0,0.3) {{\scriptsize 0.5}};
+		\node[left] at (0,1.5) {{\scriptsize 1.6}};
+		\node[left] at (0,3.1) {{\scriptsize 2.9}};
+		\draw[fill=black] (0,0.5) circle (1pt);
+		\draw[fill=black] (0,1.6) circle (1pt);
+		\draw[fill=black] (0,2.9) circle (1pt);
+		
+		% Labels on the right arrow with markers
+		\node[right] at (2,0.4) {{\scriptsize 0.6}};
+		\node[right] at (2,1.3) {{\scriptsize 1.2}};
+		\node[right] at (2,2.4) {{\scriptsize 2.5}};
+		\node[right] at (2,3.0) {{\scriptsize 2.8}};	
+		\draw[fill=black] (2,0.6) circle (1pt);
+		\draw[fill=black] (2,1.2) circle (1pt);
+		\draw[fill=black] (2,2.5) circle (1pt);
+		\draw[fill=black] (2,2.8) circle (1pt);
+	\end{tikzpicture}
 	\caption{The distributed signal in \cref{ex:distsig} with consistent cuts $C_1, C_2, C_3$}
 	\label{fig:distsig}
 \end{wrapfigure}
