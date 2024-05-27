@@ -65,33 +65,42 @@ def plot_data(n, data, ax):
         y_values = [float(y) if y != 'oot' else np.nan for y in y_values]  # Convert 'oot' to NaN for plotting
         ax.plot(eps_values, y_values, label=method, marker=marker, linestyle='-')
 
-    # Add vertical lines for each epsilon value
-    for eps in eps_values:
-        ax.axvline(x=eps, color='black', linestyle='-', linewidth=1)
-        spd = f'Speedups:\nFINE/COARSE:{speedups[n]["FINE/COARSE"][eps_values.index(eps)]}\nCOARSE/C-REL:{speedups[n]["COARSE/C-REL"][eps_values.index(eps)]}\nSMT/C-REL: {speedups[n]["SMT/C-REL"][eps_values.index(eps)]}'
-        ax.text(eps+0.0025, 5000, spd, rotation=0, fontsize=6, verticalalignment='top')
+    # # Add vertical lines for each epsilon value
+    # for eps in eps_values:
+    #     ax.axvline(x=eps, color='black', linestyle='-', linewidth=1)
+    #     spd = f'Speedups:\nFINE/COARSE:{speedups[n]["FINE/COARSE"][eps_values.index(eps)]}\nCOARSE/C-REL:{speedups[n]["COARSE/C-REL"][eps_values.index(eps)]}\nSMT/C-REL: {speedups[n]["SMT/C-REL"][eps_values.index(eps)]}'
+    #     ax.text(eps+0.0025, 10000, spd, rotation=0, fontsize=10, verticalalignment='top')
 
-    ax.set_xlabel('ε (in seconds)', fontsize=10)  # Adjust the font size as needed
+    ax.set_xlabel('ε (in seconds)', fontsize=12)  # Adjust the font size as needed
     if (n == 2):
-        ax.set_ylabel('Time (seconds)', fontsize=10)   # Adjust the font size as needed
-    ax.set_title(f'n={n}', fontsize=12)  # Adjust the font size as needed
+        ax.set_ylabel('Time (seconds)', fontsize=12)   # Adjust the font size as needed
+    ax.set_title(f'n={n}', fontsize=14)  # Adjust the font size as needed
     ax.set_xscale('log')
     ax.set_yscale('log')
-    ax.set_ylim(bottom=0, top=1e4)  # Adjust these values as needed
-    ax.set_xlim(left=min(eps_values) * 0.9, right=max(eps_values) * 2)
+    ax.set_ylim(bottom=0, top=2e2)  # Adjust these values as needed
+    ax.set_xlim(left=min(eps_values) * 0.9, right=max(eps_values) * 1.5)
     ax.set_xticks(eps_values)
     ax.set_xticklabels(eps_values)
-    ax.legend(fontsize=8, loc='lower right')  # Adjust the font size of the legend
+    # ax.legend(fontsize=12, loc='lower right')  # Adjust the font size of the legend
     ax.grid(True, which='both', linestyle='--', linewidth=0.5)
 
 
 # Create a single figure with multiple subplots arranged in a grid
-fig, axes = plt.subplots(1, len(n_values), figsize=(16, 3))  # Adjust the figsize as needed and specify the number of columns
+fig, axes = plt.subplots(1, len(n_values), figsize=(12, 4))  # Adjust the figsize as needed and specify the number of columns
+
+# Collect handles and labels for the legend
+handles, labels = [], []
 
 # Plot data for each n value
 for i, n in enumerate(n_values):
     ax = axes[i]  # Get the current axis for the subplot
     plot_data(n, data, ax)  # Plot data on the current subplot
+    if i == 0:
+        handles, labels = ax.get_legend_handles_labels()  # Collect handles and labels from the first subplot
 
-plt.tight_layout()  # Adjust subplot parameters to give specified padding
+# Create a single legend
+# Add the legend to the rightmost subplot
+axes[-1].legend(handles, labels, loc='lower right', fontsize=8)
+
+plt.tight_layout(rect=[0, 0, 1, 0.95])  # Adjust subplot parameters to give specified padding and room for the legend
 plt.show()
