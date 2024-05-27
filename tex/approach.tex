@@ -30,6 +30,15 @@ By extension, a segmentation of a collection of signals with the same temporal d
 %Intuitively, $\theta_{\text{lo}}$ and $\theta_{\text{hi}}$ give us the lower and upper bounds on the value of the monitor's clock for a given edge, i.e., the end points of the uncertainty region of the given edge.
 %We use these to describe a canonical segmentation of a distributed signal.
 
+\begin{wrapfigure}{r}{0.5\textwidth}
+	\vspace{-2em}
+	\begin{center}
+		\includegraphics[scale=0.5]{canonseg.png}
+	\end{center}
+	\caption{The signals $x_1$ (top, red, dashed) and $x_2$ (bottom, blue, solid) from \cref{ex:canonseg}. The edges are marked with solid balls and their uncertainty regions are given as semi-transparent boxes around the edges. The resulting canonical segmentation $G_S$ is shown below the graphical representation of the signals.}
+	\label{fig:canonseg}
+\end{wrapfigure}
+
 Let $(S,{\hb})$ be a distributed signal of $n$ signals.
 The \emph{canonical segmentation} $G_S$ of $(S,{\hb})$ is the segmentation of $S$ where the end points of the segments coincide with the end points of its temporal domain and uncertainty regions.
 Formally, we define $G_S$ as follows.
@@ -41,6 +50,8 @@ Let $F = \{0, d\} \cup \bigcup_{i = 1}^{n} F_i$ and let $(s_j)_{1
 \leq j \leq |F|}$ be a nondecreasing sequence of clock values corresponding to the elements of $F$.
 Then, the canonical segmentation of $(S,{\hb})$ is $G_S = \{I_1, \ldots, I_{|F| - 1}\}$ where $I_j = [s_j, s_{j+1})$ for all $1 \leq j < |F|$.
 
+
+
 \begin{example} \label{ex:canonseg}
 	Let $(S, {\hb})$ be a distributed Boolean signal with $S = (x_1, x_2)$ and $\varepsilon = 2$ over 
 	the temporal domain $[0,8)$ as given in \cref{fig:canonseg}.
@@ -50,14 +61,7 @@ Then, the canonical segmentation of $(S,{\hb})$ is $G_S = \{I_1, \ldots, I_{|F| 
 	Then, we have $F = \{0, 8\} \cup \{0, 1, 3, 4, 5, 7, 8\}$, and thus the canonical segmentation is $G_S = \{ [0,1), [1,3), [3,4), [4,5), [5,7), [7,8) \}$.
 \end{example}
 
-\begin{wrapfigure}{r}{0.5\textwidth}
-	\vspace{-2em}
-	\begin{center}
-		\includegraphics[scale=0.5]{canonseg.png}
-	\end{center}
-	\caption{The signals $x_1$ (top, red, dashed) and $x_2$ (bottom, blue, solid) from \cref{ex:canonseg}. The edges are marked with solid balls and their uncertainty regions are given as semi-transparent boxes around the edges. The resulting canonical segmentation $G_S$ is shown below the graphical representation of the signals.}
-	\label{fig:canonseg}
-\end{wrapfigure}
+
 
 
 \subsubsection{Value Expressions.}
@@ -71,6 +75,7 @@ When drop the concatenation symbol $\cdot$ when the letters are clear from the c
 Let us remark that this definition is general because finite-length piecewise-constant real-valued signals will only have a finite number of values, making $\Sigma$ finite.
 
 \begin{wrapfigure}{r}{0.5\textwidth}
+	\vspace{-2em}
 	\begin{center}
 		\includegraphics[scale=0.33]{valexpr.png}
 	\end{center}

@@ -131,9 +131,9 @@ The agents do not share memory or a global clock.
 Only to formalize statements, we speak of a \emph{hypothetical} global clock and denote its value by $T$.
 %
 For local time values, we use the lowercase letters $t$ and $s$.
-
-For a signal $x_i$, we denote by $V_i$ the set of its events, by $E_i^\uparrow$ the set of its rising edges, and by $E_i^\downarrow$ that of falling edges.
-Moreover, we let $E_i = E_i^\uparrow \cup E_i^\downarrow$.
+For a signal $x_i$, we denote by $V_i$ the set of its events, and by $E_i$ the set of its edges.
+%For a signal $x_i$, we denote by $V_i$ the set of its events, by $E_i^\uparrow$ the set of its rising edges, and by $E_i^\downarrow$ that of falling edges.
+%Moreover, we let $E_i = E_i^\uparrow \cup E_i^\downarrow$.
 %
 We represent the local clock of the $i$th agent as an increasing and divergent function $c_i : 
 \R_{\geq 0} \to \R_{\geq 0}$ that maps a global time $T$ to a local time $c_i(T)$.
@@ -167,11 +167,21 @@ A \emph{consistent cut flow} is a function $\ccf : \R_{\geq 0} \to 2^V$ that map
 For all $T,T' \in \R_{\geq 0}$ and $1 \leq i \leq n$, if $T < T'$, then for every pair of events $(c_i(T), x_i(c_i(T))) \in \ccf(T)$ and $(c_i(T'), x_i(c_i(T'))) \in \ccf(T')$ we have $(c_i(T), x_i(c_i(T))) \hb (c_i(T'), x_i(c_i(T')))$.
 We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distributed signal $(S,{\hb})$.
 
-\begin{example}
-	\alert{TODO: distributed signal, happened-before relation, consistent cut, frontier, consistent cut flow}
-	
-	Let $(S,{\hb})$ be a distributed signal with $S = (x_1, x_2)$ where 
+\begin{example} \label{ex:distsig}
+	Let $(S,{\hb})$ be a distributed signal with $S = (x_1, x_2)$ and $\varepsilon = 0.5$, where some events of $x_1$ and $x_2$ are marked on \cref{fig:distsig}.
+	For example, $(0.5, x_1(0.5)) \hb (1.7, x_1(1.7)) \hb (2.5, x_2(2.5)) \hb (2.8, x_2(2.8))$, but $(2.5, x_2(2.5)) \not\hb (2.9, x_1(2.9))$.
+	The solid blue lines marked with $C_1, C_2, C_3$ correspond to a consistent cut, e.g., $\fr(C_3) = \{(2.9, x_1(2.9)), (2.8, x_2(2.8))\}$, however $C'$ is not a consistent cut since $(2.5, x_2(2.5)) \in \fr(C')$ and $(1.7, x_1(1.7)) \hb (2.5, x_2(2.5))$ but $(1.7, x_1(1.7)) \notin \fr(C')$.
+	Moreover, the frontiers of these consistent cuts can be seen as produced by a consistent cut flow $\ccf$, e.g., with $\ccf(0.5) = \fr(C_1)$, $\ccf(1) = \fr(C_2)$, and $\ccf(2) = \fr(C_3)$.	
 \end{example}
+
+\begin{wrapfigure}{r}{0.3\textwidth}
+	\vspace{-2em}
+	\begin{center}
+		\includegraphics[scale=0.55]{distsig.png}
+	\end{center}
+	\caption{The distributed signal in \cref{ex:distsig} with consistent cuts $C_1, C_2, C_3$}
+	\label{fig:distsig}
+\end{wrapfigure}
 
 Observe that a consistent cut flow of a distributed signal induces a vector of synchronous signals which can be evaluated using the standard semantics described in \cref{sec:stl}.
 Let $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots, x_n$.
