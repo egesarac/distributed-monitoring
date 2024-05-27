@@ -367,7 +367,7 @@ Since signals are asynchronous within segments, we compute potential value sets 
 For instance, with $X_1 = \{2,3\}$ and $X_2 = \{0,1\}$, pairwise addition yields $\{2, 3, 4\}$.
 Assuming $x_1 + x_2$ is constant within this segment, we can avoid explicit interleaving computations.
 While \textsc{Fine} overapproximates traces when order matters, such as in $(x_1 > c_1) \until (x_2 > c_2)$, it preserves precision for formulas like $\LTLalways((x_1 - x_2) \cdot x_3 > c)$.
-The approach \textsc{Coarse} refines \textsc{Fine} by only considering extreme values, useful for monotonic operations where the extreme values of outputs derive from inputs.
+\alert{The approach \textsc{Coarse}} refines \textsc{Fine} by only considering extreme values, useful for monotonic operations where the extreme values of outputs derive from inputs.
 For instance, if $\min X_1 = 2$, $\max X_1 = 3$, $\min X_2 = 0$, and $\max X_2 = 1$, then $\min(x_1 + x_2) = 2$ and $\max(x_1 + x_2) = 4$.
 This way, we can efficiently maintain a smaller set of values and still preserve precision for formulas with monotonic operations.
 Lastly, assuming the monitor runs on a monitored agent reduces asynchrony by using the agent's clock as a reference point.
