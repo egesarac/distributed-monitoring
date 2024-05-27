@@ -150,9 +150,7 @@ We assume that the system is \emph{partially synchronous}: the agents use a cloc
 	\end{itemize}
 \end{definition}
 
-\begin{example}
-	\alert{TODO: distributed signal, happened-before relation}
-\end{example}
+The notion of consistent cut captures possible global states.
 
 \begin{definition}
 	Let $(S, {\hb})$ be a distributed signal of $n$ signals, and $V = \bigcup_{i = 1}^{n} V_i$ be the set of its events.
@@ -170,7 +168,9 @@ For all $T,T' \in \R_{\geq 0}$ and $1 \leq i \leq n$, if $T < T'$, then for ever
 We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distributed signal $(S,{\hb})$.
 
 \begin{example}
-	\alert{TODO: consistent cut, frontier, consistent cut flow}
+	\alert{TODO: distributed signal, happened-before relation, consistent cut, frontier, consistent cut flow}
+	
+	Let $(S,{\hb})$ be a distributed signal with $S = (x_1, x_2)$ where 
 \end{example}
 
 Observe that a consistent cut flow of a distributed signal induces a vector of synchronous signals which can be evaluated using the standard semantics described in \cref{sec:stl}.
@@ -215,6 +215,7 @@ A signal $(S,{\hb})$ satisfies (resp. violates) an STL$^+$ formula $\varphi$ iff
 
 In \cref{sec:approach,sec:algorithm}, we respectively define $\tr^+$ and present an algorithm to compute the semantics of STL$^+$.
 We finally prove the correctness of our approach.
+Note that we assume w.l.o.g. that $\varphi$ is \emph{copyless}, i.e., each signal $x \in S$ occurs in $\varphi$ at most once.
 
 \begin{theorem} \label{cl:stlsound}
 	For every STL formula $\varphi$ and every distributed signal $(S,{\hb})$, if $[(S,{\hb}) \models \varphi]_+ = \top$ (resp. $\bot$) then $[(S,{\hb}) \models \varphi] = \top$ (resp. $\bot$).
@@ -222,3 +223,4 @@ We finally prove the correctness of our approach.
 
 Notice that both the distributed semantics of STL and the semantics of STL$^+$ quantify universally over the set of traces for the verdicts $\top$ and $\bot$.
 Therefore, the \cref{cl:stlsound} holds for the verdicts $\top$ and $\bot$, but not for ${\,?}$.
+

@@ -202,12 +202,7 @@ We demonstrate this and the computation of $\mathsf{pfs}$ in \cref{ex:profiles} 
 	This set overapproximates the potential behaviors of $x_1$, for all $t \in [1,3)$, in the interval $t \oplus [0,1)$.
 \end{example}
 
-\begin{figure} 
-	\centering
-	\includegraphics[scale=0.45]{profiles.png}
-	\caption{The profiles of $J = [0,1)$ with respect to $x_1 \in S$ of \cref{ex:canonseg}. The four representative intervals of each profile is shown with solid black lines below the tabular representation of $\gamma$ for $x_1$.}
-	\label{fig:profiles}
-\end{figure}
+
 
 Let $\varphi_1$ and $\varphi_2$ be two STL formulas.
 Intuitively, once we have the profiles of a given interval $J$ with respect to $\varphi_1$ and $\varphi_2$, we can evaluate the corresponding untimed formulas on the product of these profiles and concatenate them.
@@ -240,6 +235,16 @@ where $\mathsf{pfs}((S,{\hb}), \varphi_1, I, J) = \{P_1, \ldots, P_k \}$ and $\m
 	Then, we concatenate these sets and destutter to obtain the following:
 	\[ 	\llbracket (S, {\hb}), [1,3) \models \LTLeventually_{[0,1)} x_1 \rrbracket = \{ 0, 01, 010, 0101, 01010, 1, 10, 101, 1010 \}  \]
 \end{example}
+
+\begin{wrapfigure}{r}{0.5\textwidth}
+	\vspace{-4em}
+	\begin{center}
+		\includegraphics[scale=0.33]{profiles.png}
+	\end{center}
+	\caption{The profiles of $J = [0,1)$ with respect to $x_1 \in S$ of \cref{ex:canonseg}. The four representative intervals of each profile is shown with solid black lines below the tabular representation of $\gamma$ for $x_1$.}
+	\label{fig:profiles}
+	\vspace{-4em}
+\end{wrapfigure}
 
 \subsubsection{Computing the Semantics of STL$^+$.}
 
