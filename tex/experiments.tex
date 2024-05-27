@@ -30,9 +30,9 @@ We use the abbreviation EDM to denote the variant of the exact SMT-based distrib
 
 
 \subsubsection{Experimental Subjects}
-To answer our research questions, we also use a \emph{random generator} (RG) of distributed traces, in which we can control the trace duration $d$ (in terms of the number of events).and the bound on the clock skew $\varepsilon$.
-%
-We also consider two real-world, publicly accessible applications, a \emph{heat pump} (HP) and a \emph{swarm of drones} (SD). In addition, to have more quantitative and statistically relevant results,  
+To answer our research questions, we use (1) a \emph{random generator} (RG) of distributed traces, (2) a \emph{heat pump} (HP) case study, and (3) a \emph{swarm of drones} (SD) case study.  
+
+\noindent \emph{The random generator (RG)} uses uniform distribution to generate distributed traces, in which the user can control the duration $d$ of the trace, as well as the $\epsilon$ bound on the uncertainty at which the events happen.
 
 \noindent \emph{Heat pump (HP)} models...
 \alert{TODO}
@@ -42,25 +42,28 @@ We also consider two real-world, publicly accessible applications, a \emph{heat 
 
 \subsubsection{Specifications}
 
+Table~\ref{tab:spec} summarizes the STL specifications that we use to monitor the behavior of our three experimental subjects. Specifications $\varphi_{1-5}$ are applied to the distributed traces created by the random generator and represent different classes and fragments of Boolean-valued temporal formulas. The first specification $\varphi_1$ is an LTL formula in which both the outer temporal operator ($\LTLg$) and the inner Boolean operator ($\wedge$) are conjunctive. The second specification $\varphi_2$ puts instead a disjunction within the scope of the conjunctive temporal $\LTLg$ operator. The third specification $\varphi_3$ is a simple \emph{until} formula. The fourth formula $\varphi_4$ is the common LTL response formula, while $\varphi_5$ adds a bounded real-time response requirement to the previous specification. The specification $\varphi_{HP}$ associated to the heat pump case study is an STL formula in which a sum of signals originating from different agents is compared to a constant. FInally, the specification $\varphi_{SD}$ defines a mutual separation property that requires more sophisticated arithmetic operations on signals originating from different agents.  
+
 \begin{table}
 \centering
 \begin{tabular}{|l|l|l|l|}
 \hline
-Subject & Spec ID & STL formula & Comments \\
+Subject & Spec ID & STL formula \\
 \hline
 \multirow{ 5}{*}{RG}
-& $\varphi_1$ & $\LTLg (p \wedge q)$ & \multirow{ 5}{*}{untimed} \\
+& $\varphi_1$ & $\LTLg (p \wedge q)$  \\
 & $\varphi_2$ & $\LTLg (p \vee q)$ & \\
-& $\varphi_3$ & $\LTLg (p \Rightarrow \LTLf q)$ & \\
-& $\varphi_4$ & $\LTLg (p \Rightarrow \LTLf_{[0,2)} q)$  & \\
+& $\varphi_3$ & $ p \LTLuntil q$ & \\
+& $\varphi_4$ & $\LTLg (p \Rightarrow \LTLf q)$ \\
+& $\varphi_5$ & $\LTLg (p \Rightarrow \LTLf_{[0,2)} q)$  \\
 %& $\varphi_1$ & $\LTLg (p \wedge q)$ & \multirow{ 5}{*}{untimed} \\
 %& $\varphi_2$ & $\LTLf (p \vee q)$ & \\
 %& $\varphi_3$ & $\LTLg (p \vee q)$ & \\
 %& $\varphi_4$ & $\LTLf (p \wedge q)$ & \\
 %& $\varphi_5$ & $p \until q$ & \\
 \hline
-HP & $\varphi_{HP}$ & $\LTLg \left(\sum_{i=1}^{n} x_i  > c\right)$ & \multirow{ 2}{*}{arithmetic + numeric predicates} \\
-SD & $\varphi_{SD}$ & $\bigwedge_{1 \leq i \neq j \leq n} \LTLg \left( \sqrt{(x_i-x_j)^2 + (y_i-y_j)^2 + (z_i-z_j)^2} > c \right)$ &  \\
+HP & $\varphi_{HP}$ & $\LTLg \left(\sum_{i=1}^{n} x_i  > c\right)$  \\
+SD & $\varphi_{SD}$ & $\bigwedge_{1 \leq i \neq j \leq n} \LTLg \left( \sqrt{(x_i-x_j)^2 + (y_i-y_j)^2 + (z_i-z_j)^2} > c \right)$   \\
 \hline
 \end{tabular}
 \caption{STL specifications used in the experiments.}
@@ -73,11 +76,20 @@ To conduct the experiments, we used a laptop with Ubuntu 24.04, an AMD Ryzen 7 4
 Our tool is implemented in C++ and compiled using \texttt{g++} version 13.2.0 with the optimization flag \texttt{-O3} enabled.
 The precise method invokes the SMT-solver Z3 \cite{MouraB08} and is based on \cite{MomtazAB23}.
 
-\subsubsection{Results and Discussion}
-\alert{TODO}
-\begin{figure}[htb]
+\subsubsection{Results}
+
+We first conducted the experiments on ditributed traces created by RG and evaluated on specifications $\varphi_1$ to $\varphi_5$. Figure~\ref{fig:rgresults} summarizes the results of the experiments. Each row in Figure~\ref{fig:rgresults} shows the result for a specific formula. The first column in the figure depicts a heatmap where each cell shows how many times ADF is faster than EDF when evaluating the formula on the give distributed trace with duration $d$ and uncertainty bound $\epsilon$. The second column shows a heatmap where every cell shows the percentage of \emph{false postitives} (FP) introduced by ADM, where a false positive happens when ADM does not agree with EDM, i.e. ADM evaluates to inconclusive when the real verdict is true or false. Finally, the third column depicts a heat map, where each cell estimates the achieved speedup when combining ADM with EDM, compared to using only EDM.
+
+\begin{figure}
 	\begin{center}
 	\includegraphics[width=\linewidth]{speedup}
-\caption{The experimental results.}
+\caption{The experimental results - monitoring of specifications $\varphi_{1}$ to $\varphi_{5}$ on distributed traces created by the RG.}
+\label{fig:rgresults}
 \end{center}
 \end{figure}
+
+We first observe that the approximate ADM approach consistently achieves computational speedups of \emph{several orders of magnitude} 
+compared to the exact EDM approach. The absolute speedups range from several thousands to almost 60 thousand times, regardless of the considered specification, the duration $d$ of the trace, or the uncertainty $\epsilon$ bound. We see that the highest speedups are achieved for long signals with low uncertainty bounds. The price paid in terms of accuracy is highly dependendent on the type of specification and the uncertainty bounds. We can see that applying ADM is very accurate when monitoring the property 
+$\varphi_1$ in which both the temporal and the combinatorial operators are conjunctive. On the other hand, having a combination of conjunctive and disjunctive operations (specifications $\varphi_{2}$, $\varphi_{3}$ and $\varphi_{4}$) increases the number of FPs.  Surprisingly, we see that in these cases the introduction of FPs is higher for lower values of $\epsilon$. This happens because that for higher values of $\epsilon$,  even the exact method gives many inconclusive verdicts. Finally, we see that adding real-time modalities to the temporal operators adds inacuracies and increases further the percentage of FPs. Finally, by observing the third column of Figure~\ref{fig:rgresults}, we can see that by combining EDM and ADM, we consistently get better performance than by using EDM only, even in cases where ADM introduces a high percentage of FPs.
+
+
