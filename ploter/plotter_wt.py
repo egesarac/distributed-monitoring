@@ -75,10 +75,10 @@ def plot_data(n, data, ax):
     if (n == 2):
         ax.set_ylabel('Time (seconds)', fontsize=12)   # Adjust the font size as needed
     ax.set_title(f'n={n}', fontsize=14)  # Adjust the font size as needed
-    ax.set_xscale('log')
+    # ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_ylim(bottom=0, top=2e2)  # Adjust these values as needed
-    ax.set_xlim(left=min(eps_values) * 0.9, right=max(eps_values) * 1.5)
+    ax.set_xlim(left=min(eps_values) * 0.9, right=max(eps_values) * 1.1)
     ax.set_xticks(eps_values)
     ax.set_xticklabels(eps_values)
     # ax.legend(fontsize=12, loc='lower right')  # Adjust the font size of the legend

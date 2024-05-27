@@ -1,21 +1,18 @@
 \section{Overapproximation of Synchronous Traces} \label{sec:approach}
 In this section, given a distributed signal $(S,{\hb})$, we describe an overapproximation $\tr^+(S,{\hb})$ of its set $\tr(S,{\hb})$ of synchronous traces.
-First, we present the notion of \emph{canonical segmentation}, a systematic way of partitioning the temporal domain of a given distributed signal to keep track of the partial asynchrony.
-Second, we introduce the notion of \emph{value expressions}, sets of finite words representing how a signal behaves in a time interval.
-Finally, we define $\tr^+$ based on these notions, and show that it soundly approximates $\tr$.
+First, we present the notion of \emph{canonical segmentation}, a systematic way of partitioning the temporal domain of a distributed signal to track partial asynchrony.
+Second, we introduce \emph{value expressions}, sets of finite words representing signal behavior in a time interval.
+Finally, we define $\tr^+$ based on these notions, showing it soundly approximates $\tr$.
 
 \begin{remark}
-	We assume Boolean signals in this section for convenience (all results hold for non-Boolean 
-	signals).
-	%
-	The definitions and results presented here extend to real-valued signals because finite-length piecewise-constant signals will only use a finite number of values.
+	We assume Boolean signals for convenience (all results hold for non-Boolean signals).
+	The definitions and results extend to real-valued signals because finite-length piecewise-constant signals use only a finite number of values.
 \end{remark}
 
 \subsubsection{Canonical Segmentation.}
 Consider a Boolean signal $x$ with a rising edge at time $t > \varepsilon$.
-Due to clock skew, this edge occurs in the range $(t - \varepsilon, t + \varepsilon)$ from the monitor's point of view.
-This range is called an \emph{uncertainty region} because in $(t - \varepsilon, t + \varepsilon)$ the monitor cannot tell the value of $x$ precisely, but only that it changes from 0 to 1.
-Formally, given an edge $(t, x(t))$, we define $\theta_{\text{lo}}(x,t) = \max(0, t - \varepsilon)$ and $\theta_{\text{hi}}(x,t) = \min(d, t + \varepsilon)$ as the end points of the edge's uncertainty region.
+Due to clock skew, this edge occurs in the range $(t - \varepsilon, t + \varepsilon)$ from the monitor's perspective.
+This range is an \emph{uncertainty region} because within it, the monitor can only tell that $x$ changes from 0 to 1. Formally, given an edge $(t, x(t))$, we define $\theta_{\text{lo}}(x,t) = \max(0, t - \varepsilon)$ and $\theta_{\text{hi}}(x,t) = \min(d, t + \varepsilon)$ as the endpoints of the edge's uncertainty region.
 
 Given a temporal domain $I = [0,d) \subset \R_{\geq 0}$, a \emph{segmentation} of $I$ is a partition of $I$ into finitely many intervals $I_1, \ldots, I_k$, called \emph{segments}, of the form $I_j = [t_j, t_{j+1})$ such that $t_j < t_{j+1}$ for all $1 \leq j \leq k$.
 By extension, a segmentation of a collection of signals with the same temporal domain $I$ is a segmentation of $I$.
@@ -32,7 +29,7 @@ By extension, a segmentation of a collection of signals with the same temporal d
 
 
 \begin{wrapfigure}{r}{0.5\textwidth}
-	\vspace{-2em}
+%	\vspace{-2em}
 	\begin{tikzpicture}[scale=0.6]
 		\footnotesize 
 		
@@ -92,7 +89,7 @@ By extension, a segmentation of a collection of signals with the same temporal d
 	\end{tikzpicture}
 	\caption{The signals $x_1$ (top, red, dashed) and $x_2$ (bottom, blue, solid) from \cref{ex:canonseg}. The edges are marked with solid balls and their uncertainty regions are given as semi-transparent boxes around the edges. The resulting canonical segmentation $G_S$ is shown below the graphical representation of the signals.}
 	\label{fig:canonseg}
-	\vspace{-2em}
+%	\vspace{-2em}
 \end{wrapfigure}
 
 %\begin{wrapfigure}{r}{0.5\textwidth}
@@ -104,13 +101,13 @@ By extension, a segmentation of a collection of signals with the same temporal d
 %	\label{fig:canonseg}
 %\end{wrapfigure}
 
+%%%EGE: START HERE
+
 Let $(S,{\hb})$ be a distributed signal of $n$ signals.
 The \emph{canonical segmentation} $G_S$ of $(S,{\hb})$ is the segmentation of $S$ where the end points of the segments coincide with the end points of its temporal domain and uncertainty regions.
 Formally, we define $G_S$ as follows.
 For each signal $x_i$, where $1 \leq i \leq n$, let $F_i$ be the set of end points of its 
 uncertainty regions.
-%Let $d' = \max(d, \max (\bigcup_{i = 1}^{n} F_i))$, which corresponds to the duration of the distributed signal with respect to the monitor's clock.
-%
 Let $F = \{0, d\} \cup \bigcup_{i = 1}^{n} F_i$ and let $(s_j)_{1 
 \leq j \leq |F|}$ be a nondecreasing sequence of clock values corresponding to the elements of $F$.
 Then, the canonical segmentation of $(S,{\hb})$ is $G_S = \{I_1, \ldots, I_{|F| - 1}\}$ where $I_j = [s_j, s_{j+1})$ for all $1 \leq j < |F|$.
@@ -140,7 +137,7 @@ When drop the concatenation symbol $\cdot$ when the letters are clear from the c
 Let us remark that this definition is general because finite-length piecewise-constant real-valued signals will only have a finite number of values, making $\Sigma$ finite.
 
 \begin{wrapfigure}{r}{0.5\textwidth}
-	\vspace{-2em}
+%	\vspace{-2em}
 
 \begin{tikzpicture}[scale=0.6]
 	\small
