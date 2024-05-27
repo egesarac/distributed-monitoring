@@ -77,6 +77,7 @@ Our tool is implemented in C++ and compiled using \texttt{g++} version 13.2.0 wi
 The precise method invokes the SMT-solver Z3 \cite{MouraB08} and is based on \cite{MomtazAB23}.
 
 \subsubsection{Results}
+\ege{maybe we can move some of the synthetic experiments to the appendix?}
 
 We first conducted the experiments on ditributed traces created by RG and evaluated on specifications $\varphi_1$ to $\varphi_5$. Figure~\ref{fig:rgresults} summarizes the results of the experiments. Each row in Figure~\ref{fig:rgresults} shows the result for a specific formula. The first column in the figure depicts a heatmap where each cell shows how many times ADF is faster than EDF when evaluating the formula on the give distributed trace with duration $d$ and uncertainty bound $\epsilon$. The second column shows a heatmap where every cell shows the percentage of \emph{false postitives} (FP) introduced by ADM, where a false positive happens when ADM does not agree with EDM, i.e. ADM evaluates to inconclusive when the real verdict is true or false. Finally, the third column depicts a heat map, where each cell estimates the achieved speedup when combining ADM with EDM, compared to using only EDM.
 
@@ -92,4 +93,36 @@ We first observe that the approximate ADM approach consistently achieves computa
 compared to the exact EDM approach. The absolute speedups range from several thousands to almost 60 thousand times, regardless of the considered specification, the duration $d$ of the trace, or the uncertainty $\epsilon$ bound. We see that the highest speedups are achieved for long signals with low uncertainty bounds. The price paid in terms of accuracy is highly dependendent on the type of specification and the uncertainty bounds. We can see that applying ADM is very accurate when monitoring the property 
 $\varphi_1$ in which both the temporal and the combinatorial operators are conjunctive. On the other hand, having a combination of conjunctive and disjunctive operations (specifications $\varphi_{2}$, $\varphi_{3}$ and $\varphi_{4}$) increases the number of FPs.  Surprisingly, we see that in these cases the introduction of FPs is higher for lower values of $\epsilon$. This happens because that for higher values of $\epsilon$,  even the exact method gives many inconclusive verdicts. Finally, we see that adding real-time modalities to the temporal operators adds inacuracies and increases further the percentage of FPs. Finally, by observing the third column of Figure~\ref{fig:rgresults}, we can see that by combining EDM and ADM, we consistently get better performance than by using EDM only, even in cases where ADM introduces a high percentage of FPs.
 
+
+\begin{figure}[htb]
+	\begin{center}
+		\includegraphics[width=\linewidth]{wtlin.png}
+		\caption{Water tanks log-linear scale, out-of-time limit 120s}
+	\end{center}
+\end{figure}
+
+\subsubsection{Water Tanks Discussion.}
+Speedups tend to increase with the number of signals \(n\) and decrease with the maximum clock skew \(\varepsilon\).
+The \textsc{Coarse} method demonstrates significant performance improvements over EDM, achieving up to a $104000\times$ speedup in the best-case scenario (when \(n=4\) and \(\varepsilon=0.05\)), and an $8\times$ speedup in the worst-case (when \(n=2\) and \(\varepsilon=0.4\)).
+It is important to note that \(\varepsilon=0.4\) is near the upper limit of a realistic value for this scenario, indicating that our approach does not suffer from scalability issues.
+The decentralized approach \textsc{Coarse-Relative} further enhances performance, adding up to a $1.63\times$ speedup on top of \textsc{Coarse}.
+For \textsc{Fine}, decentralization provides a substantial benefit, resulting in up to a $476\times$ speedup in instances where \textsc{Fine} did not time out.
+As expected, the explicit computation of asynchronous products (\textsc{Orig}) does not perform well.
+All methods produce the same verdict for the considered traces.
+
+\begin{figure}[htb]
+	\begin{center}
+		\includegraphics[width=\linewidth]{ms.png}
+		\caption{Mutual separation log-linear scale, out-of-time limit 360s}
+	\end{center}
+\end{figure}
+
+\subsubsection{Mutual Separation Discussion.}
+Similar to the water tanks scenario, speedups in the mutual separation case increase with \(n\) and decrease with \(\varepsilon\).
+The \textsc{Fine-Relative} method achieves about a $78000\times$ speedup in the best-case scenario (when \(n=4\) and \(\varepsilon=0.05\)) and a $23\times$ speedup in the worst-case (when \(n=2\) and \(\varepsilon=0.25\)).
+The fine method performs slower than SMT in two cases where \(n\) is small and \(\varepsilon\) is large.
+\ege{Does NTP guarantee a smaller $\varepsilon$ with fewer number of nodes?}
+As in the water tanks discussion, \textsc{Orig} does not perform well due to the complexity of the arithmetic operations involved, which causes further blowup when computing asynchronous products explicitly.
+Additionally, \textsc{Coarse} and \textsc{Coarse-Relative} are not applicable in this scenario because the arithmetic operations are not monotonic.
+Again, all methods yield the same verdicts.
 
