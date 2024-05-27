@@ -9,8 +9,8 @@
 	Then, it holds that $w \models \varphi$ for all $w \in \tr(S,{\hb})$.
 	Therefore, $[(S,{\hb}) \models \varphi] = \top$ by definition.
 	The case of $[(S,{\hb}) \models \varphi]_+ = \bot$ follows from the same arguments.
-	
-	\qed
+%	
+%	\qed
 \end{proof}
 
 \subsubsection{Proof of \cref{cl:trsound}.}
@@ -27,9 +27,9 @@
 	To show that $y_i$ is $I$-consistent with $x_i$, we need to show that the expression $y_i(t_0) \cdot y_i(t_1) \cdot \ldots \cdot y_i(t_\ell)$ belongs to $\gamma(x_i,I)$.
 	We sketch the proof idea below.
 	
-	Note that $w$ can be seen as a trace obtained through an $\varepsilon$-retiming of $S$ (see \cite[Section 4.2]{MomtazAB23}).
+	Note that $w$ can be seen as a trace obtained through an $\varepsilon$-retiming of $S$ (\cite[Section 4.2]{MomtazAB23}).
 	Then, the timestamp $t$ of any edge of $x_i$ is mapped to some clock value in the range $(\theta_{\text{lo}}(t), \theta_{\text{hi}}(t))$.
-	In particular, $|t - c^{-1}_i(t)| < \varepsilon$ for all $t \in \{t_0, t_1, \ldots, t_\ell\}$, where $c^{-1}_i(t)$ is the local clock value of $x_i$ that is mapped to $t$.
+	In particular, $|t - c^{-1}_i(t)| < \varepsilon$ for all $t \in \{t_0, t_1, \ldots, t_\ell\}$, where $c^{-1}_i(t)$ is the local clock value of $x_i$ mapped to $t$.
 	
 	Since $y_i$ has $\ell$ edges in $I$, it holds that $x_i$ has at least $\ell$ edges in $(t_0 - \varepsilon, s + \varepsilon)$.
 	Since $I$ is a segment in $G_S$, there are $\ell$ of these that are consecutive such that the intersection of their uncertainty regions contain $(t_0,s)$, i.e., $(t_0,s) \subseteq \bigcap_{1 \leq j \leq \ell} (\theta_{\text{lo}}(t_j'), \theta_{\text{hi}}(t_j'))$ where $t_j' = c^{-1}_i(t_j)$ is the corresponding timestamp in $x_i$ for all $0 \leq j \leq \ell$.
@@ -43,8 +43,8 @@
 
 	Note that if there are more edges of $x_i$ with a timestamp smaller than $t_0'$ or larger than $t_\ell'$ whose uncertainty intervals intersect with $I$, then the corresponding set of value expressions is obtained either by prefixing or suffixing.
 	In either case, we can choose $\epsilon$ from these sets for concatenation with the remaining edges' value expressions and obtain the desired result.
-	
-	\qed
+%	
+%	\qed
 \end{proof}
 
 \subsubsection{Proof of \cref{cl:algo}.}
@@ -72,14 +72,14 @@ Given a set  $R$ of (synchronous) traces, we further define $Y(\varphi, R, I) = 
 	Let $(S,{\hb})$ be a distributed signal, $\varphi$ an STL formula, and $I \in G_S$ a segment.
 	We sketch each case below.
 	
-	\vspace{1em}
+%	\vspace{1em}
 	\noindent\textbf{Atomic propositions.}
 	For the base case, let $\varphi = p$ for some $p \in \AP$.
 	Note that $\llbracket (S, {\hb}), I \models p \rrbracket = \gamma(x_p, I)$ where $x_p$ is the signal encoding $p$.
 	Moreover, by the definition of $\tr^+(S,{\hb})$, the set $Y(p, \tr^+(S,{\hb}), I)$ contains exactly the signals that are consistent with $x_p$ sliced over $I$.
 	Then, it is easy to see that the set $\pi(Y(p, \tr^+(S,{\hb}), I))$ of value expressions coincide with $\gamma(x_p, I)$.
 	
-	\vspace{1em}
+%	\vspace{1em}
 	\noindent\textbf{Negation.}
 	Let $\varphi = \lnot \psi$ for some formula $\psi$ such that $\pi(Y(\psi, \tr^+(S,{\hb}), I)) = \llbracket (S,{\hb}), I \models \psi \rrbracket$.
 	Note that $\llbracket (S,{\hb}), I \models \lnot \psi \rrbracket$ contains exactly the bitwise negations of the Boolean value expressions in $\llbracket (S,{\hb}), I \models \psi \rrbracket$.
@@ -87,7 +87,7 @@ Given a set  $R$ of (synchronous) traces, we further define $Y(\varphi, R, I) = 
 	Then, clearly, $\pi(Y(\lnot\psi, \tr^+(S,{\hb}), I))$ contains exactly the bitwise negations of the expressions in $\pi(Y(\psi, \tr^+(S,{\hb}), I))$.
 	Finally, since $\pi(Y(\psi, \tr^+(S,{\hb}), I)) = \llbracket (S,{\hb}), I \models \psi \rrbracket$, we obtain $\pi(Y(\lnot\psi, \tr^+(S,{\hb}), I)) = \llbracket (S,{\hb}), I \models \lnot\psi \rrbracket$.
 	
-	\vspace{1em}
+%	\vspace{1em}
 	\noindent\textbf{Conjunction.}
 	Let $\varphi = \psi_1 \land \psi_2$ for some formulas $\psi_1, \psi_2$ such that $\pi(Y(\psi_i, \tr^+(S,{\hb}), I)) = \llbracket (S,{\hb}), I \models \psi_i \rrbracket$ for each $i \in \{1,2\}$.
 	Note that $\llbracket (S,{\hb}), I \models \psi_1 \land \psi_2 \rrbracket$ contains exactly the bitwise conjunction of the pairs of value expressions in the asynchronous product of $\llbracket (S,{\hb}), I \models \psi_1 \rrbracket$ and $\llbracket (S,{\hb}), I \models \psi_2 \rrbracket$, or equivalently those of $\pi(Y(\psi_1, \tr^+(S,{\hb}), I))$ and $\pi(Y(\psi_2, \tr^+(S,{\hb}), I))$ by our initial assumption.
@@ -104,7 +104,7 @@ Given a set  $R$ of (synchronous) traces, we further define $Y(\varphi, R, I) = 
 	Let $(u_1,u_2)$ be a pair of value expressions of the same length obtained from $y_{\psi_1, w, I}$ and $y_{\psi_2, w, I}$ by sampling both signals at time 0 and whenever one of the signals has an edge.
 	It is easy to see that $(u_1,u_2)$ belongs to $\pi(Y(\psi_1, \tr^+(S,{\hb}), I)) \otimes \pi(Y(\psi_2, \tr^+(S,{\hb}), I))$.
 	
-	\vspace{1em}
+%	\vspace{1em}
 	\noindent\textbf{Untimed until.}
 	Let $\varphi = \psi_1 \until \psi_2$ for some formulas $\psi_1, \psi_2$ such that $\pi(Y(\psi_i, \tr^+(S,{\hb}), I)) = \llbracket (S,{\hb}), I \models \psi_i \rrbracket$ for each $i \in \{1,2\}$.
 	The key difference to the case of conjunction is that this is a temporal operator whose values at segment $I$ depends on the future segments.
@@ -120,7 +120,7 @@ Given a set  $R$ of (synchronous) traces, we further define $Y(\varphi, R, I) = 
 	Then, one can verify using the definitions that $\pi(Y(\psi_1 \until \psi_2, \tr^+(S,{\hb}), J_{k-1})) = \llbracket (S,{\hb}), J_{k-1} \models \psi_1 \until \psi_2 \rrbracket$.
 	Repeating this down to segment $I$, we obtain the desired outcome.
 	
-	\vspace{1em}
+%	\vspace{1em}
 	\noindent\textbf{Timed until.}
 	Let $\varphi = \psi_1 \until_J \psi_2$ for some interval $J$ and formulas $\psi_1, \psi_2$ such that $\pi(Y(\psi_i, \tr^+(S,{\hb}), I)) = \llbracket (S,{\hb}), I \models \psi_i \rrbracket$ for each $i \in \{1,2\}$.
 	The key difference to the case of untimed until is that we need to take into account the profiles of $J$ with respect to $(S,{\hb})$, $\psi_1$, $\psi_2$, and $I$.
@@ -138,10 +138,10 @@ Given a set  $R$ of (synchronous) traces, we further define $Y(\varphi, R, I) = 
 	Now, we argue below that the left-hand side equals $\pi(Y(\psi_1 \until_J \psi_2, \tr^+(S,{\hb}), I ))$, concluding the proof.
 
 	Let $y_j \in Y(\psi_1 \until \psi_2, \tr^+_{K_j}(S,{\hb}), K_j)$ for each $1 \leq j \leq k$.
-	Then, using the same arguments of copylessness and asynchronicity withing segments, we can show that there exists $y \in Y(\psi_1 \until_J \psi_2, \tr^+(S,{\hb}), I)$ such that $\pi(y) = \destutter( \pi(y_1) \cdot \ldots \cdot \pi(y_k) )$.
+	Then, using the arguments of copylessness and asynchronicity within segments as before, we can show that there exists $y \in Y(\psi_1 \until_J \psi_2, \tr^+(S,{\hb}), I)$ such that $\pi(y) = \destutter( \pi(y_1) \cdot \ldots \cdot \pi(y_k) )$.
 	The other direction can be proved using the hypothesis and the definition of $\tr^+$.
-	
-	\qed
+%	
+%	\qed
 \end{proof}
 
 We now proceed to prove \cref{cl:algo}.
@@ -156,6 +156,6 @@ We now proceed to prove \cref{cl:algo}.
 	By \cref{cl:eq}, this also holds for $\pi(Y(\varphi, \tr^+(S,{\hb}), I))$ where $I$ is the first segment in $G_S$.
 	Then, for all $y \in Y(\varphi, \tr^+(S,{\hb}), I)$ we have $y(0) = 1$, which means every $w \in \tr^+(S,{\hb})$ satisfies $\varphi$, and thus $[(S,{\hb}) \models \varphi]_+ = \top$.
 	The cases of $\bot$ and ${\,?}$ are similar.
-
-	\qed
+%
+%	\qed
 \end{proof}
