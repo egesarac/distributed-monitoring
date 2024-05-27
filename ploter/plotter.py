@@ -5,12 +5,12 @@ import numpy as np
 from matplotlib import colormaps
 
 # filenames
-f1 = '../results/gand.csv'
-f2 = '../results/gor.csv'
-f3 = '../results/gimpf.csv'
-f4 = '../results/gimpft1.csv'
+f1 = '../results/01gand.csv'
+f2 = '../results/02gor.csv'
+f3 = '../results/03gimpf.csv'
+f4 = '../results/04gimpft1.csv'
 
-dtype = {"d": int, "eps": int, "EDM": float, "ADM": float, "FP": float,"speedup": float, "label": str}
+dtype = {"d": int, "eps": int, "ADM": float, "EDM": float, "FP": float,"speedup": float, "label": str}
 
 fs = [f1, f2, f3, f4]
 
@@ -25,16 +25,16 @@ for i in range(len(fs)):
     data_speedup = df.pivot_table('speedup', 'eps', 'd', fill_value=float('nan'), dropna=False)
     data_speedup_label = df.pivot_table(values='label', index='eps', columns='d', aggfunc=lambda x: ''.join(str(v) for v in x),
                                     fill_value='')
-    data_speedup_label = data_speedup_label.applymap(lambda x: x.replace('\\n', '\n'))
+    data_speedup_label = data_speedup_label.map(lambda x: x.replace('\\n', '\n'))
 
     sns.heatmap(data_speedup, cmap='GnBu', annot=data_speedup_label, linewidth=0.5, ax=axs[i][0], fmt='', vmin=0, vmax=60000)
 
-    axs[i][0].set(xlabel="eps", ylabel="duration")
+    axs[i][0].set(xlabel="duration", ylabel="epsilon")
     axs[i][0].set_yticks([0.5, 1.5, 2.5, 3.5], labels=list(data_speedup.index.values))
 
     sns.heatmap(data_fp, cmap='GnBu', annot=data_fp, linewidth=0.5, ax=axs[i][1], vmin=0, vmax=100)
 
-    axs[i][1].set(xlabel="eps", ylabel='')
+    axs[i][1].set(xlabel="duration", ylabel='')
     axs[i][1].set_yticks([0.5, 1.5, 2.5, 3.5], labels=list(data_fp.index.values))
 
     if i==0:

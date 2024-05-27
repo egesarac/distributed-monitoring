@@ -169,8 +169,8 @@ We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distribu
 
 \begin{example} \label{ex:distsig}
 	Let $(S,{\hb})$ be a distributed signal with $S = (x_1, x_2)$ and $\varepsilon = 0.5$, where some events of $x_1$ and $x_2$ are marked on \cref{fig:distsig}.
-	For example, $(0.5, x_1(0.5)) \hb (1.7, x_1(1.7)) \hb (2.5, x_2(2.5)) \hb (2.8, x_2(2.8))$, but $(2.5, x_2(2.5)) \not\hb (2.9, x_1(2.9))$.
-	The solid blue lines marked with $C_1, C_2, C_3$ correspond to a consistent cut, e.g., $\fr(C_3) = \{(2.9, x_1(2.9)), (2.8, x_2(2.8))\}$, however $C'$ is not a consistent cut since $(2.5, x_2(2.5)) \in \fr(C')$ and $(1.7, x_1(1.7)) \hb (2.5, x_2(2.5))$ but $(1.7, x_1(1.7)) \notin \fr(C')$.
+	For example, $(0.5, x_1(0.5)) \hb (1.6, x_1(1.6)) \hb (2.5, x_2(2.5)) \hb (2.8, x_2(2.8))$, but $(2.5, x_2(2.5)) \not\hb (2.9, x_1(2.9))$.
+	The solid blue lines marked with $C_1, C_2, C_3$ correspond to a consistent cut, e.g., $\fr(C_3) = \{(2.9, x_1(2.9)), (2.8, x_2(2.8))\}$, however $C'$ is not a consistent cut since $(2.5, x_2(2.5)) \in \fr(C')$ and $(1.6, x_1(1.6)) \hb (2.5, x_2(2.5))$ but $(1.6, x_1(1.6)) \notin \fr(C')$.
 	Moreover, the frontiers of these consistent cuts can be seen as produced by a consistent cut flow $\ccf$, e.g., with $\ccf(0.5) = \fr(C_1)$, $\ccf(1) = \fr(C_2)$, and $\ccf(2) = \fr(C_3)$.	
 \end{example}
 
@@ -221,7 +221,7 @@ We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distribu
 	\label{fig:distsig}
 \end{wrapfigure}
 
-Observe that a consistent cut flow of a distributed signal induces a vector of synchronous signals which can be evaluated using the standard semantics described in \cref{sec:stl}.
+Observe that a consistent cut flow of a distributed signal induces a vector of synchronous signals which can be evaluated using the standard semantics described above.
 Let $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots, x_n$.
 A consistent cut flow $\ccf \in \CCF(S,{\hb})$ yields a trace $w_{\ccf} = (x'_1, \ldots x'_n)$ on the temporal domain $[0,d)$ such that $(c_i(T), x_i(c_i(T))) \in \ccf(T)$ implies $x_i'(T) = x_i(c_i(T))$ for all $1 \leq i \leq n$ and $T \in [0, d)$.
 The set of traces of $(S,{\hb})$ is given by $\tr(S,{\hb}) = \{ w_{\ccf} \st \ccf \in \CCF(S,{\hb})\}$.
@@ -261,9 +261,9 @@ A signal $(S,{\hb})$ satisfies (resp. violates) an STL$^+$ formula $\varphi$ iff
 \end{equation*}
 \normalsize
 
+Note that we assume w.l.o.g. that $\varphi$ is \emph{copyless}, i.e., each signal $x \in S$ occurs in $\varphi$ at most once.
 In \cref{sec:approach,sec:algorithm}, we respectively define $\tr^+$ and present an algorithm to compute the semantics of STL$^+$.
 We finally prove the correctness of our approach.
-Note that we assume w.l.o.g. that $\varphi$ is \emph{copyless}, i.e., each signal $x \in S$ occurs in $\varphi$ at most once.
 
 \begin{theorem} \label{cl:stlsound}
 	For every STL formula $\varphi$ and every distributed signal $(S,{\hb})$, if $[(S,{\hb}) \models \varphi]_+ = \top$ (resp. $\bot$) then $[(S,{\hb}) \models \varphi] = \top$ (resp. $\bot$).
