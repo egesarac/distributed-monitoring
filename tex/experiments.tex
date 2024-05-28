@@ -37,8 +37,7 @@ To answer our research questions, we use (1) a \emph{random generator} (RG) of d
 \noindent \emph{Heat pump (HP)} model is a SimuLink model of a hybrid high pressure water distribution system consisting of two water tanks. Inlet pipes connect each water tank to an external source, and outlet pipes distribute high pressure water that is regulated by valves.
 Each valve is operated by a controller that samples the outflow pressure at 20Hz using its local clock. Our model is a simplified emulation of the Refueling Water Storage Tanks (RWST) module of an Emergency Core Cooling System (ECCS) of a Pressurized Water Reactor Plant~\cite{USNRCPWR}.
 
-\noindent \emph{Swarm of drones (SD)} models...
-\alert{TODO}
+\noindent \emph{Swarm of drones (SD)} model is generated using a path planning software, Fly-by-Logic~\cite{PantAM17CCTA}. In this simulation, a swarm of drones were set to perform various reach-avoid missions, while securing objectives likes reaching a goal within a deadline, avoiding obstacles, avoiding collisions, and so on. The path planner finds the most robust trajectory using a temporal logic robustness optimizer. These trajectories are sampled at 20Hz.
 
 \subsubsection{Specifications}
 
