@@ -1,8 +1,8 @@
-%\vspace{-8mm}
+\vspace{-4mm}
 \section{Introduction} 
 \label{sec:introduction}
 
-\ege{I added \textbackslash usepackage[compact]{titlesec} -- is this allowed?}
+%\ege{I added \textbackslash usepackage[compact]{titlesec} -- is this allowed?}
 
 
 \emph{Distributed systems} are networks of independent agents that work together to achieve a 
@@ -100,16 +100,19 @@ We implemented our approach in a prototype tool and performed thorough evaluatio
 synthetic and real-world case studies (mutual separation in swarm of UAVs and a water distribution 
 system).
 %
-We first demonstrated that our approximate monitors achieve speed-ups of several orders of 
-magnitudes compared to the exact SMT-based distributed RV solution.
+We first demonstrated that in our synthetic experiments, our approximate monitors achieve 
+speed-ups of between 3 and 5.5 orders of magnitudes compared to the exact SMT-based 
+distributed RV solution.
 %
 We empirically characterized the classes of specifications and behaviors for which our approximate 
 monitoring approach achieves good precision.
 %
+In our case studies, we observe up to 6 orders of magnitude speed-up (although in some cases the 
+improvement is not as much). \borzoo{Please check}
+%
 We finally showed that by combining exact and approximate distributed RV, there is still a 
 significant efficiency gain on average without the sacrifice of the precision, even in cases where 
-approximate monitors have low accuracy. \borzoo{We should give some numbers here. Orders of 
-magnitude? We need a stronger statement!}
+approximate monitors have low accuracy. 
 
 \paragraph{Organization.}
 %\noindent\textit{Organization.}

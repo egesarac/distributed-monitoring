@@ -140,10 +140,8 @@ First, we abbreviate the set $\llbracket (S,{\hb}), I \models \varphi \rrbracket
 Second, given an interval $K$, we respectively denote by $l_K$ and $r_K$ its left and right end points.
 Third, recall that we denote by $F$ the set of end points of $G_S$ (see \cref{sec:approach}).
 Given an interval $J$, we define the \emph{profile} of $J$ with respect to $(S,{\hb})$, $\varphi$, and 
-$I$ as follows: \borzoo{I think we need some intuition for profiles. The formal definition is not so 
-telling.}
-\ege{What is missing in the paragraph above the definition or the example below?}
-
+$I$ as follows:
+%
 \scriptsize
 \begin{equation*}
 	\mathsf{profile}((S,{\hb}), \varphi, I, J) =
@@ -170,7 +168,7 @@ Note that the last case happens when $I \cap J$ is empty.
 %Finally, note that we assume the interval $J$ is trimmed to fit temporal domain of $S$.
 We now formalize the intuitive approach of ``sliding'' $J$ over the segmentation to obtain the 
 various profiles it produces as follows:
-
+%
 \small
 \begin{align*}
 	\mathsf{pfs}((S,{\hb}), \varphi, I, J) = \{\destutter(\mathsf{profile}((S,{\hb}), \varphi, I, J')) \st J' \subseteq I \oplus J, J' \sim J\}
@@ -214,7 +212,7 @@ Let $\varphi_1$ and $\varphi_2$ be two STL formulas.
 Intuitively, once we have the profiles of a given interval $J$ with respect to $\varphi_1$ and $\varphi_2$, we can evaluate the corresponding untimed formulas on the product of these profiles and concatenate them.
 %This captures the behavior of the satisfaction signals with respect to a bounded interval, but introduces further imprecision due to additional concatenations.
 Formally, we handle the evaluation of timed formulas inductively as follows:
-
+%
 \scriptsize
 \begin{align*}
 	\llbracket (S, {\hb}), I \models \varphi_1 \until_J \varphi_2 \rrbracket &= \destutter( \{ u_1 \mathsf{U}^0 u_2 \st (u_1, u_2) \in P_1 \otimes Q_1 \} \cdot \ldots \cdot \{ u_1 \mathsf{U}^0 u_2 \st (u_1, u_2) \in P_k \otimes Q_k \} )

@@ -44,7 +44,7 @@ Each valve is operated by a controller that samples the outflow pressure at 20Hz
 
 Table~\ref{tab:spec} summarizes the STL specifications that we use to monitor the behavior of our three experimental subjects. Specifications $\varphi_{1}$, $\varphi_{2}$ and $\varphi_{3}$ are monitored against the distributed traces created by the random generator and represent different classes and fragments of Boolean-valued temporal formulas. The first specification $\varphi_1$ is an LTL formula in which both the outer temporal operator ($\LTLg$) and the inner Boolean operator ($\wedge$) are conjunctive. The second formula $\varphi_2$ is the common LTL response formula which combines conjunctive $(\LTLg)$ and disjunctive $(\LTLf, \Rightarrow)$ operators. Finally, $\varphi_3$ adds a bounded real-time response requirement to the previous specification. The specification $\varphi_{HP}$ associated to the heat pump case study is an STL formula in which a sum of signals originating from different agents is compared to a constant. Finally, the specification $\varphi_{SD}$ defines a mutual separation property that requires more sophisticated arithmetic operations on signals originating from different agents.  
 
-\begin{table}[htb]
+\begin{table}[t]
 \centering
 \begin{tabular}{|l|l|l|l|}
 \hline
@@ -81,7 +81,7 @@ ADM is implemented in C++ and compiled using \texttt{g++} version 13.2.0 with th
 
 Figure~\ref{fig:rgresults} summarizes the results of evaluating specifications $\varphi_1$ to $\varphi_3$ against distributed trace from RG. The first column in the figure depicts a heatmap where each cell shows how many times ADM is faster than EDM when evaluating the formula on the give distributed trace with duration $d$ and uncertainty bound $\varepsilon$. The second column shows a heatmap where every cell shows the percentage of \emph{false positives} (FP) introduced by ADM, where a false positive happens when ADM does not agree with EDM, i.e. ADM evaluates to inconclusive when the real verdict is true or false. Finally, the third column depicts a heat map, where each cell estimates the achieved speedup when combining ADM with EDM, compared to using only EDM.
 
-\begin{figure}
+\begin{figure}[t]
 	\begin{center}
 	\includegraphics[width=\linewidth]{speedup}
 \caption{The experimental results - monitoring of specifications $\varphi_{1}$ to $\varphi_{3}$ on distributed traces created by the RG.}
@@ -95,10 +95,11 @@ compared to the exact EDM approach. The absolute speedups range from several tho
 $\varphi_1$ in which both the temporal and the combinatorial operators are conjunctive. On the other hand, having a combination of conjunctive and disjunctive operations (specifications $\varphi_{2}$ and $\varphi_{3}$) increases the number of FPs.  Surprisingly, we see that in these cases the introduction of FPs is higher for lower values of $\varepsilon$. This happens because that for higher values of $\varepsilon$,  even EDM gives many inconclusive verdicts. Finally, we see that adding real-time modalities to the temporal operators adds inaccuracies and increases further the percentage of FPs. Finally, by observing the third column of Figure~\ref{fig:rgresults}, we can see that by combining EDM and ADM, we consistently get better performance than by using EDM only, even in cases where ADM introduces a high percentage of FPs.
 
 
-\begin{figure}[htb]
+\begin{figure}[t]
 	\begin{center}
 		\includegraphics[width=\linewidth]{wtlin.png}
 		\caption{Heat pump log-linear scale, out-of-time limit 120s}
+		\vspace{3mm}
 	\end{center}
 \end{figure}
 
@@ -111,7 +112,7 @@ Decentralization significantly benefits \textsc{Fine}, bringing it below the tim
 As expected, \textsc{Orig} does not perform well.
 All methods produce the same verdict for the considered traces.
 
-\begin{figure}[htb]
+\begin{figure}[t]
 	\begin{center}
 		\includegraphics[width=\linewidth]{ms.png}
 		\caption{Mutual separation log-linear scale, out-of-time limit 360s}
@@ -122,7 +123,7 @@ All methods produce the same verdict for the considered traces.
 Similar to the previous case scenario, speedups in the mutual separation case increase with \(n\) and decrease with \(\varepsilon\).
 The \textsc{Fine-Relative} method achieves about a $78000\times$ speedup in the best-case scenario (when \(n=4\) and \(\varepsilon=0.05\)) and a $23\times$ speedup in the worst-case (when \(n=2\) and \(\varepsilon=0.25\)).
 The fine method performs slower than SMT in two cases where \(n\) is small and \(\varepsilon\) is large.
-\ege{Does NTP guarantee a smaller $\varepsilon$ with fewer number of nodes?}
+%
 As in the previous case, \textsc{Orig} does not perform well.
 Additionally, \textsc{Coarse} and \textsc{Coarse-Relative} are not applicable here because the arithmetic operations are not monotonic.
 Again, all methods yield the same verdicts.
