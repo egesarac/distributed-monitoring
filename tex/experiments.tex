@@ -54,7 +54,7 @@ Subject & Spec ID & STL formula \\
 & $\varphi_2$ & $\LTLg (p \vee q)$ & \\
 & $\varphi_3$ & $ p \LTLuntil q$ & \\
 & $\varphi_4$ & $\LTLg (p \Rightarrow \LTLf q)$ \\
-& $\varphi_5$ & $\LTLg (p \Rightarrow \LTLf_{[0,2)} q)$  \\
+& $\varphi_5$ & $\LTLg (p \Rightarrow \LTLf_{[0,1)} q)$  \\
 %& $\varphi_1$ & $\LTLg (p \wedge q)$ & \multirow{ 5}{*}{untimed} \\
 %& $\varphi_2$ & $\LTLf (p \vee q)$ & \\
 %& $\varphi_3$ & $\LTLg (p \vee q)$ & \\
@@ -96,17 +96,17 @@ $\varphi_1$ in which both the temporal and the combinatorial operators are conju
 \begin{figure}[htb]
 	\begin{center}
 		\includegraphics[width=\linewidth]{wtlin.png}
-		\caption{Water tanks log-linear scale, out-of-time limit 120s}
+		\caption{Heat pump log-linear scale, out-of-time limit 120s}
 	\end{center}
 \end{figure}
 
-\subsubsection{Water Tanks Discussion.}
-Speedups tend to increase with the number of signals \(n\) and decrease with the maximum clock skew \(\varepsilon\).
-The \textsc{Coarse} method demonstrates significant performance improvements over EDM, achieving up to a $104000\times$ speedup in the best-case scenario (when \(n=4\) and \(\varepsilon=0.05\)), and an $8\times$ speedup in the worst-case (when \(n=2\) and \(\varepsilon=0.4\)).
-It is important to note that \(\varepsilon=0.4\) is near the upper limit of a realistic value for this scenario, indicating that our approach does not suffer from scalability issues.
-The decentralized approach \textsc{Coarse-Relative} further enhances performance, adding up to a $1.63\times$ speedup on top of \textsc{Coarse}.
-For \textsc{Fine}, decentralization provides a substantial benefit, resulting in up to a $476\times$ speedup in instances where \textsc{Fine} did not time out.
-As expected, the explicit computation of asynchronous products (\textsc{Orig}) does not perform well.
+\subsubsection{Heat Pump Discussion.}
+Speedups increase with the number of signals \(n\) and decrease with the maximum clock skew \(\varepsilon\).
+The \textsc{Coarse} method shows significant improvements over EDM, with up to a $104000\times$ speedup in the best-case (when \(n=4\) and \(\varepsilon=0.05\)) and an $8\times$ speedup in the worst-case (when \(n=2\) and \(\varepsilon=0.4\)).
+Note that \(\varepsilon=0.4\) is near the realistic upper limit, indicating no scalability issues.
+The decentralized \textsc{Coarse-Relative} method adds up to a $1.63\times$ speedup over \textsc{Coarse}.
+Decentralization significantly benefits \textsc{Fine}, bringing it below the time-out limit with up to a $476\times$ speedup in non-time-out instances.
+As expected, \textsc{Orig} does not perform well.
 All methods produce the same verdict for the considered traces.
 
 \begin{figure}[htb]
@@ -116,12 +116,12 @@ All methods produce the same verdict for the considered traces.
 	\end{center}
 \end{figure}
 
-\subsubsection{Mutual Separation Discussion.}
-Similar to the water tanks scenario, speedups in the mutual separation case increase with \(n\) and decrease with \(\varepsilon\).
+\subsubsection{Swarm of Drones Discussion.}
+Similar to the previous case scenario, speedups in the mutual separation case increase with \(n\) and decrease with \(\varepsilon\).
 The \textsc{Fine-Relative} method achieves about a $78000\times$ speedup in the best-case scenario (when \(n=4\) and \(\varepsilon=0.05\)) and a $23\times$ speedup in the worst-case (when \(n=2\) and \(\varepsilon=0.25\)).
 The fine method performs slower than SMT in two cases where \(n\) is small and \(\varepsilon\) is large.
 \ege{Does NTP guarantee a smaller $\varepsilon$ with fewer number of nodes?}
-As in the water tanks discussion, \textsc{Orig} does not perform well due to the complexity of the arithmetic operations involved, which causes further blowup when computing asynchronous products explicitly.
+As in the previous case, \textsc{Orig} does not perform well.
 Additionally, \textsc{Coarse} and \textsc{Coarse-Relative} are not applicable in this scenario because the arithmetic operations are not monotonic.
 Again, all methods yield the same verdicts.
 

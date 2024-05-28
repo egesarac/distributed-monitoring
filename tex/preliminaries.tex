@@ -65,8 +65,8 @@ Given a tuple $(u_1, \ldots, u_m) = (\sigma_{1,1} \sigma_{1,2} v_1, \ldots, \sig
 
 Moreover, given an integer $k \geq 0$, we define $\stutter_k : \Sigma^* \to \Sigma^*$ such that $\stutter_k(u) = \{v \in \Sigma^* \st |v| = k \land \destutter(v) = \destutter(u)\}$ if $k \geq |\destutter(u)|$, and $\stutter_k(u) = \emptyset$ otherwise.
 
-\subsubsection{Signal Temporal Logic (STL) \cite{MalerN13}.} \label{sec:stl}
-
+\subsubsection{Signal Temporal Logic (STL) \cite{MalerN13}.}
+%\noindent\textbf{Signal Temporal Logic (STL) \cite{MalerN13}.}
 Let $A,B \subset \R$.
 %
 A function $f : A \to B$ is
@@ -122,8 +122,8 @@ Moreover, the untimed temporal operators are defined through their timed counter
 %we define $[w \models \varphi]_3 = \top$ iff $[w w' \models \varphi]_{\mathsf{STL}}$ for every infinite-length signal $w'$, define $[w \models \varphi]_3 = \bot$ iff $[w w' \models \lnot \varphi]_{\mathsf{STL}}$ for every infinite-length signal $w'$, and $[w \models \varphi]_3 = \?$ otherwise.
 
 
-\subsubsection{Distributed Semantics of STL \cite{MomtazAB23}.} \label{sec:diststl}
-
+\subsubsection{Distributed Semantics of STL \cite{MomtazAB23}.}
+%\noindent\textbf{Distributed Semantics of STL \cite{MomtazAB23}.}
 We consider an asynchronous and loosely-coupled message-passing system of $n \geq 2$ reliable agents producing a set of signals $x_1, \ldots, x_n$, where for some $d \in \R_{> 0}$ we have $x_i : [0,d) \to \R$ for all $1 \leq i \leq n$.
 %
 The agents do not share memory or a global clock.
@@ -143,11 +143,9 @@ We assume that the system is \emph{partially synchronous}: the agents use a cloc
 \begin{definition} \label{defn:hb}
 	A \emph{distributed signal} is a pair $(S, {\hb})$, where $S = (x_1, \ldots, x_n)$ is a vector of 
 	signals and ${\hb}$ is the happened-before relation between events in signals extended with the 
-	partial synchrony assumption as follows.
-	\begin{itemize}
-		\item For every agent, the events of its signals are totally ordered, i.e., for all $1 \leq i \leq n$ and all $(t, x_i(t)), (t', x_i(t')) \in V_i$, if $t < t'$ then $(t, x_i(t)) \hb (t', x_i(t'))$.
-		\item Every pair of events whose timestamps are at least $\varepsilon$ apart is totally ordered, i.e., for all $1 \leq i,j \leq n$ and all $(t, x_i(t)) \in V_i$ and $(t', x_j(t')) \in V_j$, if $t + \varepsilon \leq t'$ then $(t, x_i(t)) \hb (t', x_j(t'))$.
-	\end{itemize}
+	partial synchrony assumption as follows:
+	(1) For every agent, the events of its signals are totally ordered, i.e., for all $1 \leq i \leq n$ and all $(t, x_i(t)), (t', x_i(t')) \in V_i$, if $t < t'$ then $(t, x_i(t)) \hb (t', x_i(t'))$.
+	(2) Every pair of events whose timestamps are at least $\varepsilon$ apart is totally ordered, i.e., for all $1 \leq i,j \leq n$ and all $(t, x_i(t)) \in V_i$ and $(t', x_j(t')) \in V_j$, if $t + \varepsilon \leq t'$ then $(t, x_i(t)) \hb (t', x_j(t'))$.
 \end{definition}
 
 The notion of consistent cut captures possible global states.
@@ -232,16 +230,19 @@ Similarly, if $\tr(S,{\hb})$ has an empty intersection with the set of traces $\
 Otherwise, the evaluation is inconclusive since some traces satisfy the property and some violate it.
 Notice that we quantify universally over traces for both satisfaction and violation.
 
-\small
-\begin{equation*}
-	[(S,{\hb}) \models \varphi] = 
-	\begin{cases}
-		\top & \text{ if } \forall w \in \tr(S,{\hb}) : w \models \varphi \\
-		\bot & \text{ if } \forall w \in \tr(S,{\hb}) : w \models \lnot\varphi \\
-		\,? & \text{ otherwise}
-	\end{cases}
-\end{equation*}
-\normalsize
+%\begin{wrapfigure}{l}{.6\textwidth}
+	\footnotesize
+	\begin{equation*}
+		[(S,{\hb}) \models \varphi] = 
+		\begin{cases}
+			\top & \text{ if } \forall w \in \tr(S,{\hb}) : w \models \varphi \\
+			\bot & \text{ if } \forall w \in \tr(S,{\hb}) : w \models \lnot\varphi \\
+			\,? & \text{ otherwise}
+		\end{cases}
+	\end{equation*}
+	\normalsize
+%\end{wrapfigure}
+
 
 \section{Overapproximation of the STL Distributed Semantics}
 \label{sec:semantics}
@@ -252,7 +253,8 @@ In particular, given a distributed signal $(S,{\hb})$, STL$^+$ considers an appr
 $\tr^+(S,{\hb})$ of the set $\tr(S,{\hb})$ of synchronous traces where $ \tr(S,{\hb}) \subseteq \tr^+(S,{\hb})$.
 A signal $(S,{\hb})$ satisfies (resp. violates) an STL$^+$ formula $\varphi$ iff all the traces in $\tr^+(S,{\hb})$ belong to the language of $\varphi$ (resp. $\lnot \varphi$).
 
-\small
+%\begin{wrapfigure}{l}{.6\textwidth}
+\footnotesize
 \begin{equation*}
 	[(S,{\hb}) \models \varphi]_+ = 
 	\begin{cases}
@@ -262,6 +264,7 @@ A signal $(S,{\hb})$ satisfies (resp. violates) an STL$^+$ formula $\varphi$ iff
 	\end{cases}
 \end{equation*}
 \normalsize
+%\end{wrapfigure}
 
 Note that we assume w.l.o.g. that $\varphi$ is \emph{copyless}, i.e., each signal $x \in S$ occurs in $\varphi$ at most once.
 In \cref{sec:approach,sec:algorithm}, we respectively define $\tr^+$ and present an algorithm to compute the semantics of STL$^+$.
