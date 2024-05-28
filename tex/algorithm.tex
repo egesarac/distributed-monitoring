@@ -118,12 +118,11 @@ Intuitively, for a given formula and a segment, the evaluation above produces a 
 
 \begin{example}
 	Recall $(S, {\hb})$ and $\gamma$ from \cref{fig:csve}.
-	Suppose we want to compute $\llbracket (S, {\hb}), [5,7) \models \LTLeventually(x_1 \land x_2) \rrbracket$.
-	First, we compute $\llbracket (S, {\hb}), [5,7) \models x_1 \land x_2 \rrbracket$ by computing the bitwise conjunction over the asynchronous product $\gamma(x_1, [5,7)) \otimes \gamma(x_2, [5,7))$ and destuttering.
+	To compute $\llbracket (S, {\hb}), [5,7) \models \LTLeventually(x_1 \land x_2) \rrbracket$, we first compute $\llbracket (S, {\hb}), [5,7) \models x_1 \land x_2 \rrbracket$ by taking the bitwise conjunction over the asynchronous product $\gamma(x_1, [5,7)) \otimes \gamma(x_2, [5,7))$ and destuttering.
 	For example, since $010 \in \gamma(x_1, [5,7))$ and $01 \in \gamma(x_2, [5,7))$, the pair $(0010,0111)$ is in the product, whose conjunction gives us $010$ after destuttering. 
 	Repeating this for the rest, we obtain $\llbracket (S, {\hb}), [5,7) \models x_1 \land x_2 \rrbracket = \{ 0, 01, 010, 1, 10 \}$.
 	Finally, we compute $\llbracket (S, {\hb}), [5,7) \models \LTLeventually(x_1 \land x_2) \rrbracket$ by applying each expression in $\llbracket (S, {\hb}), [5,7) \models x_1 \land x_2 \rrbracket$ the bitwise eventually operator and destuttering.
-	The resulting set $\{0, 1, 10\}$ encondes the satisfaction signal of $\LTLeventually(x_1 \land x_2)$ in $[5,7)$.
+	The resulting set $\{0, 1, 10\}$ encodes the satisfaction signal of $\LTLeventually(x_1 \land x_2)$ in $[5,7)$.
 	Note that we do not need to consider the evaluation of the next segment for the eventually operator since $\llbracket (S, {\hb}), [7,8) \models x_1 \land x_2 \rrbracket = \{0\}$.
 \end{example}
 
@@ -189,17 +188,25 @@ We demonstrate this and the computation of $\mathsf{pfs}$ in \cref{ex:profiles} 
 	Recall $(S, {\hb})$ and $\gamma$ from \cref{fig:csve}.
 	We demonstrate the computation of $\mathsf{pfs}((S,{\hb}), x_1, [1,3), [0,1))$.
 	Intuitively, sliding the interval $[0,1)$ over the window $[1,3) \oplus [0,1)$ (as shown in \cref{fig:profiles}) gives us the following sets:
-	\begin{align*}
-		P_1 &= \destutter(\pfx(\gamma(x_1, [1,3)))) = \{ 0, 01, 1 \}\\
-%		&= \{ 0, 01, 1 \} \\
-		P_2 &= \destutter(\infx(\gamma(x_1, [1,3)))) = \{ 0, 01, 1 \} \\
-%		&= \{ 0, 01, 1 \} \\
-		P_3 &= \destutter(\sfx(\gamma(x_1, [1,3)))) = \{ 0, 01, 1 \} \\
-%		&= \{ 0, 01, 1 \} \\
-		P_4 &= \destutter(\sfx(\gamma(x_1, [1,3))) \cdot \pfx(\gamma(x_1, [3,4)))) \\
-		&= \{ 0, 01, 010, 0101, 01010, 1, 10, 101, 1010 \}
-	\end{align*}
-	Therefore, we obtain $\mathsf{pfs}((S,{\hb}), x_1, [1,3), [0,1)) = \{P_1, P_2, P_3, P_4\}$.
+	$P_1 = \destutter(\pfx(\gamma(x_1, [1,3))))$,
+	$P_2 = \destutter(\infx(\gamma(x_1, [1,3))))$, and
+	$P_3 = \destutter(\sfx(\gamma(x_1, [1,3))))$  where all equal to $\{ 0, 01, 1 \}$.
+	Moreover, we have $P_4 = \destutter(\sfx(\gamma(x_1, [1,3))) \cdot \pfx(\gamma(x_1, [3,4)))) = \{ 0, 01, 010, 0101, 01010, 1, 10, 101, 1010 \}$.
+	%	\small
+%%	\begin{wrapfigure}{r}{0.5\textwidth}
+%			\begin{align*}
+%			P_1 &= \destutter(\pfx(\gamma(x_1, [1,3)))) = \{ 0, 01, 1 \}\\
+%			%		&= \{ 0, 01, 1 \} \\
+%			P_2 &= \destutter(\infx(\gamma(x_1, [1,3)))) = \{ 0, 01, 1 \} \\
+%			%		&= \{ 0, 01, 1 \} \\
+%			P_3 &= \destutter(\sfx(\gamma(x_1, [1,3)))) = \{ 0, 01, 1 \} \\
+%			%		&= \{ 0, 01, 1 \} \\
+%			P_4 &= \destutter(\sfx(\gamma(x_1, [1,3))) \cdot \pfx(\gamma(x_1, [3,4)))) \\
+%			&= \{ 0, 01, 010, 0101, 01010, 1, 10, 101, 1010 \}
+%		\end{align*}
+%%	\end{wrapfigure}
+%	\normalsize
+	We obtain $\mathsf{pfs}((S,{\hb}), x_1, [1,3), [0,1)) = \{P_1, P_2, P_3, P_4\}$.
 	This set overapproximates the potential behaviors of $x_1$, for all $t \in [1,3)$, in the interval $t \oplus [0,1)$.
 \end{example}
 
@@ -238,7 +245,7 @@ where $\mathsf{pfs}((S,{\hb}), \varphi_1, I, J) = \{P_1, \ldots, P_k \}$ and $\m
 \end{example}
 
 \begin{wrapfigure}{r}{0.5\textwidth}
-	\vspace{-1em}
+	\vspace{-3.5em}
 %	\begin{center}
 %		\includegraphics[scale=0.33]{profiles.png}
 %	\end{center}
