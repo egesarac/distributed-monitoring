@@ -82,8 +82,8 @@ In particular, an edge is \emph{rising} if $\lim_{s \to t^-} x(s) < \lim_{s \to 
 A signal $x : [0,d) \to \R$ can be represented finitely by its initial value and edges: if $x$ has $m$ edges, then $x = (t_0, v_0) (t_1, v_1) \ldots (t_m, v_m)$ such that $t_0 = 0$, $t_{i-1} < t_i$, and $(t_i, v_i)$ is an edge of $x$ for all $1 \leq i \leq m$.
 
 Let $\AP$ be a set of \emph{atomic propositions}.
-The syntax is given by the following grammar where $p \in \AP$ and $I \subseteq \R_{\geq 0}$ is an interval.
-\[ \varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \land \varphi ~|~ \varphi \until_I \varphi \]
+The syntax is given by the grammar $\varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \land \varphi ~|~ \varphi \until_I \varphi$ where $p \in \AP$ and $I \subseteq \R_{\geq 0}$ is an interval.
+%\[ \varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \land \varphi ~|~ \varphi \until_I \varphi \]
 
 A \emph{trace} $w = (x_1, \ldots, x_n)$ is a finite vector of signals.
 We express atomic propositions as functions of trace values at a time point $t$,
@@ -91,7 +91,7 @@ i.e., a proposition $p \in \AP$ over a trace $w = (x_1, \ldots, x_n)$ is defined
 %i.e., a proposition $p \in \AP$ over a trace $w = (x_1, \ldots, x_n)$ is defined as $f_p(x_1(t), \ldots, x_n(t)) \sim_p c_p$ where $f_p : \R^n \to \R$ is a function, $c_p \in \R$ is a constant, and ${\sim_p} \in \{{<}, {\leq}, {\geq}, {>}\}$.
 Given intervals $I,J \subseteq \R_{\geq 0}$, we define $I \oplus J = \{i + j \st i \in I \land j \in J\}$, and we simply write $t$ for the singleton set $\{t\}$. 
 
-Below, we recall the finite-trace qualitative semantics of STL defined over $\B$ \cite{MalerN13}.
+We recall the finite-trace qualitative semantics of STL defined over $\B$ \cite{MalerN13}.
 Let $d \in \R_{> 0}$ and $w = (x_1, \ldots, x_n)$ with $x_i : [0,d) \to \R$ for all $1 \leq i \leq n$.
 Let $\varphi_1, \varphi_2$ be STL formulas and let $t \in [0,d)$.
 
@@ -165,12 +165,12 @@ A \emph{consistent cut flow} is a function $\ccf : \R_{\geq 0} \to 2^V$ that map
 For all $T,T' \in \R_{\geq 0}$ and $1 \leq i \leq n$, if $T < T'$, then for every pair of events $(c_i(T), x_i(c_i(T))) \in \ccf(T)$ and $(c_i(T'), x_i(c_i(T'))) \in \ccf(T')$ we have $(c_i(T), x_i(c_i(T))) \hb (c_i(T'), x_i(c_i(T')))$.
 We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distributed signal $(S,{\hb})$.
 
-\begin{example} \label{ex:distsig}
-	Let $(S,{\hb})$ be a distributed signal with $S = (x_1, x_2)$ and $\varepsilon = 0.5$, where some events of $x_1$ and $x_2$ are marked on \cref{fig:distsig}.
-	For example, $(0.5, x_1(0.5)) \hb (1.6, x_1(1.6)) \hb (2.5, x_2(2.5)) \hb (2.8, x_2(2.8))$, but $(2.5, x_2(2.5)) \not\hb (2.9, x_1(2.9))$.
-	The solid blue lines marked with $C_1, C_2, C_3$ correspond to a consistent cut, e.g., $\fr(C_3) = \{(2.9, x_1(2.9)), (2.8, x_2(2.8))\}$, however $C'$ is not a consistent cut since $(2.5, x_2(2.5)) \in \fr(C')$ and $(1.6, x_1(1.6)) \hb (2.5, x_2(2.5))$ but $(1.6, x_1(1.6)) \notin \fr(C')$.
-	Moreover, the frontiers of these consistent cuts can be seen as produced by a consistent cut flow $\ccf$, e.g., with $\ccf(0.5) = \fr(C_1)$, $\ccf(1) = \fr(C_2)$, and $\ccf(2) = \fr(C_3)$.	
-\end{example}
+%\begin{example} \label{ex:distsig}
+%	Let $(S,{\hb})$ be a distributed signal with $S = (x_1, x_2)$ and $\varepsilon = 0.5$, where some events of $x_1$ and $x_2$ are marked on \cref{fig:distsig}.
+%	For example, $(0.5, x_1(0.5)) \hb (1.6, x_1(1.6)) \hb (2.5, x_2(2.5)) \hb (2.8, x_2(2.8))$, but $(2.5, x_2(2.5)) \not\hb (2.9, x_1(2.9))$.
+%	The solid blue lines marked with $C_1, C_2, C_3$ correspond to a consistent cut, e.g., $\fr(C_3) = \{(2.9, x_1(2.9)), (2.8, x_2(2.8))\}$, however $C'$ is not a consistent cut since $(2.5, x_2(2.5)) \in \fr(C')$ and $(1.6, x_1(1.6)) \hb (2.5, x_2(2.5))$ but $(1.6, x_1(1.6)) \notin \fr(C')$.
+%	Moreover, the frontiers of these consistent cuts can be seen as produced by a consistent cut flow $\ccf$, e.g., with $\ccf(0.5) = \fr(C_1)$, $\ccf(1) = \fr(C_2)$, and $\ccf(2) = \fr(C_3)$.	
+%\end{example}
 
 %\begin{wrapfigure}{r}{0.3\textwidth}
 %	\vspace{-2em}
@@ -181,7 +181,7 @@ We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distribu
 %	\label{fig:distsig}
 %\end{wrapfigure}
 
-\begin{wrapfigure}{r}{0.3\textwidth}
+\begin{wrapfigure}{r}{0.31\textwidth}
 	\vspace{-2em}
 	\centering
 	\begin{tikzpicture}[scale=0.75]
@@ -215,8 +215,7 @@ We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distribu
 		\draw[fill=black] (2,2.5) circle (1pt);
 		\draw[fill=black] (2,2.8) circle (1pt);
 	\end{tikzpicture}
-	\caption{The distributed signal in \cref{ex:distsig} with consistent cuts $C_1, C_2, C_3$}
-	\label{fig:distsig}
+	\caption{A distributed signal in with consistent cuts $C_1, C_2, C_3$ constituting a consistent cut flow. Note that $C'$ is a non-example since $(2.5, x_2(2.5)) \in \fr(C')$~and $(1.6, x_1(1.6)) \notin \fr(C')$,~but  $(1.6, x_1(1.6))~\hb~(2.5, x_2(2.5))$.} \label{fig:distsig}
 \end{wrapfigure}
 
 Observe that a consistent cut flow of a distributed signal induces a vector of synchronous signals which can be evaluated using the standard semantics described above.
