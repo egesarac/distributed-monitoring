@@ -38,8 +38,10 @@ Formally, given two value expressions $u_1$ and $u_2$ (resp.  sets $L_1$ and $L_
 \end{align*}
 \normalsize
 
+\vspace{-0.5em}
 Asynchronous products of value expressions allow us to lift value expressions to satisfaction signals of formulas.
 
+\vspace{-0.5em}
 \begin{example} \label{ex:asyncprod}
 	Recall $(S, {\hb})$ and its $\gamma$ function given in \cref{fig:csve}.
 	To compute the value expressions encoding the satisfaction of $x_1 \land x_2$ in the segment $[1,3)$, we first compute the asynchronous product $\gamma(x_1, [3,4)) \otimes \gamma(x_2, [3,4))$, and then the bitwise conjunction of each pair in the set.
@@ -47,6 +49,7 @@ Asynchronous products of value expressions allow us to lift value expressions to
 	Its bitwise conjunction is $0  1  0$, encoding a potential behavior for the satisfaction of $x_1 \land x_2$.
 \end{example}
 
+\vspace{-0.7em}
 \subsubsection{Untimed Operations.}
 As hinted in \cref{ex:asyncprod}, to compute the semantics, we apply bitwise operations on value expressions and their asynchronous products to transform them into encodings of satisfaction signals of formulas.
 For example, to determine $[(S, {\hb}) \models \LTLeventually (x_1 \land x_2)]_+$, we first compute for each segment in $G_S$ the set of value expressions for the satisfaction of $x_1 \land x_2$, and then from these compute that of $\LTLeventually (x_1 \land x_2)$.
@@ -58,9 +61,8 @@ Then, we use these to evaluate (untimed) STL formulas over sets of value express
 Let $u$ and $v$ be Boolean value expressions of length $\ell$.
 We denote by $u \BitAnd v$ the bitwise-and operation, by $u \BitOr v$ the bitwise-or, and by $\BitNeg u$ the bitwise-negation.
 We also define the \emph{bitwise strong until} operator:
-
-\small
-\[ u \mathsf{U}^0 v = \left( \max_{i \leq j \leq \ell} \left( \min \left( v[j], \min_{i \leq k \leq j} u[k] \right) \right) \right)_{1 \leq i \leq \ell} \]
+%
+\[\small u \mathsf{U}^0 v = \left( \max_{i \leq j \leq \ell} \left( \min \left( v[j], \min_{i \leq k \leq j} u[k] \right) \right) \right)_{1 \leq i \leq \ell} \]
 \normalsize
 %
 As usual, we derive \emph{bitwise eventually} as 
@@ -114,6 +116,7 @@ For a given formula and a segment, the evaluation above produces a set of value 
 %$L_1 \until^1 L_2 = (L_1 \until^0 L_2) \lor (\LTLalways L_1)$.
 %Notice that, since sets of value expressions corresponding to atomic propropositions are captured by the $\gamma$ function, we can compute the sets of value expressions for each segment and (untimed) subformula.
 
+\vspace{-0.5em}
 \begin{example}
 	Recall $(S, {\hb})$ and $\gamma$ from \cref{fig:csve}.
 	To compute $\llbracket (S, {\hb}), [5,7) \models \LTLeventually(x_1 \land x_2) \rrbracket$, we first compute $\llbracket (S, {\hb}), [5,7) \models x_1 \land x_2 \rrbracket$ by taking the bitwise conjunction over the asynchronous product $\gamma(x_1, [5,7)) \otimes \gamma(x_2, [5,7))$ and destuttering.
@@ -124,6 +127,7 @@ For a given formula and a segment, the evaluation above produces a set of value 
 	Note that we do not need to consider the evaluation of the next segment for the eventually operator since $\llbracket (S, {\hb}), [7,8) \models x_1 \land x_2 \rrbracket = \{0\}$.
 \end{example}
 
+\vspace{-0.7em}
 \subsubsection{Timed Operations.}
 Handling timed operations requires a closer inspection as value expressions are untimed by definition.
 We address this issue by considering how a given evaluation interval relates with a given segmentation.
@@ -135,13 +139,14 @@ Now, if we slide the window and take $J' = [3,7)$, the window covers the ending 
 We call these sets the \emph{profiles} of $J$ and $J'$ with respect to $(S,{\hb})$, $x$, and $I$.
 
 Let $(S,{\hb})$ be a distributed signal, $I \in G_S$ be a segment, and $\varphi$ be an STL formula.
-Let us introduce the notation we use in the definition below.
+Let us introduce some notation.
 First, we abbreviate the set $\llbracket (S,{\hb}), I \models \varphi \rrbracket$ of value expressions as $\tau_{\varphi,I}$.
 Second, given an interval $K$, we respectively denote by $l_K$ and $r_K$ its left and right end points.
 Third, recall that we denote by $F$ the set of end points of $G_S$ (see \cref{sec:approach}).
 Given an interval $J$, we define the \emph{profile} of $J$ with respect to $(S,{\hb})$, $\varphi$, and 
 $I$ as follows:
-%
+
+\vspace{-1em}
 \scriptsize
 \begin{equation*}
 	\mathsf{profile}((S,{\hb}), \varphi, I, J) =
@@ -168,7 +173,8 @@ Note that the last case happens when $I \cap J$ is empty.
 %Finally, note that we assume the interval $J$ is trimmed to fit temporal domain of $S$.
 We now formalize the intuitive approach of ``sliding'' $J$ over the segmentation to obtain the 
 various profiles it produces as follows:
-%
+
+\vspace{-1em}
 \small
 \begin{align*}
 	\mathsf{pfs}((S,{\hb}), \varphi, I, J) = \{\destutter(\mathsf{profile}((S,{\hb}), \varphi, I, J')) \st J' \subseteq I \oplus J, J' \sim J\}
@@ -212,10 +218,12 @@ Let $\varphi_1$ and $\varphi_2$ be two STL formulas.
 Intuitively, once we have the profiles of a given interval $J$ with respect to $\varphi_1$ and $\varphi_2$, we can evaluate the corresponding untimed formulas on the product of these profiles and concatenate them.
 %This captures the behavior of the satisfaction signals with respect to a bounded interval, but introduces further imprecision due to additional concatenations.
 Formally, we handle the evaluation of timed formulas inductively as follows:
-%
-\scriptsize
+
+\vspace{-1em}
+\small
 \begin{align*}
-	\llbracket (S, {\hb}), I \models \varphi_1 \until_J \varphi_2 \rrbracket &= \destutter( \{ u_1 \mathsf{U}^0 u_2 \st (u_1, u_2) \in P_1 \otimes Q_1 \} \cdot \ldots \cdot \{ u_1 \mathsf{U}^0 u_2 \st (u_1, u_2) \in P_k \otimes Q_k \} )
+	\llbracket (S, {\hb}), I \models \varphi_1 \until_J \varphi_2 \rrbracket = \destutter( \{ u_1 \mathsf{U}^0 u_2 \st &(u_1, u_2) \in P_1 \otimes Q_1 \} \cdot \ldots \\ 
+	&\ldots \cdot \{ u_1 \mathsf{U}^0 u_2 \st (u_1, u_2) \in P_k \otimes Q_k \} )
 \end{align*}
 \normalsize
 where $\mathsf{pfs}((S,{\hb}), \varphi_1, I, J) = \{P_1, \ldots, P_k \}$ and $\mathsf{pfs}((S,{\hb}), \varphi_2, I, J) = \{Q_1, \ldots, Q_k \}$ such that the intervals producing $P_i$ and $Q_i$ respectively start before those producing $P_{i+1}$ and $Q_{i+1}$ for all $1 \leq i < k$.
@@ -236,12 +244,12 @@ where $\mathsf{pfs}((S,{\hb}), \varphi_1, I, J) = \{P_1, \ldots, P_k \}$ and $\m
 %		P_3' &= \{ \mathsf{E} u \st u \in P_3 \} = \{ 0, 1 \} \\
 %		P_4' &= \{ \mathsf{E} u \st u \in P_4 \} = \{ 0, 10, 1 \} \\
 %	\end{align*}
-	Then, we concatenate these sets and destutter to obtain the following:
+	We concatenate these and destutter:
 	\[ 	\llbracket (S, {\hb}), [1,3) \models \LTLeventually_{[0,1)} x_1 \rrbracket = \{ 0, 01, 010, 0101, 01010, 1, 10, 101, 1010 \}  \]
 \end{example}
 
 \begin{wrapfigure}{r}{0.5\textwidth}
-	\vspace{-3.5em}
+	\vspace{-3em}
 %	\begin{center}
 %		\includegraphics[scale=0.33]{profiles.png}
 %	\end{center}
@@ -272,7 +280,7 @@ where $\mathsf{pfs}((S,{\hb}), \varphi_1, I, J) = \{P_1, \ldots, P_k \}$ and $\m
 \end{tikzpicture}
 	\caption{The profiles of $J = [0,1)$ with respect to $x_1 \in S$ of \cref{fig:csve}. A representative interval for each profile is shown with solid black lines below the table.}
 	\label{fig:profiles}
-%	\vspace{-4em}
+	\vspace{-2em}
 \end{wrapfigure}
 
 \subsubsection{Computing the Semantics of STL$^+$.}
@@ -357,7 +365,7 @@ This is because value expressions corresponding to same segments can be seen as 
 This approach enables, for example, an algorithm for conjunction of sets of value expressions that runs in $O(|u| + |v|)$ time where $u$ and $v$ are the longest expressions in the two sets.
 The same idea also applies to untimed temporal operators.
 
-
+\vspace{-1em}
 \subsubsection{Generalization to Real-Valued Signals.}
 The methods in \cref{sec:approach} can be extended to real-valued signals and numerical predicates.
 The key is that finite-length piecewise-constant signals take finitely many values.
@@ -379,6 +387,7 @@ Lastly, assuming a decentralized setting, where each agent has a monitor running
 This approach is called \textsc{Relative}.
 We will demonstrate the benefits and downsides of each method in \cref{sec:experiments}.
 
+\vspace{-1em}
 \subsubsection{Combining Exact and Approximate Monitoring.}
 We propose a heuristic that combines the exact distributed monitors (EDM) with their approximate counterparts (ADM) with the aim to achieve better computational performance of the monitor, while remaining precise.
 The approach works as follows:

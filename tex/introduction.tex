@@ -77,10 +77,10 @@ expressions, taking into account regions of uncertainty created by clock skews.
 We define monitoring operations required to evaluate temporal specifications over such expression, 
 which result in monitoring verdicts on over-approximate behaviors.
 %
-There is typically an inevitable trade-off between {\em accuracy} and {\em speed-up} in approximate 
+There is typically an inevitable tradeoff between {\em accuracy} and {\em speedup} in approximate 
 solution and  RV is not an exception.
 %
-That is, gains in the monitoring speed-up may result in reduced accuracy.
+That is, gains in the monitoring speedup may result in reduced accuracy.
 %
 For some applications, reduced accuracy may not be acceptable.
 %
@@ -88,31 +88,28 @@ Therefore, we propose a methodology that combines our approximate monitors with 
 counterparts, with the aim to benefit from the enhanced monitoring efficiency without sacrificing 
 precision.
 %
-\alert{
 Approximate monitoring is also valuable in the sequential setting, with applications including
 monitoring with state estimation \cite{StollerBSGHSZ11,BartocciG13},
-quantitative monitoring and its resource-precision trade-offs \cite{HenzingerS21,HenzingerMS22,HenzingerMS23},
+quantitative monitoring and its resource-precision tradeoffs \cite{HenzingerS21,HenzingerMS22,HenzingerMS23},
 and various other uses \cite{AlechinaDL14,AcetoAFIL21}.
-}
+
 
 
 We implemented our approach in a prototype tool and performed thorough evaluations on both 
 synthetic and real-world case studies (mutual separation in swarm of UAVs and a water distribution 
 system).
 %
-We first demonstrated that in our synthetic experiments, our approximate monitors achieve 
-speed-ups of between 3 and 5.5 orders of magnitudes compared to the exact SMT-based 
+We first demonstrated that in synthetic experiments, our approximate monitors achieve 
+speedups of between 3 and 5 orders of magnitudes compared to the exact SMT-based 
 distributed RV solution.
 %
 We empirically characterized the classes of specifications and behaviors for which our approximate 
 monitoring approach achieves good precision.
 %
-In our case studies, we observe up to 6 orders of magnitude speed-up (although in some cases the 
-improvement is not as much). \borzoo{Please check}
+In our case studies, we observe up to 5 orders of magnitude speedup (although in some cases the 
+improvement is not as much).
 %
-We finally showed that by combining exact and approximate distributed RV, there is still a 
-significant efficiency gain on average without the sacrifice of the precision, even in cases where 
-approximate monitors have low accuracy. 
+We finally show that combining exact and approximate distributed RV yields significant efficiency gains on average without sacrificing precision, even when approximate monitors had low accuracy.
 
 \paragraph{Organization.}
 %\noindent\textit{Organization.}
@@ -122,5 +119,5 @@ Section~\ref{sec:semantics} introduces over-approximate semantics of STL while
 Sections~\ref{sec:approach} and~\ref{sec:algorithm} describe our approach in approximating traces 
 and the associated monitoring algorithm, respectively.
 %
-We evaluate our approach in Section~\ref{sec:experiments}. Finally, we make concluding remarks in 
+We evaluate our approach in Section~\ref{sec:experiments}. Finally, we conclude in 
 Section~\ref{sec:conclusion}.

@@ -190,9 +190,9 @@ Similarly, the behavior in $[4,5)$ is given by $\sfx(v_1) \cdot \pfx(v_2)$, whic
 Formally, given a distributed signal $(S,{\hb})$, we define a function $\gamma : S \times G_S \to 2^{\Sigma^*}$ that maps each signal and segment of the canonical segmentation to a set of value expressions, capturing the signal's potential behaviors in the given segment.
 Let $x$ be a signal in $S$, and let $R_1, \ldots, R_m$ be its uncertainty regions where $R_i = (t_i, t_i')$ and the corresponding value expression is $v_i$ for all $1 \leq i \leq m$.
 Now, let $I \in G_S$ be a segment with $I = [s, s')$ and for each $1 \leq i \leq m$ define the set $V_i$ of value expressions capturing how $I$ relates with $R_i$ in \cref{eq:valexprset}.
-
-\small
+%
 \begin{wrapfigure}{r}{0.5\textwidth}
+	\small
 	\vspace{-2em}
 	\begin{equation} \label{eq:valexprset}
 		V_i = 
@@ -209,7 +209,9 @@ Now, let $I \in G_S$ be a segment with $I = [s, s')$ and for each $1 \leq i \leq
 \normalsize
 The last case happens only when \( I \cap R_i \) is empty.
 We define \(\gamma\) as follows:
+%\vspace{-1em}
 \[ \gamma(x,I) = \destutter(V_1 \cdot V_2 \cdot \ldots \cdot V_m) \setminus \{\epsilon\} \]
+%\vspace{-1em}
 Observe that \(\gamma(x,I)\) contains all the potential behaviors of \( x \) in segment \( I \) by construction.
 However, it is potentially overapproximate because the sets \( V_1, \ldots, V_m \) contain redundancy by definition, and the concatenation does not ensure that an edge is considered exactly once.
 We demonstrate this in \cref{fig:csve}.
@@ -249,8 +251,9 @@ The signal $x'$ is \emph{$I$-consistent with $x$} iff the value expression $x'(s
 Moreover, $x'$ is \emph{consistent with $x$} iff it is $I$-consistent with $x$ for all $I \in G_S$.
 
 Now, let $S = (x_1, \ldots, x_n)$ and define $\tr^+(S,{\hb})$ as follows:
+\vspace{-0.5em}
 \[ \tr^+(S,{\hb}) = \{ (x_1', \ldots, x_n') \st \text{$x_i'$ is consistent with $x_i$ for all $1 \leq i \leq n$}\} \]
-
+%\vspace{-1em}
 
 
 \begin{example} \label{ex:overapx}

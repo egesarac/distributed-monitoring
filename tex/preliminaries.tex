@@ -30,6 +30,7 @@ For all $\sigma \in \Sigma \cup \{\epsilon\}$, let $\destutter(\sigma) = \sigma$
 For all $u \in \Sigma^*$ such that $u = \sigma_1 \sigma_2 v$ for some $\sigma_1,\sigma_2 \in 
 \Sigma$ and $v \in \Sigma^*$, we define it as follows.
 
+\vspace{-1em}
 \small
 \begin{equation*}
 	\destutter(u) =
@@ -51,6 +52,7 @@ For a set $L \subseteq \Sigma^*$ of finite words, we define $\destutter(L) =
 To extend $\destutter$ to tuples of words, for all $\sigma \in \Sigma \cup \{\epsilon\}$  let $\destutter(\sigma, \ldots, \sigma) = (\sigma, \ldots, \sigma)$.
 Given a tuple $(u_1, \ldots, u_m) = (\sigma_{1,1} \sigma_{1,2} v_1, \ldots, \sigma_{m,1} \sigma_{m,2} v_m)$ of finite words of the same length, we define $\destutter(u_1, \ldots, u_m)$ as expected:
 
+\vspace{-1em}
 \small
 \begin{equation*}
 	\destutter(u_1, \ldots, u_m) =
@@ -94,7 +96,7 @@ Given intervals $I,J \subseteq \R_{\geq 0}$, we define $I \oplus J = \{i + j \st
 We recall the finite-trace qualitative semantics of STL defined over $\B$ \cite{MalerN13}.
 Let $d \in \R_{> 0}$ and $w = (x_1, \ldots, x_n)$ with $x_i : [0,d) \to \R$ for all $1 \leq i \leq n$.
 Let $\varphi_1, \varphi_2$ be STL formulas and let $t \in [0,d)$.
-%6
+
 \small
 \begin{align*}
 	(w,t) \models p \iff & f_p(x_1(t), \ldots, x_n(t)) > 0 \\
@@ -112,7 +114,8 @@ $\true = \lnot \false$,
 $ \varphi_1 \lor \varphi_2 = \lnot (\lnot \varphi_1 \land \lnot \varphi_2)$,
 $\LTLf_I \varphi = \true \until_I \varphi$, and
 $\LTLg_I \varphi = \lnot \LTLf_I \lnot \varphi$.
-Moreover, the untimed temporal operators are defined through their timed counterparts on the interval $[0,\infty)$, e.g., $\varphi_1 \until \varphi_2 = \varphi_1 \until_{[0,\infty)} \varphi_2$.
+Moreover, the untimed temporal operators are defined through their timed counterparts on the interval $[0,\infty)$.
+%, e.g., $\varphi_1 \until \varphi_2 = \varphi_1 \until_{[0,\infty)} \varphi_2$.
 %Note that our interpretation of the untimed until operator is strict.
 %The non-strict variant can be defined in terms of the strict one as follows: $\varphi_1 \underline{\until} \varphi_2 = \varphi_2 \lor (\varphi_1 \land (\varphi_1 \until \varphi_2))$.
 
@@ -142,8 +145,7 @@ We assume that the system is \emph{partially synchronous}: the agents use a cloc
 
 \begin{definition} \label{defn:hb}
 	A \emph{distributed signal} is a pair $(S, {\hb})$, where $S = (x_1, \ldots, x_n)$ is a vector of 
-	signals and ${\hb}$ is the happened-before relation between events in signals extended with the 
-	partial synchrony assumption as follows:
+	signals and ${\hb}$ is the happened-before relation between events defined as follows:
 	(1) For every agent, the events of its signals are totally ordered, i.e., for all $1 \leq i \leq n$ and all $(t, x_i(t)), (t', x_i(t')) \in V_i$, if $t < t'$ then $(t, x_i(t)) \hb (t', x_i(t'))$.
 	(2) Every pair of events whose timestamps are at least $\varepsilon$ apart is totally ordered, i.e., for all $1 \leq i,j \leq n$ and all $(t, x_i(t)) \in V_i$ and $(t', x_j(t')) \in V_j$, if $t + \varepsilon \leq t'$ then $(t, x_i(t)) \hb (t', x_j(t'))$.
 \end{definition}
@@ -182,7 +184,7 @@ We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distribu
 %\end{wrapfigure}
 
 \begin{wrapfigure}{r}{0.31\textwidth}
-	\vspace{-2em}
+	\vspace{-3em}
 	\centering
 	\begin{tikzpicture}[scale=0.75]
 		% Draw the arrows
@@ -216,6 +218,7 @@ We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distribu
 		\draw[fill=black] (2,2.8) circle (1pt);
 	\end{tikzpicture}
 	\caption{A distributed signal in with consistent cuts $C_1, C_2, C_3$ constituting a consistent cut flow. Note that $C'$ is a non-example since $(2.5, x_2(2.5)) \in \fr(C')$~and $(1.6, x_1(1.6)) \notin \fr(C')$,~but  $(1.6, x_1(1.6))~\hb~(2.5, x_2(2.5))$.} \label{fig:distsig}
+	\vspace{1em}
 \end{wrapfigure}
 
 Observe that a consistent cut flow of a distributed signal induces a vector of synchronous signals which can be evaluated using the standard semantics described above.
@@ -229,18 +232,18 @@ Similarly, if $\tr(S,{\hb})$ has an empty intersection with the set of traces $\
 Otherwise, the evaluation is inconclusive since some traces satisfy the property and some violate it.
 Notice that we quantify universally over traces for both satisfaction and violation.
 
-%\begin{wrapfigure}{l}{.6\textwidth}
-	\footnotesize
-	\begin{equation*}
-		[(S,{\hb}) \models \varphi] = 
-		\begin{cases}
-			\top & \text{ if } \forall w \in \tr(S,{\hb}) : w \models \varphi \\
-			\bot & \text{ if } \forall w \in \tr(S,{\hb}) : w \models \lnot\varphi \\
-			\,? & \text{ otherwise}
-		\end{cases}
-	\end{equation*}
-	\normalsize
-%\end{wrapfigure}
+\vspace{-1em}
+\footnotesize
+\begin{equation*}
+	[(S,{\hb}) \models \varphi] = 
+	\begin{cases}
+		\top & \text{ if } \forall w \in \tr(S,{\hb}) : w \models \varphi \\
+		\bot & \text{ if } \forall w \in \tr(S,{\hb}) : w \models \lnot\varphi \\
+		\,? & \text{ otherwise}
+	\end{cases}
+\end{equation*}
+\normalsize
+
 
 
 \section{Overapproximation of the STL Distributed Semantics}
@@ -252,7 +255,7 @@ In particular, given a distributed signal $(S,{\hb})$, STL$^+$ considers an appr
 $\tr^+(S,{\hb})$ of the set $\tr(S,{\hb})$ of synchronous traces where $ \tr(S,{\hb}) \subseteq \tr^+(S,{\hb})$.
 A signal $(S,{\hb})$ satisfies (resp. violates) an STL$^+$ formula $\varphi$ iff all the traces in $\tr^+(S,{\hb})$ belong to the language of $\varphi$ (resp. $\lnot \varphi$).
 
-%\begin{wrapfigure}{l}{.6\textwidth}
+\vspace{-1em}
 \footnotesize
 \begin{equation*}
 	[(S,{\hb}) \models \varphi]_+ = 
@@ -263,7 +266,6 @@ A signal $(S,{\hb})$ satisfies (resp. violates) an STL$^+$ formula $\varphi$ iff
 	\end{cases}
 \end{equation*}
 \normalsize
-%\end{wrapfigure}
 
 Note that we assume w.l.o.g. that $\varphi$ is \emph{copyless}, i.e., each signal $x \in S$ occurs in $\varphi$ at most once.
 In \cref{sec:approach,sec:algorithm}, we respectively define $\tr^+$ and present an algorithm to compute the semantics of STL$^+$.
