@@ -29,12 +29,31 @@ By extension, a segmentation of a collection of signals with the same temporal d
 %Intuitively, $\theta_{\text{lo}}$ and $\theta_{\text{hi}}$ give us the lower and upper bounds on the value of the monitor's clock for a given edge, i.e., the end points of the uncertainty region of the given edge.
 %We use these to describe a canonical segmentation of a distributed signal.
 
+Let $(S,{\hb})$ be a distributed signal of $n$ signals.
+The \emph{canonical segmentation} $G_S$ of $(S,{\hb})$ the segmentation of $S$ where the segment endpoints match the temporal domain and uncertainty region endpoints.
+Formally, we define $G_S$ as follows.
+For each signal $x_i$, where $1 \leq i \leq n$, let $F_i$ be the set of uncertainty region endpoints.
+Let $F = \{0, d\} \cup \bigcup_{i = 1}^{n} F_i$ and let $(s_j)_{1 \leq j \leq |F|}$ be a nondecreasing sequence of clock values corresponding to the elements of $F$.
+Then, the canonical segmentation of $(S,{\hb})$ is $G_S = \{I_1, \ldots, I_{|F| - 1}\}$ where $I_j = [s_j, s_{j+1})$ for all $1 \leq j < |F|$.
+We show an example in \cref{fig:csve}.
 
-\begin{wrapfigure}{r}{0.5\textwidth}
-%	\vspace{-2em}
-	\begin{tikzpicture}[scale=0.6]
+%\begin{example} \label{ex:canonseg}
+%	\ege{remove?}
+%	Let $(S, {\hb})$ be a distributed Boolean signal with $S = (x_1, x_2)$ and $\varepsilon = 2$ over the temporal domain $[0,8)$.
+%	Both signals are initially 0.
+%	Signal $x_1$ has a rising edge at time 2 and a falling edge at time 5, while $x_2$ has a rising edge at time 3 and a falling edge at time 6.
+%	The uncertainty regions of $x_1$ are $(0,4)$ and $(3,7)$, while those of $x_2$ are $(1,5)$ and $(4,8)$.
+%	Then, we have $F = \{0, 8\} \cup \{0, 1, 3, 4, 5, 7, 8\}$, and thus the canonical segmentation is $G_S = \{ [0,1), [1,3), [3,4), [4,5), [5,7), [7,8) \}$.
+%\end{example}
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\begin{tikzpicture}[scale=0.6]
+		\tiny
+		\node at (-1.5,0) {(a)};
 		\footnotesize 
-		
 		% Plot for x1(t)
 		\begin{scope}
 			% Axes
@@ -89,37 +108,59 @@ By extension, a segmentation of a collection of signals with the same temporal d
 			\node at (7.5,0.5) {{\tiny $[7,8)$}};
 		\end{scope}
 	\end{tikzpicture}
-	\caption{The signals $x_1$ (top, red, dashed) and $x_2$ (bottom, blue, solid) from \cref{ex:canonseg}. The edges are marked with solid balls and their uncertainty regions are given as semi-transparent boxes around the edges. The resulting canonical segmentation $G_S$ is shown below the graphical representation of the signals.}
-	\label{fig:canonseg}
-%	\vspace{-2em}
-\end{wrapfigure}
 
-%\begin{wrapfigure}{r}{0.5\textwidth}
-%	\vspace{-2em}
-%	\begin{center}
-%		\includegraphics[scale=0.5]{canonseg.png}
-%	\end{center}
-%	\caption{The signals $x_1$ (top, red, dashed) and $x_2$ (bottom, blue, solid) from \cref{ex:canonseg}. The edges are marked with solid balls and their uncertainty regions are given as semi-transparent boxes around the edges. The resulting canonical segmentation $G_S$ is shown below the graphical representation of the signals.}
-%	\label{fig:canonseg}
-%\end{wrapfigure}
-
-Let $(S,{\hb})$ be a distributed signal of $n$ signals.
-The \emph{canonical segmentation} $G_S$ of $(S,{\hb})$ the segmentation of $S$ where the segment endpoints match the temporal domain and uncertainty region endpoints.
-Formally, we define $G_S$ as follows.
-For each signal $x_i$, where $1 \leq i \leq n$, let $F_i$ be the set of uncertainty region endpoints.
-Let $F = \{0, d\} \cup \bigcup_{i = 1}^{n} F_i$ and let $(s_j)_{1 \leq j \leq |F|}$ be a nondecreasing sequence of clock values corresponding to the elements of $F$.
-Then, the canonical segmentation of $(S,{\hb})$ is $G_S = \{I_1, \ldots, I_{|F| - 1}\}$ where $I_j = [s_j, s_{j+1})$ for all $1 \leq j < |F|$.
-
-\begin{example} \label{ex:canonseg}
-	\ege{remove?}
-	Let $(S, {\hb})$ be a distributed Boolean signal with $S = (x_1, x_2)$ and $\varepsilon = 2$ over the temporal domain $[0,8)$.
-	Both signals are initially 0.
-	Signal $x_1$ has a rising edge at time 2 and a falling edge at time 5, while $x_2$ has a rising edge at time 3 and a falling edge at time 6.
-	The uncertainty regions of $x_1$ are $(0,4)$ and $(3,7)$, while those of $x_2$ are $(1,5)$ and $(4,8)$.
-	Then, we have $F = \{0, 8\} \cup \{0, 1, 3, 4, 5, 7, 8\}$, and thus the canonical segmentation is $G_S = \{ [0,1), [1,3), [3,4), [4,5), [5,7), [7,8) \}$.
-\end{example}
-
-
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+			\begin{tikzpicture}[scale=0.5]
+			\tiny
+			% Part (a)
+			\node at (-1.5,0) {(b)};
+			\draw[thick] (0,0) -- (8,0);
+			\foreach \x in {0,1,3,4,5,7,8}
+			\draw (\x,0) node[above] {\x};
+			\draw (-0.5,0) node[above] {$t$:};
+			
+			\draw[fill=pink] (-1,-2) rectangle (0,0) node[midway] {$x_1$};
+			\draw[fill=pink] (0,-1) rectangle (4,0) node[midway] {$01$};
+			\draw[fill=pink] (3,-2) rectangle (7,-1) node[midway] {$10$};
+			\draw[fill=pink] (7,-2) rectangle (8,0) node[midway] {$0$};
+			
+			\draw[fill=cyan] (-1,-4) rectangle (0,-2) node[midway] {$x_2$};
+			\draw[fill=cyan] (0,-4) rectangle (1,-2) node[midway] {$0$};
+			\draw[fill=cyan] (1,-3) rectangle (5,-2) node[midway] {$01$};
+			\draw[fill=cyan] (4,-4) rectangle (8,-3) node[midway] {$10$};
+			
+			\draw (0,-4) -- (8,-4);
+			\draw (8,-4) -- (8,0);
+			
+			% Part (b)
+			\node at (-1.5,-5) {(c)};
+			\draw[thick] (0,-5) -- (8,-5);
+			\foreach \x in {0,1,3,4,5,7,8}
+			\draw (\x,-5) node[above] {\x};
+			\draw (-0.5,-5) node[above] {$t$:};
+			
+			\draw[fill=pink] (-1,-7) rectangle (0,-5) node[midway] {$x_1$};
+			\draw[fill=pink] (0,-7) rectangle (1,-5) node[midway] {\tiny\begin{tabular}{c}\{0,\\ 01\}\\\end{tabular}};
+			\draw[fill=pink] (1,-7) rectangle (3,-5) node[midway] {\tiny\begin{tabular}{c}\{0,\\ 01,\\ 1\}\\\end{tabular}};
+			\draw[fill=pink] (3,-7) rectangle (4,-5) node[midway] {\tiny{\begin{tabular}{c}\{01,\\ 010,\\ 1,\\ 10\}\\\end{tabular}}};
+			\draw[fill=pink] (4,-7) rectangle (5,-5) node[midway] {\tiny\begin{tabular}{c}\{1,\\ 10,\\ 0\}\\\end{tabular}};
+			\draw[fill=pink] (5,-7) rectangle (7,-5) node[midway] {{\tiny\begin{tabular}{c}\{10,\\ 0\}\\\end{tabular}}};
+			\draw[fill=pink] (7,-7) rectangle (8,-5) node[midway] {{\tiny\begin{tabular}{c}\{0\}\\\end{tabular}}};
+			
+			\draw[fill=cyan] (-1,-9) rectangle (0,-7) node[midway] {$x_2$};
+			\draw[fill=cyan] (0,-9) rectangle (1,-7) node[midway] {{\tiny\begin{tabular}{c}\{0\}\\\end{tabular}}};
+			\draw[fill=cyan] (1,-9) rectangle (3,-7) node[midway] {\tiny\begin{tabular}{c}\{0,\\ 01\}\\\end{tabular}};
+			\draw[fill=cyan] (3,-9) rectangle (4,-7) node[midway] {\tiny\begin{tabular}{c}\{0,\\ 01,\\ 1\}\\\end{tabular}};
+			\draw[fill=cyan] (4,-9) rectangle (5,-7) node[midway] {\tiny{\begin{tabular}{c}\{01,\\ 010,\\ 1,\\ 10\}\\\end{tabular}}};
+			\draw[fill=cyan] (5,-9) rectangle (7,-7) node[midway] {\tiny\begin{tabular}{c}\{1,\\ 10,\\ 0\}\\\end{tabular}};
+			\draw[fill=cyan] (7,-9) rectangle (8,-7) node[midway] {{\tiny\begin{tabular}{c}\{10,\\ 0\}\\\end{tabular}}};
+		\end{tikzpicture}
+	\end{subfigure}
+	\footnotesize{
+	\caption{(a) A distributed signal $(S,{\hb})$ with $x_1$ (top, red, dashed) and $x_2$ (bottom, blue, solid) whose edges are marked with solid balls and their uncertainty regions are given as semi-transparent boxes around the edges. The resulting canonical segmentation $G_S$ is shown below the graphical representation of the signals. (b) The uncertainty regions of $(S,{\hb})$ and the corresponding value expressions. (c) The tabular representation of the function $\gamma$ for $(S,{\hb})$, e.g., \(\gamma(x_1, [3,4)) = (\sfx(01) \cdot \pfx(10)) \setminus \{\epsilon\} = \{ 01, 010, 1, 10\}\).}\label{fig:csve}}
+\end{figure}
 
 
 \subsubsection{Value Expressions.}
@@ -132,74 +173,17 @@ Given a signal \( x \) and an edge \((t, x(t))\), the value expression correspon
 We omit the concatenation symbol \(\cdot\) when the letters are clear from context.
 This definition is general because finite-length piecewise-constant real-valued signals will only have a finite number of values, making \(\Sigma\) finite.
 
-
-
-%\begin{wrapfigure}{r}{0.5\textwidth}
-%	\vspace{-2em}
-%	\begin{center}
-%		\includegraphics[scale=0.33]{valexpr.png}
-%	\end{center}
-%	\caption{(a) The uncertainty regions of the distributed signal in \cref{ex:canonseg} and the corresponding value expressions. (b) The tabular representation of the function $\gamma$ for the given distributed signal.}
-%	\label{fig:valexpr}
-%\end{wrapfigure}
-
 Notice that (i) uncertainty regions may overlap, and (ii) the canonical segmentation may split an uncertainty region into multiple segments.
 Consider a signal $x$ with a rising edge in $(1,5)$ and a falling edge in $(4,8)$.
 The corresponding value expressions are respectively $v_1 = 01$ and $v_2 = 10$.
 Notice that the behavior of $x$ in the interval $[1,4)$ can be expressed as $\pfx(v_1)$, encoding whether the rising edge has happened yet.
 Similarly, the behavior in $[4,5)$ is given by $\sfx(v_1) \cdot \pfx(v_2)$, which captures whether the edges occur in this interval (thanks to prefixing and suffixing) and the fact that the rising edge happens before the falling edge (thanks to concatenation).
 
-\begin{wrapfigure}{r}{0.5\textwidth}
-	%	\vspace{-2em}
-	
-	\begin{tikzpicture}[scale=0.6]
-		\small
-		% Part (a)
-		\node at (-1.5,0) {(a)};
-		\draw[thick] (0,0) -- (8,0);
-		\foreach \x in {0,1,3,4,5,7,8}
-		\draw (\x,0) node[above] {\x};
-		\draw (-0.5,0) node[above] {$t$:};
-		
-		\draw[fill=pink] (-1,-2) rectangle (0,0) node[midway] {$x_1$};
-		\draw[fill=pink] (0,-1) rectangle (4,0) node[midway] {$01$};
-		\draw[fill=pink] (3,-2) rectangle (7,-1) node[midway] {$10$};
-		\draw[fill=pink] (7,-2) rectangle (8,0) node[midway] {$0$};
-		
-		\draw[fill=cyan] (-1,-4) rectangle (0,-2) node[midway] {$x_2$};
-		\draw[fill=cyan] (0,-4) rectangle (1,-2) node[midway] {$0$};
-		\draw[fill=cyan] (1,-3) rectangle (5,-2) node[midway] {$01$};
-		\draw[fill=cyan] (4,-4) rectangle (8,-3) node[midway] {$10$};
-		
-		\draw (0,-4) -- (8,-4);
-		\draw (8,-4) -- (8,0);
-		
-		% Part (b)
-		\node at (-1.5,-5) {(b)};
-		\draw[thick] (0,-5) -- (8,-5);
-		\foreach \x in {0,1,3,4,5,7,8}
-		\draw (\x,-5) node[above] {\x};
-		\draw (-0.5,-5) node[above] {$t$:};
-		
-		\draw[fill=pink] (-1,-7) rectangle (0,-5) node[midway] {$x_1$};
-		\draw[fill=pink] (0,-7) rectangle (1,-5) node[midway] {\scriptsize\begin{tabular}{c}\{0,\\ 01\}\\\end{tabular}};
-		\draw[fill=pink] (1,-7) rectangle (3,-5) node[midway] {\scriptsize\begin{tabular}{c}\{0,\\ 01,\\ 1\}\\\end{tabular}};
-		\draw[fill=pink] (3,-7) rectangle (4,-5) node[midway] {\scriptsize{\begin{tabular}{c}\{01,\\ 010,\\ 1,\\ 10\}\\\end{tabular}}};
-		\draw[fill=pink] (4,-7) rectangle (5,-5) node[midway] {\scriptsize\begin{tabular}{c}\{1,\\ 10,\\ 0\}\\\end{tabular}};
-		\draw[fill=pink] (5,-7) rectangle (7,-5) node[midway] {{\scriptsize\begin{tabular}{c}\{10,\\ 0\}\\\end{tabular}}};
-		\draw[fill=pink] (7,-7) rectangle (8,-5) node[midway] {{\scriptsize\begin{tabular}{c}\{0\}\\\end{tabular}}};
-		
-		\draw[fill=cyan] (-1,-9) rectangle (0,-7) node[midway] {$x_2$};
-		\draw[fill=cyan] (0,-9) rectangle (1,-7) node[midway] {{\scriptsize\begin{tabular}{c}\{0\}\\\end{tabular}}};
-		\draw[fill=cyan] (1,-9) rectangle (3,-7) node[midway] {\scriptsize\begin{tabular}{c}\{0,\\ 01\}\\\end{tabular}};
-		\draw[fill=cyan] (3,-9) rectangle (4,-7) node[midway] {\scriptsize\begin{tabular}{c}\{0,\\ 01,\\ 1\}\\\end{tabular}};
-		\draw[fill=cyan] (4,-9) rectangle (5,-7) node[midway] {\scriptsize{\begin{tabular}{c}\{01,\\ 010,\\ 1,\\ 10\}\\\end{tabular}}};
-		\draw[fill=cyan] (5,-9) rectangle (7,-7) node[midway] {\scriptsize\begin{tabular}{c}\{1,\\ 10,\\ 0\}\\\end{tabular}};
-		\draw[fill=cyan] (7,-9) rectangle (8,-7) node[midway] {{\scriptsize\begin{tabular}{c}\{10,\\ 0\}\\\end{tabular}}};
-	\end{tikzpicture}
-	\caption{(a) The uncertainty regions of the distributed signal in \cref{ex:canonseg} and the corresponding value expressions. (b) The tabular representation of the function $\gamma$ for the given distributed signal.}
-	\label{fig:valexpr}
-\end{wrapfigure}
+%\begin{wrapfigure}{r}{0.5\textwidth}
+%	%	\vspace{-2em}
+%	
+%
+%\end{wrapfigure}
 
 Formally, given a distributed signal $(S,{\hb})$, we define a function $\gamma : S \times G_S \to 2^{\Sigma^*}$ that maps each signal and segment of the canonical segmentation to a set of value expressions, capturing the signal's potential behaviors in the given segment.
 Let $x$ be a signal in $S$, and let $R_1, \ldots, R_m$ be its uncertainty regions where $R_i = (t_i, t_i')$ and the corresponding value expression is $v_i$ for all $1 \leq i \leq m$.
@@ -222,15 +206,15 @@ We define \(\gamma\) as follows:
 \[ \gamma(x,I) = \destutter(V_1 \cdot V_2 \cdot \ldots \cdot V_m) \setminus \{\epsilon\} \]
 Observe that \(\gamma(x,I)\) contains all the potential behaviors of \( x \) in segment \( I \) by construction.
 However, it is potentially overapproximate because the sets \( V_1, \ldots, V_m \) contain redundancy by definition, and the concatenation does not ensure that an edge is considered exactly once.
-%We demonstrate an example in \cref{fig:valexpr}.
+We demonstrate an example in \cref{fig:csve}.
 
-\begin{example} \label{ex:valexpr}
-	Recall the distributed signal \((S, {\hb})\) in \cref{ex:canonseg} and \cref{fig:canonseg}.
-	In \cref{fig:valexpr}a, we show the value expressions corresponding to its uncertainty regions.
-	For example, the falling edge of \(x_1\) has an uncertainty region of \((3,7)\), represented by the value expression \(10\). 
-	In \cref{fig:valexpr}b, we give the function \(\gamma\) for \((S, {\hb})\).
-	For example, \(\gamma(x_1, [3,4)) = (\sfx(01) \cdot \pfx(10)) \setminus \{\epsilon\} = \{ 01, 010, 1, 10\}\), and \(\gamma(x_2, [0,1)) = \{0\}\).
-\end{example}
+%\begin{example} \label{ex:valexpr}
+%	Recall the distributed signal \((S, {\hb})\) in \cref{fig:canonseg}.
+%	In \cref{fig:valexpr}a, we show the value expressions corresponding to its uncertainty regions.
+%	For example, the falling edge of \(x_1\) has an uncertainty region of \((3,7)\), represented by the value expression \(10\). 
+%	In \cref{fig:valexpr}b, we give the function \(\gamma\) for \((S, {\hb})\).
+%	For example, \(\gamma(x_1, [3,4)) = (\sfx(01) \cdot \pfx(10)) \setminus \{\epsilon\} = \{ 01, 010, 1, 10\}\), and \(\gamma(x_2, [0,1)) = \{0\}\).
+%\end{example}
 
 
 
@@ -264,7 +248,7 @@ Now, let $S = (x_1, \ldots, x_n)$ and define $\tr^+(S,{\hb})$ as follows:
 
 
 \begin{example} \label{ex:overapx}
-	Recall the distributed signal \((S, {\hb})\) in \cref{ex:canonseg} whose \(\gamma\) function is given in \cref{fig:valexpr}b.
+	Recall the distributed signal \((S, {\hb})\) and its \(\gamma\) function in \cref{fig:csve}.
 	Consider the synchronous trace \(w \in \tr(S, {\hb})\) where the rising edges of both signals occur at time 3 and the falling edges at time 5.
 	Such a signal \( w \) would be included in \(\tr^+(S,{\hb})\) since for each \(i \in \{1,2\}\), the value expression 1 is contained in \(\gamma(x_i, [3,4))\) and \(\gamma(x_i, [4,5))\), while 0 is contained in the remaining sets \(\gamma\) maps \(x_i\) to.
 	Now, consider a synchronous trace \((x_1', x_2')\) where both signals are initially 0, have rising edges at time 2 and 3.5, and falling edges at time 3 and 5.
