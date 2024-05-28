@@ -1,9 +1,111 @@
 \section{Introduction} \label{sec:introduction}
 
-\borzoo{I'll work on the intro and related work on Friday}
 
-\emph{Distributed systems} are networks of independent agents that work together to achieve a common objective. Distributed systems are everywhere around us and come in many different forms. For example, cloud computing uses distribution of resources and services over the internet to offer to their users a scalable infrastructure with transparent on-demand access to computing power and storage. Swarms of drones represent another family of distributed systems where individual drones collaborate  to accomplish tasks like surveillance, search and rescue, or package delivery. While each drone operates independently,  it also communicates and coordinates with others to successfully achieve their common objectives. The individual agents in a distributed system typically do not share a global clock. To coordinate actions across multiple agents, clock synchronization is often needed. While perfect clock synchronization is impractical due to network latency and node failures, algorithms such as the Network Time Protocol (NTP) allow agents to maintain a \emph{bounded skew} between the synchronized clocks. In that case, we say that a distributed system has \emph{partial synchrony}. 
+\emph{Distributed systems} are networks of independent agents that work together to achieve a 
+common objective.
+%
+Distributed systems are everywhere around us and come in many different forms.
+%
+For example, cloud computing uses distribution of resources and services over the internet to offer 
+to their users a scalable infrastructure with transparent on-demand access to computing power and 
+storage. 
+%
+Swarms of drones represent another family of distributed systems where individual drones 
+collaborate to accomplish tasks like surveillance, search and rescue, or package delivery.
+%
+While each drone operates independently, it also communicates and coordinates with others to 
+successfully achieve their common objectives.
+%
+The individual agents in a distributed system typically do not share a global clock.
+%
+To coordinate actions across multiple agents, clock synchronization is often needed.
+%
+While perfect clock synchronization is impractical due to network latency and node failures, 
+algorithms such as the Network Time Protocol (NTP) allow agents to maintain a \emph{bounded 
+skew} between the synchronized clocks.
+%
+In that case, we say that a distributed system has \emph{partial synchrony}. 
 
-Formal verification of distributed system is a notoriously hard problem, due to the combinatorial explosion of all possible interleavings in the behaviors collected from individual agents. \emph{Runtime verification (RV)} provides a more pragmatic approach, in which a monitor observes a behavior of a distributed system and checks its correctness against a formal specification. The problem of distributed RV under partial synchrony assumption has been studied for Linear Temporal Logic (LTL) and Signal Temporal Logic (STL) specification languages. The proposed solutions use Satisfiability-Modulo-Theory (SMT) solving to provide sound and complete distributed monitoring procedures. Although distributed RV monitors consume only a single distributed behavior at a time, this behavior can nevertheless have an excessive number of possible interleavings. Hence, the exact distributed monitors from the literature can still suffer from significant computational overhead. 
+Formal verification of distributed system is a notoriously hard problem, due to the combinatorial 
+explosion of all possible interleavings in the behaviors collected from individual agents.
+%
+ \emph{Runtime verification (RV)} provides a more pragmatic approach, in which a monitor observes 
+ a behavior of a distributed system and checks its correctness against a formal specification.
+ %
+%\subsection{Motivation}
+There has been emerging interst in desgining RV techniques for distributed systems in the past few 
+years.
+%
+Remotely related to the problem of distributed RV under partial synchrony are distributed RV in the 
+fully {\em synchronous}~\cite{ef20,cf16,bf16} and {\em 
+asynchronous}~\cite{cgnm13,mg05,og07,mb15,g20,bfrrt22} settings as well as  benchmarking 
+tools~\cite{aafi21} for assessing monitoring overhead.
+%
+The problem of distributed RV under partial synchrony assumption has been studied for Linear 
+ Temporal Logic (LTL)~\cite{GangulyMB20} and Signal Temporal Logic (STL)~\cite{MomtazAB23} 
+ specification languages.
+ %
+ The proposed solutions use Satisfiability-Modulo-Theory (SMT) solving to provide sound and 
+ complete distributed monitoring procedures.
+ %
+ Although distributed RV monitors consume only a single distributed behavior at a time, this behavior 
+ can nevertheless have an excessive number of possible interleavings. 
+  %
+ Put it another way, although RV deals only with verification of a single execurtion at run time, it is 
+ still prone to evaluating an explosion of combinations.
+ %
+ Hence, the exact distributed monitors from the literature can still suffer from significant 
+ computational overhead.
+ %
+ This phenamenon has been observed even under partial synchrony~\cite{GangulyMB20,gmb24}.
+  
+%  \subsection{Contributions}
 
-To mitigate this issue, we present an approach for \emph{approximate} RV of STL specifications under partial synchrony. In essence, we abstract away potential interleavings in distributed behaviors in a conservative manner, resulting in an effective over-approximation of global behaviors. This abstraction simplifies the representation of distributed behaviors and the monitoring operations required to evaluate temporal specifications. There is an inevitable trade-off in approximate RV -- gains in the monitoring speed-up may result in reduced accuracy. For some applications, reduced accuracy may not be acceptable. Therefore, we propose a methodology that combines our approximate monitors with their exact counterparts, with the aim to benefit from the enhanced monitoring efficiency without sacrificing precision. We implemented our approach in a prototype tool and performed thorough evaluations on both synthetic and real-world case studies. We first demonstrated that our approximate monitors achieve speed-ups of several orders of magnitudes compared to the exact SMT-based distributed RV solution. We empirically characterized the classes of specifications and behaviors for which our approximate monitoring approach achieves good precision. We finally showed that by combining exact and approximate distributed RV, there is still a significant efficiency gain on average without the sacrifice of the precision, even in cases where approximate monitors have low accuracy.    
+To mitigate this issue, in this paper, we present a novel approach for \emph{approximate} RV of STL 
+specifications under partial synchrony.
+%
+In essence, we abstract away potential interleavings in distributed behaviors in a conservative 
+manner, resulting in an effective over-approximation of global behaviors.
+%
+This abstraction simplifies the representation of distributed behaviors into a set of Boolean 
+expressions, taking into account regions of uncertainty created by clock skews.
+%
+We define monitoring operations required to evaluate temporal specifications over such expression, 
+which result in monitoring verdicts on over-approximate behaviors.
+%
+There is typically an inevitable trade-off between {\em accuracy} and {\em speed-up} in approximate 
+solution and  RV is not an expection.
+%
+That is, gains in the monitoring speed-up may result in reduced accuracy.
+%
+For some applications, reduced accuracy may not be acceptable.
+%
+Therefore, we propose a methodology that combines our approximate monitors with their exact 
+counterparts, with the aim to benefit from the enhanced monitoring efficiency without sacrificing 
+precision.
+
+
+
+We implemented our approach in a prototype tool and performed thorough evaluations on both 
+synthetic and real-world case studies (mutual separation in swarm of UAVs and a water distribution 
+system).
+%
+We first demonstrated that our approximate monitors achieve speed-ups of several orders of 
+magnitudes compared to the exact SMT-based distributed RV solution.
+%
+We empirically characterized the classes of specifications and behaviors for which our approximate 
+monitoring approach achieves good precision.
+%
+We finally showed that by combining exact and approximate distributed RV, there is still a 
+significant efficiency gain on average without the sacrifice of the precision, even in cases where 
+approximate monitors have low accuracy. \borzoo{We should give some numbers here. Orders of 
+magnitude? We need a stronger statement!}
+
+\paragraph{Organization.} Section~\ref{sec:preliminaries} presents the preliminary concepts.
+%
+Section~\ref{sec:semantics} introdices over-approximate semantics of STL while 
+Sections~\ref{sec:approach} and~\ref{sec:algorithm} describe our approach in approximating traces 
+and the associated monitoring algorithm, respectively.
+%
+We evaluate our approach in Section~\ref{sec:experiments}. Finally, we make concluding remarls in 
+Section~\ref{sec:conclusion}.

@@ -1,5 +1,8 @@
-\section{Monitoring Algorithm} \label{sec:algorithm}
-In this section, given a distributed signal $(S,{\hb})$, we describe an algorithm to compute $[(S,{\hb}) \models \varphi]_+$.
+\section{Monitoring Algorithm} 
+\label{sec:algorithm}
+
+In this section, given a distributed signal $(S,{\hb})$, we describe an algorithm to compute 
+$[(S,{\hb}) \models \varphi]_+$.
 The algorithm makes use of the function $\gamma$ defined in \cref{sec:approach} without explicitly computing $\tr^+(S,{\hb})$.
 To achieve this, we first describe the notion of \emph{asynchronous product} of value expressions to capture potential interleavings within segments.
 We continue with the evaluation of \emph{untimed operators} and then \emph{timed operators}.
@@ -62,8 +65,7 @@ In addition, we define the \emph{bitwise strong until} operator as follows:
 \small
 \[ u \mathsf{U}^0 v = \left( \max_{i \leq j \leq \ell} \left( \min \left( v[j], \min_{i \leq k \leq j} u[k] \right) \right) \right)_{1 \leq i \leq \ell} \]
 \normalsize
-\borzoo{We can merge the 2 inner min}
-\ege{How?}
+%
 As usual, we derive \emph{bitwise eventually} as 
 $\mathsf{E} u = 1^\ell \mathsf{U}^0 u$, \emph{bitwise always} as $\mathsf{A} u = \BitNeg 
 (\mathsf{E} \BitNeg u)$, and \emph{bitwise weak until} as $u \mathsf{U}^1 v = (u \mathsf{U}^0 v) 
