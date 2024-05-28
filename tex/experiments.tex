@@ -92,7 +92,7 @@ Figure~\ref{fig:rgresults} summarizes the results of evaluating specifications $
 
 We first observe that the approximate ADM approach consistently achieves computational speedups of \emph{several orders of magnitude} 
 compared to the exact EDM approach. The absolute speedups range from several thousands to almost 60 thousand times, regardless of the considered specification, the duration $d$ of the trace, or the uncertainty $\varepsilon$ bound. We see that the highest speedups are achieved for long signals with low uncertainty bounds. The price paid in terms of accuracy is highly dependent on the type of specification and the uncertainty bounds. We can see that applying ADM is very accurate when monitoring the property 
-$\varphi_1$ in which both the temporal and the combinatorial operators are conjunctive. On the other hand, having a combination of conjunctive and disjunctive operations (specifications $\varphi_{2}$, $\varphi_{3}$ and $\varphi_{4}$) increases the number of FPs.  Surprisingly, we see that in these cases the introduction of FPs is higher for lower values of $\varepsilon$. This happens because that for higher values of $\varepsilon$,  even the exact method gives many inconclusive verdicts. Finally, we see that adding real-time modalities to the temporal operators adds inaccuracies and increases further the percentage of FPs. Finally, by observing the third column of Figure~\ref{fig:rgresults}, we can see that by combining EDM and ADM, we consistently get better performance than by using EDM only, even in cases where ADM introduces a high percentage of FPs.
+$\varphi_1$ in which both the temporal and the combinatorial operators are conjunctive. On the other hand, having a combination of conjunctive and disjunctive operations (specifications $\varphi_{2}$ and $\varphi_{3}$) increases the number of FPs.  Surprisingly, we see that in these cases the introduction of FPs is higher for lower values of $\varepsilon$. This happens because that for higher values of $\varepsilon$,  even EDM gives many inconclusive verdicts. Finally, we see that adding real-time modalities to the temporal operators adds inaccuracies and increases further the percentage of FPs. Finally, by observing the third column of Figure~\ref{fig:rgresults}, we can see that by combining EDM and ADM, we consistently get better performance than by using EDM only, even in cases where ADM introduces a high percentage of FPs.
 
 
 \begin{figure}[htb]
@@ -103,9 +103,9 @@ $\varphi_1$ in which both the temporal and the combinatorial operators are conju
 \end{figure}
 
 \subsubsection{Heat Pump.}
-Speedups increase with the number of signals \(n\) and decrease with the maximum clock skew \(\varepsilon\).
+Speedups increase with the number of signals \(n\) and decrease with \(\varepsilon\).
 The \textsc{Coarse} method shows significant improvements over EDM, with up to a $104000\times$ speedup in the best-case (when \(n=4\) and \(\varepsilon=0.05\)) and an $8\times$ speedup in the worst-case (when \(n=2\) and \(\varepsilon=0.4\)).
-Note that \(\varepsilon=0.4\) is near the realistic upper limit, indicating no scalability issues.
+Note that \(\varepsilon=0.4\) is near the realistic upper limit \cite{MomtazAB23}, indicating no scalability issues.
 The decentralized \textsc{Coarse-Relative} method adds up to a $1.63\times$ speedup over \textsc{Coarse}.
 Decentralization significantly benefits \textsc{Fine}, bringing it below the time-out limit with up to a $476\times$ speedup in non-time-out instances.
 As expected, \textsc{Orig} does not perform well.
