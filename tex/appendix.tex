@@ -9,8 +9,8 @@
 %	Then, it holds that $w \models \varphi$ for all $w \in \tr(S,{\hb})$.
 %	Therefore, $[(S,{\hb}) \models \varphi] = \top$ by definition.
 %	The case of $[(S,{\hb}) \models \varphi]_+ = \bot$ follows from the same arguments.
-%%	
-%%	\qed
+%	
+%	\qed
 %\end{proof}
 
 \subsubsection{Proof of \cref{cl:trsound}.}
@@ -134,7 +134,8 @@ Given a set  $R$ of (synchronous) traces, we further define $Y(\varphi, R, I) = 
 	This holds by hypothesis and the definition of $\tr^+$.
 	
 	Given an interval $K$, let use define $\tr^+_K(S,{\hb})$ as the projection of the traces in $\tr^+(S,{\hb})$ to the interval $K$.
-	Then, we have $\llbracket (S,{\hb}), I \models \psi_1 \until_J \psi_2 \rrbracket = \destutter( \pi(Y(\psi_1 \until \psi_2, \tr^+_{K_1}(S,{\hb}), K_1)) \cdot \ldots \cdot \pi(Y(\psi_1 \until \psi_2, \tr^+_{K_k}(S,{\hb}), K_k)) )$.
+	Then, we have
+	\[ \llbracket (S,{\hb}), I \models \psi_1 \until_J \psi_2 \rrbracket = \destutter( \pi(Y(\psi_1 \until \psi_2, \tr^+_{K_1}(S,{\hb}), K_1)) \cdot \ldots \cdot \pi(Y(\psi_1 \until \psi_2, \tr^+_{K_k}(S,{\hb}), K_k)).	\]
 	Now, we argue below that the left-hand side equals $\pi(Y(\psi_1 \until_J \psi_2, \tr^+(S,{\hb}), I ))$, concluding the proof.
 
 	Let $y_j \in Y(\psi_1 \until \psi_2, \tr^+_{K_j}(S,{\hb}), K_j)$ for each $1 \leq j \leq k$.
@@ -160,5 +161,20 @@ We now proceed to prove \cref{cl:algo}.
 %	\qed
 \end{proof}
 
-\subsubsection{Additional Experiment Results.}
-\TODO ?
+\subsubsection{Additional Experimental Results.}
+
+We additionally consider the following specifications:
+$\varphi_4 = \LTLg (p \lor q)$, $\varphi_5 = p \until q$, and $\varphi_6 = \LTLg (p \Rightarrow \LTLf_{[0,2)} q)$.
+
+The results presented in \cref{fig:rgresults2} support our conclusions in \cref{sec:experiments}.
+Mixing conjunctive and disjunctive modalities (i.e., universal and existential quantifiers) leads to increased FPs, although combining ADM and EDM still yields considerable speedup, as can be seen for $\varphi_4$ and $\varphi_5$.
+For timed formulas, the increased size of the interval (from $[0,1)$ to $[0.2)$ in $\varphi_6$) has a negligible effect on the FPs and speedup values.
+
+\begin{figure}[h]
+	\begin{center}
+		\includegraphics[width=\linewidth]{speedup_appendix}
+		\caption{Results on monitoring $\varphi_{4}$ to $\varphi_{5}$ on distributed traces created by the RG.}
+		\label{fig:rgresults2}
+	\end{center}
+	\vspace{1em}
+\end{figure}
