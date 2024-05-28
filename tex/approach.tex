@@ -4,7 +4,7 @@
 In this section, given a distributed signal $(S,{\hb})$, we describe an overapproximation $\tr^+(S,{\hb})$ of its set $\tr(S,{\hb})$ of synchronous traces.
 First, we present the notion of \emph{canonical segmentation}, a systematic way of partitioning the temporal domain of a distributed signal to track partial asynchrony.
 Second, we introduce \emph{value expressions}, sets of finite words representing signal behavior in a time interval.
-Finally, we define $\tr^+$ based on these notions, showing it soundly approximates $\tr$.
+Finally, we define $\tr^+$ and show that it soundly approximates $\tr$.
 
 \begin{remark}
 	We assume Boolean signals for convenience (all results hold for non-Boolean signals).
@@ -161,7 +161,7 @@ We show an example in \cref{fig:csve}.
 	\end{subfigure}
 	\footnotesize{
 	\caption{(a) A distributed signal $(S,{\hb})$ with $x_1$ (top, red, dashed) and $x_2$ (bottom, blue, solid) whose edges are marked with solid balls and their uncertainty regions are given as semi-transparent boxes around the edges. The resulting canonical segmentation $G_S$ is shown below the graphical representation of the signals. (b) The uncertainty regions of $(S,{\hb})$ and the corresponding value expressions. (c) The tabular representation of the function $\gamma$ for $(S,{\hb})$, e.g., \(\gamma(x_1, [3,4)) = (\sfx(01) \cdot \pfx(10)) \setminus \{\epsilon\} = \{ 01, 010, 1, 10\}\).}\label{fig:csve}}
-	\vspace{-3em}
+%	\vspace{-3em}
 \end{figure}
 
 

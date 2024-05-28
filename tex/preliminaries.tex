@@ -29,7 +29,7 @@ We define the function $\destutter : \Sigma^* \to \Sigma^*$ inductively.
 For all $\sigma \in \Sigma \cup \{\epsilon\}$, let $\destutter(\sigma) = \sigma$.
 For all $u \in \Sigma^*$ such that $u = \sigma_1 \sigma_2 v$ for some $\sigma_1,\sigma_2 \in 
 \Sigma$ and $v \in \Sigma^*$, we define it as follows.
-%
+
 \small
 \begin{equation*}
 	\destutter(u) =
@@ -155,7 +155,7 @@ The notion of consistent cut captures possible global states.
 	A set $C \subseteq V$ is a \emph{consistent cut} iff for every event in $C$, all events that happened before  it also belong to $C$, i.e., for all $e, e' \in V$, if $e \in C$ and $e' \hb e$, then $e' \in C$.
 \end{definition}
 
-We denote by $\CC(T)$ the (infinite) set of consistent cuts at global time $T$.
+We denote by $\CC(T)$ the set of consistent cuts at global time $T$.
 Given a consistent cut $C$, its \emph{frontier} $\fr(C) \subseteq C$ is the set consisting of the last events in $C$ of each signal, i.e., $\fr(C) = \bigcup_{i = 1}^{n} \{ (t, x_i(t)) \in V_i \cap C \st \forall t' > t : (t', x_i(t')) \notin V_i \cap C \}$.
 
 \begin{definition}
@@ -267,7 +267,6 @@ A signal $(S,{\hb})$ satisfies (resp. violates) an STL$^+$ formula $\varphi$ iff
 
 Note that we assume w.l.o.g. that $\varphi$ is \emph{copyless}, i.e., each signal $x \in S$ occurs in $\varphi$ at most once.
 In \cref{sec:approach,sec:algorithm}, we respectively define $\tr^+$ and present an algorithm to compute the semantics of STL$^+$.
-We finally prove the correctness of our approach.
 
 \begin{theorem} \label{cl:stlsound}
 	For every STL formula $\varphi$ and every distributed signal $(S,{\hb})$, if $[(S,{\hb}) \models \varphi]_+ = \top$ (resp. $\bot$) then $[(S,{\hb}) \models \varphi] = \top$ (resp. $\bot$).

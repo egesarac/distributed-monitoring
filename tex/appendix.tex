@@ -1,17 +1,17 @@
 \section*{Appendix}
-\subsubsection{Proof of \cref{cl:stlsound}.}
-\begin{proof}
-	Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal.
-	Assume $[(S,{\hb}) \models \varphi]_+ = \top$.
-	We want to show that $[(S,{\hb}) \models \varphi] = \top$.
-	Expanding the definition of $[(S,{\hb}) \models \varphi]_+ = \top$, we have $w \models \varphi$ for all $w \in \tr^+(S,{\hb})$.
-	By \cref{cl:trsound}, we have $\tr(S,{\hb}) \subseteq \tr^+(S,{\hb})$.
-	Then, it holds that $w \models \varphi$ for all $w \in \tr(S,{\hb})$.
-	Therefore, $[(S,{\hb}) \models \varphi] = \top$ by definition.
-	The case of $[(S,{\hb}) \models \varphi]_+ = \bot$ follows from the same arguments.
-%	
-%	\qed
-\end{proof}
+%\subsubsection{Proof of \cref{cl:stlsound}.}
+%\begin{proof}
+%	Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal.
+%	Assume $[(S,{\hb}) \models \varphi]_+ = \top$.
+%	We want to show that $[(S,{\hb}) \models \varphi] = \top$.
+%	Expanding the definition of $[(S,{\hb}) \models \varphi]_+ = \top$, we have $w \models \varphi$ for all $w \in \tr^+(S,{\hb})$.
+%	By \cref{cl:trsound}, we have $\tr(S,{\hb}) \subseteq \tr^+(S,{\hb})$.
+%	Then, it holds that $w \models \varphi$ for all $w \in \tr(S,{\hb})$.
+%	Therefore, $[(S,{\hb}) \models \varphi] = \top$ by definition.
+%	The case of $[(S,{\hb}) \models \varphi]_+ = \bot$ follows from the same arguments.
+%%	
+%%	\qed
+%\end{proof}
 
 \subsubsection{Proof of \cref{cl:trsound}.}
 \begin{proof}
@@ -149,7 +149,7 @@ We now proceed to prove \cref{cl:algo}.
 \begin{proof}[of \cref{cl:algo}]
 	Consider a distributed signal $(S,{\hb})$ and an STL formula $\varphi$.
 	Assume $[(S,{\hb}) \models \varphi]_+ = \top$.
-	It means that for every trace $w \in \tr^+(S,{\hb})$, the corresponding satisfaction signal's initial value is 1, i.e., $y_{\varphi,w}(0) = 1$.
+	Then, for every trace $w \in \tr^+(S,{\hb})$, the corresponding satisfaction signal's initial value is 1, i.e., $y_{\varphi,w}(0) = 1$.
 	By \cref{cl:eq}, this also holds for $\llbracket (S, {\hb}) \models \varphi \rrbracket$.
 	Now, assume  $\llbracket (S, {\hb}) \models \varphi \rrbracket = \{1\}$.
 	It means that every value expression encoding the satisfaction of $\varphi$ (computed through recursive applications of the semantics function) start with 1.
@@ -159,3 +159,6 @@ We now proceed to prove \cref{cl:algo}.
 %
 %	\qed
 \end{proof}
+
+\subsubsection{Additional Experiment Results.}
+\TODO ?
