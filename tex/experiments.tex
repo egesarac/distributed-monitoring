@@ -1,4 +1,5 @@
-\section{Experimental Evaluation} \label{sec:experiments}
+\section{Experimental Evaluation} 
+\label{sec:experiments}
 
 This section presents the research questions and the experiments we conducted and analyzed to validate our approximate distributed monitoring approach.
 
@@ -41,20 +42,18 @@ Each valve is operated by a controller that samples the outflow pressure at 20Hz
 
 \subsubsection{Specifications}
 
-Table~\ref{tab:spec} summarizes the STL specifications that we use to monitor the behavior of our three experimental subjects. Specifications $\varphi_{1-5}$ are applied to the distributed traces created by the random generator and represent different classes and fragments of Boolean-valued temporal formulas. The first specification $\varphi_1$ is an LTL formula in which both the outer temporal operator ($\LTLg$) and the inner Boolean operator ($\wedge$) are conjunctive. The second specification $\varphi_2$ puts instead a disjunction within the scope of the conjunctive temporal $\LTLg$ operator. The third specification $\varphi_3$ is a simple \emph{until} formula. The fourth formula $\varphi_4$ is the common LTL response formula, while $\varphi_5$ adds a bounded real-time response requirement to the previous specification. The specification $\varphi_{HP}$ associated to the heat pump case study is an STL formula in which a sum of signals originating from different agents is compared to a constant. Finally, the specification $\varphi_{SD}$ defines a mutual separation property that requires more sophisticated arithmetic operations on signals originating from different agents.  
+Table~\ref{tab:spec} summarizes the STL specifications that we use to monitor the behavior of our three experimental subjects. Specifications $\varphi_{1}$, $\varphi_{2}$ and $\varphi_{3}$ are monitored against the distributed traces created by the random generator and represent different classes and fragments of Boolean-valued temporal formulas. The first specification $\varphi_1$ is an LTL formula in which both the outer temporal operator ($\LTLg$) and the inner Boolean operator ($\wedge$) are conjunctive. The second formula $\varphi_2$ is the common LTL response formula which combines conjunctive $(\LTLg)$ and disjunctive $(\LTLf, \Rightarrow)$ operators. Finally, $\varphi_3$ adds a bounded real-time response requirement to the previous specification. The specification $\varphi_{HP}$ associated to the heat pump case study is an STL formula in which a sum of signals originating from different agents is compared to a constant. Finally, the specification $\varphi_{SD}$ defines a mutual separation property that requires more sophisticated arithmetic operations on signals originating from different agents.  
 
-\begin{table}
+\begin{table}[htb]
 \centering
-\begin{tabular}{|l|l|l|}
+\begin{tabular}{|l|l|l|l|}
 \hline
 Subject & Spec ID & STL formula \\
 \hline
 \multirow{ 5}{*}{RG}
 & $\varphi_1$ & $\LTLg (p \wedge q)$  \\
-& $\varphi_2$ & $\LTLg (p \vee q)$ \\
-& $\varphi_3$ & $ p \LTLuntil q$ \\
-& $\varphi_4$ & $\LTLg (p \Rightarrow \LTLf q)$ \\
-& $\varphi_5$ & $\LTLg (p \Rightarrow \LTLf_{[0,1)} q)$  \\
+& $\varphi_2$ & $\LTLg (p \Rightarrow \LTLf q)$ \\
+& $\varphi_3$ & $\LTLg (p \Rightarrow \LTLf_{[0,1)} q)$  \\
 %& $\varphi_1$ & $\LTLg (p \wedge q)$ & \multirow{ 5}{*}{untimed} \\
 %& $\varphi_2$ & $\LTLf (p \vee q)$ & \\
 %& $\varphi_3$ & $\LTLg (p \vee q)$ & \\
@@ -75,10 +74,9 @@ To conduct the experiments, we used a laptop with Ubuntu 24.04, an AMD Ryzen 7 4
 Our tool is implemented in C++ and compiled using \texttt{g++} version 13.2.0 with the optimization flag \texttt{-O3} enabled.
 The precise method invokes the SMT-solver Z3 \cite{MouraB08} and is based on \cite{MomtazAB23}.
 
-\subsubsection{Results}
-\ege{maybe we can move some of the synthetic experiments to the appendix?}
+\paragraph{Random Generator Discussion}
 
-We first conducted the experiments on distributed traces created by RG and evaluated on specifications $\varphi_1$ to $\varphi_5$. Figure~\ref{fig:rgresults} summarizes the results of the experiments. Each row in Figure~\ref{fig:rgresults} shows the result for a specific formula. The first column in the figure depicts a heatmap where each cell shows how many times ADM is faster than EDM when evaluating the formula on the give distributed trace with duration $d$ and uncertainty bound $\epsilon$. The second column shows a heatmap where every cell shows the percentage of \emph{false positives} (FP) introduced by ADM, where a false positive happens when ADM does not agree with EDM, i.e. ADM evaluates to inconclusive when the real verdict is true or false. Finally, the third column depicts a heat map, where each cell estimates the achieved speedup when combining ADM with EDM, compared to using only EDM.
+Figure~\ref{fig:rgresults} summarizes the results of evaluating specifications $\varphi_1$ to $\varphi_5$ against distributed trace from RG. The first column in the figure depicts a heatmap where each cell shows how many times ADM is faster than EDM when evaluating the formula on the give distributed trace with duration $d$ and uncertainty bound $\epsilon$. The second column shows a heatmap where every cell shows the percentage of \emph{false positives} (FP) introduced by ADM, where a false positive happens when ADM does not agree with EDM, i.e. ADM evaluates to inconclusive when the real verdict is true or false. Finally, the third column depicts a heat map, where each cell estimates the achieved speedup when combining ADM with EDM, compared to using only EDM.
 
 \begin{figure}
 	\begin{center}
@@ -100,7 +98,7 @@ $\varphi_1$ in which both the temporal and the combinatorial operators are conju
 	\end{center}
 \end{figure}
 
-\subsubsection{Heat Pump Discussion.}
+\paragraph{Heat Pump Discussion.}
 Speedups increase with the number of signals \(n\) and decrease with the maximum clock skew \(\varepsilon\).
 The \textsc{Coarse} method shows significant improvements over EDM, with up to a $104000\times$ speedup in the best-case (when \(n=4\) and \(\varepsilon=0.05\)) and an $8\times$ speedup in the worst-case (when \(n=2\) and \(\varepsilon=0.4\)).
 Note that \(\varepsilon=0.4\) is near the realistic upper limit, indicating no scalability issues.
@@ -116,7 +114,7 @@ All methods produce the same verdict for the considered traces.
 	\end{center}
 \end{figure}
 
-\subsubsection{Swarm of Drones Discussion.}
+\paragraph{Swarm of Drones Discussion.}
 Similar to the previous case scenario, speedups in the mutual separation case increase with \(n\) and decrease with \(\varepsilon\).
 The \textsc{Fine-Relative} method achieves about a $78000\times$ speedup in the best-case scenario (when \(n=4\) and \(\varepsilon=0.05\)) and a $23\times$ speedup in the worst-case (when \(n=2\) and \(\varepsilon=0.25\)).
 The fine method performs slower than SMT in two cases where \(n\) is small and \(\varepsilon\) is large.
@@ -124,4 +122,6 @@ The fine method performs slower than SMT in two cases where \(n\) is small and \
 As in the previous case, \textsc{Orig} does not perform well.
 Additionally, \textsc{Coarse} and \textsc{Coarse-Relative} are not applicable in this scenario because the arithmetic operations are not monotonic.
 Again, all methods yield the same verdicts.
+
+\paragraph{Summary.} To answer RQ1, we observe that while the speedup achieved with ADM compared to EDM is consistenly very high and in three to five orders of maginute, the tradeoff between the efficiency and the accuracy depends to a large extent on the type of specifications, the duration of the input signals and the maximal clock skew. The arithmetic and timed operators are particulatly sensitive to the over-approximations of ADM and reduce the accuracy of the method. Untimed temporal properties, and especially properties in which conjunctive and disjunctive operations are not combined achieve very high levels of accuracy, resulting in an excellent tradeoff. Given the significant increase of the efficiency in ADM compared to EDM, these two methods can be effectively combined even in situations where ADM gives low accuracy. The combination of ADM and EDM results consistently in the overall increase of efficiency, thus giving a positive answer to RQ2.
 

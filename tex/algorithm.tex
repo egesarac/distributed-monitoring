@@ -383,6 +383,19 @@ Lastly, assuming a decentralized setting, where each agent has a monitor running
 \alert{This approach is called \textsc{Relative}.}
 We will demonstrate the benefits and downsides of each method in \cref{sec:experiments}.
 
+\subsubsection{Combining Exact and Aprroximate Monitoring.} We propose a heuristic that combines the exact distrubuted monitors (EDM) with their approximate counterparts (ADM) with the aim to achieve better computational performance of the monitor, while remaining precise. The approach works as follows:
+\begin{enumerate}
+\item For every distributed trace $(S,{\hb})$:
+\begin{enumerate}
+\item Compute the approximate verdict $v \leftarrow [(S,{\hb}) \models \varphi]_+$.
+\item If the verdict is inconclusive, i.e. $v = ?$:
+\begin{enumerate}
+\item Compute the exact verdict $v \leftarrow [(S,{\hb}) \models \varphi]$.
+\end{enumerate}
+\end{enumerate}
+\item Return the verdict $v$.
+\end{enumerate}
+
 %\ege{This part is new, please check and maybe try to shorten.}
 %The methods described in \cref{sec:approach} and here can be generalized to handle arithmetic operations over real-valued signals and numerical predicates.
 %The key observation enabling this is that such finite-length piecewise-constant signals take only finitely many values.
