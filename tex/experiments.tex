@@ -79,12 +79,12 @@ ADM is implemented in C++ and compiled using \texttt{g++} version 13.2.0 with th
 
 \subsubsection{Random Generator.}
 
-Figure~\ref{fig:rgresults} summarizes the results of evaluating specifications $\varphi_1$ to $\varphi_5$ against distributed trace from RG. The first column in the figure depicts a heatmap where each cell shows how many times ADM is faster than EDM when evaluating the formula on the give distributed trace with duration $d$ and uncertainty bound $\varepsilon$. The second column shows a heatmap where every cell shows the percentage of \emph{false positives} (FP) introduced by ADM, where a false positive happens when ADM does not agree with EDM, i.e. ADM evaluates to inconclusive when the real verdict is true or false. Finally, the third column depicts a heat map, where each cell estimates the achieved speedup when combining ADM with EDM, compared to using only EDM.
+Figure~\ref{fig:rgresults} summarizes the results of evaluating specifications $\varphi_1$ to $\varphi_3$ against distributed trace from RG. The first column in the figure depicts a heatmap where each cell shows how many times ADM is faster than EDM when evaluating the formula on the give distributed trace with duration $d$ and uncertainty bound $\varepsilon$. The second column shows a heatmap where every cell shows the percentage of \emph{false positives} (FP) introduced by ADM, where a false positive happens when ADM does not agree with EDM, i.e. ADM evaluates to inconclusive when the real verdict is true or false. Finally, the third column depicts a heat map, where each cell estimates the achieved speedup when combining ADM with EDM, compared to using only EDM.
 
 \begin{figure}
 	\begin{center}
 	\includegraphics[width=\linewidth]{speedup}
-\caption{The experimental results - monitoring of specifications $\varphi_{1}$ to $\varphi_{5}$ on distributed traces created by the RG.}
+\caption{The experimental results - monitoring of specifications $\varphi_{1}$ to $\varphi_{3}$ on distributed traces created by the RG.}
 \label{fig:rgresults}
 \end{center}
 \vspace{1em}
