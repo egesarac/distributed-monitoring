@@ -2,13 +2,13 @@
 \label{sec:approach}
 
 In this section, given a distributed signal $(S,{\hb})$, we describe an overapproximation $\tr^+(S,{\hb})$ of its set $\tr(S,{\hb})$ of synchronous traces.
-First, we present the notion of \emph{canonical segmentation}, a systematic way of partitioning the temporal domain of a distributed signal to track partial asynchrony.
+First, we present the notion of \emph{canonical segmentation}, a systematic way of partitioning the temporal domain of a distributed signal to track partial synchrony.
 Second, we introduce \emph{value expressions}, sets of finite words representing signal behavior in a time interval.
 Finally, we define $\tr^+$ and show that it soundly approximates $\tr$.
 
 \begin{remark}
-	We assume Boolean signals for convenience (all results hold for non-Boolean signals).
-	The definitions and results extend to real-valued signals because finite-length piecewise-constant signals use only a finite number of values.
+	We assume Boolean signals for convenience. 
+	All the concepts and results in this section generalize to non-Boolean signals because finite-length piecewise-constant signals use only a finite number of values.
 \end{remark}
 
 \subsubsection{Canonical Segmentation.}
@@ -35,7 +35,7 @@ Formally, we define $G_S$ as follows.
 For each signal $x_i$, where $1 \leq i \leq n$, let $F_i$ be the set of uncertainty region endpoints.
 Let $F = \{0, d\} \cup \bigcup_{i = 1}^{n} F_i$ and let $(s_j)_{1 \leq j \leq |F|}$ be a nondecreasing sequence of clock values corresponding to the elements of $F$.
 Then, the canonical segmentation of $(S,{\hb})$ is $G_S = \{I_1, \ldots, I_{|F| - 1}\}$ where $I_j = [s_j, s_{j+1})$ for all $1 \leq j < |F|$.
-We show an example in \cref{fig:csve}.
+We show an example in \cref{fig:csve}a.
 
 %\begin{example} \label{ex:canonseg}
 %	\ege{remove?}
@@ -160,7 +160,7 @@ We show an example in \cref{fig:csve}.
 		\end{tikzpicture}
 	\end{subfigure}
 	\footnotesize{
-	\caption{(a) A distributed signal $(S,{\hb})$ with $x_1$ (top, red, dashed) and $x_2$ (bottom, blue, solid) whose edges are marked with solid balls and their uncertainty regions are given as semi-transparent boxes around the edges. The resulting canonical segmentation $G_S$ is shown below the graphical representation of the signals. (b) The uncertainty regions of $(S,{\hb})$ and the corresponding value expressions. (c) The tabular representation of the function $\gamma$ for $(S,{\hb})$, e.g., \(\gamma(x_1, [3,4)) = (\sfx(01) \cdot \pfx(10)) \setminus \{\epsilon\} = \{ 01, 010, 1, 10\}\).}\label{fig:csve}}
+	\caption{(a) A distributed signal $(S,{\hb})$ with $x_1$ (top, red) and $x_2$ (bottom, blue) whose edges are marked with solid balls and their uncertainty regions are given as semi-transparent boxes around the edges. The resulting canonical segmentation $G_S$ is shown below the graphical representation of the signals. (b) The uncertainty regions of $(S,{\hb})$ and the corresponding value expressions. (c) The tabular representation of the function $\gamma$ for $(S,{\hb})$, e.g., \(\gamma(x_1, [3,4)) = (\sfx(01) \cdot \pfx(10)) \setminus \{\epsilon\} = \{ 01, 010, 1, 10\}\).}\label{fig:csve}}
 	\vspace{1em}
 \end{figure}
 
@@ -214,7 +214,7 @@ We define \(\gamma\) as follows:
 %\vspace{-1em}
 Observe that \(\gamma(x,I)\) contains all the potential behaviors of \( x \) in segment \( I \) by construction.
 However, it is potentially overapproximate because the sets \( V_1, \ldots, V_m \) contain redundancy by definition, and the concatenation does not ensure that an edge is considered exactly once.
-We demonstrate this in \cref{fig:csve}.
+We demonstrate this in \cref{fig:csve}b and \cref{fig:csve}c.
 
 %\begin{example} \label{ex:valexpr}
 %	Recall the distributed signal \((S, {\hb})\) in \cref{fig:canonseg}.
@@ -245,7 +245,7 @@ We describe how the function $\gamma$ defines a set $\tr^+(S,{\hb})$ of synchron
 %Now, let $S = (x_1, \ldots, x_n)$ and define the \emph{canonical overapproximation} of $(S,{\hb})$ as follows:
 %$$ \tr^+(S,{\hb}) = \{ (x_1', \ldots, x_n') \st \text{$x_i$ and $x_i'$ are consistent for all $1 \leq i \leq n$}\} $$
 %
-Let $x \in S$ and $x'$ be two signals with the same temporal domain, and let $I = [s, s')$ be a segment in $G_S$.
+Consider $x \in S$, and let $x'$ be a signal with the same temporal domain, and let $I = [s, s')$ be a segment in $G_S$.
 Let $(t_1, x'(t_1)), \ldots, (t_\ell, x'(t_\ell))$ be the edges of $x'$ in segment $I$ with $t_i < t_{i+1}$ for all $1 \leq i < \ell$.
 The signal $x'$ is \emph{$I$-consistent with $x$} iff the value expression $x'(s) \cdot x'(t_1) \cdot \ldots \cdot x'(t_\ell)$ belongs to $\gamma(x,I)$.
 Moreover, $x'$ is \emph{consistent with $x$} iff it is $I$-consistent with $x$ for all $I \in G_S$.
