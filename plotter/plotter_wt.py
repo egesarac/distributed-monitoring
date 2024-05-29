@@ -9,52 +9,52 @@ eps_values = [0.05, 0.1, 0.2, 0.4]
 # eps_values = [1, 2, 4, 8]
 # n_values = [2]
 n_values = [2, 3, 4]
-methods = ['SMT', 'ORIG', 'FINE', 'F-REL', 'COARSE', 'C-REL']
+methods = ['EDM', 'ADM', 'ADM-F', 'ADM-FR', 'ADM-C', 'ADM-CR']
 markers = ['o', 's', 'D', '^', 'v', 'P']  # Different shapes for each method
 
 data = {
     2: {
-        'SMT': [9.3985,10.5139,13.7389,18.4945],
-        'ORIG': [0.0180,5.8773,'oot','oot'],
-        'FINE': [0.0017,0.0137,6.2907,'oot'],
-        'F-REL': [0.0006,0.0022,0.0132,2.2280],
-        'COARSE': [0.0006,0.0026,0.0156,2.5440],
-        'C-REL': [0.0005,0.0018,0.0087,1.1977],
+        'EDM': [9.3985,10.5139,13.7389,18.4945],
+        'ADM': [0.0180,5.8773,'oot','oot'],
+        'ADM-F': [0.0017,0.0137,6.2907,'oot'],
+        'ADM-FR': [0.0006,0.0022,0.0132,2.2280],
+        'ADM-C': [0.0006,0.0026,0.0156,2.5440],
+        'ADM-CR': [0.0005,0.0018,0.0087,1.1977],
     },
     3: {
-        'SMT': [22.2457,30.3284,44.4894,49.5030],
-        'ORIG': [1.2092,'oot','oot','oot'],
-        'FINE': [0.0014,0.0201,6.6749,'oot'],
-        'F-REL': [0.0005,0.0028,0.0755,20.7458],
-        'COARSE': [0.0003,0.0012,0.0205,3.4808],
-        'C-REL': [0.0002,0.0009,0.0134,2.1409],
+        'EDM': [22.2457,30.3284,44.4894,49.5030],
+        'ADM': [1.2092,'oot','oot','oot'],
+        'ADM-F': [0.0014,0.0201,6.6749,'oot'],
+        'ADM-FR': [0.0005,0.0028,0.0755,20.7458],
+        'ADM-C': [0.0003,0.0012,0.0205,3.4808],
+        'ADM-CR': [0.0002,0.0009,0.0134,2.1409],
     },
     4: {
-        'SMT': [37.4117,52.0112,84.5577,102.8766],
-        'ORIG': ['oot','oot','oot','oot'],
-        'FINE': [0.0031,0.0436,7.5063,'oot'],
-        'F-REL': [0.0012,0.0103,0.4119,'oot'],
-        'COARSE': [0.0004,0.0016,0.0268,4.3823],
-        'C-REL': [0.0003,0.0012,0.0198,3.0741],
+        'EDM': [37.4117,52.0112,84.5577,102.8766],
+        'ADM': ['oot','oot','oot','oot'],
+        'ADM-F': [0.0031,0.0436,7.5063,'oot'],
+        'ADM-FR': [0.0012,0.0103,0.4119,'oot'],
+        'ADM-C': [0.0004,0.0016,0.0268,4.3823],
+        'ADM-CR': [0.0003,0.0012,0.0198,3.0741],
     }
 }
 
 speedups = {
     2: {
-        'FINE/COARSE': [2.73, 5.27, 403.67, '-'],
-        'COARSE/C-REL': [1.24, 1.47, 1.79, 2.12],
-        'SMT/C-REL': [18229, 5909, 1576, 15],
+        'ADM-F/ADM-C': [2.73, 5.27, 403.67, '-'],
+        'ADM-C/ADM-CR': [1.24, 1.47, 1.79, 2.12],
+        'EDM/ADM-CR': [18229, 5909, 1576, 15],
     },
     3: {
-        'FINE/COARSE': [4.83, 16.67, 324.86, '-'],
-        'COARSE/C-REL': [1.19, 1.41, 1.63, '-'],
-        'SMT/C-REL': [93558, 35422, 3328, 23],
+        'ADM-F/ADM-C': [4.83, 16.67, 324.86, '-'],
+        'ADM-C/ADM-CR': [1.19, 1.41, 1.63, '-'],
+        'EDM/ADM-CR': [93558, 35422, 3328, 23],
 
     },
     4: {
-        'FINE/COARSE': [8.71, 27.82, 280.25, '-'],
-        'COARSE/C-REL': [1.14, 1.28, 1.35, 1.43],
-        'SMT/C-REL': [118471, 42383, 4273, 33],
+        'ADM-F/ADM-C': [8.71, 27.82, 280.25, '-'],
+        'ADM-C/ADM-CR': [1.14, 1.28, 1.35, 1.43],
+        'EDM/ADM-CR': [118471, 42383, 4273, 33],
     }
 }
 
@@ -68,7 +68,7 @@ def plot_data(n, data, ax):
     # # Add vertical lines for each epsilon value
     # for eps in eps_values:
     #     ax.axvline(x=eps, color='black', linestyle='-', linewidth=1)
-    #     spd = f'Speedups:\nFINE/COARSE:{speedups[n]["FINE/COARSE"][eps_values.index(eps)]}\nCOARSE/C-REL:{speedups[n]["COARSE/C-REL"][eps_values.index(eps)]}\nSMT/C-REL: {speedups[n]["SMT/C-REL"][eps_values.index(eps)]}'
+    #     spd = f'Speedups:\nADM-F/ADM-C:{speedups[n]["ADM-F/ADM-C"][eps_values.index(eps)]}\nADM-C/ADM-CR:{speedups[n]["ADM-C/ADM-CR"][eps_values.index(eps)]}\nEDM/ADM-CR: {speedups[n]["EDM/ADM-CR"][eps_values.index(eps)]}'
     #     ax.text(eps+0.0025, 10000, spd, rotation=0, fontsize=10, verticalalignment='top')
 
     ax.set_xlabel('ε (in seconds)', fontsize=12)  # Adjust the font size as needed

@@ -1,27 +1,27 @@
 \section{Monitoring Algorithm} 
 \label{sec:algorithm}
 
-In this section, given a distributed signal $(S,{\hb})$, we describe an algorithm to compute 
-$[(S,{\hb}) \models \varphi]_+$.
-The algorithm makes use of the function $\gamma$ defined in \cref{sec:approach} without explicitly computing $\tr^+(S,{\hb})$.
-To achieve this, we first describe the notion of \emph{asynchronous product} of value expressions to capture potential interleavings within segments.
-We continue with the evaluation of \emph{untimed operators} and then \emph{timed operators}.
-Finally, we conclude with putting all these together to compute the \emph{semantics} of STL$^+$ 
-and discuss an efficient implementation of the monitoring algorithm using \emph{bit vectors} to 
-represent and manipulate sets of Boolean value expressions.
-%Then, we present an algorithm to compute the \emph{semantics} $[(S,{\hb}) \models \varphi]_+$ using operations on value expressions and their asynchronous products that encode $\gamma$. 
-%Finally, we discuss how \emph{bit vectors} can represent asynchronous products and allow us to manipulate them faster.
+In this section, for a distributed signal $(S,{\hb})$, we describe an algorithm to compute $[(S,{\hb}) \models \varphi]_+$ using the function $\gamma$ from \cref{sec:approach} without explicitly computing $\tr^+(S,{\hb})$.
+We introduce the \emph{asynchronous product} of value expressions to capture interleavings within segments, then evaluate \emph{untimed} and \emph{timed operators}.
+Finally, we combine these steps to compute the \emph{semantics} of STL$^+$.
+We also discuss an efficient implementation of the monitoring algorithm using \emph{bit vectors}, heuristics to enhance \emph{generalization} for real-valued signals, and a method to \emph{combine} our approach with exact monitoring.
+%In this section, given a distributed signal $(S,{\hb})$, we describe an algorithm to compute 
+%$[(S,{\hb}) \models \varphi]_+$.
+%The algorithm makes use of the function $\gamma$ defined in \cref{sec:approach} without explicitly computing $\tr^+(S,{\hb})$.
+%To achieve this, we first describe the notion of \emph{asynchronous product} of value expressions to capture potential interleavings within segments.
+%We continue with the evaluation of \emph{untimed operators} and then \emph{timed operators}.
+%Finally, we conclude with putting all these together to compute the \emph{semantics} of STL$^+$.
+%We also discuss an efficient implementation of the monitoring algorithm using \emph{bit vectors}, heuristics to enhance \emph{generalization} for real-valued signals, and a method to \emph{combine} our approach with exact monitoring.
 
 \begin{remark}
-	For the sake of convenience, we focus on Boolean signals for the rest of the section.
-	Asynchronous products and the algorithm to compute $[(S,{\hb}) \models \varphi]_+$ can be extended to value expressions over arbitrary finite alphabets, e.g., encoding finite-length piecewise-constant real-valued signals.
-	This allows us to express complex properties where atomic propositions are real-valued functions.
+	As in \cref{sec:approach}, we focus on Boolean signals for convenience.
+	The concepts and algorithms here can be extended to value expressions over arbitrary finite alphabets, e.g., encoding finite-length piecewise-constant real-valued signals.
+	Hence, we are able to express and evaluate complex properties where atomic propositions are functions of real-valued signals.
 \end{remark}
 
 \subsubsection{Asynchronous Products.}
 Consider the value expressions $u_1 = 0 \cdot 1$ and $u_2 = 1 \cdot 0$ encoding the behaviors of two signals within a segment.
-The behaviors within a segment are asynchronous.
-To capture their potential interleavings, we consider how the values in $u_1$ and $u_2$ can align.
+Since behaviors within a segment are asynchronous, to capture their potential interleavings, we consider how the values in $u_1$ and $u_2$ can align.
 In particular, there are three potential alignments:
 (i) the rising edge of $u_1$ happens before the falling edge of $u_2$,
 (ii) the falling edge of $u_2$ happens before the rising edge of $u_1$, and
@@ -52,11 +52,11 @@ Asynchronous products of value expressions allow us to lift value expressions to
 \vspace{-0.7em}
 \subsubsection{Untimed Operations.}
 As hinted in \cref{ex:asyncprod}, to compute the semantics, we apply bitwise operations on value expressions and their asynchronous products to transform them into encodings of satisfaction signals of formulas.
-For example, to determine $[(S, {\hb}) \models \LTLeventually (x_1 \land x_2)]_+$, we first compute for each segment in $G_S$ the set of value expressions for the satisfaction of $x_1 \land x_2$, and then from these compute that of $\LTLeventually (x_1 \land x_2)$.
+For example, to determine $[(S, {\hb}) \models \LTLeventually (x_1 \land x_2)]_+$, we first compute for each segment in $G_S$ the set of value expressions for the satisfaction of $x_1 \land x_2$, and then from these compute those of $\LTLeventually (x_1 \land x_2)$.
 This compositional approach allows us to evaluate arbitrary STL$^+$ formulas.
 
 First, we define bitwise operations on Boolean value expressions encoding atomic propositions.
-Then, we use these to evaluate (untimed) STL formulas over sets of value expressions.
+Then, we use these to evaluate untimed STL formulas over sets of value expressions.
 %
 Let $u$ and $v$ be Boolean value expressions of length $\ell$.
 We denote by $u \BitAnd v$ the bitwise-and operation, by $u \BitOr v$ the bitwise-or, and by $\BitNeg u$ the bitwise-negation.
@@ -71,7 +71,7 @@ $\mathsf{E} u = 1^\ell \mathsf{U}^0 u$, \emph{bitwise always} as $\mathsf{A} u =
 \BitOr (\mathsf{A} u)$.
 %\[ u \mathsf{U}^1 v = \left( \max \left( (u \mathsf{U}^0 v)[i], (\mathsf{A} u)[i] \right) \right)_{1 \leq i \leq \ell} \]
 The distinction between $\mathsf{U}^0$ and $\mathsf{U}^1$ will be useful when we incrementally evaluate a formula.
-We remark that the definitions of these operators coincide with the robustness semantics of (discrete time) STL.
+We remark that the definitions of these operators coincide with the robustness semantics of STL.
 Finally, note that the output of these operations is a value expression of length $\ell$.
 For example, if $u = 010$, we have $\mathsf{E} u = 110$ and $\mathsf{A} u = 000$.
 
@@ -89,6 +89,7 @@ We define the evaluation of untimed formulas with respect to $(S, {\hb})$ and a 
 %Now, let $L_1$ and $L_2$ be two sets of value expressions.
 %We define the following untimed operations:
 
+\vspace{-0.8em}
 \scriptsize
 \begin{align*}
 %	\lnot L_1 &= \{ \BitNeg u \st u \in L_1 \} \\
@@ -217,7 +218,7 @@ We demonstrate this and the computation of $\mathsf{pfs}$ in \cref{ex:profiles} 
 Let $\varphi_1$ and $\varphi_2$ be two STL formulas.
 Intuitively, once we have the profiles of a given interval $J$ with respect to $\varphi_1$ and $\varphi_2$, we can evaluate the corresponding untimed formulas on the product of these profiles and concatenate them.
 %This captures the behavior of the satisfaction signals with respect to a bounded interval, but introduces further imprecision due to additional concatenations.
-Formally, we handle the evaluation of timed formulas inductively as follows:
+Formally, we handle the evaluation of timed formulas as follows:
 
 \vspace{-1em}
 \small
@@ -237,14 +238,14 @@ where $\mathsf{pfs}((S,{\hb}), \varphi_1, I, J) = \{P_1, \ldots, P_k \}$ and $\m
 	We demonstrate the evaluation of the timed formula $\LTLeventually_{[0,1)} x_1$ over the segment $[1,3)$.
 	Recall from \cref{ex:profiles} the set $\mathsf{pfs}((S,{\hb}), x_1, [1,3), [0,1)) = \{P_1, P_2, P_3, P_4\}$ of profiles.
 	First, we apply the bitwise eventually operator to each value expression in each of these profiles separately:
-	$\{ \mathsf{E} u \st u \in P_1 \} = \{ 0, 1 \}$, $\{ \mathsf{E} u \st u \in P_2 \} = \{ 0, 1 \}$, $\{ \mathsf{E} u \st u \in P_3 \} = \{ 0, 1 \}$, and $\{ \mathsf{E} u \st u \in P_4 \} = \{ 0, 10, 1 \}$.
+	$\{ \mathsf{E} u \st u \in P_1 \} = \{ \mathsf{E} u \st u \in P_2 \} = \{ \mathsf{E} u \st u \in P_3 \} = \{ 0, 1 \}$, and $\{ \mathsf{E} u \st u \in P_4 \} = \{ 0, 10, 1 \}$.
 %	\begin{align*}
 %		P_1' &= \{ \mathsf{E} u \st u \in P_1 \} = \{ 0, 1 \} \\
 %		P_2' &= \{ \mathsf{E} u \st u \in P_2 \} = \{ 0, 1 \} \\
 %		P_3' &= \{ \mathsf{E} u \st u \in P_3 \} = \{ 0, 1 \} \\
 %		P_4' &= \{ \mathsf{E} u \st u \in P_4 \} = \{ 0, 10, 1 \} \\
 %	\end{align*}
-	We concatenate these and destutter:
+	We then concatenate these and destutter:
 	\[ 	\llbracket (S, {\hb}), [1,3) \models \LTLeventually_{[0,1)} x_1 \rrbracket = \{ 0, 01, 010, 0101, 01010, 1, 10, 101, 1010 \}  \]
 \end{example}
 
@@ -361,13 +362,13 @@ Our implementation of the algorithm we describe in this section relies on the fo
 Sets of boolean value expressions and their operations can be efficiently implemented through bit vectors.
 Intuitively, to represent such a set, we can encode each element using its first bit and its length since value expressions are boolean and always destuttered.
 Moreover, to evaluate untimed operations on such sets, we only need to know the maximal lengths of the four possible types of expressions ($0 \ldots 0$, $0 \ldots 1$, $1 \ldots 0$, and $1 \ldots 1$) and whether the set contains $0$ or $1$ (to handle some edge cases).
-This is because value expressions corresponding to same segments can be seen as completely asynchronous and the possible interleavings obtained from shorter expressions can be obtained from longer ones.
+This is because value expressions corresponding to same segments can be seen as completely asynchronous and the possible interleavings obtained from shorter expressions can be also obtained from longer ones.
 This approach enables, for example, an algorithm for conjunction of sets of value expressions that runs in $O(|u| + |v|)$ time where $u$ and $v$ are the longest expressions in the two sets.
 The same idea also applies to untimed temporal operators.
 
-\vspace{-1em}
+\vspace{-0.5em}
 \subsubsection{Generalization to Real-Valued Signals.}
-The methods in \cref{sec:approach} can be extended to real-valued signals and numerical predicates.
+Our approximate distributed monitoring method, denoted \textsc{Adm}, can be extended to real-valued signals and numerical predicates.
 The key is that finite-length piecewise-constant signals take finitely many values.
 By defining $\Sigma$ as a finite alphabet of these values, we can compute atomic propositions as above.
 %Arithmetic operations are handled by computing the asynchronous product of the signals and applying the operation letter-by-letter, transforming the results into atomic propositions via comparison with constants.
@@ -376,20 +377,20 @@ For example, if the asynchronous product of two signals $x_1$ and $x_2$ yields $
 
 We can avoid explicit computation of asynchronous products for some formulas and numerical predicates.
 Since signals are asynchronous within segments, we can compute potential value sets instead of sequences.
-This approach is called \textsc{Fine}.
+This approach is called \emph{Fine}, denoted by \textsc{Adm-F}.
 For instance, with $X_1 = \{2,3\}$ and $X_2 = \{0,1\}$, pairwise addition yields $\{2, 3, 4\}$.
 Assuming $x_1 + x_2$ is constant within this segment, we can avoid explicit interleaving computations.
-While \textsc{Fine} overapproximates traces when order matters, such as in $(x_1 > c_1) \until (x_2 > c_2)$, it preserves precision for formulas like $\LTLalways((x_1 - x_2) \cdot x_3 > c)$.
-The approach \textsc{Coarse} refines \textsc{Fine} by only considering extreme values, which is useful for monotonic operations where the extreme values of outputs derive from inputs.
+While \textsc{Adm-F} overapproximates traces when order matters, such as in $(x_1 > c_1) \until (x_2 > c_2)$, it preserves precision for formulas like $\LTLalways((x_1 - x_2) \cdot x_3 > c)$.
+The approach \emph{Coarse}, denoted \textsc{Adm-C}, abstracts \emph{Fine} by only considering extreme values, which is useful for monotonic operations where the extreme values of outputs derive from inputs.
 For instance, if $\min X_1 = 2$, $\max X_1 = 3$, $\min X_2 = 0$, and $\max X_2 = 1$, then $\min(x_1 + x_2) = 2$ and $\max(x_1 + x_2) = 4$.
 This way, we can efficiently maintain a smaller set of values and still preserve precision for formulas with monotonic operations.
 Lastly, assuming a decentralized setting, where each agent has a monitor running on it, reduces asynchrony by using the agent's clock as a reference point.
-This approach is called \textsc{Relative}.
-We will demonstrate the benefits and downsides of each method in \cref{sec:experiments}.
+This approach is called \emph{Relative}, denoted \textsc{Adm-Fr} or \textsc{Adm-Cr} depending the approach it is paired with.
+We will evaluate each method in \cref{sec:experiments}.
 
-\vspace{-1em}
+\vspace{-0.5em}
 \subsubsection{Combining Exact and Approximate Monitoring.}
-We propose a heuristic that combines the exact distributed monitors (EDM) with their approximate counterparts (ADM) with the aim to achieve better computational performance of the monitor, while remaining precise.
+We propose a method that combines approximate distributed monitors (\textsc{Adm}) with their exact counterparts (\textsc{Edm}) with the aim to achieve better computational performance while remaining precise.
 The approach works as follows:
 Given a distributed signal $(S,{\hb})$ and a formula $\varphi$, compute the approximate verdict $v \gets [(S,{\hb}) \models \varphi]_+$.
 If the verdict is inconclusive, i.e., $v = {\,?}$, then compute and return the exact verdict $[(S,{\hb}) \models \varphi]$, else return $v$.

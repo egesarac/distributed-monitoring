@@ -6,13 +6,13 @@
 \subsection{Research Questions}
 
 We seek answers to the following research questions (RQs):
-\vspace{-0.3em}
+\vspace{-0.25em}
 \begin{resq}[What is the tradeoff between the efficiency and the accuracy of approximate distributed monitors?]
 The approximate distributed monitoring comes with a price in terms of the loss of accuracy.
 We want to understand the tradeoff between the potential speedups that an approximate distributed monitor can achieve when compared to its exact counterpart and the consequent loss in accuracy due to the approximations.
 We would also like to identify the classes of signals and properties for which this tradeoff is effective. 
 \end{resq}
-\vspace{-0.8em}
+\vspace{-0.75em}
 \begin{resq}[Can the combination of approximate and exact distributed monitors increase efficiency while preserving accuracy?]
 We are interested in evaluating whether a smart, combined use of approximate and exact distributed monitors can still bring improvements in monitoring efficiency while guaranteeing the accuracy of the monitoring verdicts. 
 \end{resq}
@@ -21,16 +21,16 @@ We are interested in evaluating whether a smart, combined use of approximate and
 \subsection{Experimental Setup}
 
 \subsubsection{Distributed Monitors.}
-In our study, we compare our approximate distributed monitoring (ADM) approach and its variants to an exact distributed monitoring approach (EDM).
-For EDM, we take a variant of the distributed monitoring procedure from~\cite{MomtazAB23} that allows to evaluate STL specifications over distributed traces using SMT-solving.
+In our study, we compare our approximate distributed monitoring (\textsc{Adm}) approach and its variants to an exact distributed monitoring approach (\textsc{Edm}).
+For \textsc{Edm}, we take a variant of the distributed monitoring procedure from~\cite{MomtazAB23} that allows to evaluate STL specifications over distributed traces using SMT-solving.
 Originally, that procedure assumes that input signals are polynomial continuous functions.
-We adapt the SMT-based approach to consider input signals as piecewise-constant signals to make a consistent comparison with ADM.
+We adapt the SMT-based approach to consider input signals as piecewise-constant signals to make a consistent comparison with \textsc{Adm}.
 We note that the passage from the polynomial continuous to piecewise-constant input signals reduces the efficiency of the SMT-based monitors.
 We also observe that the SMT-based monitors from~\cite{MomtazAB23} can split the input trace into multiple segments and evaluate the specification incrementally, segment-by-segment, allowing early termination of the monitor in some cases.
 Since the focus of this paper is purely on the offline monitoring, we also use the exact monitors without their incremental mode.
-%We use the abbreviation EDM to denote the variant of the exact SMT-based distributed monitors used in this study.
+%We use the abbreviation \textsc{Edm} to denote the variant of the exact SMT-based distributed monitors used in this study.
 
-\vspace{-0.4em}
+\vspace{-0.35em}
 \subsubsection{Experimental Subjects.}
 To answer our research questions, we use (1) a \emph{random generator (RG)} of distributed traces, (2) a \emph{water tank (WT)} case study, and (3) a \emph{swarm of drones (SD)} case study.  
 
@@ -74,14 +74,14 @@ SD & $\varphi_{\text{SD}}$ & $\bigwedge_{1 \leq i \neq j \leq n} \LTLg \left( \s
 \vspace{-0.4em}
 \subsubsection{Computing Platform.}
 We used a laptop with Ubuntu 24.04, an AMD Ryzen 7 4800HS CPU at 2.90 GHz clock rate, and 16GB of RAM.
-ADM is implemented in C++ and compiled using \texttt{g++} version 13.2.0 with the optimization flag \texttt{-O3} enabled, and EDM invokes the SMT-solver Z3 \cite{MouraB08} and is based on \cite{MomtazAB23}.
+\textsc{Adm} is implemented in C++ and compiled using \texttt{g++} version 13.2.0 with the optimization flag \texttt{-O3} enabled, and \textsc{Edm} invokes the SMT-solver Z3 \cite{MouraB08} and is based on \cite{MomtazAB23}.
 
 \subsection{Discussion}
 
 \vspace{-0.3em}
 \subsubsection{Random Generator.}
 
-Figure~\ref{fig:rgresults} summarizes the results of evaluating specifications $\varphi_1$ to $\varphi_3$ against distributed trace from RG. The first column in the figure depicts a heatmap where each cell shows how many times ADM is faster than EDM when evaluating the formula on the give distributed trace with duration $d$ and uncertainty bound $\varepsilon$. The second column shows a heatmap where every cell shows the percentage of \emph{false positives} (FP) introduced by ADM, where a false positive happens when ADM does not agree with EDM, i.e. ADM evaluates to inconclusive when the real verdict is true or false. Finally, the third column depicts a heat map, where each cell estimates the achieved speedup when combining ADM with EDM, compared to using only EDM.
+Figure~\ref{fig:rgresults} summarizes the results of evaluating specifications $\varphi_1$ to $\varphi_3$ against distributed traces from RG. The first column in the figure depicts a heatmap where each cell shows how many times \textsc{Adm} is faster than \textsc{Edm} when evaluating the formula on the given distributed trace with duration $d$ and uncertainty bound $\varepsilon$. The second column shows a heatmap where every cell shows the percentage of \emph{false positives} (FP) introduced by \textsc{Adm}, where a false positive happens when \textsc{Adm} does not agree with \textsc{Edm}, i.e., \textsc{Adm} evaluates to inconclusive when the real verdict is true or false. Finally, the third column depicts a heat map, where each cell estimates the achieved speedup when combining \textsc{Adm} with \textsc{Edm}, compared to using only \textsc{Edm}.
 
 \begin{figure}[t]
 	\begin{center}
@@ -92,24 +92,24 @@ Figure~\ref{fig:rgresults} summarizes the results of evaluating specifications $
 \vspace{1em}
 \end{figure}
 
-The approximate ADM approach consistently achieves computational speedups of \emph{several orders of magnitude} 
-compared to the exact EDM approach.
-The speedups range from several thousands to almost 60 thousand times, regardless of the considered specification, the duration $d$ of the trace, or the uncertainty $\varepsilon$ bound.
+The approximate \textsc{Adm} approach consistently achieves computational speedups of \emph{several orders of magnitude} 
+compared to the exact \textsc{Edm} approach.
+The speedups range from several thousands to almost 60 thousand times, regardless of the considered specification, the duration $d$ of the trace, or the uncertainty bound $\varepsilon$.
 These speedups are highest for long signals with low uncertainty bounds.
 The price paid in terms of accuracy highly depends on the type of specification and the uncertainty bounds.
-For example, ADM is very accurate when monitoring the property $\varphi_1$ in which both the temporal and the combinatorial operators are conjunctive.
+For example, \textsc{Adm} is very accurate when monitoring the property $\varphi_1$ in which both the temporal and the combinatorial operators are conjunctive.
 On the other hand, having a combination of conjunctive and disjunctive operations (as in $\varphi_{2}$ and $\varphi_{3}$) increases the number of FPs.
 Surprisingly, we see that in these cases the introduction of FPs is higher for lower values of $\varepsilon$.
-This is because even EDM gives many inconclusive verdicts for higher values of $\varepsilon$.
+This is because even \textsc{Edm} gives many inconclusive verdicts for higher values of $\varepsilon$.
 We see that adding real-time modalities to the temporal operators increases FPs.
-Finally, by observing the third column of Figure~\ref{fig:rgresults}, we can see that by combining EDM and ADM, we consistently get better performance than by using EDM only, even in cases where ADM introduces a high percentage of FPs.
+Finally, by observing the third column of Figure~\ref{fig:rgresults}, we can see that by combining \textsc{Edm} and \textsc{Adm}, we consistently get better performance than by using \textsc{Edm} only, even in cases where \textsc{Adm} introduces a high percentage of FPs.
 
-%The approximate monitoring approach ADM consistently achieves computational speedups of \emph{several orders of magnitude} over the exact approach EDM, ranging from thousands to nearly 60 thousand times, regardless of  These speedups are highest for long signals with low uncertainty bounds. The accuracy tradeoff depends on the specification type and uncertainty bounds. ADM is very accurate for the property $\varphi_1$ with conjunctive operators, but combining conjunctive and disjunctive operations (as in $\varphi_2$ and $\varphi_3$) increases false positives (FPs), surprisingly at lower $\varepsilon$ values in particular. This is because higher $\varepsilon$ values result in many inconclusive verdicts even for EDM. Adding real-time modalities to temporal operators also increases FPs. Finally, as shown in the third column of \cref{fig:rgresults}, combining EDM and ADM consistently improves performance, even when ADM introduces many FPs.
+%The approximate monitoring approach \textsc{Adm} consistently achieves computational speedups of \emph{several orders of magnitude} over the exact approach \textsc{Edm}, ranging from thousands to nearly 60 thousand times, regardless of  These speedups are highest for long signals with low uncertainty bounds. The accuracy tradeoff depends on the specification type and uncertainty bounds. \textsc{Adm} is very accurate for the property $\varphi_1$ with conjunctive operators, but combining conjunctive and disjunctive operations (as in $\varphi_2$ and $\varphi_3$) increases false positives (FPs), surprisingly at lower $\varepsilon$ values in particular. This is because higher $\varepsilon$ values result in many inconclusive verdicts even for \textsc{Edm}. Adding real-time modalities to temporal operators also increases FPs. Finally, as shown in the third column of \cref{fig:rgresults}, combining \textsc{Edm} and \textsc{Adm} consistently improves performance, even when \textsc{Adm} introduces many FPs.
 
 
 \begin{figure}[t]
 	\begin{center}
-		\includegraphics[width=\linewidth]{wtlin.png}
+		\includegraphics[width=\linewidth]{wt_newnames.png}
 		\caption{Results on monitoring $\varphi_{\text{WT}}$ (time limit is 120s, timed-out instances not shown).}
 		\vspace{3mm}
 	\end{center}
@@ -119,16 +119,16 @@ Finally, by observing the third column of Figure~\ref{fig:rgresults}, we can see
 \vspace{-0.5em}
 \subsubsection{Water Tank.}
 Speedups increase with the number of signals \(n\) and decrease with \(\varepsilon\).
-The \textsc{Coarse} method shows significant improvements over EDM, with up to a $104000\times$ speedup in the best-case (when \(n=4\) and \(\varepsilon=0.05\)) and an $8\times$ speedup in the worst-case (when \(n=2\) and \(\varepsilon=0.4\)).
+The \textsc{Adm-C} method shows significant improvements over \textsc{Edm}, with up to a $104000\times$ speedup in the best-case (when \(n=4\) and \(\varepsilon=0.05\)) and an $8\times$ speedup in the worst-case (when \(n=2\) and \(\varepsilon=0.4\)).
 Note that \(\varepsilon=0.4\) is near the realistic upper limit \cite{MomtazAB23}, indicating no scalability issues.
-The decentralized \textsc{Coarse-Relative} method adds up to a $1.63\times$ speedup over \textsc{Coarse}.
-Decentralization significantly benefits \textsc{Fine}, bringing it below the time-out limit with up to a $476\times$ speedup in non-time-out instances.
-As expected, \textsc{Orig} does not perform well.
+The decentralized \textsc{Adm-Cr} method adds up to a $1.63\times$ speedup over \textsc{Adm-C}.
+Decentralization significantly benefits \textsc{Adm-F}, bringing it below the time-out limit with up to a $476\times$ speedup in non-time-out instances.
+As expected, \textsc{Adm} does not perform well.
 All methods produce the same verdict for the considered traces.
 
 \begin{figure}[t]
 	\begin{center}
-		\includegraphics[width=\linewidth]{ms.png}
+		\includegraphics[width=\linewidth]{ms_newnames.png}
 		\caption{Results on monitoring $\varphi_{\text{SD}}$ (time limit is 360s, timed-out instances not shown).}
 	\end{center}
 \end{figure}
@@ -136,15 +136,15 @@ All methods produce the same verdict for the considered traces.
 \vspace{-0.5em}
 \subsubsection{Swarm of Drones.}
 Similar to the previous case scenario, speedups in the mutual separation case increase with \(n\) and decrease with \(\varepsilon\).
-The \textsc{Fine-Relative} method achieves about a $78000\times$ speedup in the best-case scenario (when \(n=4\) and \(\varepsilon=0.05\)) and a $23\times$ speedup in the worst-case (when \(n=2\) and \(\varepsilon=0.25\)).
-The fine method performs slower than SMT in two cases where \(n\) is small and \(\varepsilon\) is large.
+The \textsc{Adm-Fr} method achieves about a $78000\times$ speedup in the best-case scenario (when \(n=4\) and \(\varepsilon=0.05\)) and a $23\times$ speedup in the worst-case (when \(n=2\) and \(\varepsilon=0.25\)).
+The \textsc{Adm-F} method performs slower than SMT in two cases where \(n\) is small and \(\varepsilon\) is large.
 %
-As in the previous case, \textsc{Orig} does not perform well.
-Additionally, \textsc{Coarse} and \textsc{Coarse-Relative} are not applicable here because the arithmetic operations are not monotonic.
+As in the previous case, \textsc{Adm} does not perform well.
+Additionally, \textsc{Adm-C} and \textsc{Adm-Cr} are not applicable here because the arithmetic operations are not monotonic.
 Again, all methods yield the same verdicts.
 
 \vspace{-0.5em}
 \subsubsection{Summary.}
-%To answer RQ1, we observe that while the speedup achieved with ADM compared to EDM is consistently very high and in three to five orders of magnitude, the tradeoff between efficiency and accuracy depends largely on the type of specifications, the duration of the input signals and the maximal clock skew. The arithmetic and timed operators are particularly sensitive to the over-approximations of ADM and reduce the accuracy of the method. Untimed temporal properties, especially those in which conjunctive and disjunctive operations are not combined, achieve very high levels of accuracy, resulting in an excellent tradeoff. Given the significant increase of efficiency in ADM compared to EDM, the two methods can be effectively combined even in situations where ADM has low accuracy. The combination of ADM and EDM results consistently in the overall increase of efficiency, thus positively answering RQ2.
-To answer RQ1, we find that ADM achieves a speedup of three to five orders of magnitude over EDM. However, the efficiency-accuracy tradeoff depends on the type of specifications, input signal duration, and maximal clock skew. Arithmetic and timed operators are particularly affected by ADM's overapproximations, reducing accuracy. Untimed temporal properties, especially those without mixed conjunctive and disjunctive operations, maintain high accuracy and offer an excellent tradeoff. Despite lower accuracy in some cases, combining ADM and EDM still results in significant efficiency gains, positively answering RQ2.
+%To answer RQ1, we observe that while the speedup achieved with \textsc{Adm} compared to \textsc{Edm} is consistently very high and in three to five orders of magnitude, the tradeoff between efficiency and accuracy depends largely on the type of specifications, the duration of the input signals and the maximal clock skew. The arithmetic and timed operators are particularly sensitive to the over-approximations of \textsc{Adm} and reduce the accuracy of the method. Untimed temporal properties, especially those in which conjunctive and disjunctive operations are not combined, achieve very high levels of accuracy, resulting in an excellent tradeoff. Given the significant increase of efficiency in \textsc{Adm} compared to \textsc{Edm}, the two methods can be effectively combined even in situations where \textsc{Adm} has low accuracy. The combination of \textsc{Adm} and \textsc{Edm} results consistently in the overall increase of efficiency, thus positively answering RQ2.
+To answer RQ1, we find that \textsc{Adm} achieves a speedup of three to five orders of magnitude over \textsc{Edm}. However, the efficiency-accuracy tradeoff depends on the type of specifications, input signal duration, and maximal clock skew. Arithmetic and timed operators are particularly affected by \textsc{Adm}'s overapproximations, reducing accuracy. Untimed temporal properties, especially those without mixed conjunctive and disjunctive operations, maintain high accuracy and offer an excellent tradeoff. Despite lower accuracy in some cases, combining \textsc{Adm} and \textsc{Edm} still results in significant gains, positively answering RQ2.
 
