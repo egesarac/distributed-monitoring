@@ -17,8 +17,8 @@ and suffixes of $u$.
 %
 We also let $\infx(u) = \{v \in \Sigma^* \st \exists x,y \in \Sigma^* : u = xvy\}$.
 %
-For a nonempty word $u \in \Sigma^*$ and $1 \leq i \leq |u|$, we denote by $u[i]$ the $i$th letter of 
-$u$, by $u[..i]$ the prefix of $u$ of length $i$, and by $u[i..]$ the suffix of $u$ of length $|u| - i + 1$. 
+For a nonempty word $u \in \Sigma^*$ and $1 \leq i \leq |u|$, we denote by $u[i]$ the $i$th letter of $u$.
+%, by $u[..i]$ the prefix of $u$ of length $i$, and by $u[i..]$ the suffix of $u$ of length $|u| - i + 1$. 
 %
 Given $u \in \Sigma^*$ and $\ell \geq 1$, we denote by $u^\ell$ the word obtained by concatenating $u$ by itself $\ell - 1$ times.
 Moreover, given $L \subseteq \Sigma^*$, we define $\first(L) = \{ u[0] \st u \in L\}$.
@@ -28,7 +28,7 @@ For tuples $(u_1, \ldots, u_m)$ and $(v_1, \ldots, v_m)$ of words, we let $(u_1,
 We define the function $\destutter : \Sigma^* \to \Sigma^*$ inductively.
 For all $\sigma \in \Sigma \cup \{\epsilon\}$, let $\destutter(\sigma) = \sigma$.
 For all $u \in \Sigma^*$ such that $u = \sigma_1 \sigma_2 v$ for some $\sigma_1,\sigma_2 \in 
-\Sigma$ and $v \in \Sigma^*$, we define it as follows.
+\Sigma$ and $v \in \Sigma^*$, we define it as follows:
 
 \vspace{-1em}
 \small
@@ -84,16 +84,16 @@ In particular, an edge is \emph{rising} if $\lim_{s \to t^-} x(s) < \lim_{s \to 
 A signal $x : [0,d) \to \R$ can be represented finitely by its initial value and edges: if $x$ has $m$ edges, then $x = (t_0, v_0) (t_1, v_1) \ldots (t_m, v_m)$ such that $t_0 = 0$, $t_{i-1} < t_i$, and $(t_i, v_i)$ is an edge of $x$ for all $1 \leq i \leq m$.
 
 Let $\AP$ be a set of \emph{atomic propositions}.
-The syntax is given by the grammar $\varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \land \varphi ~|~ \varphi \until_I \varphi$ where $p \in \AP$ and $I \subseteq \R_{\geq 0}$ is an interval.
+The syntax of STL is given by the grammar $\varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \land \varphi ~|~ \varphi \until_I \varphi$ where $p \in \AP$ and $I \subseteq \R_{\geq 0}$ is an interval.
 %\[ \varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \land \varphi ~|~ \varphi \until_I \varphi \]
 
 A \emph{trace} $w = (x_1, \ldots, x_n)$ is a finite vector of signals.
 We express atomic propositions as functions of trace values at a time point $t$,
 i.e., a proposition $p \in \AP$ over a trace $w = (x_1, \ldots, x_n)$ is defined as $f_p(x_1(t), \ldots, x_n(t)) > 0$ where $f_p : \R^n \to \R$ is a function.
 %i.e., a proposition $p \in \AP$ over a trace $w = (x_1, \ldots, x_n)$ is defined as $f_p(x_1(t), \ldots, x_n(t)) \sim_p c_p$ where $f_p : \R^n \to \R$ is a function, $c_p \in \R$ is a constant, and ${\sim_p} \in \{{<}, {\leq}, {\geq}, {>}\}$.
-Given intervals $I,J \subseteq \R_{\geq 0}$, we define $I \oplus J = \{i + j \st i \in I \land j \in J\}$, and we simply write $t$ for the singleton set $\{t\}$. 
+Given intervals $I,J \subseteq \R_{\geq 0}$, we define $I \oplus J = \{i + j \st i \in I , j \in J\}$, and we simply write $t$ for the singleton set $\{t\}$. 
 
-We recall the finite-trace qualitative semantics of STL defined over $\B$ \cite{MalerN13}.
+We recall the finite-trace qualitative semantics of STL defined over $\B$.
 Let $d \in \R_{> 0}$ and $w = (x_1, \ldots, x_n)$ with $x_i : [0,d) \to \R$ for all $1 \leq i \leq n$.
 Let $\varphi_1, \varphi_2$ be STL formulas and let $t \in [0,d)$.
 
@@ -150,7 +150,7 @@ We assume that the system is \emph{partially synchronous}: the agents use a cloc
 	(2) Every pair of events whose timestamps are at least $\varepsilon$ apart is totally ordered, i.e., for all $1 \leq i,j \leq n$ and all $(t, x_i(t)) \in V_i$ and $(t', x_j(t')) \in V_j$, if $t + \varepsilon \leq t'$ then $(t, x_i(t)) \hb (t', x_j(t'))$.
 \end{definition}
 
-The notion of consistent cut captures possible global states.
+The notion of \emph{consistent cut} captures possible global states.
 
 \begin{definition}
 	Let $(S, {\hb})$ be a distributed signal of $n$ signals, and $V = \bigcup_{i = 1}^{n} V_i$ be the set of its events.
@@ -221,7 +221,7 @@ We denote by $\CCF(S,{\hb})$ the set of all consistent cut flows of the distribu
 	\vspace{1em}
 \end{wrapfigure}
 
-Observe that a consistent cut flow of a distributed signal induces a vector of synchronous signals which can be evaluated using the standard semantics described above.
+Observe that a consistent cut flow of a distributed signal induces a vector of synchronous signals which can be evaluated using the standard STL semantics described above.
 Let $(S,{\hb})$ be a distributed signal of $n$ signals $x_1, \ldots, x_n$.
 A consistent cut flow $\ccf \in \CCF(S,{\hb})$ yields a trace $w_{\ccf} = (x'_1, \ldots x'_n)$ on the temporal domain $[0,d)$ such that $(c_i(T), x_i(c_i(T))) \in \ccf(T)$ implies $x_i'(T) = x_i(c_i(T))$ for all $1 \leq i \leq n$ and $T \in [0, d)$.
 The set of traces of $(S,{\hb})$ is given by $\tr(S,{\hb}) = \{ w_{\ccf} \st \ccf \in \CCF(S,{\hb})\}$.
@@ -250,7 +250,6 @@ Notice that we quantify universally over traces for both satisfaction and violat
 \label{sec:semantics}
 
 To address the computational overhead in exact distributed monitoring, we define STL$^+$, a variant of STL whose syntax is the same as STL but semantics provide a sound approximation of the STL distributed semantics.
-STL$^+$ is better adapted to distributed monitoring as it overapproximates the set of traces.
 In particular, given a distributed signal $(S,{\hb})$, STL$^+$ considers an approximation 
 $\tr^+(S,{\hb})$ of the set $\tr(S,{\hb})$ of synchronous traces where $ \tr(S,{\hb}) \subseteq \tr^+(S,{\hb})$.
 A signal $(S,{\hb})$ satisfies (resp. violates) an STL$^+$ formula $\varphi$ iff all the traces in $\tr^+(S,{\hb})$ belong to the language of $\varphi$ (resp. $\lnot \varphi$).
@@ -267,7 +266,7 @@ A signal $(S,{\hb})$ satisfies (resp. violates) an STL$^+$ formula $\varphi$ iff
 \end{equation*}
 \normalsize
 
-Note that we assume w.l.o.g. that $\varphi$ is \emph{copyless}, i.e., each signal $x \in S$ occurs in $\varphi$ at most once.
+Throughout the paper, we assume that $\varphi$ is \emph{copyless}, i.e., each signal $x \in S$ occurs in $\varphi$ at most once. %%% this may be not wlog -- the verdict may change when a formula is made copyless
 In \cref{sec:approach,sec:algorithm}, we respectively define $\tr^+$ and present an algorithm to compute the semantics of STL$^+$.
 
 \begin{theorem} \label{cl:stlsound}
@@ -275,5 +274,5 @@ In \cref{sec:approach,sec:algorithm}, we respectively define $\tr^+$ and present
 \end{theorem}
 
 Notice that both the distributed semantics of STL and the semantics of STL$^+$ quantify universally over the set of traces for the verdicts $\top$ and $\bot$.
-Therefore, the \cref{cl:stlsound} holds for the verdicts $\top$ and $\bot$, but not for ${\,?}$.
+Therefore, \cref{cl:stlsound} holds for the verdicts $\top$ and $\bot$, but not for ${\,?}$.
 

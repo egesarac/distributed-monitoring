@@ -69,16 +69,16 @@ To mitigate this issue, we present a novel approach for \emph{approximate} RV of
 specifications under partial synchrony.
 %
 In essence, we abstract away potential interleavings in distributed behaviors in a conservative 
-manner, resulting in an effective over-approximation of global behaviors.
+manner, resulting in an effective overapproximation of global behaviors.
 %
 This abstraction simplifies the representation of distributed behaviors into a set of Boolean 
 expressions, taking into account regions of uncertainty created by clock skews.
 %
-We define monitoring operations required to evaluate temporal specifications over such expression, 
-which result in monitoring verdicts on over-approximate behaviors.
+We define monitoring operations required to evaluate temporal specifications over such expressions, 
+which result in monitoring verdicts on overapproximate behaviors.
 %
 There is typically an inevitable tradeoff between {\em accuracy} and {\em speedup} in approximate 
-solution and  RV is not an exception.
+solutions, and  RV is not an exception.
 %
 That is, gains in the monitoring speedup may result in reduced accuracy.
 %
@@ -96,12 +96,11 @@ and various other uses \cite{AlechinaDL14,AcetoAFIL21}.
 
 
 We implemented our approach in a prototype tool and performed thorough evaluations on both 
-synthetic and real-world case studies (mutual separation in swarm of UAVs and a water distribution 
+synthetic and real-world case studies (mutual separation in swarm of drones and a water distribution 
 system).
 %
-We first demonstrated that in synthetic experiments, our approximate monitors achieve 
-speedups of between 3 and 5 orders of magnitudes compared to the exact SMT-based 
-distributed RV solution.
+We first demonstrated that in synthetic experiments, our approximate monitors consistently achieve 
+speedups of between 3 and 5 orders of magnitudes compared to the exact SMT-based solution.
 %
 We empirically characterized the classes of specifications and behaviors for which our approximate 
 monitoring approach achieves good precision.
@@ -115,7 +114,7 @@ We finally show that combining exact and approximate distributed RV yields signi
 %\noindent\textit{Organization.}
 Section~\ref{sec:preliminaries} presents the preliminary concepts.
 %
-Section~\ref{sec:semantics} introduces over-approximate semantics of STL while 
+Section~\ref{sec:semantics} introduces overapproximate semantics of STL while 
 Sections~\ref{sec:approach} and~\ref{sec:algorithm} describe our approach in approximating traces 
 and the associated monitoring algorithm, respectively.
 %
