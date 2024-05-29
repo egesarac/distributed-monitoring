@@ -71,7 +71,7 @@ def plot_data(n, data, ax):
     #     spd = f'Speedups:\nADM-F/ADM-C:{speedups[n]["ADM-F/ADM-C"][eps_values.index(eps)]}\nADM-C/ADM-CR:{speedups[n]["ADM-C/ADM-CR"][eps_values.index(eps)]}\nEDM/ADM-CR: {speedups[n]["EDM/ADM-CR"][eps_values.index(eps)]}'
     #     ax.text(eps+0.0025, 10000, spd, rotation=0, fontsize=10, verticalalignment='top')
 
-    ax.set_xlabel('ε (in seconds)', fontsize=12)  # Adjust the font size as needed
+    ax.set_xlabel('ε (seconds)', fontsize=12)  # Adjust the font size as needed
     if (n == 2):
         ax.set_ylabel('Time (seconds)', fontsize=12)   # Adjust the font size as needed
     ax.set_title(f'n={n}', fontsize=14)  # Adjust the font size as needed

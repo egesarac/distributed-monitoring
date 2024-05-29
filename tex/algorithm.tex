@@ -385,8 +385,8 @@ The approach \emph{Coarse}, denoted \textsc{Adm-C}, abstracts \emph{Fine} by onl
 For instance, if $\min X_1 = 2$, $\max X_1 = 3$, $\min X_2 = 0$, and $\max X_2 = 1$, then $\min(x_1 + x_2) = 2$ and $\max(x_1 + x_2) = 4$.
 This way, we can efficiently maintain a smaller set of values and still preserve precision for formulas with monotonic operations.
 Lastly, assuming a decentralized setting, where each agent has a monitor running on it, reduces asynchrony by using the agent's clock as a reference point.
-This approach is called \emph{Relative}, denoted \textsc{Adm-Fr} or \textsc{Adm-Cr} depending the approach it is paired with.
-We will evaluate each method in \cref{sec:experiments}.
+This approach is called \emph{Relative}, denoted \textsc{Adm-Fr} or \textsc{Adm-Cr} depending on the approach it is paired with.
+We evaluate each method in \cref{sec:experiments}.
 
 \vspace{-0.5em}
 \subsubsection{Combining Exact and Approximate Monitoring.}
@@ -394,6 +394,7 @@ We propose a method that combines approximate distributed monitors (\textsc{Adm}
 The approach works as follows:
 Given a distributed signal $(S,{\hb})$ and a formula $\varphi$, compute the approximate verdict $v \gets [(S,{\hb}) \models \varphi]_+$.
 If the verdict is inconclusive, i.e., $v = {\,?}$, then compute and return the exact verdict $[(S,{\hb}) \models \varphi]$, else return $v$.
+We evaluate this approach in \cref{sec:experiments}.
 %\begin{enumerate}
 %\item For every distributed trace $(S,{\hb})$:
 %\begin{enumerate}
