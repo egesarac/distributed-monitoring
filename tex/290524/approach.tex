@@ -6,10 +6,10 @@ First, we present the notion of \emph{canonical segmentation}, a systematic way 
 Second, we introduce \emph{value expressions}, sets of finite words representing signal behavior in a time interval.
 Finally, we define $\tr^+$ and show that it soundly approximates $\tr$.
 
-%\begin{remark}
-%	We assume Boolean signals for convenience. 
-%	All the concepts and results in this section generalize to non-Boolean signals because finite-length piecewise-constant signals use only a finite number of values.
-%\end{remark}
+\begin{remark}
+	We assume Boolean signals for convenience. 
+	All the concepts and results in this section generalize to non-Boolean signals because finite-length piecewise-constant signals use only a finite number of values.
+\end{remark}
 
 \subsubsection{Canonical Segmentation.}
 Consider a Boolean signal $x$ with a rising edge at time $t > \varepsilon$.
@@ -47,7 +47,7 @@ We show an example in \cref{fig:csve}a.
 %\end{example}
 
 \begin{figure}
-%	\vspace{-1em}
+	\vspace{-1em}
 	\centering
 	\begin{subfigure}{.5\textwidth}
 		\centering
@@ -161,7 +161,7 @@ We show an example in \cref{fig:csve}a.
 	\end{subfigure}
 	\footnotesize{
 	\caption{(a) A distributed signal $(S,{\hb})$ with $x_1$ (top, red) and $x_2$ (bottom, blue) whose edges are marked with solid balls and their uncertainty regions are given as semi-transparent boxes around the edges. The resulting canonical segmentation $G_S$ is shown below the graphical representation of the signals. (b) The uncertainty regions of $(S,{\hb})$ and the corresponding value expressions. (c) The tabular representation of the function $\gamma$ for $(S,{\hb})$, e.g., \(\gamma(x_1, [3,4)) = (\sfx(01) \cdot \pfx(10)) \setminus \{\epsilon\} = \{ 01, 010, 1, 10\}\).}\label{fig:csve}}
-%	\vspace{1em}
+	\vspace{1em}
 \end{figure}
 
 
@@ -193,7 +193,7 @@ Now, let $I \in G_S$ be a segment with $I = [s, s')$ and for each $1 \leq i \leq
 %
 \begin{wrapfigure}{r}{0.5\textwidth}
 	\small
-	\vspace{-1em}
+	\vspace{-2em}
 	\begin{equation} \label{eq:valexprset}
 		V_i = 
 		\begin{cases}
@@ -204,14 +204,14 @@ Now, let $I \in G_S$ be a segment with $I = [s, s')$ and for each $1 \leq i \leq
 			\{\epsilon\} & \text{otherwise}
 		\end{cases}
 	\end{equation}
-	\vspace{-1em}
+	\vspace{-2em}
 \end{wrapfigure}
 \normalsize
 The last case happens only when \( I \cap R_i \) is empty.
 We define \(\gamma\) as follows:
-%%\vspace{-1em}
+%\vspace{-1em}
 \[ \gamma(x,I) = \destutter(V_1 \cdot V_2 \cdot \ldots \cdot V_m) \setminus \{\epsilon\} \]
-%%\vspace{-1em}
+%\vspace{-1em}
 Observe that \(\gamma(x,I)\) contains all the potential behaviors of \( x \) in segment \( I \) by construction.
 However, it is potentially overapproximate because the sets \( V_1, \ldots, V_m \) contain redundancy by definition, and the concatenation does not ensure that an edge is considered exactly once.
 We demonstrate this in \cref{fig:csve}b and \cref{fig:csve}c.
@@ -251,9 +251,9 @@ The signal $x'$ is \emph{$I$-consistent with $x$} iff the value expression $x'(s
 Moreover, $x'$ is \emph{consistent with $x$} iff it is $I$-consistent with $x$ for all $I \in G_S$.
 
 Now, let $S = (x_1, \ldots, x_n)$ and define $\tr^+(S,{\hb})$ as follows:
-%\vspace{-0.5em}
+\vspace{-0.5em}
 \[ \tr^+(S,{\hb}) = \{ (x_1', \ldots, x_n') \st \text{$x_i'$ is consistent with $x_i$ for all $1 \leq i \leq n$}\} \]
-%%\vspace{-1em}
+%\vspace{-1em}
 
 
 \begin{example} \label{ex:overapx}

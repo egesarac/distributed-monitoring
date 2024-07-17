@@ -13,11 +13,11 @@ We also discuss an efficient implementation of the monitoring algorithm using \e
 %Finally, we conclude with putting all these together to compute the \emph{semantics} of STL$^+$.
 %We also discuss an efficient implementation of the monitoring algorithm using \emph{bit vectors}, heuristics to enhance \emph{generalization} for real-valued signals, and a method to \emph{combine} our approach with exact monitoring.
 
-%\begin{remark}
-%	As in \cref{sec:approach}, we focus on Boolean signals for convenience.
-%	The concepts and algorithms here can be extended to value expressions over arbitrary finite alphabets, e.g., encoding finite-length piecewise-constant real-valued signals.
-%	Hence, we are able to express and evaluate complex properties where atomic propositions are functions of real-valued signals.
-%\end{remark}
+\begin{remark}
+	As in \cref{sec:approach}, we focus on Boolean signals for convenience.
+	The concepts and algorithms here can be extended to value expressions over arbitrary finite alphabets, e.g., encoding finite-length piecewise-constant real-valued signals.
+	Hence, we are able to express and evaluate complex properties where atomic propositions are functions of real-valued signals.
+\end{remark}
 
 \subsubsection{Asynchronous Products.}
 Consider the value expressions $u_1 = 0 \cdot 1$ and $u_2 = 1 \cdot 0$ encoding the behaviors of two signals within a segment.
@@ -29,7 +29,7 @@ In particular, there are three potential alignments:
 We respectively represent these with the tuples $(011, 110)$, $(001, 100)$, and $(01, 10)$ where the first component encodes $u_1$ and the second $u_2$.
 Formally, given two value expressions $u_1$ and $u_2$ (resp.  sets $L_1$ and $L_2$ of value expressions), we define their \emph{asynchronous product} as follows:
 
-%\vspace{-1.25em}
+\vspace{-1.25em}
 \small
 \begin{align*}
 	u_1 \otimes u_2 &= \big\{ \destutter(v_1, v_2) \st v_i \in \stutter_k(u_i), k = |u_1| + |u_2| - 1, i \in 
@@ -38,10 +38,10 @@ Formally, given two value expressions $u_1$ and $u_2$ (resp.  sets $L_1$ and $L_
 \end{align*}
 \normalsize
 
-%\vspace{-0.5em}
+\vspace{-0.5em}
 Asynchronous products of value expressions allow us to lift value expressions to satisfaction signals of formulas.
 
-%\vspace{-0.5em}
+\vspace{-0.5em}
 \begin{example} \label{ex:asyncprod}
 	Recall $(S, {\hb})$ and its $\gamma$ function given in \cref{fig:csve}.
 	To compute the value expressions encoding the satisfaction of $x_1 \land x_2$ in the segment $[1,3)$, we first compute the asynchronous product $\gamma(x_1, [3,4)) \otimes \gamma(x_2, [3,4))$, and then the bitwise conjunction of each pair in the set.
@@ -49,7 +49,7 @@ Asynchronous products of value expressions allow us to lift value expressions to
 	Its bitwise conjunction is $0  1  0$, encoding a potential behavior for the satisfaction of $x_1 \land x_2$.
 \end{example}
 
-%\vspace{-0.7em}
+\vspace{-0.7em}
 \subsubsection{Untimed Operations.}
 As hinted in \cref{ex:asyncprod}, to compute the semantics, we apply bitwise operations on value expressions and their asynchronous products to transform them into encodings of satisfaction signals of formulas.
 For example, to determine $[(S, {\hb}) \models \LTLeventually (x_1 \land x_2)]_+$, we first compute for each segment in $G_S$ the set of value expressions for the satisfaction of $x_1 \land x_2$, and then from these compute those of $\LTLeventually (x_1 \land x_2)$.
@@ -71,7 +71,7 @@ $\mathsf{E} u = 1^\ell \mathsf{U}^0 u$, \emph{bitwise always} as $\mathsf{A} u =
 \BitOr (\mathsf{A} u)$.
 %\[ u \mathsf{U}^1 v = \left( \max \left( (u \mathsf{U}^0 v)[i], (\mathsf{A} u)[i] \right) \right)_{1 \leq i \leq \ell} \]
 The distinction between $\mathsf{U}^0$ and $\mathsf{U}^1$ will be useful when we incrementally evaluate a formula.
-%We remark that the definitions of these operators coincide with the robustness semantics of STL.
+We remark that the definitions of these operators coincide with the robustness semantics of STL.
 Finally, note that the output of these operations is a value expression of length $\ell$.
 For example, if $u = 010$, we have $\mathsf{E} u = 110$ and $\mathsf{A} u = 000$.
 
@@ -89,7 +89,7 @@ We define the evaluation of untimed formulas with respect to $(S, {\hb})$ and a 
 %Now, let $L_1$ and $L_2$ be two sets of value expressions.
 %We define the following untimed operations:
 
-%\vspace{-0.8em}
+\vspace{-0.8em}
 \scriptsize
 \begin{align*}
 %	\lnot L_1 &= \{ \BitNeg u \st u \in L_1 \} \\
@@ -117,7 +117,7 @@ For a given formula and a segment, the evaluation above produces a set of value 
 %$L_1 \until^1 L_2 = (L_1 \until^0 L_2) \lor (\LTLalways L_1)$.
 %Notice that, since sets of value expressions corresponding to atomic propropositions are captured by the $\gamma$ function, we can compute the sets of value expressions for each segment and (untimed) subformula.
 
-%\vspace{-0.5em}
+\vspace{-0.5em}
 \begin{example}
 	Recall $(S, {\hb})$ and $\gamma$ from \cref{fig:csve}.
 	To compute $\llbracket (S, {\hb}), [5,7) \models \LTLeventually(x_1 \land x_2) \rrbracket$, we first compute $\llbracket (S, {\hb}), [5,7) \models x_1 \land x_2 \rrbracket$ by taking the bitwise conjunction over the asynchronous product $\gamma(x_1, [5,7)) \otimes \gamma(x_2, [5,7))$ and destuttering.
@@ -128,7 +128,7 @@ For a given formula and a segment, the evaluation above produces a set of value 
 	Note that we do not need to consider the evaluation of the next segment for the eventually operator since $\llbracket (S, {\hb}), [7,8) \models x_1 \land x_2 \rrbracket = \{0\}$.
 \end{example}
 
-%\vspace{-0.7em}
+\vspace{-0.7em}
 \subsubsection{Timed Operations.}
 Handling timed operations requires a closer inspection as value expressions are untimed by definition.
 We address this issue by considering how a given evaluation interval relates with a given segmentation.
@@ -139,7 +139,6 @@ Initially, $J$ covers the entire segment $[0,4)$ and the beginning of $[4,6)$, f
 Now, if we slide the window and take $J' = [3,7)$, the window covers the ending of $[0,4)$, the entire $[4,6)$, and the beginning of $[6,10)$, for which the potential behaviors are captured by the set $\sfx(\gamma(x, [0,4))) \cdot \gamma(x, [4,6)) \cdot \pfx(\gamma(x, [6,9))$.
 We call these sets the \emph{profiles} of $J$ and $J'$ with respect to $(S,{\hb})$, $x$, and $I$.
 
-We first present the definitions, and then demonstrate them in \cref{ex:profiles,ex:timed} and \cref{fig:profiles}. 
 Let $(S,{\hb})$ be a distributed signal, $I \in G_S$ be a segment, and $\varphi$ be an STL formula.
 Let us introduce some notation.
 First, we abbreviate the set $\llbracket (S,{\hb}), I \models \varphi \rrbracket$ of value expressions as $\tau_{\varphi,I}$.
@@ -148,7 +147,7 @@ Third, recall that we denote by $F$ the set of end points of $G_S$ (see \cref{se
 Given an interval $J$, we define the \emph{profile} of $J$ with respect to $(S,{\hb})$, $\varphi$, and 
 $I$ as follows:
 
-%\vspace{-1em}
+\vspace{-1em}
 \scriptsize
 \begin{equation*}
 	\mathsf{profile}((S,{\hb}), \varphi, I, J) =
@@ -190,8 +189,8 @@ We demonstrate this and the computation of $\mathsf{pfs}$ in \cref{ex:profiles} 
 
 \begin{example} \label{ex:profiles}
 	Recall $(S, {\hb})$ and $\gamma$ from \cref{fig:csve}.
-	We describe the computation of $\mathsf{pfs}((S,{\hb}), x_1, [1,3), [0,1))$.
-	Sliding the interval $[0,1)$ over the window $[1,3) \oplus [0,1)$ (see \cref{fig:profiles}) gives us the following sets:
+	We demonstrate the computation of $\mathsf{pfs}((S,{\hb}), x_1, [1,3), [0,1))$.
+	Intuitively, sliding the interval $[0,1)$ over the window $[1,3) \oplus [0,1)$ (as shown in \cref{fig:profiles}) gives us the following sets:
 	$P_1 = \destutter(\pfx(\gamma(x_1, [1,3))))$,
 	$P_2 = \destutter(\infx(\gamma(x_1, [1,3))))$, and
 	$P_3 = \destutter(\sfx(\gamma(x_1, [1,3))))$  where all equal to $\{ 0, 01, 1 \}$.
@@ -210,7 +209,7 @@ We demonstrate this and the computation of $\mathsf{pfs}$ in \cref{ex:profiles} 
 %		\end{align*}
 %%	\end{wrapfigure}
 %	\normalsize
-	We obtain that $\mathsf{pfs}((S,{\hb}), x_1, [1,3), [0,1)) = \{P_1, P_2, P_3, P_4\}$.
+	We obtain $\mathsf{pfs}((S,{\hb}), x_1, [1,3), [0,1)) = \{P_1, P_2, P_3, P_4\}$.
 	This set overapproximates the potential behaviors of $x_1$, for all $t \in [1,3)$, in the interval $t \oplus [0,1)$.
 \end{example}
 
@@ -221,7 +220,7 @@ Intuitively, once we have the profiles of a given interval $J$ with respect to $
 %This captures the behavior of the satisfaction signals with respect to a bounded interval, but introduces further imprecision due to additional concatenations.
 Formally, we handle the evaluation of timed formulas as follows:
 
-%\vspace{-1em}
+\vspace{-1em}
 \small
 \begin{align*}
 	\llbracket (S, {\hb}), I \models \varphi_1 \until_J \varphi_2 \rrbracket = \destutter( \{ u_1 \mathsf{U}^0 u_2 \st &(u_1, u_2) \in P_1 \otimes Q_1 \} \cdot \ldots \\ 
@@ -246,12 +245,44 @@ where $\mathsf{pfs}((S,{\hb}), \varphi_1, I, J) = \{P_1, \ldots, P_k \}$ and $\m
 %		P_3' &= \{ \mathsf{E} u \st u \in P_3 \} = \{ 0, 1 \} \\
 %		P_4' &= \{ \mathsf{E} u \st u \in P_4 \} = \{ 0, 10, 1 \} \\
 %	\end{align*}
-	We then concatenate these and destutter to obtain 
-	$\llbracket (S, {\hb}), [1,3) \models \LTLeventually_{[0,1)} x_1 \rrbracket = \{ 0, 01, 010, 0101, 01010, 1, 10, 101, 1010 \}$.
-%	\[ 	\llbracket (S, {\hb}), [1,3) \models \LTLeventually_{[0,1)} x_1 \rrbracket = \{ 0, 01, 010, 0101, 01010, 1, 10, 101, 1010 \}  \]
+	We then concatenate these and destutter:
+	\[ 	\llbracket (S, {\hb}), [1,3) \models \LTLeventually_{[0,1)} x_1 \rrbracket = \{ 0, 01, 010, 0101, 01010, 1, 10, 101, 1010 \}  \]
 \end{example}
 
-
+\begin{wrapfigure}{r}{0.5\textwidth}
+	\vspace{-3em}
+%	\begin{center}
+%		\includegraphics[scale=0.33]{profiles.png}
+%	\end{center}
+\centering
+\begin{tikzpicture}[scale=0.6]
+	\small
+	\draw[thick] (0,-5) -- (8,-5);
+	\foreach \x in {0,1,3,4,5,7,8}
+	\draw (\x,-5) node[above] {\x};
+	\draw (-0.5,-5) node[above] {$t$:};
+	
+	\draw[fill=pink] (-1,-7) rectangle (0,-5) node[midway] {$x_1$};
+	\draw[fill=pink] (0,-7) rectangle (1,-5) node[midway] {\scriptsize\begin{tabular}{c}\{0,\\ 01\}\\\end{tabular}};
+	\draw[fill=pink] (1,-7) rectangle (3,-5) node[midway] {\scriptsize\begin{tabular}{c}\{0,\\ 01,\\ 1\}\\\end{tabular}};
+	\draw[fill=pink] (3,-7) rectangle (4,-5) node[midway] {\scriptsize{\begin{tabular}{c}\{01,\\ 010,\\ 1,\\ 10\}\\\end{tabular}}};
+	\draw[fill=pink] (4,-7) rectangle (5,-5) node[midway] {\scriptsize\begin{tabular}{c}\{1,\\ 10,\\ 0\}\\\end{tabular}};
+	\draw[fill=pink] (5,-7) rectangle (7,-5) node[midway] {{\scriptsize\begin{tabular}{c}\{10,\\ 0\}\\\end{tabular}}};
+	\draw[fill=pink] (7,-7) rectangle (8,-5) node[midway] {{\scriptsize\begin{tabular}{c}\{0\}\\\end{tabular}}};
+	
+	\draw[dotted] (1,-7) -- (1,-9.5);
+	\draw[dotted] (3,-7) -- (3,-9.5);
+	\draw[dotted] (4,-7) -- (4,-9.5);
+	
+	\draw[fill=black] (1, -7.5 + 0.05) node[left]{{\scriptsize (1)}} rectangle (2, -7.5 - 0.05) ;
+	\draw[fill=black] (1.5, -8 + 0.05) node[left] {{\scriptsize (2)}} rectangle (2.5, -8 - 0.05) ;
+	\draw[fill=black] (2, -8.5 + 0.05) node[left] {{\scriptsize (3)}} rectangle (3, -8.5 - 0.05);
+	\draw[fill=black] (2.5, -9 + 0.05) node[left] {{\scriptsize (4)}} rectangle (3.5, -9 - 0.05);
+\end{tikzpicture}
+	\caption{The profiles of $J = [0,1)$ with respect to $x_1 \in S$ of \cref{fig:csve}. A representative interval for each profile is shown with solid black lines below the table.}
+	\label{fig:profiles}
+	\vspace{-2em}
+\end{wrapfigure}
 
 \subsubsection{Computing the Semantics of STL$^+$.}
 
@@ -320,62 +351,28 @@ Putting it all together, given a distributed signal $(S, {\hb})$ and an STL$^+$ 
 %\end{algorithm}
 
 
-\begin{wrapfigure}{r}{0.5\textwidth}
-	%	\vspace{-3em}
-	%	\begin{center}
-		%		\includegraphics[scale=0.33]{profiles.png}
-		%	\end{center}
-	\centering
-	\begin{tikzpicture}[scale=0.6]
-		\small
-		\draw[thick] (0,-5) -- (8,-5);
-		\foreach \x in {0,1,3,4,5,7,8}
-		\draw (\x,-5) node[above] {\x};
-		\draw (-0.5,-5) node[above] {$t$:};
-		
-		\draw[fill=pink] (-1,-7) rectangle (0,-5) node[midway] {$x_1$};
-		\draw[fill=pink] (0,-7) rectangle (1,-5) node[midway] {\scriptsize\begin{tabular}{c}\{0,\\ 01\}\\\end{tabular}};
-		\draw[fill=pink] (1,-7) rectangle (3,-5) node[midway] {\scriptsize\begin{tabular}{c}\{0,\\ 01,\\ 1\}\\\end{tabular}};
-		\draw[fill=pink] (3,-7) rectangle (4,-5) node[midway] {\scriptsize{\begin{tabular}{c}\{01,\\ 010,\\ 1,\\ 10\}\\\end{tabular}}};
-		\draw[fill=pink] (4,-7) rectangle (5,-5) node[midway] {\scriptsize\begin{tabular}{c}\{1,\\ 10,\\ 0\}\\\end{tabular}};
-		\draw[fill=pink] (5,-7) rectangle (7,-5) node[midway] {{\scriptsize\begin{tabular}{c}\{10,\\ 0\}\\\end{tabular}}};
-		\draw[fill=pink] (7,-7) rectangle (8,-5) node[midway] {{\scriptsize\begin{tabular}{c}\{0\}\\\end{tabular}}};
-		
-		\draw[dotted] (1,-7) -- (1,-9.5);
-		\draw[dotted] (3,-7) -- (3,-9.5);
-		\draw[dotted] (4,-7) -- (4,-9.5);
-		
-		\draw[fill=black] (1, -7.5 + 0.05) node[left]{{\scriptsize (1)}} rectangle (2, -7.5 - 0.05) ;
-		\draw[fill=black] (1.5, -8 + 0.05) node[left] {{\scriptsize (2)}} rectangle (2.5, -8 - 0.05) ;
-		\draw[fill=black] (2, -8.5 + 0.05) node[left] {{\scriptsize (3)}} rectangle (3, -8.5 - 0.05);
-		\draw[fill=black] (2.5, -9 + 0.05) node[left] {{\scriptsize (4)}} rectangle (3.5, -9 - 0.05);
-	\end{tikzpicture}
-	\caption{The profiles of $J = [0,1)$ with respect to $x_1 \in S$ of \cref{fig:csve}. A representative interval for each profile is shown with solid black lines below the table.}
-	\label{fig:profiles}
-	%	\vspace{-2em}
-\end{wrapfigure}
 
 
 
 
 
 \subsubsection{Sets of Boolean Value Expressions as Bit Vectors.}
-Asynchronous products are expensive to compute.
-Our implementation relies on the observation that sets of boolean value expressions and their operations can be efficiently implemented through bit vectors.
-Intuitively, to represent such a set, we encode each element using its first bit and its length since value expressions are boolean and always destuttered.
+Evidently, asynchronous products are expensive to compute.
+Our implementation of the algorithm we describe in this section relies on the following observation:
+Sets of boolean value expressions and their operations can be efficiently implemented through bit vectors.
+Intuitively, to represent such a set, we can encode each element using its first bit and its length since value expressions are boolean and always destuttered.
 Moreover, to evaluate untimed operations on such sets, we only need to know the maximal lengths of the four possible types of expressions ($0 \ldots 0$, $0 \ldots 1$, $1 \ldots 0$, and $1 \ldots 1$) and whether the set contains $0$ or $1$ (to handle some edge cases).
-This is because value expressions within the same segments are completely asynchronous and the possible interleavings obtained from shorter expressions can be also obtained from longer ones.
-%This approach enables, for example, an algorithm for conjunction of sets of value expressions that runs in $O(|u| + |v|)$ time where $u$ and $v$ are the longest expressions in the two sets.
-%The same idea also applies to untimed temporal operators.
+This is because value expressions corresponding to same segments can be seen as completely asynchronous and the possible interleavings obtained from shorter expressions can be also obtained from longer ones.
+This approach enables, for example, an algorithm for conjunction of sets of value expressions that runs in $O(|u| + |v|)$ time where $u$ and $v$ are the longest expressions in the two sets.
+The same idea also applies to untimed temporal operators.
 
-%\vspace{-0.5em}
+\vspace{-0.5em}
 \subsubsection{Generalization to Real-Valued Signals.}
 Our approximate distributed monitoring method, denoted \textsc{Adm}, can be extended to real-valued signals and numerical predicates.
 The key is that finite-length piecewise-constant signals take finitely many values.
 By defining $\Sigma$ as a finite alphabet of these values, we can compute atomic propositions as above.
 %Arithmetic operations are handled by computing the asynchronous product of the signals and applying the operation letter-by-letter, transforming the results into atomic propositions via comparison with constants.
-For example, if the asynchronous product of two signals $x_1$ and $x_2$ yields $(2\cdot2\cdot3, 1\cdot0\cdot1)$, adding these letter-by-letter results in $3 \cdot 2 \cdot 4$, and comparing with $> 2$ gives $101$.
-%Repeating this for all pairs produces the required atomic proposition.
+For example, if the asynchronous product of two signals $x_1$ and $x_2$ yields $(2\cdot2\cdot3, 1\cdot0\cdot1)$, adding these letter-by-letter results in $3 \cdot 2 \cdot 4$, and comparing with $> 2$ gives $101$. Repeating this for all pairs produces the required atomic proposition.
 %\alert{This approach is called \textsc{Orig}.}
 
 We can avoid explicit computation of asynchronous products for some formulas and numerical predicates.
@@ -383,16 +380,15 @@ Since signals are asynchronous within segments, we can compute potential value s
 This approach is called \emph{Fine}, denoted by \textsc{Adm-F}.
 For instance, with $X_1 = \{2,3\}$ and $X_2 = \{0,1\}$, pairwise addition yields $\{2, 3, 4\}$.
 Assuming $x_1 + x_2$ is constant within this segment, we can avoid explicit interleaving computations.
-Note that \textsc{Adm-F} overapproximates traces when order matters.
-%While \textsc{Adm-F} overapproximates traces when order matters, such as in $(x_1 > c_1) \until (x_2 > c_2)$, it preserves precision for formulas like $\LTLalways((x_1 - x_2) \cdot x_3 > c)$.
+While \textsc{Adm-F} overapproximates traces when order matters, such as in $(x_1 > c_1) \until (x_2 > c_2)$, it preserves precision for formulas like $\LTLalways((x_1 - x_2) \cdot x_3 > c)$.
 The approach \emph{Coarse}, denoted \textsc{Adm-C}, abstracts \emph{Fine} by only considering extreme values, which is useful for monotonic operations where the extreme values of outputs derive from inputs.
 For instance, if $\min X_1 = 2$, $\max X_1 = 3$, $\min X_2 = 0$, and $\max X_2 = 1$, then $\min(x_1 + x_2) = 2$ and $\max(x_1 + x_2) = 4$.
-%This way, we can efficiently maintain a smaller set of values and still preserve precision for formulas with monotonic operations.
-Lastly, we also consider a decentralized setting where each agent has a monitor running on it, reducing asynchrony by using the agent's clock as a reference point.
-We call this \emph{Relative}, denoted \textsc{Adm-Fr} or \textsc{Adm-Cr} depending on the approach it is paired with.
-We evaluate these in \cref{sec:experiments}.
+This way, we can efficiently maintain a smaller set of values and still preserve precision for formulas with monotonic operations.
+Lastly, assuming a decentralized setting, where each agent has a monitor running on it, reduces asynchrony by using the agent's clock as a reference point.
+This approach is called \emph{Relative}, denoted \textsc{Adm-Fr} or \textsc{Adm-Cr} depending on the approach it is paired with.
+We evaluate each method in \cref{sec:experiments}.
 
-%\vspace{-0.5em}
+\vspace{-0.5em}
 \subsubsection{Combining Exact and Approximate Monitoring.}
 We propose a method that combines approximate distributed monitors (\textsc{Adm}) with their exact counterparts (\textsc{Edm}) with the aim to achieve better computational performance while remaining precise.
 The approach works as follows:
