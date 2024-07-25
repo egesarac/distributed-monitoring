@@ -270,10 +270,10 @@ A signal $(S,{\hb})$ satisfies (resp. violates) an STL$^+$ formula $\varphi$ iff
 \normalsize
 
 %%% this may be not wlog -- the verdict may change when a formula is made copyless
-Throughout the paper, we assume  $\varphi$ is \emph{copyless}, i.e., each signal $x \in S$ occurs in $\varphi$ at most once, the signals are Boolean, non-Zeno, and piecewise-constant.
-We assume Boolean signals only for convenience. 
-All the concepts and results generalize to non-Boolean signals because finite-length piecewise-constant signals use only a finite number of values.
-Moreover, note that our approach is a sound overapproximation for non-copyless formulas.
+Throughout the paper, we assume  $\varphi$ is \emph{copyless}, i.e., each signal $x \in S$ occurs in $\varphi$ at most once.
+Moreover, the signals are Boolean, non-Zeno, piecewise-constant, and have no edge at time 0.
+We assume Boolean signals only for convenience; all the concepts and results generalize to non-Boolean signals because finite-length piecewise-constant signals use only a finite number of values.
+We note that our approach is a sound overapproximation also for non-copyless formulas, although potentially less precise.
 In \cref{sec:approach,sec:algorithm}, we respectively define $\tr^+$ and present an algorithm to compute the semantics of STL$^+$.
 
 \begin{theorem} \label{cl:stlsound}

@@ -388,6 +388,7 @@ Note that \textsc{Adm-F} overapproximates traces when order matters.
 The approach \emph{Coarse}, denoted \textsc{Adm-C}, abstracts \emph{Fine} by only considering extreme values, which is useful for monotonic operations where the extreme values of outputs derive from inputs.
 For instance, if $\min X_1 = 2$, $\max X_1 = 3$, $\min X_2 = 0$, and $\max X_2 = 1$, then $\min(x_1 + x_2) = 2$ and $\max(x_1 + x_2) = 4$.
 %This way, we can efficiently maintain a smaller set of values and still preserve precision for formulas with monotonic operations.
+\todo{introduce decenteralized monitoring better, make it more prominent}
 Lastly, we also consider a decentralized setting where each agent has a monitor running on it, reducing asynchrony by using the agent's clock as a reference point.
 We call this \emph{Relative}, denoted \textsc{Adm-Fr} or \textsc{Adm-Cr} depending on the approach it is paired with.
 We evaluate these in \cref{sec:experiments}.
