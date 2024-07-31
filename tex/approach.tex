@@ -204,7 +204,7 @@ Now, let $I \in G_S$ be a segment with $I = [s, s')$ and for each $1 \leq i \leq
 			\{\epsilon\} & \text{otherwise}
 		\end{cases}
 	\end{equation}
-	\vspace{-1em}
+	\vspace{-2em}
 \end{wrapfigure}
 \normalsize
 The last case happens only when \( I \cap R_i \) is empty.
@@ -213,8 +213,8 @@ We define \(\gamma\) as follows:
 \[ \gamma(x,I) = \destutter(V_1 \cdot V_2 \cdot \ldots \cdot V_m) \setminus \{\epsilon\} \]
 %%\vspace{-1em}
 Observe that \(\gamma(x,I)\) contains all the potential behaviors of \( x \) in segment \( I \) by construction.
-However, it is potentially overapproximate because the sets \( V_1, \ldots, V_m \) contain redundancy by definition, and the concatenation does not ensure that an edge is considered exactly once.
-We demonstrate this in \cref{fig:csve}b and \cref{fig:csve}c.
+However, it is potentially overapproximate because the sets \( V_1, \ldots, V_m \) contain redundancy by definition, and the concatenation does not ensure that an edge is considered exactly once -- see \cref{fig:csve}b and \cref{fig:csve}c.
+%We demonstrate this in \cref{fig:csve}b and \cref{fig:csve}c.
 
 %\begin{example} \label{ex:valexpr}
 %	Recall the distributed signal \((S, {\hb})\) in \cref{fig:canonseg}.
@@ -249,7 +249,6 @@ Consider $x \in S$, and let $x'$ be a signal with the same temporal domain, and 
 Let $(t_1, x'(t_1)), \ldots, (t_\ell, x'(t_\ell))$ be the edges of $x'$ in segment $I$ with $t_i < t_{i+1}$ for all $1 \leq i < \ell$.
 The signal $x'$ is \emph{$I$-consistent with $x$} iff the value expression $x'(s) \cdot x'(t_1) \cdot \ldots \cdot x'(t_\ell)$ belongs to $\gamma(x,I)$.
 Moreover, $x'$ is \emph{consistent with $x$} iff it is $I$-consistent with $x$ for all $I \in G_S$.
-
 Now, let $S = (x_1, \ldots, x_n)$ and define $\tr^+(S,{\hb})$ as follows:
 %\vspace{-0.5em}
 \[ \tr^+(S,{\hb}) = \{ (x_1', \ldots, x_n') \st \text{$x_i'$ is consistent with $x_i$ for all $1 \leq i \leq n$}\} \]

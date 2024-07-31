@@ -373,25 +373,36 @@ This is because value expressions within the same segments are completely asynch
 Our approximate distributed monitoring method, denoted \textsc{Adm}, can be extended to real-valued signals and numerical predicates.
 The key is that finite-length piecewise-constant signals take finitely many values.
 By defining $\Sigma$ as a finite alphabet of these values, we can compute atomic propositions as above.
-%Arithmetic operations are handled by computing the asynchronous product of the signals and applying the operation letter-by-letter, transforming the results into atomic propositions via comparison with constants.
+%%Arithmetic operations are handled by computing the asynchronous product of the signals and applying the operation letter-by-letter, transforming the results into atomic propositions via comparison with constants.
 For example, if the asynchronous product of two signals $x_1$ and $x_2$ yields $(2\cdot2\cdot3, 1\cdot0\cdot1)$, adding these letter-by-letter results in $3 \cdot 2 \cdot 4$, and comparing with $> 2$ gives $101$.
-%Repeating this for all pairs produces the required atomic proposition.
+%%Repeating this for all pairs produces the required atomic proposition.
 %\alert{This approach is called \textsc{Orig}.}
 
 We can avoid explicit computation of asynchronous products for some formulas and numerical predicates.
 Since signals are asynchronous within segments, we can compute potential value sets instead of sequences.
 This approach is called \emph{Fine}, denoted by \textsc{Adm-F}.
-For instance, with $X_1 = \{2,3\}$ and $X_2 = \{0,1\}$, pairwise addition yields $\{2, 3, 4\}$.
+%For instance, with $X_1 = \{2,3\}$ and $X_2 = \{0,1\}$, pairwise addition yields $\{2, 3, 4\}$.
 Assuming $x_1 + x_2$ is constant within this segment, we can avoid explicit interleaving computations.
 Note that \textsc{Adm-F} overapproximates traces when order matters.
-%While \textsc{Adm-F} overapproximates traces when order matters, such as in $(x_1 > c_1) \until (x_2 > c_2)$, it preserves precision for formulas like $\LTLalways((x_1 - x_2) \cdot x_3 > c)$.
+%%While \textsc{Adm-F} overapproximates traces when order matters, such as in $(x_1 > c_1) \until (x_2 > c_2)$, it preserves precision for formulas like $\LTLalways((x_1 - x_2) \cdot x_3 > c)$.
 The approach \emph{Coarse}, denoted \textsc{Adm-C}, abstracts \emph{Fine} by only considering extreme values, which is useful for monotonic operations where the extreme values of outputs derive from inputs.
-For instance, if $\min X_1 = 2$, $\max X_1 = 3$, $\min X_2 = 0$, and $\max X_2 = 1$, then $\min(x_1 + x_2) = 2$ and $\max(x_1 + x_2) = 4$.
-%This way, we can efficiently maintain a smaller set of values and still preserve precision for formulas with monotonic operations.
-\todo{introduce decenteralized monitoring better, make it more prominent}
-Lastly, we also consider a decentralized setting where each agent has a monitor running on it, reducing asynchrony by using the agent's clock as a reference point.
+%For instance, if $\min X_1 = 2$, $\max X_1 = 3$, $\min X_2 = 0$, and $\max X_2 = 1$, then $\min(x_1 + x_2) = 2$ and $\max(x_1 + x_2) = 4$.
+%%This way, we can efficiently maintain a smaller set of values and still preserve precision for formulas with monotonic operations.
+%\todo{introduce decenteralized monitoring better, make it more prominent}
+
+\alert{
+We assumed so far that the central monitor runs on a process independent of the observed agents.
+Lastly, we also consider a setting where the monitor runs on one of the observed agents.
+This approach reduces asynchrony by using the agent's local clock as a reference point for the monitor.
 We call this \emph{Relative}, denoted \textsc{Adm-Fr} or \textsc{Adm-Cr} depending on the approach it is paired with.
 We evaluate these in \cref{sec:experiments}.
+}
+%So far, we only focused on a centralized setting where a single monitor receives inputs from the agents.
+%Lastly, we also consider a \emph{decentralized} setting where each agent operates with an individual monitor running on it.
+%This approach reduces asynchrony by using each agent's local clock as a reference point for the monitor.
+%We call this \emph{Relative}, denoted \textsc{Adm-Fr} or \textsc{Adm-Cr} depending on the approach it is paired with.
+%We evaluate these in \cref{sec:experiments}.
+
 
 %\vspace{-0.5em}
 \subsubsection{Combining Exact and Approximate Monitoring.}

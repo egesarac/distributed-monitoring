@@ -1,10 +1,13 @@
 \section{Conclusion} \label{sec:conclusion}
 
-We introduced an approximate and modular procedure for distributed monitoring of STL specifications. The proposed method has several orders of magnitude better efficiency compared to the exact SMT-based STL distributed monitors. This comes at the price of accuracy. Nevertheless, we show that the loss in accuracy depends a lot on the temporal formula and the maximum skew between local clocks, and identify classes of specifications for which approximate monitors do not introduce a lot of inaccuracies in practice. We finally propose combining the approximate and the exact monitoring methods in a way that still allows to have significant efficiency gains, while preserving full precision of the monitors.
+%We introduced an approximate and modular procedure for distributed monitoring of STL specifications. The proposed method has several orders of magnitude better efficiency compared to the exact SMT-based STL distributed monitors. This comes at the price of accuracy. Nevertheless, we show that the loss in accuracy depends a lot on the temporal formula and the maximum skew between local clocks, and identify classes of specifications for which approximate monitors do not introduce a lot of inaccuracies in practice. We finally propose combining the approximate and the exact monitoring methods in a way that still allows to have significant efficiency gains, while preserving full precision of the monitors.
 
-In this paper, the focus was on the offline evaluation of distributed traces. We plan to extend our monitoring approach to the online setting. We will also exploit the modular nature of our monitors to have a better control over the accuracy of their verdicts. More specifically, for every operator, we can either generate the exact or the approximate evaluation algorithm.  
+%In this paper, the focus was on the offline evaluation of distributed traces. We plan to extend our monitoring approach to the online setting. We will also exploit the modular nature of our monitors to have a better control over the accuracy of their verdicts. More specifically, for every operator, we can either generate the exact or the approximate evaluation algorithm.  
 
-%\subsubsection*{Acknowledgments.}
-%We thank the anonymous reviewers for their helpful comments.
-%This work was supported in part by the ERC-2020-AdG 101020093.
-%\rednote{More grant acks?}
+\alert{
+We presented an approximate, modular procedure for distributed STL monitoring that significantly improves efficiency over exact SMT-based methods.
+In this paper, the focus was on the offline evaluation of distributed traces.
+We plan to extend our monitoring approach to the online setting.
+We will also exploit the modular nature of our monitors to have a better control over the accuracy of their verdicts.
+More specifically, for every operator, we can either generate the exact or the approximate evaluation algorithm.
+}
