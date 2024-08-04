@@ -34,7 +34,7 @@ Since the focus of this paper is purely on the offline monitoring, we also use t
 %\vspace{-0.35em}
 \subsubsection{Experimental Subjects.}
 To answer our research questions, we use (1) a \emph{random generator (RG)} of distributed traces, (2) a \emph{water tank (WT)} case study, and (3) a \emph{swarm of drones (SD)} case study.  
-
+%
 \emph{The random generator (RG)} uses uniform distribution to generate distributed traces, in which the user can control the duration $d$ of the trace, as well as the $\varepsilon$ bound on the uncertainty at which the events happen.
 \emph{Water tank (WT)} model is a SimuLink model of a hybrid high pressure water distribution system consisting of two water tanks. Inlet pipes connect each water tank to an external source, and outlet pipes distribute high pressure water that is regulated by valves.
 Each valve is operated by a controller that samples the outflow pressure at 20Hz using its local clock. Our model is a simplified emulation of the Refueling Water Storage Tanks (RWST) module of an Emergency Core Cooling System (ECCS) of a Pressurized Water Reactor Plant~\cite{USNRCPWR}.
@@ -43,7 +43,7 @@ Each valve is operated by a controller that samples the outflow pressure at 20Hz
 
 %\vspace{-0.4em}
 \subsubsection{Specifications.}
-Table~\ref{tab:spec} summarizes the STL specifications that we use to monitor the behavior of our three experimental subjects. Specifications $\varphi_{1}$, $\varphi_{2}$ and $\varphi_{3}$ are monitored against the distributed traces created by the random generator and represent different classes and fragments of Boolean-valued temporal formulas. The first specification $\varphi_1$ is an LTL formula in which both the outer temporal operator ($\LTLg$) and the inner Boolean operator ($\wedge$) are conjunctive. The second formula $\varphi_2$ is the common LTL response formula which combines conjunctive $(\LTLg)$ and disjunctive $(\LTLf, \Rightarrow)$ operators. Finally, $\varphi_3$ adds a bounded real-time response requirement to the previous specification. The specification $\varphi_{WT}$ associated to the water tank case study is an STL formula in which a sum of signals originating from different agents is compared to a constant. Finally, the specification $\varphi_{SD}$ defines a mutual separation property over a swarm of drones, requiring more sophisticated arithmetic operations on signals originating from different agents.
+Table~\ref{tab:spec} shows the STL specifications that we use to evaluate our experimental subjects. Specifications $\varphi_{1}$, $\varphi_{2}$ and $\varphi_{3}$ are monitored against the distributed traces created by the random generator and represent different classes and fragments of Boolean-valued temporal formulas. The first specification $\varphi_1$ is an LTL formula in which both the outer temporal operator ($\LTLg$) and the inner Boolean operator ($\wedge$) are conjunctive. The second formula $\varphi_2$ is the common LTL response formula which combines conjunctive $(\LTLg)$ and disjunctive $(\LTLf, \Rightarrow)$ operators. Finally, $\varphi_3$ adds a bounded real-time response requirement to the previous specification. The specification $\varphi_{WT}$ associated to the water tank case study is an STL formula in which a sum of signals originating from different agents is compared to a constant. Finally, the specification $\varphi_{SD}$ defines a mutual separation property over a swarm of drones, requiring more sophisticated arithmetic operations on signals originating from different agents.
 
 \begin{table}[t]
 	\centering
@@ -105,7 +105,7 @@ We used a laptop with Ubuntu 24.04, an AMD Ryzen 7 4800HS CPU at 2.90 GHz clock 
 %\vspace{-0.3em}
 \subsubsection{Random Generator.}
 
-Figure~\ref{fig:rgresults} summarizes the results of evaluating specifications $\varphi_1$ to $\varphi_3$ against distributed traces from RG. The first column in the figure depicts a heatmap where each cell shows how many times \textsc{Adm} is faster than \textsc{Edm} when evaluating the formula on the given distributed trace with duration $d$ and uncertainty bound $\varepsilon$. The second column shows a heatmap where every cell shows the percentage of \emph{false positives} (FP) introduced by \textsc{Adm}, where a false positive happens when \textsc{Adm} does not agree with \textsc{Edm}, i.e., \textsc{Adm} evaluates to inconclusive when the real verdict is true or false. Finally, the third column depicts a heat map, where each cell estimates the achieved speedup when combining \textsc{Adm} with \textsc{Edm}, compared to using only \textsc{Edm}.
+Figure~\ref{fig:rgresults} summarizes the results of evaluating specifications $\varphi_1$ to $\varphi_3$ against distributed traces from RG. The first column in the figure depicts a heatmap where cells show the speedup of \textsc{Adm} compared to \textsc{Edm} when evaluating the formula on the given distributed trace with duration $d$ and uncertainty bound $\varepsilon$. The second column shows a heatmap where every cell shows the percentage of \emph{false positives} (FP) introduced by \textsc{Adm}, where \textsc{Adm} evaluates to inconclusive when the \textsc{Edm} (real) verdict is true or false. Finally, the third column depicts a heatmap, where each cell estimates the achieved speedup when combining \textsc{Adm} with \textsc{Edm}, compared to using only \textsc{Edm}.
 
 \begin{figure}[t]
 	\begin{center}
@@ -116,17 +116,19 @@ Figure~\ref{fig:rgresults} summarizes the results of evaluating specifications $
 %\vspace{1em}
 \end{figure}
 
-The approximate \textsc{Adm} approach consistently achieves computational speedups of \emph{several orders of magnitude} 
-compared to the exact \textsc{Edm} approach.
-The speedups range from several thousands to almost 60 thousand times, regardless of the considered specification, the duration $d$ of the trace, or the uncertainty bound $\varepsilon$.
-These speedups are highest for long signals with low uncertainty bounds.
+We see that \textsc{Adm} consistently achieves speedups of \emph{several orders of magnitude} 
+compared to the \textsc{Edm} approach.
+The speedups range from several thousands to almost 60 thousand times
+%, regardless of the considered specification, the duration $d$ of the trace, or the uncertainty bound $\varepsilon$.
+%These speedups 
+and are the highest for long signals with low uncertainty bounds.
 The price paid in terms of accuracy highly depends on the type of specification and the uncertainty bounds.
 For example, \textsc{Adm} is very accurate when monitoring the property $\varphi_1$ in which both the temporal and the combinatorial operators are conjunctive.
 On the other hand, having a combination of conjunctive and disjunctive operations (as in $\varphi_{2}$ and $\varphi_{3}$) increases the number of FPs.
 Surprisingly, we see that in these cases the introduction of FPs is higher for lower values of $\varepsilon$.
 This is because even \textsc{Edm} gives many inconclusive verdicts for higher values of $\varepsilon$.
 We see that adding real-time modalities to the temporal operators increases FPs.
-Finally, by observing the third column of Figure~\ref{fig:rgresults}, we can see that by combining \textsc{Edm} and \textsc{Adm}, we consistently get better performance than by using \textsc{Edm} only, even in cases where \textsc{Adm} introduces a high percentage of FPs.
+Finally, we can see (Figure~\ref{fig:rgresults} right column) that by combining \textsc{Edm} and \textsc{Adm}, we consistently get better performance than by using \textsc{Edm} only, even in cases where \textsc{Adm} introduces a high percentage of FPs.
 
 %The approximate monitoring approach \textsc{Adm} consistently achieves computational speedups of \emph{several orders of magnitude} over the exact approach \textsc{Edm}, ranging from thousands to nearly 60 thousand times, regardless of  These speedups are highest for long signals with low uncertainty bounds. The accuracy tradeoff depends on the specification type and uncertainty bounds. \textsc{Adm} is very accurate for the property $\varphi_1$ with conjunctive operators, but combining conjunctive and disjunctive operations (as in $\varphi_2$ and $\varphi_3$) increases false positives (FPs), surprisingly at lower $\varepsilon$ values in particular. This is because higher $\varepsilon$ values result in many inconclusive verdicts even for \textsc{Edm}. Adding real-time modalities to temporal operators also increases FPs. Finally, as shown in the third column of \cref{fig:rgresults}, combining \textsc{Edm} and \textsc{Adm} consistently improves performance, even when \textsc{Adm} introduces many FPs.
 

@@ -1,18 +1,17 @@
-%\vspace{-4mm}
 \section{Introduction} 
 \label{sec:introduction}
 
 \emph{Distributed systems} are networks of independent agents that work together to achieve a 
 common objective.
 %
-Distributed systems are everywhere around us and come in many different forms.
+They come in many different forms.
 %
 For example, cloud computing uses distribution of resources and services over the internet to offer 
 to their users a scalable infrastructure with transparent on-demand access to computing power and 
 storage. 
 %
-Swarms of drones represent another family of distributed systems where individual drones 
-collaborate to accomplish tasks like surveillance, search and rescue, or package delivery.
+Swarms of drones is another family of distributed systems where individual drones 
+collaborate to accomplish tasks like search and rescue or package delivery.
 %
 While each drone operates independently, it also communicates and coordinates with others to 
 successfully achieve their common objectives.
@@ -25,7 +24,7 @@ While perfect clock synchronization is impractical due to network latency and no
 algorithms such as the Network Time Protocol (NTP) allow agents to maintain a \emph{bounded 
 skew} between the synchronized clocks.
 %
-In that case, we say that a distributed system has \emph{partial synchrony}. 
+We then say that a distributed system has \emph{partial synchrony}. 
 
 Formal verification of distributed system is a notoriously hard problem, due to the combinatorial 
 explosion of all possible interleavings in the behaviors collected from individual agents.
@@ -64,27 +63,23 @@ The problem of distributed RV under partial synchrony assumption has been studie
   
 %  \subsection{Contributions}
 
-To mitigate this issue, we present a novel approach for \emph{approximate} RV of STL 
-specifications under partial synchrony.
+To mitigate this issue, we propose a new approach for \emph{approximate} RV of STL 
+under partial synchrony.
 %
-In essence, we abstract away potential interleavings in distributed behaviors in a conservative 
-manner, resulting in an effective overapproximation of global behaviors.
+In essence, we conservatively abstract away potential interleavings in distributed behaviors, resulting in their overapproximation.
 %
 This abstraction simplifies the representation of distributed behaviors into a set of Boolean 
 expressions, taking into account regions of uncertainty created by clock skews.
 %
-We define monitoring operations required to evaluate temporal specifications over such expressions, 
-which result in monitoring verdicts on overapproximate behaviors.
+We define monitoring operations that evaluate temporal specifications over such expressions, 
+which result in monitoring verdicts on overapproximated behaviors.
 %
-There is typically an inevitable tradeoff between {\em accuracy} and {\em speedup} in approximate 
-solutions, and  RV is not an exception.
+This approximate solution yields an inevitable tradeoff between {\em accuracy} and {\em speedup}.
 %
-That is, gains in the monitoring speedup may result in reduced accuracy.
+%That is,  gains in the monitoring speedup may result in reduced accuracy.
 %
-For some applications, reduced accuracy may not be acceptable.
-%
-Therefore, we propose a methodology that combines our approximate monitors with their exact 
-counterparts, with the aim to benefit from the enhanced monitoring efficiency without sacrificing 
+For applications where reduced accuracy is not acceptable, we devise a methodology that combines approximate and exact monitors, 
+with the aim to benefit from the enhanced efficiency without sacrificing 
 precision.
 %
 Approximate monitoring is also valuable in the sequential setting, with applications including
@@ -98,16 +93,16 @@ We implemented our approach in a prototype tool and performed thorough evaluatio
 synthetic and real-world case studies (mutual separation in swarm of drones and a water distribution 
 system).
 %
-We first demonstrated that in synthetic experiments, our approximate monitors consistently achieve 
-speedups of between 3 and 5 orders of magnitudes compared to the exact SMT-based solution.
+We first demonstrated that in many experiments, our approximate monitors achieve 
+speedups of up to 5 orders of magnitude compared to the exact SMT-based solution.
 %
 We empirically characterized the classes of specifications and behaviors for which our approximate 
-monitoring approach achieves good precision.
+monitors achieve good precision.
 %
-In our case studies, we observe up to 5 orders of magnitude speedup (although in some cases the 
-improvement is not as much).
+%In our case studies, we observe up to 5 orders of magnitude speedup.
+%  (although in some cases the  improvement is not as much)
 %
-We finally show that combining exact and approximate distributed RV yields significant efficiency gains on average without sacrificing precision, even when approximate monitors had low accuracy.
+We finally showed that combining exact and approximate distributed RV yields significant efficiency gains on average without sacrificing precision, even with low-accuracy approximate monitors.
 
 %\paragraph{Organization.}
 %%\noindent\textit{Organization.}
