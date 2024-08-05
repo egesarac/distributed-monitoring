@@ -390,13 +390,11 @@ The approach \emph{Coarse}, denoted \textsc{Adm-C}, abstracts \emph{Fine} by onl
 %%This way, we can efficiently maintain a smaller set of values and still preserve precision for formulas with monotonic operations.
 %\todo{introduce decenteralized monitoring better, make it more prominent}
 
-\alert{
 We assumed so far that the central monitor runs on a process independent of the observed agents.
 Lastly, we also consider a setting where the monitor runs on one of the observed agents.
 This approach reduces asynchrony by using the agent's local clock as a reference point for the monitor.
 We call this \emph{Relative}, denoted \textsc{Adm-Fr} or \textsc{Adm-Cr} depending on the approach it is paired with.
 We evaluate these in \cref{sec:experiments}.
-}
 %So far, we only focused on a centralized setting where a single monitor receives inputs from the agents.
 %Lastly, we also consider a \emph{decentralized} setting where each agent operates with an individual monitor running on it.
 %This approach reduces asynchrony by using each agent's local clock as a reference point for the monitor.
