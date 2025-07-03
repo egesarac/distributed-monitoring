@@ -1,0 +1,116 @@
+\section{Introduction} 
+\label{sec:introduction}
+
+\emph{Distributed systems} are networks of independent agents that work together to achieve a 
+common objective.
+%
+They come in many different forms.
+%
+For example, cloud computing uses distribution of resources and services over the internet to offer 
+to their users a scalable infrastructure with transparent on-demand access to computing power and 
+storage. 
+%
+Swarms of drones is another family of distributed systems where individual drones 
+collaborate to accomplish tasks like search and rescue or package delivery.
+%
+While each drone operates independently, it also communicates and coordinates with others to 
+successfully achieve their common objectives.
+%
+The individual agents in a distributed system typically do not share a global clock.
+%
+To coordinate actions across multiple agents, clock synchronization is often needed.
+%
+While perfect clock synchronization is impractical due to network latency and node failures, 
+algorithms such as the Network Time Protocol (NTP) allow agents to maintain a \emph{bounded 
+skew} between the synchronized clocks.
+%
+We then say that a distributed system has \emph{partial synchrony}. 
+
+Formal verification of distributed system is a notoriously hard problem, due to the combinatorial 
+explosion of all possible interleavings in the behaviors collected from individual agents.
+%
+% \emph{Runtime verification (RV)} provides a more pragmatic approach, in which a monitor observes 
+% a behavior of a distributed system and checks its correctness against a formal specification.
+ \emph{Runtime verification (RV)} provides a more pragmatic approach in which a behavior of a distributed system is observed and its correctness is checked against a formal specification.
+ %
+%\subsection{Motivation}
+%There has been emerging interest in designing RV techniques for distributed systems in the past few years.
+%
+We consider the \emph{distributed RV} setting where this task is performed by a single central monitor observing the independent agents (as opposed to \emph{decentralized RV} where the monitoring task itself is distributed).
+%
+Remotely related to the problem of distributed RV under partial synchrony are distributed RV in the 
+fully {\em synchronous}~\cite{ef20,cf16,bf16} and {\em 
+asynchronous}~\cite{cgnm13,mg05,og07,mb15,g20,bfrrt22} settings as well as  benchmarking 
+tools~\cite{aafi21} for assessing monitoring overhead.
+%
+The problem of distributed RV under partial synchrony assumption has been studied for Linear 
+ Temporal Logic (LTL)~\cite{GangulyMB20} and Signal Temporal Logic (STL)~\cite{MomtazAB23} 
+ specification languages.
+ %
+ The proposed solutions use Satisfiability-Modulo-Theory (SMT) solving to provide sound and 
+ complete distributed monitoring procedures.
+ %
+ Although distributed RV monitors consume only a single distributed behavior at a time, this behavior 
+ can have an excessive number of possible interleavings. 
+  %
+ Put another way, although RV deals only with the verification of a single execution at run time, it is 
+ still prone to evaluating an explosion of combinations.
+ %
+ Hence, the exact distributed monitors from the literature can still suffer from significant 
+ computational overhead.
+ %
+ This phenomenon has been observed even under partial synchrony~\cite{GangulyMB20,gmb24}, and becomes problematic even for offline monitoring of a large set of log files.
+  
+%  \subsection{Contributions}
+
+To mitigate this issue, we propose a new approach for \emph{approximate} RV of STL 
+under partial synchrony.
+%
+In essence, we conservatively abstract away potential interleavings in distributed behaviors, resulting in their overapproximation.
+%
+This abstraction simplifies the representation of distributed behaviors into a set of Boolean 
+expressions, taking into account regions of uncertainty created by clock skews.
+%
+We define monitoring operations that evaluate temporal specifications over such expressions, 
+which result in monitoring verdicts on overapproximated behaviors.
+%
+This approximate solution yields an inevitable tradeoff between {\em accuracy} and {\em speedup}.
+%
+%That is,  gains in the monitoring speedup may result in reduced accuracy.
+%
+For applications where reduced accuracy is not acceptable, we devise a methodology that combines approximate and exact monitors, 
+with the aim to benefit from the enhanced efficiency without sacrificing 
+precision.
+%
+Approximate monitoring is also valuable in the sequential setting, with applications including
+monitoring with state estimation \cite{StollerBSGHSZ11,BartocciG13},
+quantitative monitoring and its resource-precision tradeoffs \cite{HenzingerS21,HenzingerMS22,HenzingerMS23},
+and various other uses \cite{AlechinaDL14,AcetoAFIL21}.
+
+
+
+We implemented our approach in a prototype tool and performed thorough evaluations on both 
+synthetic and real-world case studies (mutual separation in swarm of drones and a water distribution 
+system).
+%
+We first demonstrated that in many experiments, our approximate monitors achieve 
+speedups of up to 5 orders of magnitude compared to the exact SMT-based solution.
+%
+We empirically characterized the classes of specifications and behaviors for which our approximate 
+monitors achieve good precision.
+%
+%In our case studies, we observe up to 5 orders of magnitude speedup.
+%  (although in some cases the  improvement is not as much)
+%
+We finally showed that combining exact and approximate distributed RV yields significant efficiency gains on average without sacrificing precision, even with low-accuracy approximate monitors.
+
+%\paragraph{Organization.}
+%%\noindent\textit{Organization.}
+%Section~\ref{sec:preliminaries} presents the preliminary concepts.
+%%
+%Section~\ref{sec:semantics} introduces overapproximate semantics of STL while 
+%Sections~\ref{sec:approach} and~\ref{sec:algorithm} describe our approach in approximating traces 
+%and the associated monitoring algorithm, respectively.
+%%
+%We evaluate our approach in Section~\ref{sec:experiments}. Finally, we conclude in 
+%Section~\ref{sec:conclusion}.

@@ -59,5 +59,5 @@ for ax, row in zip(axs[:,0], rows):
                 size='large', ha='right', va='center', rotation=90)
 
 plt.tight_layout()
-plt.savefig("speedup_appendix.pdf", format="pdf", bbox_inches="tight")
+plt.savefig("speedup_appendix2.pdf", format="pdf", bbox_inches="tight")
 
