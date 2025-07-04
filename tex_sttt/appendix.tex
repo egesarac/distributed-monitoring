@@ -180,23 +180,60 @@ We now proceed to prove \cref{cl:algo}.
 	The cases of $\bot$ and ${\,?}$ are similar.
 \end{proof}
 
+\bgroup \color{red}
 \subsubsection*{Proof of \cref{cl:algoOnline}.}
-\textbf{Statement.} TODO
+\textbf{Statement.}
+The outputs of \textsc{ADM-Naive} and \textsc{ADM-Incr} coincide after every new signal portion.
+Formally, consider a distributed signal $(S,{\hb})$ that incrementally becomes available and a past STL formula $\varphi$.
+Then, for every $i \geq 1$, the following equality holds:
+\begin{align*}
+	\llbracket (S, {\hb}), i \models \varphi \rrbracket_{\textit{naive}} = \llbracket (S, {\hb}), i \models \varphi \rrbracket_{\textit{incr}}
+\end{align*}
 
 \begin{proof}[\normalsize Proof.]
 	\normalsize
-	\rednote[inline]{proof sketch: by induction (on chunks or signals, the temporal domain) the arguments can be formalized as in the case of offline monitoring. here we give a sketch focusing on the differences listed above.}
+%	\rednote[inline]{proof sketch: by induction (on chunks or signals, the temporal domain) the arguments can be formalized as in the case of offline monitoring. here we give a sketch focusing on the differences listed above.}
+%	
+%	base case: the initial chunk, naive and incr coincide by definition so no need to prove anything explicitly
+%	
+%	inductive case: suppose it's correct for $i$ chunks, show for $i+1$ chunks.
+%	i know the value expressions from the previous chunk, which come from the last segment of the previous signal.
+%	thanks to inductive evaluation of ptstl, if needed, i can use these together with the my current signal to compute the value expressions for the satisfaction in first segment of my current signal.
+%	for timed formulas, we may need to look further back, but the idea is the same.
+%	
+%	why is this correct?
+%	the value expressions computed in the previous segment will stay the same in the current segment because we've already considered epsilon ahead to account for any uncertainty that might affect the result there.	
+
+	We prove the statement by induction over the number $i \geq 1$ of signal portions that have been processed.
 	
-	base case: the initial chunk, naive and incr coincide by definition so no need to prove anything explicitly
+	\subparagraph*{Base case ($i = 1$).}
+	Since the inductive evaluation assumes that formulas are violated when signals are undefined, initializing $V = \{0\}$ in \textsc{ADM-Incr} guarantees that \textsc{ADM-Incr} and \textsc{ADM-Naive} behave exactly the same.
 	
-	inductive case: suppose it's correct for $i$ chunks, show for $i+1$ chunks.
-	i know the value expressions from the previous chunk, which come from the last segment of the previous signal.
-	thanks to inductive evaluation of ptstl, if needed, i can use these together with the my current signal to compute the value expressions for the satisfaction in first segment of my current signal.
-	for timed formulas, we may need to look further back, but the idea is the same.
 	
-	why is this correct?
-	the value expressions computed in the previous segment will stay the same in the current segment because we've already considered epsilon ahead to account for any uncertainty that might affect the result there.	
+	\subparagraph*{Induction step.}
+	Assume that after processing the first $i$ portions the two algorithms have
+	produced identical verdicts, i.e., $ \llbracket (S,\hb), i \models \varphi \rrbracket_{\textit{naive}} = \llbracket (S,\hb), i \models \varphi \rrbracket_{\textit{incr}}$.
+	
+	When the $(i+1)$st portion $(S_{i+1},\hb_{i+1})$ arrives, \textsc{ADM-Naive} concatenates it with the entire previous signal prefix and obtains a longer signal
+	Let us denote this signal by $\sigma_{i+1}$.
+	In contrast, \textsc{ADM-Incr} discards the part of the prefix that ends before $i\Delta - H(\varphi) - \varepsilon - \delta$, which guarantees that all edges that may still interact with future edges are retained, and inserts a summary segment
+	$\hat{I}$ that stores the verdict for every subformula of $\varphi$, which, by induction hypothesis, equal the verdict that \textsc{ADM-Naive} produced for the previous portion.
+	Let us denote the resulting signal by $\sigma_{i+1}'$.
+	
+	We claim that for every subformula $\psi$ of $\varphi$ and for every segment $I$ of the canonical segmentation of $\sigma_{i+1}$ that lies strictly to the right of $\hat {I}$, we have $\llbracket \sigma_{i+1}, I \models \psi\rrbracket = \llbracket \sigma_{i+1}', I \models \psi \rrbracket$.
+	To see why this holds, first observe that both monitors run exactly the same inductive rules (given in \cref{sec:offline}, \cref{fig:eval,fig:timedEval}).
+	These rules evaluate a subformula on a segment $I$ from (i) the value expressions of atomic propositions for the current segment $I$, and (ii) the value expression set already computed for the immediate predecessor segment $I'$.
+	The value expressions of atomic propositions coincide for the two signals because $\sigma_{i+1}$ and $\sigma_{i+1}'$ are identical on $I$.
+	By the induction hypothesis, the verdicts stored for $\hat{I}$ coincides with that of the prefix of $\sigma_{i+1}$ that is discarded in $\sigma_{i+1}'$, so the computed value expression sets for $I'$ are also equal.
+	Therefore, the inductive rules yield identical results on $I$ for $\sigma_{i+1}$ and $\sigma_{i+1}'$.
+	
+	Now, by repeatedly applying the claim from left to right over the segmentation, we
+	obtain in particular $\llbracket\sigma_{i+1}, J \models \varphi \rrbracket = \llbracket \sigma_{i+1}', J \models \varphi \rrbracket$, where $J$ is as defined in the algorithms \textsc{ADM-Naive} and \textsc{ADM-Incr}.
+	Therefore, we conclude
+	$$\llbracket (S,\hb), i+1 \models \varphi \rrbracket_{\textit{naive}} = \llbracket (S,\hb), i+1 \models \varphi \rrbracket_{\textit{incr}}.$$
 \end{proof}
+\egroup
+
 
 \subsubsection*{Additional Experimental Results.}
 
@@ -211,7 +248,7 @@ For timed formulas, the increased size of the interval (from $[0,1)$ to $[0,2)$ 
 
 \begin{figure}[h]
 	\begin{center}
-		\includegraphics[width=\linewidth]{speedup_appendix}
+%		\includegraphics[width=\linewidth]{speedup_appendix}
 		\caption{Results on monitoring $\varphi_{4}$ to $\varphi_{6}$ on distributed traces created by the RG.}
 		\label{fig:rgresults2}
 	\end{center}
