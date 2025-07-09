@@ -197,7 +197,7 @@ Let us demonstrate these definitions on an example.
 		\bgroup \color{red} \llbracket (S, {\hb}), I \models \varphi_1 \since_J \varphi_2 \rrbracket \egroup = \destutter( \{ u_1 \mathsf{S}^0 u_2 \st &(u_1, u_2) \in P_1' \otimes Q_1' \} \cdot \ldots \\ 
 		&\ldots \cdot \{ u_1 \mathsf{S}^0 u_2 \st (u_1, u_2) \in P_k' \otimes Q_k' \} )
 	\end{align*}
-	\caption{Inductive evaluation of timed formulas.
+	\caption{Inductive evaluation of timed formulas where $J$ is a bounded interval.
 		\textbf{(a)}~Evaluation of timed until, where $\mathsf{fwPfs}((S,{\hb}), \varphi_1, I, J) = \{P_1, \ldots, P_k \}$ and $\mathsf{fwPfs}((S,{\hb}), \varphi_2, I, J) = \{Q_1, \ldots, Q_k \}$ such that the intervals producing $P_i$ and $Q_i$ respectively start before those producing $P_{i+1}$ and $Q_{i+1}$ for all $1 \leq i < k$.
 		\textbf{(b)}~Evaluation of timed since, where $\mathsf{bwPfs}((S,{\hb}), \varphi_1, I, J) = \{P_1', \ldots, P_k' \}$ and $\mathsf{bwPfs}((S,{\hb}), \varphi_2, I, J) = \{Q_1', \ldots, Q_k' \}$ such that the intervals producing $P_i$ and $Q_i$ respectively start before those producing $P_{i+1}$ and $Q_{i+1}$ for all $1 \leq i < k$.
 		\label{fig:timedEval}}
@@ -219,6 +219,18 @@ Let us demonstrate these definitions on an example.
 		\llbracket (S, {\hb}), [1,3) \models \LTLeventually_{[0,1)} x_1 \rrbracket \\= \{ 0, 01, 010, 0101, 01010, 1, 10, 101, 1010 \}. 
 	\end{multline*}
 \end{example}
+
+\bgroup \color{red}
+\begin{remark}
+	Consider the formula $\varphi_1 \until_I \varphi_2$ where $\inf I > 0$ and $\sup I = \infty$.
+	We can evaluate this formula similarly to its untimed counterpart $\varphi_1 \until \varphi_2$ (\cref{fig:eval}).
+	Recall that the untimed one's evaluation looks at the next segment's first bits to determine whether to apply $\mathsf{U}^0$ or $\mathsf{U}^1$.
+	For the timed one, we can use the same logic with an additional look-ahead of $\inf I$.
+	In particular, if $\inf I$ coincides with a future segment's left end point, we consider that segment's first bits; otherwise $\inf I$ falls strictly in a segment, in which case we consider all possible truth values of $\varphi_1 \until \varphi_2$ in that segment since signals are asynchronous within each segment.
+	The same applies to timed since formulas.
+\end{remark}
+\egroup
+
 
 \paragraph*{Computing the Semantics of STL$^+$.}
 
@@ -262,7 +274,7 @@ Putting it all together, given a distributed signal $(S, {\hb})$ and an STL$^+$ 
 		\draw[fill=black] (2, -8.5 + 0.05) node[left] {{\scriptsize (3)}} rectangle (3, -8.5 - 0.05);
 		\draw[fill=black] (2.5, -9 + 0.05) node[left] {{\scriptsize (4)}} rectangle (3.5, -9 - 0.05);
 	\end{tikzpicture}
-	\caption{Profiles of $J = [0,1)$ with respect to $x_1 \in~S$ of \cref{fig:csve}. A representative interval for each profile is shown with solid black lines below the table.}
+	\caption{Forward profiles of $J = [0,1)$ with respect to $x_1 \in~S$ of \cref{fig:csve}. A representative interval for each profile is shown with solid black lines below the table.}
 	\label{fig:profiles}
 \end{figure}
 
@@ -316,17 +328,163 @@ Our goal is to describe an algorithm that computes, given a past STL formula $\v
 Let us first highlight the main difference of the online setting from the offline one.
 Unlike in the offline setting, the monitor does not know whether the current signal portion is the last one or not.
 After processing consecutive portions of a signal of length $d$, an edge in the next portion with a local timestamp of $t' \in (d, d+\varepsilon)$ may result in new potential interleavings with the edges that have been observed in the current portion.
-However, if the monitor attempts to produce a verdict for the signal prefix until length $d$, it may produce unsound verdicts as it may miss potential interleavings of edges.
-Therefore, the monitor can only produce a conclusive verdict for the signal's prefix of length $d-\varepsilon$.
-We demonstrate this problem of ``forward uncertainty'' in FIG-TODO.
+As a result, if the monitor attempts to produce a verdict for the signal prefix until length $d$, it may produce unsound verdicts as it may miss potential interleavings of edges.
+This problem of ``forward uncertainty'' can be avoided if the monitor only produces a verdict for the signal's prefix of length $d-\varepsilon$, since no edge with a local timestamp larger than $d$ can influence the verdict at time $d-\varepsilon$ with respect to the monitor's clock.
 
 Below, we detail two contrasting solutions: a \emph{naive} approach that recomputes everything from scratch after each new portion arrives, and an \emph{incremental} approach that takes advantage of the inductive computation of value expressions.
-We demonstrate these in FIG-TODO2.
+We demonstrate these in \cref{fig:online}.
+
+\begin{figure*}
+	%	\vspace{-1em}
+	\centering
+		\begin{subfigure}[c]{.1\textwidth}
+		\centering
+		\begin{tikzpicture}[scale=0.75,>=stealth]
+			% portion labels
+			\node[anchor=east] at ($(-1,3.6)$) {};
+			\vspace{1em}
+			\node[anchor=east] at ($(-1,3)$) {\footnotesize{Portion 1}};
+			\node[anchor=east] at ($(-1,1.5)$) {\footnotesize{Portion 2}};
+			\node[anchor=east] at ($(-1,0)$)       {{\footnotesize Portion 3}};
+		\end{tikzpicture}
+	\end{subfigure}
+%	\hspace{1em}
+	\begin{subfigure}[c]{.42\textwidth}
+		\centering
+		\begin{tikzpicture}[scale=0.75,
+			>=stealth,
+			box/.style = {fill=gray!40, draw=black, fill opacity=.45}
+			]
+
+			%--- handy lengths ------------------------------------------------------------
+			\def\DL{2.5}        % 1·Δ  (horizontal unit)
+			\def\eps{1.0}      % ε   (shown as small offset of the dashed line)
+			\def\del{0.05}      % δ   (horizontal shift used in panel b)
+			\def\vsep{1.5}      % vertical separation between rows
+			\def\arrowL{3*\DL+0.5}  % total arrow length (both panels)
+			\def\barH{0.28}   % <── height of the grey bar
+			
+			%--- column anchors -----------------------------------------------------------
+			\coordinate (A) at (0,0);             % left column (a)
+			
+			%==============================================================================
+			%                               panel (a)
+			%------------------------------------------------------------------------------
+			\scriptsize
+			\node at ($(A)+(1.5*\DL,2.1*\vsep+0.9)$) {\textbf{(a)}};
+			\footnotesize
+			
+			% portion labels
+%			\node[anchor=east] at ($(A)+(-0.8,2*\vsep)$) {Portion 1};
+%			\node[anchor=east] at ($(A)+(-0.8,1*\vsep)$) {Portion 2};
+%			\node[anchor=east] at ($(A)+(-0.8,0)$)       {Portion 3};
+			
+			% -- row 1 -------------------------------------------------
+			\draw[->] ($(A)+(0.5,2*\vsep)$) -- ++(\arrowL,0);
+			\path ($(A)+(0.5,2*\vsep)$) coordinate (s1a);
+			\filldraw[box] ($(s1a)+(0,-\barH/2)$) rectangle ++(\DL,\barH);
+			\draw[solid] ($(s1a)+(0,0.4)$) -- ++(0,-0.8);
+			\draw[solid] ($(s1a)+(\DL,0.4)$) -- ++(0,-0.8);
+			\draw[dashed] ($(s1a)+(\DL-\eps,0.4)$) -- ++(0,-0.8);
+			\node[below]  at ($(s1a)+(0,     -0.4)$) {$0$};
+			\node[below]  at ($(s1a)+(\DL-\eps, -0.4)$) {$\Delta-\varepsilon$};
+			\node[below]  at ($(s1a)+(\DL,      -0.4)$) {$\Delta$};
+			
+			% -- row 2 -------------------------------------------------
+			\draw[->] ($(A)+(0.5,1*\vsep)$) -- ++(\arrowL,0);
+			\path ($(A)+(0.5,1*\vsep)$) coordinate (s2a);
+			\filldraw[box] ($(s2a)+(0,-\barH/2)$) rectangle ++(2*\DL,\barH);
+			\draw[dashed] ($(s2a)+(2*\DL-\eps,0.4)$) -- ++(0,-0.8);
+			\draw[solid] ($(s2a)+(0,0.4)$) -- ++(0,-0.8);
+			\draw[solid] ($(s2a)+(2*\DL,0.4)$) -- ++(0,-0.8);
+			\node[below]  at ($(s2a)+(0,     -0.4)$) {$0$};
+			\node[below]  at ($(s2a)+(2*\DL-\eps,-0.4)$) {$2\Delta-\varepsilon$};
+			\node[below]  at ($(s2a)+(2*\DL,     -0.4)$) {$2\Delta$};
+			
+			% -- row 3 -------------------------------------------------
+			\draw[->] ($(A)+(0.5,0)$)       -- ++(\arrowL,0);
+			\path ($(A)+(0.5,0)$) coordinate (s3a);
+			\filldraw[box] ($(s3a)+(0,-\barH/2)$) rectangle ++(3*\DL,\barH);
+			\draw[dashed] ($(s3a)+(3*\DL-\eps,0.4)$) -- ++(0,-0.8);
+			\draw[solid] ($(s3a)+(0,0.4)$) -- ++(0,-0.8);
+			\draw[solid] ($(s3a)+(3*\DL,0.4)$) -- ++(0,-0.8);
+			\node[below]  at ($(s3a)+(0,     -0.4)$) {$0$};
+			\node[below]  at ($(s3a)+(3*\DL-\eps,-0.4)$) {$3\Delta-\varepsilon$};
+			\node[below]  at ($(s3a)+(3*\DL,     -0.4)$) {$3\Delta$};
+		\end{tikzpicture}
+	\end{subfigure}
+	\hspace{1em}
+	\begin{subfigure}[c]{.42\textwidth}
+		\centering
+		\begin{tikzpicture}[scale=0.75,
+			>=stealth,
+			box/.style = {fill=gray!40, draw=black, fill opacity=.45}
+			]
+			
+			%--- handy lengths ------------------------------------------------------------
+			\def\DL{2.5}        % 1·Δ  (horizontal unit)
+			\def\eps{1.0}      % ε   (shown as small offset of the dashed line)
+			\def\del{0.05}      % δ   (horizontal shift used in panel b)
+			\def\vsep{1.5}      % vertical separation between rows
+			\def\arrowL{3*\DL+0.5}  % total arrow length (both panels)
+			\def\barH{0.28}   % <── height of the grey bar
+			
+			%--- column anchors -----------------------------------------------------------
+			\coordinate (B) at (0,0);             % left column (a)
+			
+			%==============================================================================
+			%                               panel (b)
+			%------------------------------------------------------------------------------
+			\scriptsize
+			\node at ($(B)+(1.5*\DL,2.1*\vsep+0.9)$) {\textbf{(b)}};
+			\footnotesize 	
+			
+			% -- row 1 -------------------------------------------------
+			\draw[->] ($(B)+(0.5,2*\vsep)$) -- ++(\arrowL,0);
+			\path ($(B)+(0.5,2*\vsep)$) coordinate (s1b);
+			\filldraw[box] ($(s1b)+(0,-\barH/2)$) rectangle ++(\DL,\barH);
+			\draw[dashed] ($(s1b)+(\DL-\eps,0.4)$) -- ++(0,-0.8);
+			\draw[solid] ($(s1b)+(0,0.4)$) -- ++(0,-0.8);
+			\draw[solid] ($(s1b)+(\DL,0.4)$) -- ++(0,-0.8);
+			\node[below]  at ($(s1b)+(0,-0.4)$) {$0$};
+			\node[below]  at ($(s1b)+(\DL-\eps,-0.4)$) {$\Delta-\varepsilon$};
+			\node[below]  at ($(s1b)+(\DL,     -0.4)$) {$\Delta$};
+			
+			% -- row 2 -------------------------------------------------
+			\draw[->] ($(B)+(0.5,1*\vsep)$) -- ++(\arrowL,0);
+			\path ($(B)+(0.5+\DL-\eps-\del,1*\vsep)$) coordinate (s2b);
+			\filldraw[box] ($(s2b)+(0,-\barH/2)$) rectangle ++(\DL+\eps+\del,\barH);
+			\draw[dashed] ($(s2b)+(\DL+\del,0.4)$) -- ++(0,-0.8);
+			\draw[solid] ($(s2b)+(0,0.4)$) -- ++(0,-0.8);
+			\draw[solid] ($(s2b)+(\DL+\eps+\del,0.4)$) -- ++(0,-0.8);
+			\node[below] at ($(s2b)+(0,         -0.4)$) {$\Delta-\varepsilon-\delta$};
+			\node[below] at ($(s2b)+(\DL+\del,-0.4)$) {$2\Delta-\varepsilon$};
+			\node[below] at ($(s2b)+(\DL+\eps+\del,     -0.4)$) {$2\Delta$};
+			
+			% -- row 3 -------------------------------------------------
+			\draw[->] ($(B)+(0.5,0)$)       -- ++(\arrowL,0);
+			\path ($(B)+(0.5+2*\DL-\eps-\del,0)$) coordinate (s3b);
+			\filldraw[box] ($(s3b)+(0,-\barH/2)$) rectangle ++(\DL+\eps+\del,\barH);
+			\draw[dashed] ($(s3b)+(\DL+\del,0.4)$) -- ++(0,-0.8);
+			\draw[solid] ($(s3b)+(0,0.4)$) -- ++(0,-0.8);
+			\draw[solid] ($(s3b)+(\DL+\eps+\del,0.4)$) -- ++(0,-0.8);
+			\node[below] at ($(s3b)+(0,         -0.4)$) {$2\Delta-\varepsilon-\delta$};
+			\node[below] at ($(s3b)+(\DL-\del,-0.4)$) {$3\Delta-\varepsilon$};
+			\node[below] at ($(s3b)+(\DL+\eps+\del,     -0.4)$) {$3\Delta$};
+		\end{tikzpicture}
+	\end{subfigure}
+	\vspace{1ex}
+	\caption{\bgroup \color{red}Two contrasting approaches to online monitoring with a sampling period of $\Delta$ and a maximum clock skew of $\varepsilon$. The signal (solid arrows) become available incrementally. As new portions of the signal arrive, the monitor stores some part of it (gray boxes around solid arrows). In both approaches, after receiving the $i$th signal portion, the monitor can give a conclusive verdict for time $i\Delta-\varepsilon$ with respect to its local clock (dashed lines).
+		\textbf{(a)} The \emph{naive} monitor stores the entire signal it has read so far and computes its verdict from scratch each time a new portion arrives.
+		\textbf{(b)} The \emph{incremental} monitor stores only the current portion it receives and a fraction of the previous portion just enough to correctly compute value expressions for the current. Here, $\delta$ is a constant (much smaller than $\varepsilon$) that helps the monitor distinguish whether there is an edge at time $(i-1)\Delta-\varepsilon$ when processing the $i$th portion. \egroup\label{fig:online}}
+	%	\vspace{1em}
+\end{figure*}
+
 
 \paragraph*{Naive algorithm.}
 The \emph{naive} strategy, denoted \textsc{ADM-Naive}, stores the entire history of $(S,{\hb})$ (i.e., all the portions observed so far) and reruns the offline algorithm we presented in \cref{sec:offline} whenever a new portion is received.
 
-As we discussed above and demonstrated in FIG-TODO, when there is forward uncertainty, for a signal of length $d$, the monitor can only give a conclusive verdict for its prefix of length $d-\varepsilon$.
+As we discussed above, when there is forward uncertainty, for a signal of length $d$, the monitor can only give a conclusive verdict for its prefix of length $d-\varepsilon$.
 To compute this conclusive verdict, the monitor needs to take into account two scenarios: one in which the edges with local timestamps in $(d-2\varepsilon, d)$ happens before time $d-\varepsilon$ with respect to the monitor's clock, and another in which they happen after $d-\varepsilon$.
 The ``before'' scenario is handled by including the value expressions of these edges in the computation, and the ``after'' scenario by taking their prefixes.
 
@@ -342,7 +500,7 @@ More specifically, \textsc{ADM-Naive} follows the steps below:
 		\item Output $\llbracket (S, {\hb}), i \models \varphi \rrbracket_{\textit{naive}} \defeq \llbracket (S, {\hb}), J \models \varphi \rrbracket$ where $J = [b,b') \in G_S$ is the segment such that $d - \varepsilon = b'$, if such a segment exists, and $d - \varepsilon \in J$ otherwise.
 	\end{enumerate}
 \end{enumerate}
-Thanks to the soundness of our offline monitoring algorithm (\cref{cl:algo}), \textsc{ADM-Naive} is sound:
+Thanks to the soundness of our offline monitoring algorithm (\cref{cl:algo}), \textsc{ADM-Naive} is sound.
 The computation of value expression sets, i.e., the $\gamma$ function, already captures the uncertainty due to clock skew.
 At Step 2.3 above, by prefixing the value expressions only on the segments that end after $d-\varepsilon$, we capture the uncertainty on whether the signal ends here or not.
 Despite its immediate soundness, both time and memory consumption of \textsc{ADM-Naive} grow with the signal length, which is impractical for long-running systems.
@@ -354,10 +512,10 @@ When a new portion arrives, these summaries are used to inductively compute the 
 
 As expected, \textsc{ADM-Incr} handles the problem of forward uncertainty exactly as \textsc{ADM-Naive} does.
 However, for \textsc{ADM-Incr} there is a dual ``backward uncertainty'' problem:
-Suppose we have an incremental monitor for an untimed past STL formula $\varphi$ and it receives new signal portions with period of $\Delta > 0$.
+Suppose we have an incremental monitor for an untimed past STL formula $\varphi$ and it receives new signal portions with a period of $\Delta > 0$.
 It processes the initial portion the same as \textsc{ADM-Naive}, so its verdict reflects the satisfaction of $\varphi$ until time $\Delta - \varepsilon$ with respect to its local clock.
 The next portion has local timestamps in the range $[\Delta, 2\Delta)$.
-The edges with local timestamps in $[\Delta - \varepsilon, \Delta)$ may have happened before time $\Delta - \varepsilon$ with respect to the monitor's local clock, which leads to the question of how they should be handled and how much of the past signal the monitor should keep in memory
+The edges with local timestamps in $[\Delta - \varepsilon, \Delta)$ may have happened before time $\Delta - \varepsilon$ with respect to the monitor's local clock, which leads to the question of how they should be handled and how much of the past signal the monitor should keep in memory.
 
 The following observation settles these questions:
 Whether these edges happen before or after time $\Delta - \varepsilon$ has been already considered while processing the previous portion.
@@ -368,14 +526,14 @@ To distinguish whether there is such an edge, we let $\delta > 0$ be a constant 
 
 In the above explanation, we assumed an untimed past STL formula.
 For timed formulas, the monitor may need to store signal values further in the past because of the sliding window computation involved in the inductive evaluation of timed since (\cref{fig:timedEval}).
-Given a timed past STL formula $\varphi$, its \emph{horizon} $H(\varphi)$ is defined inductively~\cite{MalerNP07,JaksicBGKNN15} as follows:
+Given a timed past STL formula $\varphi$, we define its \emph{memory horizon} $M(\varphi)$ inductively as follows:
 \begin{align*}
-	H(p) &= 0 \\
-	H(\lnot \varphi) &= H(\varphi) \\
-	H(\varphi_1 \land \varphi_2) &= \max(H(\varphi_1), H(\varphi_2))\\
-	H(\varphi_1 \since_I \varphi_2) &= \max I + \max(H(\varphi_1), H(\varphi_2))
+	M(p) &= 0 \\
+	M(\lnot \varphi) &= M(\varphi) \\
+	M(\varphi_1 \land \varphi_2) &= \max(M(\varphi_1), M(\varphi_2))\\
+	M(\varphi_1 \since_I \varphi_2) &= h(I) + \max(M(\varphi_1), M(\varphi_2))
 \end{align*}
-Note that the horizon of untimed past formulas is 0.
+where, for $I$ with left end-point $a$ and right end-point $b$, we let $h(I) = a$ if $b = \infty$ and $h(I) = b$ otherwise.
 More specifically, \textsc{ADM-Incr} with the sampling period $\Delta > 0$ follows the steps below:
 \begin{enumerate}[label*=\arabic*.]
 	\item Initialize $(S,{\hb})$ as an empty signal and $V = \{0\}$ as a summary of the previous portion's verdict.
@@ -392,7 +550,7 @@ More specifically, \textsc{ADM-Incr} with the sampling period $\Delta > 0$ follo
 
 Intuitively, \textsc{ADM-Incr} simulates \textsc{ADM-Naive} portion by portion.
 After processing the $(i-1)$st portion it keeps (i) the suffix of the signal starting at $(i-1)\Delta - \varepsilon - \delta$ and (ii) for every subformula of $\varphi$ the verdict that the offline monitor already produced for the prefix ending there.
-When the $i$th portion arrives, \textsc{ADM-Incr} replaces older data with an imaginary segment whose stored verdicts reproduce the missing history, appends the new portion, and then runs exactly the same inductive rules that the offline algorithm would apply to the full signal.
+When the $i$th portion arrives, \textsc{ADM-Incr} replaces older data with an imaginary segment whose stored verdicts help produce the next segment's verdicts inductively, appends the new portion, and then runs exactly the same inductive rules that the offline algorithm would apply to the full signal.
 Because the uncertain edges in the last $\varepsilon$ time units are still present and the summary segment supplies the correct past truth values, every intermediate value expression, and hence the final verdict at time $i\Delta - \varepsilon$, is identical in the two executions.
 Repeating this argument for every $i$ shows that the two algorithms output the same verdict stream.
 
