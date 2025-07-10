@@ -89,6 +89,7 @@ A signal $x : [0,d) \to \R$ can be represented finitely by its initial value and
 Let $\AP$ be a set of \emph{atomic propositions}.
 The syntax of \emph{future STL} is given by the grammar $\varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \land \varphi ~|~ \varphi \until_I \varphi$ and that of \emph{past STL} is given by $\varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \land \varphi ~|~ \varphi \since_I \varphi$ where $p \in \AP$ and $I \subseteq \R_{\geq 0}$ is an interval.
 Below, when we speak of an STL formula, we mean either a future STL or a past STL formula.
+\egroup
 
 A \emph{trace} $w = (x_1, \ldots, x_n)$ is a finite vector of signals.
 We express atomic propositions as functions of trace values at a time point $t$,
@@ -100,7 +101,7 @@ We recall the finite-trace qualitative semantics of STL defined over $\B$.
 Let $d \in \R_{> 0}$ and $w = (x_1, \ldots, x_n)$ with $x_i : [0,d) \to \R$ for all $1 \leq i \leq n$.
 Let $\varphi_1, \varphi_2$ be STL formulas and let $t \in [0,d)$.
 
-%\small
+\bgroup \color{red}
 \begin{align*}
 	(w,t) \models p \iff & f_p(x_1(t), \ldots, x_n(t)) > 0 \\
 	(w,t) \models \lnot \varphi_1 \iff & \overline{(w,t) \models \varphi_1} \\
@@ -112,7 +113,6 @@ Let $\varphi_1, \varphi_2$ be STL formulas and let $t \in [0,d)$.
 	& (w,t') \models \varphi_2 \land \forall t'' \in (t', t) : \\
 	& (w,t'') \models \varphi_1
 \end{align*}
-%\normalsize
 
 When $\varphi$ is a future (resp. past) STL formula, we simply write $w \models \varphi$ for $(w,0) \models \varphi$ (resp. $(w,d) \models \varphi$).
 We additionally use the following standard abbreviations: 
@@ -125,7 +125,7 @@ $\LTLdiamondminus_I \varphi = \true \since_I \varphi$, and
 $\LTLsquareminus_I \varphi = \lnot \LTLdiamondminus_I \lnot \varphi$.
 Moreover, the untimed temporal operators are defined through their timed counterparts on the interval $[0,\infty)$.
 
-Future STL formulas whose timed operators are bounded (i.e., use of $\until_I$ is restricted to intervals $I$ with a real-valued right end point) can be translated to past STL formulas, which can be monitored efficiently in an online manner~\cite{MalerNP07,JaksicBGKNN15,Gol18}.
+Future STL formulas whose timed operators are bounded (i.e., use of $\until_I$ is restricted to intervals $I$ with a real-valued right end point) can be translated to past STL formulas, which can be efficiently monitored online~\cite{MalerNP07,JaksicBGKNN15,Gol18}.
 \egroup
 
 \paragraph*{Distributed Semantics of STL \cite{MomtazAB23}.}
