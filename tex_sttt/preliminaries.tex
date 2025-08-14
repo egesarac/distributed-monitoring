@@ -291,6 +291,18 @@ In \cref{sec:algorithm} we present algorithm to compute the semantics of STL$^+$
 		[(S,{\hb}) \models \varphi]_+ = \bot &\implies [(S,{\hb}) \models \varphi] = \bot \\
 	\end{align*}
 \end{theorem}
+\begin{proof}[\normalsize Proof.]
+	\normalsize
+	Let $\varphi$ be an STL formula and $(S,{\hb})$ be a distributed signal.
+	Assume $[(S,{\hb}) \models \varphi]_+ = \top$.
+	We want to show that $[(S,{\hb}) \models \varphi] = \top$.
+	Expanding the definition of $[(S,{\hb}) \models \varphi]_+ = \top$, we have $w \models \varphi$ for all $w \in \tr^+(S,{\hb})$.
+	By \cref{cl:trsound}, we have $\tr(S,{\hb}) \subseteq \tr^+(S,{\hb})$.
+	Then, it holds that $w \models \varphi$ for all $w \in \tr(S,{\hb})$.
+	Therefore, $[(S,{\hb}) \models \varphi] = \top$ by definition.
+	The case of $[(S,{\hb}) \models \varphi]_+ = \bot$ follows from the same arguments.
+\end{proof}
+
 
 Notice that both the distributed semantics of STL and the semantics of STL$^+$ quantify universally over the set of traces for the verdicts $\top$ and $\bot$.
 Therefore, \cref{cl:stlsound} holds for the verdicts $\top$ and $\bot$, but not for ${\,?}$.

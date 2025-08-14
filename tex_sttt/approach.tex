@@ -274,4 +274,37 @@ Putting it all together, we finally prove that $\tr^+$ overapproximates $\tr$.
 \begin{lemma} \label{cl:trsound}
 	For every distributed signal $(S,{\hb})$, we have $\tr(S,{\hb}) \subseteq \tr^+(S,{\hb})$.
 \end{lemma}
-
+\begin{proof}[\normalsize Proof.]
+	\normalsize
+	Let $(S,{\hb})$ be a distributed signal where $S = (x_1, \ldots, x_n)$.
+	Let $w = (y_1, \ldots, y_n) \in \tr(S,{\hb})$ be a trace.
+	We want to show that $w \in \tr^+(S,{\hb})$.
+	First, let us recall the definition of $\tr^+$.
+	\begin{align*}
+		\tr^+(S,{\hb}) = \{ (x_1', \ldots, x_n') \st \text{$x_i'$ is consistent with}&\\
+		\text{$x_i$ for all $1 \leq i \leq n$}&\} 
+	\end{align*}
+	
+	Let $1 \leq i \leq n$ be arbitrary.
+	To show that $y_i$ is consistent with $x_i$, we need to show that $y_i$ is $I$-consistent with $x_i$ for all $I \in G_S$.
+	Let $I = [t_0, s)$ be an arbitrary segment in $G_S$, let $(t_1, y_i(t_1)), \ldots, (t_\ell, y_i(t_\ell))$ be the edges of $y_i$ in segment $I$ with $t_j < t_{j+1}$ for all $1 \leq j < \ell$.
+	To show that $y_i$ is $I$-consistent with $x_i$, we need to show that the expression $y_i(t_0) \cdot y_i(t_1) \cdot \ldots \cdot y_i(t_\ell)$ belongs to $\gamma(x_i,I)$.
+	We sketch the proof idea below.
+	
+	Note that $w$ can be seen as a trace obtained through an $\varepsilon$-retiming of $S$ (\cite[Section 4.2]{MomtazAB23}).
+	Then, the timestamp $t$ of any edge of $x_i$ is mapped to some clock value in the range $(\theta_{\text{lo}}(t), \theta_{\text{hi}}(t))$.
+	In particular, $|t - c^{-1}_i(t)| < \varepsilon$ for all $t \in \{t_0, t_1, \ldots, t_\ell\}$, where $c^{-1}_i(t)$ is the local clock value of $x_i$ mapped to $t$.
+	
+	Since $y_i$ has $\ell$ edges in $I$, it holds that $x_i$ has at least $\ell$ edges in $(t_0 - \varepsilon, s + \varepsilon)$.
+	Since $I$ is a segment in $G_S$, there are $\ell$ of these that are consecutive such that the intersection of their uncertainty regions contain $(t_0,s)$, i.e., $(t_0,s) \subseteq \bigcap_{1 \leq j \leq \ell} (\theta_{\text{lo}}(t_j'), \theta_{\text{hi}}(t_j'))$ where $t_j' = c^{-1}_i(t_j)$ is the corresponding timestamp in $x_i$ for all $0 \leq j \leq \ell$.
+	In particular, note that $y_i(t_j) = x_i(t_j')$ for all $0 \leq j \leq \ell$.
+	
+	Now, notice that, by definition, $\gamma(x_i, I)$ takes into account every edge of $x_i$ whose uncertainty region has a nonempty intersection with $I$, and preserves their order.
+	Let $V_j$ be the set of value expressions capturing how $I$ relates with the uncertainty intervals of the edge $(t_j', x_i(t_j'))$ for all $1 \leq j \leq \ell$ (as defined in \cref{eq:valexprset}).
+	Then, $\destutter(\{x_i(t_0')\} \cdot V_1 \cdot \ldots \cdot V_\ell) \subseteq \gamma(x_i, I)$.
+	One can verify that for all $1 \leq j \leq \ell$, either $x_i(t_j')$ or $x_i(t_{j-1}') \cdot x_i(t_j')$ belongs to $V_j$.
+	This allows us to choose a value expression $v_j$ from each $V_j$ such that $\destutter(\{x_i(t_0')\} \cdot v_1 \cdot \ldots \cdot v_\ell) = x_i(t_0') \cdot x_i(t_1') \cdot \ldots \cdot x_i(t_\ell')$, which concludes the proof. 
+	
+	Note that if there are more edges of $x_i$ with a timestamp smaller than $t_0'$ or larger than $t_\ell'$ whose uncertainty intervals intersect with $I$, then the corresponding set of value expressions is obtained either by prefixing or suffixing.
+	In either case, we can choose $\epsilon$ from these sets for concatenation with the remaining edges' value expressions and obtain the desired result.
+\end{proof}

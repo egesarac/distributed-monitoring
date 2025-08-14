@@ -9,11 +9,11 @@ f2 = '../results/gor.csv'
 f3 = '../results/until.csv'
 f4 = '../results/gimpf.csv'
 f5 = '../results/gimpft1.csv'
-f5 = '../results/gimpft2.csv'
+f6 = '../results/gimpft2.csv'
 
 dtype = {"d": int, "eps": int, "ADM": float, "EDM": float, "FP": float,"speedup": float, "label": str}
 
-fs = [f2, f3, f5]
+fs = [f1, f2, f3, f4, f5, f6]
 
 
 fig, axs = plt.subplots(len(fs), 3)
@@ -52,12 +52,12 @@ for i in range(len(fs)):
         axs[i][2].set_xticks([0.5, 1.5, 2.5, 3.5], labels=data_fp.columns)
         axs[i][2].set_title('Speedup (times) Combined vs. EDM')
 
-rows = ['Phi {}'.format(row) for row in ['4', '5', '6']]
+rows = ['Phi {}'.format(row) for row in ['1','2','3','4', '5', '6']]
 for ax, row in zip(axs[:,0], rows):
     ax.annotate(row, xy=(0, 0.5), xytext=(-ax.yaxis.labelpad - 5, 0),
                 xycoords=ax.yaxis.label, textcoords='offset points',
                 size='large', ha='right', va='center', rotation=90)
 
 plt.tight_layout()
-plt.savefig("speedup_appendix2.pdf", format="pdf", bbox_inches="tight")
+plt.savefig("speedup_all.pdf", format="pdf", bbox_inches="tight")
 
