@@ -1,0 +1,40 @@
+\documentclass[iicol,lineno]{sn-jnl}
+
+\input{preamble}
+\input{macros}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{example}{Example}
+\newtheorem{remark}{Remark}
+\newtheorem{definition}{Definition}
+
+\raggedbottom
+%%\unnumbered% uncomment this for unnumbered level heads
+
+\begin{document}
+	\title[Approximate Distributed Monitoring under Partial Synchrony]{Approximate Distributed Monitoring under Partial Synchrony: Balancing Speed \& Accuracy}
+	\author[1]{\fnm{Borzoo} \sur{Bonakdarpour}}\email{borzoo@msu.edu}
+	\author[1]{\fnm{Anik} \sur{Momtaz}}\email{momtazan@msu.edu}
+	\author[2]{\fnm{Dejan} \sur{Ni\v{c}kovi\'{c}}}\email{dejan.nickovic@ait.ac.at}
+	\author*[3]{\fnm{N. Ege} \sur{Sara\c{c}}}\email{esarac@ista.ac.at}
+	\affil[1]{\orgname{Michigan State University}}
+	\affil[2]{\orgname{AIT Austrian Institute of Technology}}
+	\affil*[3]{\orgname{Institute of Science and Technology Austria (ISTA)}}
+	%%\pacs[JEL Classification]{D8, H51}
+	%%\pacs[MSC Classification]{35A01, 65L10, 65L12, 65L20, 65L70}
+	
+	\maketitle
+	\input abstract
+	\input introduction
+	\input preliminaries
+	\input approach
+	\input algorithm
+	\input experiments
+	\input conclusion
+	
+	\bibliographystyle{plain}
+	\bibliography{main}
+%	\newpage
+%	\input appendix
+\end{document}
