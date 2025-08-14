@@ -437,10 +437,11 @@ We now focus on the online setting, where the monitor does not have access to th
 Our goal is to describe an algorithm that computes, given a past STL formula $\varphi$, the value expressions for the satisfaction of $\varphi$ after reading each new signal portion.
 
 Let us first highlight the main difference of the online setting from the offline one.
-Unlike in the offline setting, the monitor does not know whether the current signal portion is the last one or not.
+Unlike in the offline setting, the monitor does not know whether the current signal portion is the last one.
 After processing consecutive portions of a signal of length $d$, an edge in the next portion with a local timestamp $t' \in (d, d+\varepsilon)$ may result in new potential interleavings with the edges that have been observed in the current portion.
-As a result, if the monitor attempts to produce a verdict for the signal prefix until length $d$, it may produce unsound verdicts as it may miss potential interleavings of edges.
-This problem of ``forward uncertainty'' can be avoided if the monitor only produces a verdict for the signal's prefix of length \emph{at most} $d-\varepsilon$, since no edge with a local timestamp larger than $d$ can influence the verdict at time $d-\varepsilon$ with respect to the monitor's clock.
+As a result, if the monitor attempts to produce a verdict for the signal prefix until length $d$, it may produce an unsound verdict as it may miss potential interleavings.
+
+This problem of ``forward uncertainty'' can be avoided if the monitor only produces a verdict for the signal's prefix of length at most $d-\varepsilon$, since no edge with a local timestamp larger than $d$ can influence the verdict at time $d-\varepsilon$ with respect to the monitor's clock.
 Notice that $d-\varepsilon$ is an upper bound.
 As our approximate monitors rely on partitioning the temporal domain into fully asynchronous segments, when $d-\varepsilon$ is not a segment end point, trying to produce a conclusive verdict for it would lead to further overapproximation.
 
@@ -588,7 +589,7 @@ We demonstrate these in \cref{fig:online}.
 	\caption{\bgroup \color{red}
 		Two contrasting approaches to online monitoring with a sampling period of $\Delta$ and a maximum clock skew of $\varepsilon$. The signal (solid arrows) become available incrementally. As new portions of the signal arrive, the monitor stores some part of it (gray boxes around solid arrows). In both approaches, after receiving the $i$th signal portion, the monitor can give a conclusive verdict for time at most $i\Delta-\varepsilon$ with respect to its local clock (dashed lines).
 		\textbf{(a)} The \emph{naive} monitor stores the entire signal it has read so far and computes its verdict from scratch each time a new portion arrives.
-		\textbf{(b)} The \emph{incremental} monitor stores only the current portion it receives and a fraction of the previous portion just enough to correctly compute the value expressions for the current. \egroup\label{fig:online}}
+		\textbf{(b)} The \emph{incremental} monitor stores only the current portion it receives and a fraction of the previous portion sufficient to correctly compute the value expressions for the current one. Here, we assume the monitor is able to produce a verdict for time $i\Delta-\varepsilon$ for every $i \geq 1$. Since no edges with timestamps earlier than $i\Delta-2\varepsilon$ can influence the segmentation between $i\Delta-\varepsilon$ and $i\Delta$, the monitor can drop from its memory the signal's prefix of length $i\Delta-2\varepsilon$. \egroup\label{fig:online}}
 	%	\vspace{1em}
 \end{figure*}
 
@@ -642,9 +643,9 @@ Suppose we have an incremental monitor for an untimed past STL formula $\varphi$
 It processes the initial portion the same as \textsc{ADM-Naive}, so its verdict reflects the satisfaction of $\varphi$ at the end of the latest segment $J = [a, a')$ with $a' \leq \Delta - \varepsilon$.
 Although this segment could serve as a synchronization point, the incremental approach leads to the question of how much of the past signal the monitor should keep in memory.
 
-The following observation settles these questions:
-The verdicts of the previous portion can be carried forward only if the segmentation between $a'$ and $\Delta - \varepsilon$ is preserved.
-It means that the monitor can drop from its memory the edges that cannot influence the segmentation between $a'$ and $\Delta - \varepsilon$.
+The following observation settles this question:
+The verdicts of the previous portion can be carried forward correctly only if the segmentation between $a'$ and $\Delta$ is preserved.
+It means that the monitor can drop from its memory the edges that cannot influence the segmentation between $a'$ and $\Delta$.
 Therefore, it suffices to consider the edges with local timestamps at least $a' - \varepsilon$ and use the previous portion's verdict to compute the next portion's verdict inductively.
 This establishes that the monitor needs to store (i)~the observations from the previous portion with timestamps greater than or equal to $a' - \varepsilon$, and (ii)~the verdict in segment $J$ for every subformula of $\varphi$.
 
@@ -677,9 +678,9 @@ More specifically, \textsc{ADM-Incr} with the sampling period $\Delta > 0$ follo
 	\item Initialize $(S,{\hb})$ as an empty signal, $V = \{0\}$ as a summary of the previous portion's verdict, and $v = 0$.
 	\item Repeat for $i \geq 1$:
 	\begin{enumerate}[leftmargin=5pt,label*=\arabic*]
-		\item Remove the prefix of $(S,{\hb})$ of length $\max((i-1)\Delta - M(\varphi) - 2\varepsilon, 0)$ and append the new signal portion $(S_i,{\hb}_i)$ to $(S,{\hb})$.
+		\item Remove the prefix of $(S,{\hb})$ of length $\max(0, (i-1)\Delta - M(\varphi) - 2\varepsilon)$ and append the new signal portion $(S_i,{\hb}_i)$ to $(S,{\hb})$.
 		\item Compute the canonical segmentation $G_S$ and remove the segments whose right end point is at most $v$.
-		\item Let $\hat{I} = [-1, v)$ be an imaginary segment and $\llbracket (S, {\hb}), \hat{I} \models \varphi \rrbracket \defeq V$.
+		\item Let $\hat{I} = [-1, v)$ be an imaginary segment and $\llbracket (S, {\hb}), \hat{I} \models \psi \rrbracket \defeq V$ for every subformula $\psi$ of $\varphi$.
 		\item Find the segment $J = [a, a') \in G_S$ with the largest $a' \leq i\Delta-\varepsilon$.
 		\item Compute and output $\llbracket (S, {\hb}), i \models \varphi \rrbracket_{\textit{incr}} \defeq \llbracket (S, {\hb}), J \models \varphi \rrbracket$.
 		\item Let $V = \last(\llbracket (S, {\hb}), J \models \varphi \rrbracket)$ and $v = a'$.
@@ -700,11 +701,11 @@ More specifically, \textsc{ADM-Incr} with the sampling period $\Delta > 0$ follo
 
 Intuitively, \textsc{ADM-Incr} simulates \textsc{ADM-Naive} portion by portion.
 For an untimed formula, after processing the $(i-1)$st portion it keeps (i) the suffix of the signal starting at $(i-1)\Delta - 2\varepsilon$ and (ii) for every subformula of $\varphi$ the verdict that the offline monitor already produced for the prefix finishing at the latest segment that ends before $(i-1)\Delta - \varepsilon$ together with its right end point.
-When the $i$th portion arrives, \textsc{ADM-Incr} replaces older data with an imaginary segment that stores the previous portion's verdict, appends the new portion, and then runs exactly the same inductive rules that the offline algorithm would apply to the full signal.
+When the $i$th portion arrives, \textsc{ADM-Incr} replaces older data with an imaginary segment that stores the previous portion's verdicts, appends the new portion, and then runs exactly the same inductive rules that the offline algorithm would apply to the full signal.
 Because the uncertain edges in the last $2\varepsilon$ time units are still present, the part of the segmentation between the last verdict's timestamp and $i\Delta$ is preserved.
 Moreover, the summary segment supplies the correct past truth values.
-Therefore, every intermediate value expression, and hence the final verdict at the end of the portion, is identical in the two executions.
-Repeating this argument for every $i$ shows that the two algorithms output the same verdict stream.
+Therefore, every intermediate value expression, and hence the final verdict at the end of the portion, is identical in \textsc{ADM-Naive} and \textsc{ADM-Incr}.
+%Repeating this argument for every $i$ shows that the two algorithms output the same verdict stream.
 
 \begin{theorem} \label{cl:algoOnline}
 	The outputs of \textsc{ADM-Naive} and \textsc{ADM-Incr} coincide after every new signal portion.
