@@ -730,19 +730,15 @@ Therefore, every intermediate value expression, and hence the final verdict at t
 	When the $(i+1)$st portion $(S_{i+1},\hb_{i+1})$ arrives, \textsc{ADM-Naive} concatenates it with the entire previous signal prefix and obtains a longer signal
 	Let us denote this signal by $\sigma_{i+1}$.
 	In contrast, \textsc{ADM-Incr} discards the part of the prefix that ends before $i\Delta - H(\varphi) - 2\varepsilon$, which guarantees that all edges that may still interact with future edges are retained, and inserts a summary segment
-	$\hat{I}$ and lets $\llbracket (S,\hb), \hat{I} \models \psi \rrbracket = \llbracket (S,\hb), i \models \psi \rrbracket_{\textit{incr}}$, which, by induction hypothesis, coincides with $\llbracket (S,\hb), i \models \psi \rrbracket_{\textit{naive}}$.
+	$\hat{I}$ and for every subformula $\psi$ of $\varphi$ lets $\llbracket (S,\hb), \hat{I} \models \psi \rrbracket = \llbracket (S,\hb), i \models \psi \rrbracket_{\textit{incr}}$, which, by induction hypothesis, coincides with $\llbracket (S,\hb), i \models \psi \rrbracket_{\textit{naive}}$.
 	Let us denote the resulting signal by $\sigma_{i+1}'$.
 	
 	We claim that for every subformula $\psi$ of $\varphi$ and for every segment $I$ of the canonical segmentation of $\sigma_{i+1}$ that lies strictly to the right of $\hat{I}$, we have $\llbracket \sigma_{i+1}, I \models \psi\rrbracket = \llbracket \sigma_{i+1}', I \models \psi \rrbracket$.
-	To see why this holds, observe that (i) these parts of the segmentations coincide because \textsc{ADM-Incr} takes into account all the edges in the past that might have an effect here, and (ii) both monitors run exactly the same inductive rules (given in \cref{sec:offline}, \cref{fig:eval,fig:timedEval}).
-	These rules evaluate a subformula on a segment $I$ from the value expressions of atomic propositions for the current segment $I$, and (ii) the value expression set already computed for the immediate predecessor segment $I'$.
-	The value expressions of atomic propositions coincide for the two signals because $\sigma_{i+1}$ and $\sigma_{i+1}'$ are identical on $I$.
+	To see why this holds, observe that (i) these parts of the segmentations coincide because \textsc{ADM-Incr} takes into account all the edges in the past that might have an effect here, (ii) the value expressions of the atomic propositions also coincide for the same reason, and (iii) both monitors run exactly the same inductive rules (given in \cref{sec:offline}, \cref{fig:eval,fig:timedEval}).
+	These rules evaluate a subformula on a segment $I$ from the value expressions of atomic propositions for the current segment $I$ and the value expression set already computed for the immediate predecessor segment $I'$.
 	By the induction hypothesis, the verdicts stored for $\hat{I}$ coincides with that of the prefix of $\sigma_{i+1}$ that is discarded in $\sigma_{i+1}'$, so the computed value expression sets for $I'$ are also equal.
 	Therefore, the inductive rules yield identical results on $I$ for $\sigma_{i+1}$ and $\sigma_{i+1}'$.
-	
-	Now, by repeatedly applying the claim from left to right over the segmentation, we
-	obtain in particular $\llbracket\sigma_{i+1}, J \models \varphi \rrbracket = \llbracket \sigma_{i+1}', J \models \varphi \rrbracket$, where $J$ is the latest segment in their canonical segmentation whose right end point is less than or equal to $(i+1)\Delta - \varepsilon$.
-	Therefore, we conclude
+	Finally, since the latest segment $J$ in the canonical segmentation whose right end point is less than or equal to $(i+1)\Delta - \varepsilon$ also lies strictly to the right of $\hat{I}$, we conclude
 	$$\llbracket (S,\hb), i+1 \models \varphi \rrbracket_{\textit{naive}} = \llbracket (S,\hb), i+1 \models \varphi \rrbracket_{\textit{incr}}.$$
 \end{proof}
 

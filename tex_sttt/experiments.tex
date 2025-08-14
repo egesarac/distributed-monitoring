@@ -24,6 +24,35 @@ We want to understand to which degree the incremental approach achieves this goa
 \end{resq}
 \egroup
 
+\begin{table*}[t]
+	\centering
+	%	\scalebox{0.88}{
+		\begin{tabular}{|l|l|}
+			\hline
+			Subject & STL formula(s) \\
+			\hline
+			%			RG & $\varphi_1 =\LTLg (p \wedge q)$ \,\,\,\,\,\, $\varphi_2 = \LTLg (p \Rightarrow \LTLf q)$ \,\,\,\,\,\, $\varphi_3 = \LTLg (p \Rightarrow \LTLf_{[0,1)} q)$ \\
+			%			   & $\varphi_4 = \LTLg (p \lor q)$ \,\,\,\,\,\,  $\varphi_5 = p \until q$ \,\,\,\,\,\, $\varphi_6 = \LTLg (p \Rightarrow \LTLf_{[0,2)} q)$ \\
+			RG (offline) & $\varphi_1 =\LTLg (p \wedge q)$ \,\,\,\,\,\,\,\,\,\,\,\,\,\,\, $\varphi_2 =\LTLg (p \lor q)$ \,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, $\varphi_3 = p \until q$ \\
+			& $\varphi_4 = \LTLg (p \Rightarrow \LTLf q)$  \,\,\,\,\,\,  $\varphi_5 = \LTLg (p \Rightarrow \LTLf_{[0,1)} q)$ \,\,\,\,\,\, $\varphi_6 = \LTLg (p \Rightarrow \LTLf_{[0,2)} q)$ \\
+			RG (online) & $\psi_1 =\LTLsquareminus (p \wedge q)$ \,\,\,\,\,\,\,\,\,\,\,\,\,\,\, $\psi_2 =\LTLsquareminus (p \lor q)$ \,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, $\psi_3 = p \since q$ \\
+			& $\psi_4 = \LTLsquareminus (p \Rightarrow \LTLdiamondminus q)$  \,\,\,\,\,\,  $\psi_5 = \LTLsquareminus (p \Rightarrow \LTLdiamondminus_{[0,1)} q)$ \,\,\,\,\,\, $\psi_6 = \LTLsquareminus (p \Rightarrow \LTLdiamondminus_{[0,2)} q)$ \\
+			%& $\varphi_1$ & $\LTLg (p \wedge q)$ & \multirow{ 5}{*}{untimed} \\
+			%& $\varphi_2$ & $\LTLf (p \vee q)$ & \\
+			%& $\varphi_3$ & $\LTLg (p \vee q)$ & \\
+			%& $\varphi_4$ & $\LTLf (p \wedge q)$ & \\
+			%& $\varphi_5$ & $p \until q$ & \\
+			%			\hline
+			WT & $\varphi_{\text{WT}} = \LTLg \left(\sum_{i=1}^{n} x_i  > c\right)$  \\
+			%			\hline
+			SD & $\varphi_{\text{SD}} = \bigwedge_{1 \leq i \neq j \leq n} \LTLg \left( \sqrt{(x_i-x_j)^2 + (y_i-y_j)^2 + (z_i-z_j)^2} > c \right)$   \\
+			\hline
+		\end{tabular}%}
+	\caption{STL specifications used in the experiments.}
+	%	\vspace{-3em}
+	\label{tab:spec} 
+\end{table*}
+
 \subsection{Experimental Setup}
 
 \paragraph*{Distributed Monitors.}
@@ -47,6 +76,8 @@ Each valve is operated by a controller that samples the outflow pressure at 20Hz
 \emph{Swarm of drones (SD)} model is generated using a path planning software, Fly-by-Logic~\cite{PantAM17CCTA}. Here, a swarm of drones perform various reach-avoid missions, while securing objectives such as reaching a goal within a deadline, avoiding obstacles and collisions. The path planner finds the most robust trajectory using a temporal logic robustness optimizer. These trajectories are sampled at 20Hz.
 Note that the actual values of clock skew are less important than the fact that when clock skew exceeds the sampling interval, we encounter the problem of uncertainty.
 
+
+
 %\vspace{-0.4em}
 \paragraph*{Specifications.}
 Table~\ref{tab:spec} shows the STL specifications that we use to evaluate our experimental subjects.
@@ -56,35 +87,6 @@ The specification $\varphi_2$ combines conjunctive $(\LTLg)$ and disjunctive ($\
 The remaining three formulas are the common response formulas, which also combine conjunctive $(\LTLg)$ and disjunctive $(\LTLf, \Rightarrow)$ operators: $\varphi_4$ is the usual LTL variant, $\varphi_5$ and $\varphi_6$ add a bounded real-time response requirement to the previous specification, where the bound of $\varphi_5$ is tighter than that of $\varphi_6$.
 For online monitoring, we use the past-time variants $\psi_1$ to $\psi_6$ of the formulas described above.
 The specification $\varphi_{WT}$ associated to the water tank case study is an STL formula in which a sum of signals originating from different agents is compared to a constant. Finally, the specification $\varphi_{SD}$ defines a mutual separation property over a swarm of drones, requiring more sophisticated arithmetic operations on signals originating from different agents.
-
-\begin{table*}[t]
-	\centering
-%	\scalebox{0.88}{
-		\begin{tabular}{|l|l|}
-			\hline
-			Subject & STL formula(s) \\
-			\hline
-%			RG & $\varphi_1 =\LTLg (p \wedge q)$ \,\,\,\,\,\, $\varphi_2 = \LTLg (p \Rightarrow \LTLf q)$ \,\,\,\,\,\, $\varphi_3 = \LTLg (p \Rightarrow \LTLf_{[0,1)} q)$ \\
-%			   & $\varphi_4 = \LTLg (p \lor q)$ \,\,\,\,\,\,  $\varphi_5 = p \until q$ \,\,\,\,\,\, $\varphi_6 = \LTLg (p \Rightarrow \LTLf_{[0,2)} q)$ \\
-			RG (offline) & $\varphi_1 =\LTLg (p \wedge q)$ \,\,\,\,\,\,\,\,\,\,\,\,\,\,\, $\varphi_2 =\LTLg (p \lor q)$ \,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, $\varphi_3 = p \until q$ \\
-			& $\varphi_4 = \LTLg (p \Rightarrow \LTLf q)$  \,\,\,\,\,\,  $\varphi_5 = \LTLg (p \Rightarrow \LTLf_{[0,1)} q)$ \,\,\,\,\,\, $\varphi_6 = \LTLg (p \Rightarrow \LTLf_{[0,2)} q)$ \\
-			RG (online) & $\psi_1 =\LTLsquareminus (p \wedge q)$ \,\,\,\,\,\,\,\,\,\,\,\,\,\,\, $\psi_2 =\LTLsquareminus (p \lor q)$ \,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, $\psi_3 = p \since q$ \\
-			& $\psi_4 = \LTLsquareminus (p \Rightarrow \LTLdiamondminus q)$  \,\,\,\,\,\,  $\psi_5 = \LTLsquareminus (p \Rightarrow \LTLdiamondminus_{[0,1)} q)$ \,\,\,\,\,\, $\psi_6 = \LTLsquareminus (p \Rightarrow \LTLdiamondminus_{[0,2)} q)$ \\
- 			%& $\varphi_1$ & $\LTLg (p \wedge q)$ & \multirow{ 5}{*}{untimed} \\
-			%& $\varphi_2$ & $\LTLf (p \vee q)$ & \\
-			%& $\varphi_3$ & $\LTLg (p \vee q)$ & \\
-			%& $\varphi_4$ & $\LTLf (p \wedge q)$ & \\
-			%& $\varphi_5$ & $p \until q$ & \\
-%			\hline
-			WT & $\varphi_{\text{WT}} = \LTLg \left(\sum_{i=1}^{n} x_i  > c\right)$  \\
-%			\hline
-			SD & $\varphi_{\text{SD}} = \bigwedge_{1 \leq i \neq j \leq n} \LTLg \left( \sqrt{(x_i-x_j)^2 + (y_i-y_j)^2 + (z_i-z_j)^2} > c \right)$   \\
-			\hline
-	\end{tabular}%}
-	\caption{STL specifications used in the experiments.}
-%	\vspace{-3em}
-	\label{tab:spec} 
-\end{table*}
 
 %\begin{table}[t]
 %\centering
@@ -119,6 +121,16 @@ We used a laptop with Ubuntu 24.04, an AMD Ryzen 7 4800HS CPU at 2.90GHz clock r
 
 \subsection{Discussion}
 
+\begin{figure*}[t]
+	\begin{center}
+		\includegraphics[width=\linewidth]{speedup_all}
+		\caption{Results on monitoring $\varphi_{1}$ to $\varphi_{6}$ on distributed traces created by the RG.}
+		\label{fig:rgresults}
+	\end{center}
+	%\vspace{1em}
+\end{figure*}
+
+
 %\vspace{-0.3em}
 \paragraph*{Random Generator, Offline Monitoring.}
 Figure~\ref{fig:rgresults} summarizes the results of evaluating specifications $\varphi_1$ to $\varphi_6$ against distributed traces from RG.
@@ -126,14 +138,6 @@ The first column in the figure depicts a heatmap where cells show the speedup of
 The second column shows a heatmap where every cell shows the percentage of \emph{false positives} (FP) introduced by \textsc{Adm}, where \textsc{Adm} evaluates to inconclusive when the \textsc{Edm} (real) verdict is true or false.
 Finally, the third column depicts a heatmap, where each cell estimates the achieved speedup when combining \textsc{Adm} with \textsc{Edm}, compared to using only \textsc{Edm}.
 
-\begin{figure*}[t]
-	\begin{center}
-	\includegraphics[width=\linewidth]{speedup_all}
-\caption{Results on monitoring $\varphi_{1}$ to $\varphi_{6}$ on distributed traces created by the RG.}
-\label{fig:rgresults}
-\end{center}
-%\vspace{1em}
-\end{figure*}
 
 We see that \textsc{Adm} consistently achieves speedups of \emph{several orders of magnitude} 
 compared to the \textsc{Edm} approach.
@@ -215,5 +219,5 @@ Again, all methods yield the same verdicts.
 \paragraph*{Summary.}
 %To answer RQ1, we observe that while the speedup achieved with \textsc{Adm} compared to \textsc{Edm} is consistently very high and in three to five orders of magnitude, the tradeoff between efficiency and accuracy depends largely on the type of specifications, the duration of the input signals and the maximal clock skew. The arithmetic and timed operators are particularly sensitive to the over-approximations of \textsc{Adm} and reduce the accuracy of the method. Untimed temporal properties, especially those in which conjunctive and disjunctive operations are not combined, achieve very high levels of accuracy, resulting in an excellent tradeoff. Given the significant increase of efficiency in \textsc{Adm} compared to \textsc{Edm}, the two methods can be effectively combined even in situations where \textsc{Adm} has low accuracy. The combination of \textsc{Adm} and \textsc{Edm} results consistently in the overall increase of efficiency, thus positively answering RQ2.
 To answer RQ1, we find that \textsc{Adm} achieves a speedup of three to five orders of magnitude over \textsc{Edm}. However, the efficiency-accuracy tradeoff depends on the type of specifications, input signal duration, and maximal clock skew. Arithmetic and timed operators are particularly affected by \textsc{Adm}'s overapproximations, reducing accuracy. Untimed temporal properties, especially those without mixed conjunctive and disjunctive operations, maintain high accuracy and offer an excellent tradeoff. Despite lower accuracy in some cases, combining \textsc{Adm} and \textsc{Edm} still results in significant gains, positively answering RQ2.
-In addition, our incremental monitors scale cleanly to online settings: updates take $O(1)$ time per portion and remain robust to large clock skew, keeping latency within real-time budgets (sub-ms for untimed, sub-0.1 s for timed). Consequently, they sustain kHz-level sampling without compromising responsiveness, positively answering the scalability question.
+In addition, our incremental monitors scale cleanly to online settings: updates take $O(1)$ time per portion and remain robust to large clock skew, keeping latency within real-time budgets. Consequently, they sustain kHz-level sampling without compromising responsiveness, positively answering the scalability question.
 
