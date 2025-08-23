@@ -234,27 +234,20 @@
 	\affil*[3]{\orgname{Institute of Science and Technology Austria (ISTA)}}
 	%%\pacs[JEL Classification]{D8, H51}
 	%%\pacs[MSC Classification]{35A01, 65L10, 65L12, 65L20, 65L70}
-	
-	\maketitle
-	
+		
 	\abstract{
-		In distributed systems with processes that do not share a global clock, \emph{partial synchrony} is 
-		achieved by clock synchronization 
-		that guarantees bounded clock skew among all applications. Existing solutions for distributed 
-		runtime verification under partial 
-		synchrony against temporal logic specifications are exact but suffer from significant 
-		computational overhead. In this paper, we propose an \emph{approximate} 
-		distributed monitoring algorithm for Signal Temporal Logic (STL) that mitigates this issue by 
-		abstracting away potential interleaving behaviors. 
-		This conservative abstraction enables a significant speedup of the distributed monitors, albeit 
-		with a tradeoff in accuracy. We address this 
-		tradeoff with a methodology that combines our approximate monitor with its exact counterpart, 
-		resulting in enhanced  
-		efficiency without sacrificing precision. We evaluate our approach with multiple 
-		experiments, 
-		showcasing its efficacy in 
+		In distributed systems with processes that do not share a global clock, \emph{partial synchrony} is achieved by clock synchronization that guarantees bounded clock skew among all applications.
+		Existing solutions for distributed runtime verification under partial synchrony against temporal logic specifications are exact but suffer from significant 
+		computational overhead.
+		In this paper, we propose an \emph{approximate} distributed monitoring algorithm for Signal Temporal Logic (STL) that mitigates this issue by abstracting away potential interleaving behaviors.
+		This conservative abstraction enables a significant speedup of the distributed monitors, albeit with a tradeoff in accuracy.
+		To address this tradeoff, we combine our approximate monitor with its exact counterpart, achieving enhanced efficiency without sacrificing precision.
+		Our framework supports \emph{offline} monitoring of both future and past STL, as well as \emph{online} monitoring of past STL.
+		We evaluate our approach with multiple experiments, showcasing its efficacy in 
 		both real-world applications and synthetic examples.
 	}
+	
+	\maketitle
 	
 	\keywords{distributed systems, approximate monitoring, partial synchrony}
 	
@@ -364,16 +357,15 @@
 	%
 	We finally showed that combining exact and approximate distributed RV yields significant efficiency gains on average without sacrificing precision, even with low-accuracy approximate monitors.
 	
-	%\paragraph{Organization.}
-	%%\noindent\textit{Organization.}
-	%Section~\ref{sec:preliminaries} presents the preliminary concepts.
-	%%
-	%Section~\ref{sec:semantics} introduces overapproximate semantics of STL while 
-	%Sections~\ref{sec:approach} and~\ref{sec:algorithm} describe our approach in approximating traces 
-	%and the associated monitoring algorithm, respectively.
-	%%
-	%We evaluate our approach in Section~\ref{sec:experiments}. Finally, we conclude in 
-	%Section~\ref{sec:conclusion}.
+	This journal version extends our earlier conference paper \cite{BonakdarpourMNS24}.
+	First, we introduce two approximate algorithms for online monitoring of past-time STL, together with detailed correctness proofs and a comprehensive experimental evaluation.
+	Second, we extend the offline monitoring algorithm to support past-time STL, and provide its correctness proofs and additional experimental study, which were omitted in the conference version due to space constraints.
+	
+	\paragraph{Organization.}
+	Section~\ref{sec:preliminaries} presents the preliminary concepts.
+	Section~\ref{sec:semantics} introduces overapproximate semantics of STL while Sections~\ref{sec:approach} and~\ref{sec:algorithm} describe our approach in approximating traces and the associated monitoring algorithms, respectively.
+	We evaluate our approach in Section~\ref{sec:experiments}.
+	Finally, we conclude in Section~\ref{sec:conclusion}.
 	
 	
 	\section{Preliminaries} \label{sec:preliminaries}
@@ -463,11 +455,9 @@
 	In particular, an edge is \emph{rising} if $\lim_{s \to t^-} x(s) < \lim_{s \to t^+} x(s)$, and it is \emph{falling} otherwise.
 	A signal $x : [0,d) \to \R$ can be represented finitely by its initial value and edges: if $x$ has $m$ edges, then $x = (t_0, v_0) (t_1, v_1) \ldots (t_m, v_m)$ such that $t_0 = 0$, $t_{i-1} < t_i$, and $(t_i, v_i)$ is an edge of $x$ for all $1 \leq i \leq m$.
 	
-	\bgroup \color{red}
 	Let $\AP$ be a set of \emph{atomic propositions}.
 	The syntax of \emph{future STL} is given by the grammar $\varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \land \varphi ~|~ \varphi \until_I \varphi$ and that of \emph{past STL} is given by $\varphi :=  p ~|~ \lnot \varphi ~|~ \varphi \land \varphi ~|~ \varphi \since_I \varphi$ where $p \in \AP$ and $I \subseteq \R_{\geq 0}$ is an interval.
 	Below, when we speak of an STL formula, we mean either a future STL or a past STL formula.
-	\egroup
 	
 	A \emph{trace} $w = (x_1, \ldots, x_n)$ is a finite vector of signals.
 	We express atomic propositions as functions of trace values at a time point $t$,
@@ -479,7 +469,6 @@
 	Let $d \in \R_{> 0}$ and $w = (x_1, \ldots, x_n)$ with $x_i : [0,d) \to \R$ for all $1 \leq i \leq n$.
 	Let $\varphi_1, \varphi_2$ be STL formulas and let $t \in [0,d)$.
 	
-	\bgroup \color{red}
 	\begin{align*}
 		(w,t) \models p \iff & f_p(x_1(t), \ldots, x_n(t)) > 0 \\
 		(w,t) \models \lnot \varphi_1 \iff & \overline{(w,t) \models \varphi_1} \\
@@ -504,8 +493,7 @@
 	Moreover, the untimed temporal operators are defined through their timed counterparts on the interval $[0,\infty)$.
 	
 	Future STL formulas whose timed operators are bounded (i.e., use of $\until_I$ is restricted to intervals $I$ with a real-valued right end point) can be translated to past STL formulas, which can be efficiently monitored online~\cite{MalerNP07,JaksicBGKNN15,Gol18}.
-	\egroup
-	
+
 	\paragraph*{Distributed Semantics of STL \cite{MomtazAB23}.}
 	%\noindent\textbf{Distributed Semantics of STL \cite{MomtazAB23}.}
 	We consider an asynchronous and loosely-coupled message-passing system of $n \geq 2$ reliable agents producing a set of signals $x_1, \ldots, x_n$, where for some $d \in \R_{> 0}$ we have $x_i : [0,d) \to \R$ for all $1 \leq i \leq n$.
@@ -997,14 +985,12 @@
 		In either case, we can choose $\epsilon$ from these sets for concatenation with the remaining edges' value expressions and obtain the desired result.
 	\end{proof}
 	
-	\section{Monitoring Algorithm} 
+	\section{Monitoring Algorithms} 
 	\label{sec:algorithm}
 	
-	\bgroup \color{red}
 	In this section, we give algorithms to compute the STL$^+$ semantics in two different settings: the \emph{offline} setting where the entire execution trace is available at once (\cref{sec:offline}) and the \emph{online} setting where the execution trace becomes available incrementally (\cref{sec:online}).
 	In the offline setting, our algorithm works both for future STL and past STL.
 	In the online setting, we consider only past STL.
-	\egroup
 	
 	\subsection{Offline Algorithm} \label{sec:offline}
 	In the offline setting, we assume the entire signal is available to the monitor.
@@ -1047,7 +1033,6 @@
 	For example, to determine $[(S, {\hb}) \models \LTLeventually (x_1 \land x_2)]_+$, we first compute for each segment in $G_S$ the set of value expressions for the satisfaction of $x_1 \land x_2$, and then from these compute those of $\LTLeventually (x_1 \land x_2)$.
 	This compositional approach allows us to evaluate arbitrary STL$^+$ formulas.
 	
-	\bgroup \color{red}
 	First, we define bitwise operations on Boolean value expressions encoding atomic propositions.
 	Then, we use these to evaluate untimed STL formulas over sets of value expressions.
 	Let $u$ and $v$ be Boolean value expressions of length $\ell$.
@@ -1068,7 +1053,6 @@
 	The distinction between $\mathsf{U}^0$ and $\mathsf{U}^1$ (resp. $\mathsf{S}^0$ and $\mathsf{S}^1$) will be useful when we incrementally evaluate a formula.
 	Finally, note that the output of these operations is a value expression of length $\ell$.
 	For example, if $u = 010$, we have $\mathsf{E} u = 110$ and $\mathsf{A} u = 000$.
-	\egroup
 	
 	Let  $(S, {\hb})$ be a distributed signal.
 	Consider an atomic proposition $p \in \AP$ encoded as $x_p \in S$ and let $\varphi_1, \varphi_2$ be two STL formulas.
@@ -1082,7 +1066,7 @@
 			\llbracket (S, {\hb}), I \models \varphi_1 \land \varphi_2 \rrbracket &= \destutter(\{ u_1 \BitAnd u_2 \st (u_1, u_2) \in \llbracket (S, {\hb}), I \models \varphi_1 \rrbracket \otimes \llbracket (S, {\hb}), I \models \varphi_2 \rrbracket  \}) \\
 			\llbracket (S, {\hb}), I \models \varphi_1 \until \varphi_2 \rrbracket &= \destutter(\{ u_1 \mathsf{U}^a u_2 \st (u_1, u_2) \in \llbracket (S, {\hb}), I \models \varphi_1 \rrbracket \otimes \llbracket (S, {\hb}), I \models \varphi_2 \rrbracket, \\
 			&\hspace{17em} a \in \first(\llbracket (S, {\hb}), I' \models \varphi_1 \until \varphi_2 \rrbracket) \}) \\
-			\bgroup \color{red}\llbracket (S, {\hb}), I \models \varphi_1 \since \varphi_2 \rrbracket \egroup &= \destutter(\{ u_1 \mathsf{S}^a u_2 \st (u_1, u_2) \in \llbracket (S, {\hb}), I \models \varphi_1 \rrbracket \otimes \llbracket (S, {\hb}), I \models \varphi_2 \rrbracket, \\
+			\llbracket (S, {\hb}), I \models \varphi_1 \since \varphi_2 \rrbracket &= \destutter(\{ u_1 \mathsf{S}^a u_2 \st (u_1, u_2) \in \llbracket (S, {\hb}), I \models \varphi_1 \rrbracket \otimes \llbracket (S, {\hb}), I \models \varphi_2 \rrbracket, \\
 			&\hspace{17em} a \in \last(\llbracket (S, {\hb}), I'' \models \varphi_1 \since \varphi_2 \rrbracket) \})
 		\end{align*}
 		\caption{Inductive evaluation of untimed formulas, where $I'$ is the segment that follows $I$ in $G_S$  and  $I''$ is the segment that precedes $I$ in $G_S$ (if such segments exist). For completeness, for every formula $\varphi$ we define $\llbracket (S, {\hb}), J \models \varphi \rrbracket = \{0\}$ when $J \notin G_S$. \label{fig:eval}}
@@ -1144,7 +1128,7 @@
 		\end{align*}
 		\begin{align*}
 			\textbf{(c) }
-			\bgroup \color{red} \mathsf{bwPfs}((S,{\hb}), \varphi, I, J) \egroup = \{\destutter(\mathsf{profile}((S,{\hb}), \varphi, I, J')) \st J' \subseteq I \ominus J, J' \sim J\}
+			\mathsf{bwPfs}((S,{\hb}), \varphi, I, J) = \{\destutter(\mathsf{profile}((S,{\hb}), \varphi, I, J')) \st J' \subseteq I \ominus J, J' \sim J\}
 		\end{align*}
 		\caption{Key definitions for the evaluation of timed formulas.
 			\textbf{(a)}~The \emph{profile} of an interval $J$ (with respect to $(S,{\hb})$, $\varphi$, and $I$).
@@ -1193,7 +1177,7 @@
 		\end{align*}
 		\begin{align*}
 			\textbf{(b) }
-			\bgroup \color{red} \llbracket (S, {\hb}), I \models \varphi_1 \since_J \varphi_2 \rrbracket \egroup = \destutter( \{ u_1 \mathsf{S}^0 u_2 \st &(u_1, u_2) \in P_1' \otimes Q_1' \} \cdot \ldots \\ 
+			\llbracket (S, {\hb}), I \models \varphi_1 \since_J \varphi_2 \rrbracket = \destutter( \{ u_1 \mathsf{S}^0 u_2 \st &(u_1, u_2) \in P_1' \otimes Q_1' \} \cdot \ldots \\ 
 			&\ldots \cdot \{ u_1 \mathsf{S}^0 u_2 \st (u_1, u_2) \in P_k' \otimes Q_k' \} )
 		\end{align*}
 		\caption{Inductive evaluation of timed formulas where $J$ is a bounded interval.
@@ -1219,7 +1203,6 @@
 		\end{multline*}
 	\end{example}
 	
-	\bgroup \color{red}
 	\begin{remark}
 		Consider the formula $\varphi_1 \until_I \varphi_2$ where $\inf I > 0$ and $\sup I = \infty$.
 		We can evaluate this formula similarly to its untimed counterpart $\varphi_1 \until \varphi_2$ (\cref{fig:eval}).
@@ -1228,14 +1211,12 @@
 		In particular, if $\inf I$ coincides with a future segment's left end point, we consider that segment's first bits; otherwise $\inf I$ falls strictly in a segment, in which case we consider all possible truth values of $\varphi_1 \until \varphi_2$ in that segment since signals are asynchronous within each segment.
 		The same applies to timed since formulas.
 	\end{remark}
-	\egroup
-	
+
 	
 	\paragraph*{Computing the Semantics of STL$^+$.}
 	
 	Putting it all together, given a distributed signal $(S, {\hb})$ and an STL$^+$ formula $\varphi$, we can compute $[(S,{\hb}) \models \varphi]_+$ thanks to the following theorem.
 	
-	\bgroup \color{red}
 	\begin{theorem} \label{cl:algo}
 		Consider a distributed signal $(S,{\hb})$ and an STL formula $\varphi$.
 		If $\varphi$ is a future (resp. past) formula, let $f = \first$ (resp. $f = \last$).
@@ -1356,8 +1337,7 @@
 		Then, for all $y \in Y(\varphi, \tr^+(S,{\hb}), I)$ we have $y(0) = 1$, which means every $w \in \tr^+(S,{\hb})$ satisfies $\varphi$, and thus $[(S,{\hb}) \models \varphi]_+ = \top$.
 		The cases of $\bot$ and ${\,?}$ are similar.
 	\end{proof}
-	
-	\egroup
+
 	
 	\begin{figure}
 		\centering
@@ -1430,7 +1410,6 @@
 	If the verdict is inconclusive, i.e., $v = {\,?}$, then compute and return the exact verdict $[(S,{\hb}) \models \varphi]$, else return $v$.
 	We evaluate this approach in \cref{sec:experiments}.
 	
-	\bgroup \color{red}
 	\subsection{Online Algorithm}\label{sec:online}
 	We now focus on the online setting, where the monitor does not have access to the entire signal, but it periodically reads a new \emph{portion} of the distributed signal $(S,{\hb})$ of a fixed length.
 	Our goal is to describe an algorithm that computes, given a past STL formula $\varphi$, the value expressions for the satisfaction of $\varphi$ after reading each new signal portion.
@@ -1585,10 +1564,10 @@
 			\end{tikzpicture}
 		\end{subfigure}
 		\vspace{1ex}
-		\caption{\bgroup \color{red}
+		\caption{
 			Two contrasting approaches to online monitoring with a sampling period of $\Delta$ and a maximum clock skew of $\varepsilon$. The signal (solid arrows) become available incrementally. As new portions of the signal arrive, the monitor stores some part of it (gray boxes around solid arrows). In both approaches, after receiving the $i$th signal portion, the monitor can give a conclusive verdict for time at most $i\Delta-\varepsilon$ with respect to its local clock (dashed lines).
 			\textbf{(a)} The \emph{naive} monitor stores the entire signal it has read so far and computes its verdict from scratch each time a new portion arrives.
-			\textbf{(b)} The \emph{incremental} monitor stores only the current portion it receives and a fraction of the previous portion sufficient to correctly compute the value expressions for the current one. Here, we assume the monitor is able to produce a verdict for time $i\Delta-\varepsilon$ for every $i \geq 1$. Since no edges with timestamps earlier than $i\Delta-2\varepsilon$ can influence the segmentation between $i\Delta-\varepsilon$ and $i\Delta$, the monitor can drop from its memory the signal's prefix of length $i\Delta-2\varepsilon$. \egroup\label{fig:online}}
+			\textbf{(b)} The \emph{incremental} monitor stores only the current portion it receives and a fraction of the previous portion sufficient to correctly compute the value expressions for the current one. Here, we assume the monitor is able to produce a verdict for time $i\Delta-\varepsilon$ for every $i \geq 1$. Since no edges with timestamps earlier than $i\Delta-2\varepsilon$ can influence the segmentation between $i\Delta-\varepsilon$ and $i\Delta$, the monitor can drop from its memory the signal's prefix of length $i\Delta-2\varepsilon$. \label{fig:online}}
 		%	\vspace{1em}
 	\end{figure*}
 	
@@ -1742,8 +1721,7 @@
 	\end{proof}
 	
 	We evaluate the performance of \textsc{Adm-Incr} against \textsc{Adm-Naive} in \cref{sec:experiments}.
-	\egroup
-	
+
 	
 	
 	
@@ -1767,14 +1745,12 @@
 	\begin{resq}[Can the combination of approximate and exact distributed monitors increase efficiency while preserving accuracy?]
 		We are interested in evaluating whether a smart, combined use of approximate and exact distributed monitors can still bring improvements in monitoring efficiency while guaranteeing the accuracy of the monitoring verdicts. 
 	\end{resq}
-	\bgroup \color{red}
 	\begin{resq}[How scalable are online incremental monitors?]
 		The offline monitors can be naively used for online monitoring, which comes with immediate soundness but computational overhead due to redundant computation and using memory carelessly.
 		The alternative, incremental monitoring approach aims to address these issues.
 		We want to understand to which degree the incremental approach achieves this goal and scales to scenarios with high-frequency sampling and large clock skew.
 	\end{resq}
-	\egroup
-	
+
 	\begin{table*}[t]
 		\centering
 		%	\scalebox{0.88}{
@@ -1835,7 +1811,7 @@
 	The specification $\varphi_1$ is an LTL formula in which both the outer temporal operator ($\LTLg$) and the inner Boolean operator ($\wedge$) are conjunctive.
 	The specification $\varphi_2$ combines conjunctive $(\LTLg)$ and disjunctive ($\lor$) operators, and $\varphi_3$ is the usual until operator.
 	The remaining three formulas are the common response formulas, which also combine conjunctive $(\LTLg)$ and disjunctive $(\LTLf, \Rightarrow)$ operators: $\varphi_4$ is the usual LTL variant, $\varphi_5$ and $\varphi_6$ add a bounded real-time response requirement to the previous specification, where the bound of $\varphi_5$ is tighter than that of $\varphi_6$.
-	\textcolor{red}{For online monitoring, we use the past-time variants $\psi_1$ to $\psi_6$ of the formulas described above.}
+	For online monitoring, we use the past-time variants $\psi_1$ to $\psi_6$ of the formulas described above.
 	The specification $\varphi_{WT}$ associated to the water tank case study is an STL formula in which a sum of signals originating from different agents is compared to a constant. Finally, the specification $\varphi_{SD}$ defines a mutual separation property over a swarm of drones, requiring more sophisticated arithmetic operations on signals originating from different agents.
 	
 	%\begin{table}[t]
@@ -1896,7 +1872,6 @@
 
 		
 		
-		\bgroup \color{red}
 		\paragraph*{Random Generator, Online Monitoring.}
 		Figure~\ref{fig:rgresultsOnline} summarizes the results of evaluating specifications $\psi_1$ to $\psi_6$ against distributed traces from RG.
 		As expected, \textsc{Adm-Incr} consistently outperforms \textsc{Adm-Naive}.
@@ -1908,12 +1883,11 @@
 		For timed formulas, performance degrades with larger temporal bounds: smaller bounds complete under 0.5 s, whereas larger bounds take under 1.2 s, reflecting the added cost of profile computation.
 		
 		Per-portion latency remains low.
-		For fixed $\varepsilon$ and $\Delta$, \textsc{Adm-Incr}'s wall time increases linearly with trace length, confirming  $O(1)$ time per portion (unlike \textsc{Adm-Naive}).
+		For fixed $\varepsilon$ and $\Delta$, \textsc{Adm-Incr}'s wall time increases linearly with trace length, confirming $O(1)$ time per portion (unlike \textsc{Adm-Naive}).
 		For untimed formulas, per-portion wall time is well below 0.01 seconds across all settings, demonstrating excellent scalability.
 		This indicates that, even in the slowest configuration (longest trace $d=512$, largest clock skew $\varepsilon=8$, and smallest portion size $\Delta=16$), untimed formulas can be efficiently monitored on traces with a sampling frequency of at least 1.6kHz.
 		For timed formulas, wall time per portion stays below $0.025$ seconds with the smaller bound and below $0.075$ seconds with the larger bound.
-		\egroup
-		
+
 
 		
 		%\vspace{-0.5em}
@@ -1942,7 +1916,7 @@
 		\paragraph*{Summary.}
 		%To answer RQ1, we observe that while the speedup achieved with \textsc{Adm} compared to \textsc{Edm} is consistently very high and in three to five orders of magnitude, the tradeoff between efficiency and accuracy depends largely on the type of specifications, the duration of the input signals and the maximal clock skew. The arithmetic and timed operators are particularly sensitive to the over-approximations of \textsc{Adm} and reduce the accuracy of the method. Untimed temporal properties, especially those in which conjunctive and disjunctive operations are not combined, achieve very high levels of accuracy, resulting in an excellent tradeoff. Given the significant increase of efficiency in \textsc{Adm} compared to \textsc{Edm}, the two methods can be effectively combined even in situations where \textsc{Adm} has low accuracy. The combination of \textsc{Adm} and \textsc{Edm} results consistently in the overall increase of efficiency, thus positively answering RQ2.
 		To answer RQ1, we find that \textsc{Adm} achieves a speedup of three to five orders of magnitude over \textsc{Edm}. However, the efficiency-accuracy tradeoff depends on the type of specifications, input signal duration, and maximal clock skew. Arithmetic and timed operators are particularly affected by \textsc{Adm}'s overapproximations, reducing accuracy. Untimed temporal properties, especially those without mixed conjunctive and disjunctive operations, maintain high accuracy and offer an excellent tradeoff. Despite lower accuracy in some cases, combining \textsc{Adm} and \textsc{Edm} still results in significant gains, positively answering RQ2.
-		\textcolor{red}{In addition, our incremental monitors scale cleanly to online settings: updates take $O(1)$ time per portion and remain robust to large clock skew, keeping latency within real-time budgets. Consequently, they sustain kHz-level sampling without compromising responsiveness, positively answering the scalability question.}
+		In addition, our incremental monitors scale cleanly to online settings: updates take $O(1)$ time per portion and remain robust to large clock skew, keeping latency within real-time budgets. Consequently, they sustain kHz-level sampling without compromising responsiveness, positively answering the scalability question.
 		
 		
 	\section{Conclusion} \label{sec:conclusion}

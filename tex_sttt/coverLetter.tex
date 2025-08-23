@@ -1,0 +1,74 @@
+\documentclass[10pt]{letter}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{color}
+
+\oddsidemargin=0in %.2in
+\evensidemargin=.2in
+\textwidth=6.5in
+\topmargin=-1in
+\textheight=9in
+
+%% \pagestyle{empty}
+\setlength{\textheight}{10.0in} %{8.875in}
+%% \setlength{\columnsep}{2.5pc}
+%% \setlength{\textwidth}{6.875in}
+%% \setlength{\footheight}{0.0in}
+%% \setlength{\topmargin}{0.0in}
+%% \setlength{\oddsidemargin}{-0.25in}
+
+
+\name{\vspace*{-1.5cm}N. Ege  Sara\c{c} \\
+	Corresponding Author  \\ 
+	\vspace*{0.5cm}
+	\hspace*{-0.3cm}
+	\begin{tabular}{lcl}
+		Address & : & Institute of Science and Technology Austria \\
+		&& Am Campus 1, 3400\\
+		&& Klosterneuburg, Austria\\
+		e-mail  & : & ege.sarac@ista.ac.at\\
+	\end{tabular}
+}
+\date{\today}
+
+\begin{document}
+	\begin{letter}
+		{
+			Prof. Abraham and Prof. Abbas\\
+			Guest Editors,\\
+			International Journal on Software Tools for Technology Transfer
+		}
+		
+		\opening{Dear Prof. Abraham and Prof. Abbas,}
+		
+		I hereby submit the manuscript ``Approximate Distributed Monitoring under Partial Synchrony: Balancing Speed \& Accuracy'' co-authored by Borzoo Bonakdarpour, Anik Momtaz, Dejan Ni\v{c}kovi\'{c}, and N. Ege Sara\c{c} to be considered for publication in the STTT Special Issue for RV 2024.
+		
+		The contribution of the manuscript can be summarized as follows:
+		\setlist{nolistsep}
+		\begin{itemize}[noitemsep]
+			\item We introduce a conservative abstraction for distributed runtime verification under partial synchrony that overapproximates interleavings, and thus enables a sound approximate semantics for STL.
+			\item We develop monitoring algorithms that compute the overapproximate semantics: an offline algorithm for both future and past STL, and online algorithms (only past STL) that operate on the incrementally available portions of the trace.
+			\item We present implementation techniques (bit-vector–based representation, asynchronous products, and profile computation for timed operators) and a method to combine approximate and exact SMT-based monitors to preserve precision while improving efficiency.
+			\item We provide a prototype tool and an extensive empirical evaluation on synthetic traces and two real-world case studies (water distribution system and swarm of drones), showing speedups of several orders of magnitude over exact monitors and characterizing when accuracy remains high.
+		\end{itemize}
+		
+		The manuscript is original, has not been simultaneously submitted to a journal, and it extends the following conference paper:
+		\begin{itemize}
+			\item Borzoo Bonakdarpour, Anik Momtaz, Dejan Ni\v{c}kovi\'{c}, and N. Ege Sara\c{c}. Approximate Distributed Monitoring under Partial Synchrony: Balancing Speed \& Accuracy. In Erika Ábrahám and Houssam Abbas, editors, \emph{Runtime Verification - 24th International Conference, RV 2024, Istanbul, Turkey, October 15-17, 2024, Proceedings, volume 15191 of Lecture Notes in Computer Science}, pages 282–301. Springer, 2024.
+		\end{itemize}
+				
+		
+		Compared to the conference version, this manuscript includes the following new material:
+		\begin{itemize}
+			\item Two approximate algorithms for online monitoring of past-time STL: a naive baseline and an incremental algorithm with constant time per portion (for fixed portion size).
+			\item Formal correctness proofs for both online algorithms.
+			\item Experimental evaluation of the two online algorithms.
+			\item Extension of the offline approximate monitor to past-time STL.
+			\item Formal correctness proof for the offline algorithm (moved from the appendix).
+			\item Additional experimental evaluation for the offline algorithm (moved from the appendix).
+		\end{itemize}
+		Thank you for your consideration. 
+		
+		\closing{Best regards,} %\\ \includegraphics[width=0.05\textwidth]{sign.png}
+	\end{letter}
+\end{document}
